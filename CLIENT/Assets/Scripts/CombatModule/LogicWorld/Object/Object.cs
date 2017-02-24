@@ -79,6 +79,7 @@ namespace Combat
         }
         #endregion
 
+        #region Destruct
         public void Destruct()
         {
             OnDestruct();
@@ -96,7 +97,9 @@ namespace Combat
         protected virtual void OnDestruct()
         {
         }
+        #endregion
 
+        #region Construct
         public void InitializeObject(ObjectCreationContext context)
         {
             PreInitializeObject(context);
@@ -176,7 +179,9 @@ namespace Combat
         {
             return ComponentTypeRegistry.IsLogicComponent(component_type_id);
         }
+        #endregion
 
+        #region Components
         public T GetComponent<T>() where T : Component
         {
             Component component;
@@ -199,6 +204,7 @@ namespace Combat
                 return null;
             return GetComponent(type);
         }
+        #endregion
 
         public bool IsDead()
         {

@@ -48,11 +48,19 @@ namespace Combat
         public abstract Entity GetOwnerEntity();
         #endregion
 
-        public virtual void Destruct()
+        #region Destruct
+        public void Destruct()
         {
+            OnDestruct();
             m_parent_object = null;
         }
 
+        public virtual void OnDestruct()
+        {
+        }
+        #endregion
+
+        #region Construct
         public virtual void InitializeProperty(ComponentProperty property)
         {
         }
@@ -73,7 +81,9 @@ namespace Combat
         protected virtual void PostInitializeComponent()
         {
         }
+        #endregion
 
+        #region Enable&Disable
         public void Enable()
         {
             if (m_disable_count > 0)
@@ -103,5 +113,6 @@ namespace Combat
         protected virtual void OnDisable()
         {
         }
+        #endregion
     }
 }
