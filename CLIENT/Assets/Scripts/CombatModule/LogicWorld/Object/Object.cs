@@ -79,8 +79,9 @@ namespace Combat
         }
         #endregion
 
-        public virtual void Destruct()
+        public void Destruct()
         {
+            OnDestruct();
             NotifyGeneratorDestroy();
             RemoveAllListeners();
             var enumerator = m_components.GetEnumerator();
@@ -92,17 +93,15 @@ namespace Combat
             m_components.Clear();
         }
 
+        protected virtual void OnDestruct()
+        {
+        }
+
         public void InitializeObject(ObjectCreationContext context)
         {
             PreInitializeObject(context);
             InitializeComponents(context);
             PostInitializeObject(context);
-            var enumerator = m_components.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                Component component = enumerator.Current.Value;
-                component.AfterObjectCreated();
-            }
         }
 
         protected virtual void PreInitializeObject(ObjectCreationContext context)
@@ -124,7 +123,14 @@ namespace Combat
             while (enumerator.MoveNext())
             {
                 Component component = enumerator.Current.Value;
-                component.PostInitializeComponent();
+                component.InitializeComponent();
+            }
+
+            enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Component component = enumerator.Current.Value;
+                component.OnObjectCreated();
             }
         }
 

@@ -10,10 +10,9 @@ namespace Combat
         {
         }
 
-        public override void Destruct()
+        protected override void OnDestruct()
         {
             m_entities.Clear();
-            base.Destruct();
         }
 
         #region GETTER

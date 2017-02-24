@@ -57,14 +57,21 @@ namespace Combat
         {
         }
 
-        public virtual void PostInitializeComponent()
+        public virtual void InitializeComponent()
         {
         }
 
-        public virtual void AfterObjectCreated()
+        public void OnObjectCreated()
         {
+            PostInitializeComponent();
             if (m_disable_count == 0)
                 OnEnable();
+            else if (m_disable_count > 0)
+                OnDisable();
+        }
+
+        protected virtual void PostInitializeComponent()
+        {
         }
 
         public void Enable()

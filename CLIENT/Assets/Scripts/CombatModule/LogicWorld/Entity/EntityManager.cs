@@ -7,5 +7,17 @@ namespace Combat
             : base(logic_world, IDGenerator.ENTITY_FIRST_ID)
         {
         }
+
+        protected override void AfterObjectCreated(Entity entity)
+        {
+            Player player = entity.GetOwnerPlayer();
+            player.AddEntity(entity);
+        }
+
+        protected override void PreDestroyObject(Entity entity)
+        {
+            Player player = entity.GetOwnerPlayer();
+            player.RemoveEntity(entity);
+        }
     }
 }
