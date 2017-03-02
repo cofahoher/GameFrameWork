@@ -192,7 +192,7 @@ namespace Combat
         {
             m_random_generator.ResetSeed(world_context.m_world_seed);
             m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
-            ObjectConfig object_config = m_outside_world.GetObjectConfig();
+            ObjectConfig object_config = GlobalConfigManager.Instance.GetObjectConfig();
             for (int i = 0; i < world_context.m_players.Count; ++i)
             {
                 ObjectCreationContext context = world_context.m_players[i];

@@ -8,9 +8,18 @@ namespace Combat
         void Reset();  //Reset后，如同刚被构造
     }
 
-    public class ResuableObjectPool<TT> where TT : IRecyclable
+    public class ResuableObjectPool<TT> : Singleton<ResuableObjectPool<TT>> where TT : IRecyclable
     {
         Dictionary<System.Type, List<IRecyclable>> m_pools = new Dictionary<System.Type, List<IRecyclable>>();
+
+        private ResuableObjectPool()
+        {
+        }
+
+        public override void Destruct()
+        {
+            Clear();
+        }
 
         public T Create<T>() where T : IRecyclable, new()
         {
@@ -48,6 +57,40 @@ namespace Combat
                 m_pools[type] = pool;
             }
             pool.Add(instance);
+        }
+
+        public void Clear()
+        {
+            m_pools.Clear();
+        }
+    }
+
+    public class TestRecyclable : IRecyclable
+    {
+        /*
+         * 使用方式：
+         * 
+         * TestRecyclable temp = TestRecyclable.Create();
+         * // 使用temp
+         * TestRecyclable.Recycle(temp);
+         * 
+         */
+        public static TestRecyclable Create()
+        {
+            return ResuableObjectPool<IRecyclable>.Instance.Create<TestRecyclable>();
+        }
+
+        public static void Recycle(TestRecyclable instance)
+        {
+            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+        }
+
+        public TestRecyclable()
+        {
+        }
+
+        public void Reset()
+        {
         }
     }
 }

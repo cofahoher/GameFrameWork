@@ -144,14 +144,14 @@ namespace Combat
             List<ComponentData> components_data = type_data.m_components_data;
             for (int i = 0; i < components_data.Count; ++i)
             {
-                List<ComponentProperty> properties = components_data[i].m_component_properties;
+                List<ComponentVariable> properties = components_data[i].m_component_variables;
                 if (properties == null || properties.Count == 0)
                     continue;
                 Component component = GetComponent(components_data[i].m_component_type_id);
                 if (component == null)
                     continue;
                 for (int j = 0; j < properties.Count; ++j)
-                    component.InitializeProperty(properties[j]);
+                    component.InitializeVariable(properties[j]);
             }
         }
 

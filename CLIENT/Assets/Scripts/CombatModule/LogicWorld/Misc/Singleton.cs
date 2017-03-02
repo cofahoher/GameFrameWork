@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 namespace Combat
 {
@@ -7,9 +9,13 @@ namespace Combat
         void DestroySingleton();
     }
 
-    public abstract class Singleton<T> : ISingleton, IDestruct where T : ISingleton, IDestruct, new()
+    public abstract class Singleton<T> : ISingleton, IDestruct where T : Singleton<T>
     {
-        static T ms_instance;
+        protected static T ms_instance;
+
+        protected Singleton()
+        {
+        }
 
         public static T Instance
         {
@@ -17,7 +23,12 @@ namespace Combat
             {
                 if (ms_instance == null)
                 {
-                    ms_instance = new T();
+                    //感谢yqq指点
+                    ConstructorInfo[] ctors = typeof(T).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic);
+                    ConstructorInfo ctor = Array.Find(ctors, c => c.GetParameters().Length == 0);
+                    if (ctor == null)
+                        throw new Exception("Non-public ctor() not found!");
+                    ms_instance = ctor.Invoke(null) as T;
                     SingletonManager.AddSingleton(ms_instance);
                 }
                 return ms_instance;
@@ -53,6 +64,9 @@ namespace Combat
 
     class TestSingleton : Singleton<TestSingleton>
     {
+        private TestSingleton()
+        {
+        }
         public override void Destruct()
         {
         }

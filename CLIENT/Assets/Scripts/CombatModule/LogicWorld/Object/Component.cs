@@ -61,7 +61,7 @@ namespace Combat
         #endregion
 
         #region Construct
-        public virtual void InitializeProperty(ComponentProperty property)
+        public virtual void InitializeVariable(ComponentVariable property)
         {
         }
 

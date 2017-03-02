@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ComponentProperty
+    public class ComponentVariable
     {
         public string m_key;
         public string m_value;
@@ -10,7 +10,7 @@ namespace Combat
     public class ComponentData
     {
         public int m_component_type_id;
-        public List<ComponentProperty> m_component_properties = new List<ComponentProperty>();
+        public List<ComponentVariable> m_component_variables = new List<ComponentVariable>();
     }
 
     //Object的组件定义
