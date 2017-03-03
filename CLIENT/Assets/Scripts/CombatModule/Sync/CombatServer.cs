@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 namespace Combat
 {
     public class CombatServer : IOutsideWorld
@@ -33,6 +34,7 @@ namespace Combat
 
         public void Initializa(CombatStartInfo combat_start_info)
         {
+            AttributeSystem.Instance.InitializeAllDefinition();
             m_logic_world = new LogicWorld(this, false);
             m_sync_server = new SPSyncServer();
             m_sync_server.Init(m_logic_world);
@@ -75,18 +77,5 @@ namespace Combat
             m_sync_server.Update(current_time);
             m_last_update_time = current_time;
         }
-
-        #region 配置，暂时先放这里
-        LevelConfig m_level_config = new LevelConfig();
-        ObjectConfig m_object_config = new ObjectConfig();
-        public LevelConfig GetLevelConfig()
-        {
-            return m_level_config;
-        }
-        public ObjectConfig GetObjectConfig()
-        {
-            return m_object_config;
-        }
-        #endregion
     }
 }

@@ -8,12 +8,11 @@ namespace Combat
         int m_unturned_frame_count = 0;
         bool m_game_over = false;
 
-        const int MAX_FRONT_PREDICT_PER_UPDATE = 100;
+        const int MAX_FRAME_FORWARD_PER_UPDATE = 100;
 
-        public SPPlayerWorldSynchronizer(ILogicWorld logic_world)
+        public SPPlayerWorldSynchronizer(ILogicWorld logic_world, ICommandSynchronizer command_synchronizer)
+            : base(logic_world, command_synchronizer)
         {
-            m_logic_world = logic_world;
-            m_command_synchronizer = new SPPredictedCommandSynchronizer();
         }
 
         public override void Start(int start_time)
@@ -42,8 +41,8 @@ namespace Combat
             int frame_diff = (forward_end_time - m_forward_start_time) / SyncParam.FRAME_TIME;
             if (frame_diff <= 0)
                 return false;
-            else if (frame_diff > MAX_FRONT_PREDICT_PER_UPDATE)
-                frame_diff = MAX_FRONT_PREDICT_PER_UPDATE;
+            else if (frame_diff > MAX_FRAME_FORWARD_PER_UPDATE)
+                frame_diff = MAX_FRAME_FORWARD_PER_UPDATE;
             for (int i = 0; i < frame_diff; ++i)
             {
                 m_game_over = UpdateLogicFrame();
@@ -70,16 +69,16 @@ namespace Combat
         }
     }
 
+    #region 观战
     public class SPWatcherWorldSynchronizer : WorldSynchronizer
     {
         int m_forward_start_time = 0;
         int m_unturned_frame_count = 0;
         bool m_game_over = false;
 
-        public SPWatcherWorldSynchronizer(ILogicWorld logic_world)
+        public SPWatcherWorldSynchronizer(ILogicWorld logic_world, ICommandSynchronizer command_synchronizer)
+            : base(logic_world, command_synchronizer)
         {
-            m_logic_world = logic_world;
-            m_command_synchronizer = new SPTrustedCommandSynchronizer();
         }
 
         public override void Start(int start_time)
@@ -110,9 +109,11 @@ namespace Combat
                 return false;
             int ready_turn = m_command_synchronizer.GetReadyTurn();
             int turn_diff = ready_turn - m_synchronized_turn;
-            if (turn_diff <= 0)
+            if (turn_diff < 0)
                 return false;
-            int max_frame_diff = turn_diff * SyncParam.FRAME_COUNT_PER_SYNCTURN - m_unturned_frame_count;
+            int max_frame_diff = turn_diff * SyncParam.FRAME_COUNT_PER_SYNCTURN - m_unturned_frame_count + (SyncParam.FRAME_COUNT_PER_SYNCTURN - 1);
+            if (max_frame_diff <= 0)
+                return false;
             if (frame_diff > max_frame_diff)
                 frame_diff = max_frame_diff;
             for (int i = 0; i < frame_diff; ++i)
@@ -140,16 +141,16 @@ namespace Combat
             return false;
         }
     }
+    #endregion
 
     public class SPCheckerWorldSynchronizer : WorldSynchronizer
     {
         bool m_game_over = false;
 
-        public SPCheckerWorldSynchronizer(ILogicWorld logic_world)
+        public SPCheckerWorldSynchronizer(ILogicWorld logic_world, ICommandSynchronizer command_synchronizer)
+            : base(logic_world, command_synchronizer)
         {
-            m_logic_world = logic_world;
-            m_command_synchronizer = new SPTrustedCommandSynchronizer();
-        }        
+        }
 
         public override bool PushLocalCommand(Command command)
         {

@@ -65,6 +65,7 @@ namespace Combat
             m_state = CombatClientState.Loading;
             m_waiting_cnt = 0;
 
+            AttributeSystem.Instance.InitializeAllDefinition();
             m_logic_world = new LogicWorld(this, true);
             m_render_world = new RenderWorld(this, m_logic_world);
             m_sync_client = new SPSyncClient();
@@ -200,7 +201,7 @@ namespace Combat
             if (commands.Count > 0)
             {
                 //ZZWTODO 发送command
-                m_sync_client.ClearOutPutCommand();
+                m_sync_client.ClearOutputCommand();
             }
             m_render_world.OnUpdate(delta_ms, current_time_int);
             m_last_update_time = current_time_int;
@@ -213,7 +214,7 @@ namespace Combat
             if (commands.Count > 0)
             {
                 //ZZWTODO 发送command
-                m_sync_client.ClearOutPutCommand();
+                m_sync_client.ClearOutputCommand();
             }
             m_state = CombatClientState.Ending;
             //ZZWTODO 发送游戏结束
@@ -221,19 +222,6 @@ namespace Combat
 
         void OnUpdateEnding(int current_time_int)
         {
-        }
-        #endregion
-
-        #region 配置，暂时先放这里
-        LevelConfig m_level_config = new LevelConfig();
-        ObjectConfig m_object_config = new ObjectConfig();
-        public LevelConfig GetLevelConfig()
-        {
-            return m_level_config;
-        }
-        public ObjectConfig GetObjectConfig()
-        {
-            return m_object_config;
         }
         #endregion
     }

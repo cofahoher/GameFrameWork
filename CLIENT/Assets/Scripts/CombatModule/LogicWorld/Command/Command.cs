@@ -27,6 +27,15 @@ namespace Combat
             get { return m_syncturn; }
             set { m_syncturn = value; }
         }
+        //具体数据是什么，可以固定为几个int；或者提供序列化接口，以下只是随便写写
+        public int Serialize(char[] buff, int index)
+        {
+            return 0;
+        }
+        public int Unserialize(char[] buff, int index)
+        {
+            return 0;
+        }
     }
 
     public class SyncTurnDoneCommand : Command

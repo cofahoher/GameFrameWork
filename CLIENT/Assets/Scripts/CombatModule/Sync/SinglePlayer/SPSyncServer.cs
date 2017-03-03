@@ -18,14 +18,15 @@ namespace Combat
         public override void Init(ILogicWorld logic_world)
         {
             m_logic_world = logic_world;
-            m_world_syhchronizer = new SPCheckerWorldSynchronizer(logic_world);
+            m_command_synchronizer = new MNLPServerCommandSynchronizer();
+            m_world_syhchronizer = new SPCheckerWorldSynchronizer(logic_world, m_command_synchronizer);
         }
 
         public override void AddPlayer(long player_pstid)
         {
             PlayerSyncData psd = new PlayerSyncData();
             m_sync_data_of_players[player_pstid] = psd;
-            m_world_syhchronizer.AddPlayer(player_pstid);
+            m_command_synchronizer.AddPlayer(player_pstid);
         }
 
         public override void RemovePlayer(long player_pstid)
@@ -34,7 +35,11 @@ namespace Combat
             if (!m_sync_data_of_players.TryGetValue(player_pstid, out psd))
                 return;
             psd.SyncState = PlayerSyncData.SYNC_STATE_DEAD;
-            m_world_syhchronizer.RemovePlayer(player_pstid);
+            m_command_synchronizer.RemovePlayer(player_pstid);
+        }
+
+        public override void UpdatePlayerLatency(long player_pstid, int latency)
+        {
         }
 
         public override void Start(int current_time)
