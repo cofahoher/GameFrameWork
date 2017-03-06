@@ -8,7 +8,7 @@ namespace Combat
         void AddPlayer(long player_pstid);
         void RemovePlayer(long player_pstid);
         void UpdatePlayerLatency(long player_pstid, int latency);
-        void Start(int current_time);
+        void Start(int current_time, int latency);
         void Update(int current_time);
         void PushClientCommand(Command command);
         void AddOutputCommand(Command command);
@@ -40,7 +40,7 @@ namespace Combat
         public abstract void AddPlayer(long player_pstid);
         public abstract void RemovePlayer(long player_pstid);
         public abstract void UpdatePlayerLatency(long player_pstid, int latency);
-        public abstract void Start(int current_time);
+        public abstract void Start(int current_time, int latency);
         public abstract void Update(int current_time);
         public abstract void PushClientCommand(Command command);
         public void AddOutputCommand(Command command)

@@ -42,7 +42,7 @@ namespace Combat
         {
         }
 
-        public override void Start(int current_time)
+        public override void Start(int current_time, int latency)
         {
             m_start_time = current_time;
             m_world_syhchronizer.Start(current_time);

@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class CombatServer : IOutsideWorld
+    public class TestCombatServer : IOutsideWorld
     {        
         int m_start_time = -1;
         int m_last_update_time = -1;
-        LogicWorld m_logic_world;
+        TestLogicWorld m_logic_world;
         ISyncServer m_sync_server;
 
-        public CombatServer()
+        public TestCombatServer()
         {
         }
 
@@ -22,7 +22,7 @@ namespace Combat
         }
 
         #region GETTER
-        public LogicWorld GetLogicWorld()
+        public TestLogicWorld GetLogicWorld()
         {
             return m_logic_world;
         }
@@ -32,14 +32,11 @@ namespace Combat
         }
         #endregion
 
-        public void Initializa(CombatStartInfo combat_start_info)
+        public void Initializa()
         {
-            AttributeSystem.Instance.InitializeAllDefinition();
-            m_logic_world = new LogicWorld(this, false);
-            m_sync_server = new SPSyncServer();
+            m_logic_world = new TestLogicWorld(this);
+            m_sync_server = new MNLPSyncServer();
             m_sync_server.Init(m_logic_world);
-            WorldCreationContext world_context = WorldCreationContext.CreateWorldCreationContext(combat_start_info);
-            m_logic_world.BuildLogicWorld(world_context);
         }
         
         public void AddPlayer(long player_pstid)
@@ -47,11 +44,11 @@ namespace Combat
             m_sync_server.AddPlayer(player_pstid);
         }
 
-        public void StartCombat(int current_time_int)
+        public void StartCombat(int current_time_int, int latency)
         {
             m_start_time = current_time_int;
             m_last_update_time = 0;
-            m_sync_server.Start(0, 0);
+            m_sync_server.Start(0, latency);
         }
 
         public int GetCurrentTime()

@@ -215,6 +215,8 @@ namespace Combat
 
         public void OnGameOver(bool is_dropout, long winner_player_pstid)
         {
+            if (m_game_over)
+                return;
             m_game_over = true;
             m_outside_world.OnGameOver(is_dropout, m_current_frame, winner_player_pstid);
         }

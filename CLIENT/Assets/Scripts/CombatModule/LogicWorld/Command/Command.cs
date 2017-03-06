@@ -6,6 +6,7 @@ namespace Combat
     {
         Invalid = 0,
         SyncTurnDone = 1,
+        RandomTest = 100,
     }
 
     public class Command
@@ -43,6 +44,20 @@ namespace Combat
         public SyncTurnDoneCommand()
         {
             m_type = CommandType.SyncTurnDone;
+        }
+    }
+
+    public class RandomTestCommand : Command
+    {
+        int m_random = 0;
+        public RandomTestCommand()
+        {
+            m_type = CommandType.RandomTest;
+        }
+        public int Random
+        {
+            get { return m_random; }
+            set { m_random = value; }
         }
     }
 }
