@@ -148,6 +148,16 @@ namespace Combat
         {
         }
 
+        public int GetCurrentFrame()
+        {
+            return m_current_frame;
+        }
+
+        public uint GetCRC()
+        {
+            return 0;
+        }
+
         #region 回合制
         public void OnTurnBegin()
         {

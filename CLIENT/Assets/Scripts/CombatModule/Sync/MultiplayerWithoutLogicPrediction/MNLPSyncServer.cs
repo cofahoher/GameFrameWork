@@ -18,7 +18,7 @@ namespace Combat
         {
             m_logic_world = logic_world;
             m_command_synchronizer = new MNLPServerCommandSynchronizer();
-            m_world_syhchronizer = new MNLPServerWorldSynchronizer(this, logic_world, m_command_synchronizer);
+            m_world_syhchronizer = new MNLPServerWorldSynchronizer(logic_world, m_command_synchronizer);
         }
 
         public override void AddPlayer(long player_pstid)
@@ -84,7 +84,7 @@ namespace Combat
         void OnTurnEnd(int turn_index)
         {
             List<Command> commands = m_command_synchronizer.GetCommands(turn_index);
-            if (commands.Count > 0)
+            if (commands != null && commands.Count > 0)
             {
                 for (int j = 0; j < commands.Count; ++j)
                     AddOutputCommand(commands[j]);

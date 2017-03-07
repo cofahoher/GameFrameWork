@@ -15,6 +15,7 @@ namespace Combat
 
     public class TestCombatClient : IOutsideWorld
     {
+        INetwork m_network;
         SyncModelClient m_sync_model;
         long m_local_player_pstid = -1;
 
@@ -33,6 +34,7 @@ namespace Combat
 
         public TestCombatClient(SyncModelClient sync_model)
         {
+            m_network = sync_model.GetNetwork();
             m_sync_model = sync_model;
         }
 
@@ -67,7 +69,7 @@ namespace Combat
             m_state = TestCombatClientState.Loading;
             m_waiting_cnt = 0;
 
-            m_logic_world = new TestLogicWorld(this);
+            m_logic_world = new TestLogicWorld(this, true);
             m_render_world = new TestRenderWorld(this, m_logic_world);
             m_sync_client = new MNLPSyncClient();
             m_sync_client.Init(m_logic_world, this);
@@ -183,7 +185,9 @@ namespace Combat
             int delta_ms = current_time_int - m_last_update_time;
             m_render_world.OnUpdate(delta_ms, current_time_int);
             m_last_update_time = current_time_int;
-            m_sync_model.OnLoadingComplete();
+            NetworkMessages_LoadingComplete msg = new NetworkMessages_LoadingComplete();
+            msg.PlayerPstid = m_local_player_pstid;
+            m_network.SendToServer(msg);
         }
 
         void OnUpdateRunning(int current_time_int)
@@ -196,7 +200,11 @@ namespace Combat
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
-                m_sync_model.SendSyncCommands(commands);
+                NetworkMessages_SyncCommands msg = new NetworkMessages_SyncCommands();
+                msg.PlayerPstid = m_local_player_pstid;
+                for (int i = 0; i < commands.Count; ++i)
+                    msg.AddCommand(commands[i]);
+                m_network.SendToServer(msg);
                 m_sync_client.ClearOutputCommand();
             }
             m_render_world.OnUpdate(delta_ms, current_time_int);
@@ -209,11 +217,18 @@ namespace Combat
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
-                m_sync_model.SendSyncCommands(commands);
+                NetworkMessages_SyncCommands msg = new NetworkMessages_SyncCommands();
+                msg.PlayerPstid = m_local_player_pstid;
+                for (int i = 0; i < commands.Count; ++i)
+                    msg.AddCommand(commands[i]);
+                m_network.SendToServer(msg);
                 m_sync_client.ClearOutputCommand();
             }
             m_state = TestCombatClientState.Ending;
-            m_sync_model.OnGameOver();
+            NetworkMessages_GameOver msg2 = new NetworkMessages_GameOver();
+            msg2.PlayerPstid = m_local_player_pstid;
+            msg2.m_crc = m_logic_world.GetCRC();
+            m_network.SendToServer(msg2);
         }
 
         void OnUpdateEnding(int current_time_int)

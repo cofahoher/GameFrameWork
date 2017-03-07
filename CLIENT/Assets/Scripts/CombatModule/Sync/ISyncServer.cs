@@ -13,7 +13,7 @@ namespace Combat
         void PushClientCommand(Command command);
         void AddOutputCommand(Command command);
         List<Command> GetOutputCommands();
-        void ClearOutPutCommand();
+        void ClearOutputCommand();
     }
 
     public abstract class SyncServer : ISyncServer
@@ -51,7 +51,7 @@ namespace Combat
         {
             return m_output_commands;
         }
-        public void ClearOutPutCommand()
+        public void ClearOutputCommand()
         {
             m_output_commands.Clear();
         }

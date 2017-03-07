@@ -9,7 +9,7 @@ namespace Combat
         RandomGenerator m_random_generator = new RandomGenerator();
         bool m_started = false;
         int m_time = 0;
-        int m_interval = 50;
+        int m_interval = 1000;
 
         public TestRenderWorld(TestCombatClient combat_client, TestLogicWorld logic_world)
         {

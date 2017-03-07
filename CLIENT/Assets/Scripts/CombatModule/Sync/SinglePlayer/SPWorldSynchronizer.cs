@@ -52,7 +52,7 @@ namespace Combat
                     ++m_synchronized_turn;
                     m_unturned_frame_count = 0;
                     List<Command> commands = m_command_synchronizer.GetCommands(m_synchronized_turn);
-                    if (commands.Count > 0)
+                    if (commands != null && commands.Count > 0)
                     {
                         for (int j = 0; j < commands.Count; ++j)
                             m_logic_world.HandleCommand(commands[j]);
@@ -125,7 +125,7 @@ namespace Combat
                     ++m_synchronized_turn;
                     m_unturned_frame_count = 0;
                     List<Command> commands = m_command_synchronizer.GetCommands(m_synchronized_turn);
-                    if (commands.Count > 0)
+                    if (commands != null && commands.Count > 0)
                     {
                         for (int j = 0; j < commands.Count; ++j)
                             m_logic_world.HandleCommand(commands[j]);
@@ -183,7 +183,7 @@ namespace Combat
                 m_game_over = UpdateLogicTurn();
                 ++m_synchronized_turn;
                 List<Command> commands = m_command_synchronizer.GetCommands(m_synchronized_turn);
-                if (commands.Count > 0)
+                if (commands != null && commands.Count > 0)
                 {
                     for (int j = 0; j < commands.Count; ++j)
                         m_logic_world.HandleCommand(commands[j]);

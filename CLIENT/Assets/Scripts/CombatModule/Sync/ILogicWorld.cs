@@ -17,10 +17,15 @@ namespace Combat
         void HandleCommand(Command command);
         //世界拷贝，不用实现
         void CopyFrom(ILogicWorld parallel_world);
+        //FRAME
+        int GetCurrentFrame();
+        //CRC
+        uint GetCRC();
     }
 
     public class DummyLogicWorld : ILogicWorld
     {
+        int m_current_frame = 0;
         public void Destruct()
         {
         }
@@ -29,6 +34,7 @@ namespace Combat
         }
         public bool OnUpdate(int delta_ms)
         {
+            ++m_current_frame;
             return false;
         }
         public bool IsGameOver()
@@ -40,6 +46,14 @@ namespace Combat
         }
         public void CopyFrom(ILogicWorld parallel_world)
         {
+        }
+        public int GetCurrentFrame()
+        {
+            return m_current_frame;
+        }
+        public uint GetCRC()
+        {
+            return 0;
         }
     }
 }
