@@ -12,17 +12,17 @@ namespace Combat
 
     public class LevelConfig
     {
-        public Dictionary<string, LevelData> m_level_data;
+        public Dictionary<int, LevelData> m_level_data = new Dictionary<int,LevelData>();
 
         public LevelConfig()
         {
             InitDummyConfigData();
         }
 
-        public LevelData GetLevelData(string level_name)
+        public LevelData GetLevelData(int level_id)
         {
             LevelData level_data = null;
-            if (!m_level_data.TryGetValue(level_name, out level_data))
+            if (!m_level_data.TryGetValue(level_id, out level_data))
                 return null;
             return level_data;
         }
@@ -30,6 +30,9 @@ namespace Combat
         public void InitDummyConfigData()
         {
             //假装有配置
+            LevelData level_data = new LevelData();
+            level_data.m_scene_name = "Scenes/zzw_test";
+            m_level_data[1] = level_data;
         }
     }
 }

@@ -12,6 +12,16 @@ namespace Combat
         {
         }
 
+        public void Destruct()
+        {
+            OnDestruct();
+            m_parent_object = null;
+        }
+
+        public virtual void OnDestruct()
+        {
+        }
+
         #region GETTER
         public Object ParentObject
         {
@@ -48,21 +58,10 @@ namespace Combat
         public abstract Entity GetOwnerEntity();
         #endregion
 
-        #region Destruct
-        public void Destruct()
+        #region 初始化
+        public virtual void InitializeVariable(Dictionary<string, string> variables)
         {
-            OnDestruct();
-            m_parent_object = null;
-        }
-
-        public virtual void OnDestruct()
-        {
-        }
-        #endregion
-
-        #region Construct
-        public virtual void InitializeVariable(ComponentVariable property)
-        {
+            //ZZWTODO 有没有更好的方式？
         }
 
         public virtual void InitializeComponent()

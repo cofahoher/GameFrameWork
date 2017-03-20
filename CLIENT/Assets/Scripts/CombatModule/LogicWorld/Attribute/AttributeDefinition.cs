@@ -52,8 +52,9 @@ namespace Combat
         {
             AttributeFormulaEvaluationContext context = AttributeFormulaEvaluationContext.Create();
             context.Initialize(obj, null);
-            return m_formula.ComputeValue(context);
+            int result = m_formula.ComputeValue(context);
             AttributeFormulaEvaluationContext.Recycle(context);
+            return result;
         }
 
         public void Reflect(Object obj, Attribute attribute)

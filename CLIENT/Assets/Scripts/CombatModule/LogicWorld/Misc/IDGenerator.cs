@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class IDGenerator
+    public class IDGenerator : IDestruct
     {
-        public const int DEFAULT_FIRST_ID             = -1000000;
+        public const int INVALID_FIRST_ID             = -1000000;
         public const int PLAYER_FIRST_ID              =  1;
         public const int ENTITY_FIRST_ID              =  100;
         public const int ABILITY_FIRST_ID             =  1000000;
@@ -15,9 +15,13 @@ namespace Combat
 
         int m_next_id = 0;
 
-        public IDGenerator(int first_id = DEFAULT_FIRST_ID)
+        public IDGenerator(int first_id = INVALID_FIRST_ID)
         {
             m_next_id = first_id;
+        }
+
+        public void Destruct()
+        {
         }
 
         public int GenID()

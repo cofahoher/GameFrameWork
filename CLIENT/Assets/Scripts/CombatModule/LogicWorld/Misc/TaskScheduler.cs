@@ -2,31 +2,32 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class TaskScheduler : IDestruct
+    public class TaskScheduler<TContext> : IDestruct
     {
-        System.Object m_context;
-        Heap<Task> m_queue = new Heap<Task>(Heap<Task>.CheckPriorityMethod.CPM_LESS);
+        TContext m_context;
+        Heap<Task<TContext>> m_queue = new Heap<Task<TContext>>(Heap<Task<TContext>>.CheckPriorityMethod.CPM_LESS);
 
-        public TaskScheduler(System.Object context)
+        public TaskScheduler(TContext context)
         {
             m_context = context;
         }
 
         public void Destruct()
         {
-            m_context = null;
+            m_context = default(TContext);
             m_queue.Clear();
         }
 
-        public void Schedule(Task task, int current_time, int delay = 0, int period = -1)
+        public void Schedule(Task<TContext> task, int current_time, int delay = 0, int period = -1)
         {
+            task.SetTaskScheduler(this);
             task.ScheduleTime = current_time;
             task.Period = period;
             task.NextExecutionTime = current_time + delay;
             m_queue.Enqueue(task);
         }
 
-        public void Cancel(Task task)
+        public void Cancel(Task<TContext> task)
         {
             m_queue.Remove(task);
         }
@@ -35,7 +36,7 @@ namespace Combat
         {
             while (true)
             {
-                Task task = m_queue.Peek();
+                Task<TContext> task = m_queue.Peek();
                 if (task == null || task.NextExecutionTime > current_time)
                     break;
                 int delta_time = 0;
@@ -55,10 +56,10 @@ namespace Combat
             }
         }
     }
-    
-    public class Task : HeapItem, IRecyclable
+
+    public abstract class Task<TContext> : HeapItem, IRecyclable, IDestruct
     {
-        protected TaskScheduler m_scheduler;
+        protected TaskScheduler<TContext> m_scheduler;
         protected int m_schedule_time = -1;
         protected int m_period = -1;
         protected int m_next_execution_time = -1;
@@ -79,11 +80,11 @@ namespace Combat
             set { m_next_execution_time = value; }
         }
 
-        public TaskScheduler GetTaskScheduler()
+        public TaskScheduler<TContext> GetTaskScheduler()
         {
             return m_scheduler;
         }
-        public void SetTaskScheduler(TaskScheduler scheduler)
+        public void SetTaskScheduler(TaskScheduler<TContext> scheduler)
         {
             m_scheduler = scheduler;
         }
@@ -125,13 +126,11 @@ namespace Combat
             return IsInHeap();
         }
 
-        public virtual void Run(System.Object context, int current_time, int delta_time)
-        {
-        }
+        public abstract void Run(TContext context, int current_time, int delta_time);
 
         public override int CompareTo(object obj)
         {
-            Task item = obj as Task;
+            Task<TContext> item = obj as Task<TContext>;
             if (item == null)
                 return -1;
             int result = m_next_execution_time - item.m_next_execution_time;

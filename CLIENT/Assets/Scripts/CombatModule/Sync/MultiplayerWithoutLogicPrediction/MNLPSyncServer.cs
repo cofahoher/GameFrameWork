@@ -84,7 +84,7 @@ namespace Combat
         void OnTurnEnd(int turn_index)
         {
             List<Command> commands = m_command_synchronizer.GetCommands(turn_index);
-            if (commands != null && commands.Count > 0)
+            if (commands != null)
             {
                 for (int j = 0; j < commands.Count; ++j)
                     AddOutputCommand(commands[j]);

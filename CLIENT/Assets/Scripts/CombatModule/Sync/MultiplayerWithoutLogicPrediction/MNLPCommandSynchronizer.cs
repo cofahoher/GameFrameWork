@@ -16,6 +16,7 @@ namespace Combat
                 int syncturn = command.SyncTurn;
                 if (syncturn > m_ready_turn)
                     m_ready_turn = syncturn;
+                return false;
             }
             return base.AddCommand(command);
         }

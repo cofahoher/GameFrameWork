@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    enum CombatClientState
+    public enum CombatClientState
     {
         None = 0,
         Loading = 1,
@@ -16,10 +16,6 @@ namespace Combat
     public class CombatClient : IOutsideWorld
     {
         long m_local_player_pstid = -1;
-
-        bool m_is_dropout = false;
-        int m_end_frame = -1;
-        long m_winner_player_pstid = 0;
 
         CombatClientState m_state = CombatClientState.None;
         int m_state_start_time = -1;
@@ -45,6 +41,10 @@ namespace Combat
         }
 
         #region GETTER
+        public CombatClientState CurrentState
+        {
+            get { return m_state; }
+        }
         public LogicWorld GetLogicWorld()
         {
             return m_logic_world;
@@ -57,24 +57,32 @@ namespace Combat
         {
             return m_sync_client;
         }
+        public long LocalPlayerPstid
+        {
+            get { return m_local_player_pstid; }
+        }
         #endregion
 
+        #region 和局外的接口
         public void Initializa(long local_player_pstid, CombatStartInfo combat_start_info)
         {
             m_local_player_pstid = local_player_pstid;
             m_state = CombatClientState.Loading;
+            m_state_start_time = -1;
+            m_last_update_time = -1;
             m_waiting_cnt = 0;
 
             AttributeSystem.Instance.InitializeAllDefinition();
-            m_logic_world = new LogicWorld(this, true);
-            m_render_world = new RenderWorld(this, m_logic_world);
+            m_logic_world = new MyLogicWorld(this, true);
+            m_render_world = new MyRenderWorld(this, m_logic_world);
             m_sync_client = new SPSyncClient();
-            m_sync_client.Init(m_logic_world, this);
+            m_sync_client.Init(m_logic_world);
 
             WorldCreationContext world_context = WorldCreationContext.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
             ++m_waiting_cnt;
-            m_render_world.LoadScene();
+            LevelData level_data = GlobalConfigManager.Instance.GetLevelConfig().GetLevelData(combat_start_info.m_level_id);
+            m_render_world.LoadScene(level_data.m_scene_name);
         }
 
         public void AddPlayer(long player_pstid)
@@ -89,6 +97,7 @@ namespace Combat
             m_last_update_time = 0;
             m_sync_client.Start(0, m_local_player_pstid, 200);
         }
+        #endregion
 
         #region RESOURCE
         public void OnSceneLoaded()
@@ -112,9 +121,12 @@ namespace Combat
         {
             m_render_world.OnUpdate(0, 0);
             m_state = CombatClientState.Loaded;
+            m_state_start_time = -1;
+            m_last_update_time = -1;
         }
         #endregion
 
+        #region IOutsideWorld
         public int GetCurrentTime()
         {
             float float_time = UnityEngine.Time.unscaledTime;
@@ -126,18 +138,15 @@ namespace Combat
             m_render_world.OnGameStart();
         }
 
-        public void OnGameOver(bool is_dropout, int end_frame, long winner_player_pstid)
+        public void OnGameOver(GameResult game_result)
         {
-            m_is_dropout = is_dropout;
-            m_end_frame = end_frame;
-            m_winner_player_pstid = winner_player_pstid;
             m_state = CombatClientState.GameOver;
         }
+        #endregion
 
         #region UPDATE
-        public void OnUpdate(float current_time_float)
+        public void OnUpdate(int current_time_int)
         {
-            int current_time_int = (int)(current_time_float * 1000);
             switch (m_state)
             {
             case CombatClientState.None:
@@ -176,17 +185,17 @@ namespace Combat
 
         void OnUpdateLoaded(int current_time_int)
         {
+            //ZZWTODO 通知服务器
             m_state = CombatClientState.WaitingForStart;
             m_state_start_time = current_time_int;
             m_last_update_time = current_time_int;
+            m_render_world.OnUpdate(0, 0);
         }
 
         void OnUpdateWaitingForStart(int current_time_int)
         {
-            int delta_ms = current_time_int - m_last_update_time;
-            m_render_world.OnUpdate(delta_ms, current_time_int);
             m_last_update_time = current_time_int;
-            //ZZWTODO 等待
+            //ZZWTODO 等待服务器或者自己直接开始
             StartCombat(current_time_int);
         }
 
@@ -200,7 +209,7 @@ namespace Combat
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
-                //ZZWTODO 发送command
+                //ZZWTODO 这里发送或者局外自己取
                 m_sync_client.ClearOutputCommand();
             }
             m_render_world.OnUpdate(delta_ms, current_time_int);
@@ -213,11 +222,11 @@ namespace Combat
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
-                //ZZWTODO 发送command
+                //ZZWTODO 这里发送或者局外自己取
                 m_sync_client.ClearOutputCommand();
             }
             m_state = CombatClientState.Ending;
-            //ZZWTODO 发送游戏结束
+            //ZZWTODO 通知局外
         }
 
         void OnUpdateEnding(int current_time_int)

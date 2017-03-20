@@ -2,7 +2,14 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class DamageModifier
+    public class DamageModifier : IDestruct
     {
+        public DamageModifier()
+        {
+        }
+
+        public void Destruct()
+        {
+        }
     }
 }

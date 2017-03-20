@@ -22,7 +22,5 @@ namespace Combat
         int m_type_id = -1;
         int m_proto_id = -1;
         int m_level = -1;
-        //int m_formation_position = -1;
-        SortedDictionary<string, string> m_custom_data;
     }
 }

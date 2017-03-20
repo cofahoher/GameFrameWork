@@ -22,7 +22,7 @@ namespace Combat
         }
     }
 
-    public class Heap<T> where T : HeapItem
+    public class Heap<T> : IDestruct where T : HeapItem
     {
         public enum CheckPriorityMethod
         {

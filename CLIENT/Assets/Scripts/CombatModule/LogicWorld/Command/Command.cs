@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public enum CommandType
+    public partial class CommandType
     {
-        Invalid = 0,
-        SyncTurnDone = 1,
-        RandomTest = 100,
+        public const int Invalid = 0;
+        public const int SyncTurnDone = 1;
+        public const int RandomTest = 2;
     }
 
     public class Command
     {
         protected long m_player_pstid = -1;
-        protected CommandType m_type = CommandType.Invalid;
+        protected int m_type = CommandType.Invalid;
         protected int m_syncturn = -1;
         public long PlayerPstid
         {
             get { return m_player_pstid; }
             set { m_player_pstid = value; }
         }
-        public CommandType Type
+        public int Type
         {
             get { return m_type; }
         }
@@ -49,15 +49,10 @@ namespace Combat
 
     public class RandomTestCommand : Command
     {
-        int m_random = 0;
+        public int m_random = 0;
         public RandomTestCommand()
         {
             m_type = CommandType.RandomTest;
-        }
-        public int Random
-        {
-            get { return m_random; }
-            set { m_random = value; }
         }
     }
 }

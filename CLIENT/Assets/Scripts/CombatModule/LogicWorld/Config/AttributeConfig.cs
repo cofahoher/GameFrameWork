@@ -14,7 +14,7 @@ namespace Combat
 
     public class AttrubuteConfig
     {
-        public SortedDictionary<int, AttributeData> m_attributes_data;
+        public SortedDictionary<int, AttributeData> m_attributes_data = new SortedDictionary<int,AttributeData>();
 
         public AttrubuteConfig()
         {

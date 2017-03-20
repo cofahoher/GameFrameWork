@@ -12,17 +12,39 @@ namespace Combat
         RenderEntity,
     }
 
-    public class Object : SignalGenerator, ILogicOwnerInfo, IDestruct
+    public abstract class Object : SignalGenerator, ILogicOwnerInfo, IDestruct
     {
         protected ObjectCreationContext m_context;
-        protected SortedDictionary<System.Type, Component> m_components = new SortedDictionary<System.Type, Component>();
+        protected SortedDictionary<int, Component> m_components = new SortedDictionary<int, Component>();
         protected bool m_is_delete_pending = false;
 
         public Object()
         {
         }
 
+        public void Destruct()
+        {
+            OnDestruct();
+            NotifyGeneratorDestroy();
+            RemoveAllListeners();
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Component component = enumerator.Current.Value;
+                component.Destruct();
+            }
+            m_components.Clear();
+        }
+
+        protected virtual void OnDestruct()
+        {
+        }
+
         #region GETTER
+        public ObjectCreationContext GetCreationContext()
+        {
+            return m_context;
+        }
         public int ID
         {
             get { return m_context.m_object_id; }
@@ -79,29 +101,10 @@ namespace Combat
         }
         #endregion
 
-        #region Destruct
-        public void Destruct()
-        {
-            OnDestruct();
-            NotifyGeneratorDestroy();
-            RemoveAllListeners();
-            var enumerator = m_components.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                Component component = enumerator.Current.Value;
-                component.Destruct();
-            }
-            m_components.Clear();
-        }
-
-        protected virtual void OnDestruct()
-        {
-        }
-        #endregion
-
-        #region Construct
+        #region 初始化
         public void InitializeObject(ObjectCreationContext context)
         {
+            m_context = context;
             PreInitializeObject(context);
             InitializeComponents(context);
             PostInitializeObject(context);
@@ -113,12 +116,10 @@ namespace Combat
 
         void InitializeComponents(ObjectCreationContext context)
         {
-            m_context = context;
             List<ComponentData> components_data = context.m_type_data.m_components_data;
             for (int i = 0; i < components_data.Count; ++i)
                 AddComponent(components_data[i].m_component_type_id);
-            InitializeComponentProperties(context.m_type_data);
-            InitializeComponentProperties(context.m_custom_data);
+            InitializeComponentVariables(context.m_type_data);
 
             //ZZWTODO context.m_proto_data attribute skill
 
@@ -137,21 +138,22 @@ namespace Combat
             }
         }
 
-        void InitializeComponentProperties(ObjectTypeData type_data)
+        void InitializeComponentVariables(ObjectTypeData type_data)
         {
             if (type_data == null)
                 return;
             List<ComponentData> components_data = type_data.m_components_data;
             for (int i = 0; i < components_data.Count; ++i)
             {
-                List<ComponentVariable> properties = components_data[i].m_component_variables;
-                if (properties == null || properties.Count == 0)
+                if (!IsSuitableComponent(components_data[i].m_component_type_id))
+                    continue;
+                Dictionary<string, string> variables = components_data[i].m_component_variables;
+                if (variables == null || variables.Count == 0)
                     continue;
                 Component component = GetComponent(components_data[i].m_component_type_id);
                 if (component == null)
                     continue;
-                for (int j = 0; j < properties.Count; ++j)
-                    component.InitializeVariable(properties[j]);
+                component.InitializeVariable(variables);
             }
         }
 
@@ -161,21 +163,18 @@ namespace Combat
 
         Component AddComponent(int component_type_id)
         {
-            if (!CanAddComponent(component_type_id))
+            if (!IsSuitableComponent(component_type_id))
                 return null;
-            System.Type type = ComponentTypeRegistry.GetComponentClassType(component_type_id);
-            if (type == null)
-                return null;
-            Component component = System.Activator.CreateInstance(type) as Component;
+            Component component = ComponentTypeRegistry.CreateComponent(component_type_id);
             if (component == null)
                 return null;
             component.ParentObject = this;
             component.ComponentTypeID = component_type_id;
-            m_components[type] = component;
+            m_components[component_type_id] = component;
             return component;
         }
 
-        protected virtual bool CanAddComponent(int component_type_id)
+        protected virtual bool IsSuitableComponent(int component_type_id)
         {
             return ComponentTypeRegistry.IsLogicComponent(component_type_id);
         }
@@ -185,7 +184,8 @@ namespace Combat
         public T GetComponent<T>() where T : Component
         {
             Component component;
-            if (!m_components.TryGetValue(typeof(T), out component))
+            int component_type_id = ComponentTypeRegistry.ComponentType2ID(typeof(T));
+            if (!m_components.TryGetValue(component_type_id, out component))
                 return null;
             return component as T;
         }
@@ -193,16 +193,16 @@ namespace Combat
         public Component GetComponent(System.Type type)
         {
             Component component;
-            m_components.TryGetValue(type, out component);
+            int component_type_id = ComponentTypeRegistry.ComponentType2ID(type);
+            m_components.TryGetValue(component_type_id, out component);
             return component;
         }
 
         public Component GetComponent(int component_type_id)
         {
-            System.Type type = ComponentTypeRegistry.GetComponentClassType(component_type_id);
-            if (type == null)
-                return null;
-            return GetComponent(type);
+            Component component;
+            m_components.TryGetValue(component_type_id, out component);
+            return component;
         }
         #endregion
 

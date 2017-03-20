@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 namespace Combat
 {
+    enum CombatServerState
+    {
+        NotRunning = 0,
+        Running,
+    }
     public class CombatServer : IOutsideWorld
-    {        
+    {
+        CombatServerState m_state = CombatServerState.NotRunning;
         int m_start_time = -1;
         int m_last_update_time = -1;
+
         LogicWorld m_logic_world;
         ISyncServer m_sync_server;
 
@@ -35,7 +42,7 @@ namespace Combat
         public void Initializa(CombatStartInfo combat_start_info)
         {
             AttributeSystem.Instance.InitializeAllDefinition();
-            m_logic_world = new LogicWorld(this, false);
+            m_logic_world = new MyLogicWorld(this, false);
             m_sync_server = new SPSyncServer();
             m_sync_server.Init(m_logic_world);
             WorldCreationContext world_context = WorldCreationContext.CreateWorldCreationContext(combat_start_info);
@@ -49,6 +56,7 @@ namespace Combat
 
         public void StartCombat(int current_time_int)
         {
+            m_state = CombatServerState.Running;
             m_start_time = current_time_int;
             m_last_update_time = 0;
             m_sync_server.Start(0, 0);
@@ -64,12 +72,14 @@ namespace Combat
             //NOUSE
         }
 
-        public void OnGameOver(bool is_dropout, int end_frame, long winner_player_pstid)
+        public void OnGameOver(GameResult game_result)
         {
         }
 
         public void OnUpdate(int current_time_int)
         {
+            if (m_state != CombatServerState.Running)
+                return;
             int current_time = current_time_int - m_start_time;
             int delta_ms = current_time - m_last_update_time;
             if (delta_ms < 0)

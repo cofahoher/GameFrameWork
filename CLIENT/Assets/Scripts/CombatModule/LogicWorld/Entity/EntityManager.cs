@@ -9,16 +9,23 @@ namespace Combat
         {
         }
 
+        protected override Entity CreateObjectInstance()
+        {
+            return new Entity();
+        }
+
         protected override void AfterObjectCreated(Entity entity)
         {
             Player player = entity.GetOwnerPlayer();
             player.AddEntity(entity);
+            m_logic_world.AddSimpleRenderMessage(RenderMessageType.CreateEntity, entity.ID);
         }
 
         protected override void PreDestroyObject(Entity entity)
         {
             Player player = entity.GetOwnerPlayer();
             player.RemoveEntity(entity);
+            m_logic_world.AddSimpleRenderMessage(RenderMessageType.DestroyEntity, entity.ID);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Combat
     {
         int m_current_turn_index = 0;
         int m_current_turn_time = 0;
-        TaskScheduler m_turn_scheduler;
+        TaskScheduler<LogicWorld> m_turn_scheduler;
 
         public int CurrentTurnIndex
         {
@@ -18,7 +18,7 @@ namespace Combat
             get { return m_current_turn_index; }   
         }
 
-        public TaskScheduler GetTaskScheduler()
+        public TaskScheduler<LogicWorld> GetTaskScheduler()
         {
             return m_turn_scheduler;
         }

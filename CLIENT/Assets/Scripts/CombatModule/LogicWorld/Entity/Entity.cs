@@ -2,13 +2,23 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class Entity : Object, IRenderMessageGenerator
+    public class Entity : Object
+#if ENTITY_RENDER_MESSAGE
+        , IRenderMessageGenerator
+#endif
     {
-        List<RenderMessage> m_render_messages;
+#if ENTITY_RENDER_MESSAGE
+        //List<RenderMessage> m_render_messages;
+#endif
         Player m_owner_player;
 
         public Entity()
         {
+        }
+
+        protected override void OnDestruct()
+        {
+            m_owner_player = null;
         }
 
         #region ILogicOwnerInfo
@@ -35,6 +45,7 @@ namespace Combat
         #endregion
 
         #region RenderMessage
+#if ENTITY_RENDER_MESSAGE
         public bool CanGenerateRenderMessage()
         {
             return m_render_messages != null;
@@ -44,6 +55,14 @@ namespace Combat
         {
             if (m_render_messages == null)
                 return;
+            m_render_messages.Add(render_message);
+        }
+
+        public void AddSimpleRenderMessage(int type, int entity_id = -1)
+        {
+            if (m_render_messages == null)
+                return;
+            SimpleRenderMessage render_message = SimpleRenderMessage.Create(type, entity_id);
             m_render_messages.Add(render_message);
         }
 
@@ -57,18 +76,19 @@ namespace Combat
             if (m_render_messages != null)
                 m_render_messages.Clear();
         }
+#endif
         #endregion
-
-        protected override void OnDestruct()
-        {
-            m_owner_player = null;
-        }
-
+        
         protected override void PreInitializeObject(ObjectCreationContext context)
         {
+#if ENTITY_RENDER_MESSAGE
             if (context.m_logic_world.CanGenerateRenderMessage())
                 m_render_messages = new List<RenderMessage>();
-            m_owner_player = context.m_logic_world.GetPlayerManager().GetObject(context.m_owner_id);
+#endif
+            PlayerManager player_manager = context.m_logic_world.GetPlayerManager();
+            int player_id = player_manager.Proxyid2Objectid(context.m_object_proxy_id);
+            context.m_owner_id = player_id;
+            m_owner_player = player_manager.GetObject(player_id);
         }
     }
 }

@@ -9,15 +9,14 @@ namespace Combat
         RandomGenerator m_random_generator = new RandomGenerator();
         bool m_started = false;
         int m_time = 0;
-        int m_interval = 1000;
+        int m_interval = 50;
 
         public TestRenderWorld(TestCombatClient combat_client, TestLogicWorld logic_world)
         {
             m_combat_client = combat_client;
             m_logic_world = logic_world;
-
-            System.Random ran = new System.Random();
-            m_random_generator.ResetSeed(ran.Next());
+            m_random_generator.ResetSeed((int)(m_combat_client.LocalPlayerPstid));
+            RandomInterval();
         }
 
         public void Destruct()
@@ -43,14 +42,26 @@ namespace Combat
             m_time += delta_ms;
             if (m_time < m_interval)
                 return;
+            //while (m_time > m_interval)
+            //{
+            //    m_time -= m_interval;
+            //    GenerateRandomCommand();
+            //    RandomInterval();
+            //}
             m_time = 0;
             GenerateRandomCommand();
+            RandomInterval();
+        }
+
+        void RandomInterval()
+        {
+            m_interval = m_random_generator.RandBetween(10, 70);
         }
 
         void GenerateRandomCommand()
         {
             RandomTestCommand command = new RandomTestCommand();
-            command.Random = m_random_generator.Rand();
+            command.m_random = m_random_generator.Rand();
             m_combat_client.GetSyncClient().PushLocalCommand(command);
         }
     }

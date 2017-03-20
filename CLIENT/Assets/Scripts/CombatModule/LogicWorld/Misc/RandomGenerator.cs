@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class RandomGenerator
+    public class RandomGenerator : IDestruct
     {
         int m_seed = 0;
 
         public RandomGenerator(int seed = 0)
         {
             m_seed = seed;
+        }
+
+        public void Destruct()
+        {
         }
 
         public void ResetSeed(int seed)

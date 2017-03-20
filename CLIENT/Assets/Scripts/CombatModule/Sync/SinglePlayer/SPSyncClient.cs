@@ -25,10 +25,9 @@ namespace Combat
         {
         }
 
-        public override void Init(ILogicWorld logic_world, IOutsideWorld outside_world)
+        public override void Init(ILogicWorld logic_world)
         {
             m_logic_world = logic_world;
-            m_outside_world = outside_world;
             m_command_synchronizer = new SPPredictedCommandSynchronizer();
             m_world_syhchronizer = new SPPlayerWorldSynchronizer(logic_world, m_command_synchronizer);
         }
@@ -78,7 +77,6 @@ namespace Combat
                 {
                     m_current_turn = 0;
                     m_world_syhchronizer.Start(m_start_time);
-                    m_outside_world.OnGameStart();
                     m_last_update_time = m_start_time;
                 }
             }
@@ -92,7 +90,7 @@ namespace Combat
                 return;
             m_stored_turndone_count += forward_turn_count;
             m_current_turn = synchronized_turn + 1;
-            if (m_stored_turndone_count >= SyncParam.SYNCTURN_COUNT_TO_SEND)
+            if (m_stored_turndone_count >= SyncParam.SP_SYNC_INTERVAL_TURNCOUNT)
             {
                 if (m_send_turndone)
                 {
@@ -109,7 +107,7 @@ namespace Combat
         {
             command.PlayerPstid = m_local_player_pstid;
             command.SyncTurn = m_current_turn;
-            if (m_world_syhchronizer.PushLocalCommand(command))
+            if (m_command_synchronizer.AddCommand(command))
                 AddOutputCommand(command);
         }
 

@@ -6,9 +6,6 @@ namespace Combat
     {
         int GetSynchronizedTurn();
         void Start(int start_time);
-        bool PushLocalCommand(Command command);
-        bool PushClientCommand(Command command);
-        bool PushServerCommand(Command command);
         bool ForwardFrame(int forward_end_time);
         bool ForwardTurn();
     }
@@ -17,7 +14,6 @@ namespace Combat
     {
         protected ILogicWorld m_logic_world;
         protected ICommandSynchronizer m_command_synchronizer;
-        protected int m_synchronized_turn = -1;
 
         public WorldSynchronizer(ILogicWorld logic_world, ICommandSynchronizer command_synchronizer)
         {
@@ -30,34 +26,10 @@ namespace Combat
             m_logic_world = null;
             m_command_synchronizer = null;
         }
-        public int GetSynchronizedTurn()
-        {
-            return m_synchronized_turn;
-        }
-        public virtual void Start(int start_time)
-        {
-            m_logic_world.OnStart();
-        }
-        public virtual bool PushLocalCommand(Command command)
-        {
-            return false;
-        }
-        public virtual bool PushClientCommand(Command command)
-        {
-            return false;
-        }
-        public virtual bool PushServerCommand(Command command)
-        {
-            return false;
-        }
-        public virtual bool ForwardFrame(int forward_end_time)
-        {
-            return false;
-        }
-        public virtual bool ForwardTurn()
-        {
-            return false;
-        }
+        public abstract int GetSynchronizedTurn();
+        public abstract void Start(int start_time);
+        public abstract bool ForwardFrame(int forward_end_time);
+        public abstract bool ForwardTurn();
         protected bool UpdateLogicFrame()
         {
             return m_logic_world.OnUpdate(SyncParam.FRAME_TIME);

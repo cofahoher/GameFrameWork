@@ -2,39 +2,58 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    enum AttackPhase
-    {
-        UltimateSKillPhase,
-        CommonAttackPhase,
-    }
-
-    class TurnInfo
-    {
-        int m_player_index;
-        AttackPhase m_attack_phase;
-    }
-
     public class LogicWorld : ILogicWorld, IRenderMessageGenerator
     {
-        IOutsideWorld m_outside_world;
-        bool m_need_render_message = false;
-        List<RenderMessage> m_render_messages;
+        protected IOutsideWorld m_outside_world;
+        protected bool m_need_render_message = false;
+        protected List<RenderMessage> m_render_messages;
 
-        int m_current_time = 0;
-        int m_current_frame = 0;
-        int m_current_turn_index = 0;
-        int m_current_turn_time = 0;
-        bool m_game_over = false;
-        TaskScheduler m_scheduler;
-        TaskScheduler m_turn_scheduler;
+        protected int m_current_time = 0;
+        protected int m_current_frame = 0;
+        protected int m_current_turn_index = 0;
+        protected int m_current_turn_time = 0;
+        protected bool m_game_over = false;
+        protected TaskScheduler<LogicWorld> m_scheduler;
 
-        RandomGenerator m_random_generator;
+        protected RandomGenerator m_random_generator;
 
-        PlayerManager m_player_manager;
-        EntityManager m_entity_manager;
-        EffectManager m_effect_manager;
-        CommandHandler m_command_handler;
-        FactionManager m_faction_manager;
+        protected PlayerManager m_player_manager;
+        protected EntityManager m_entity_manager;
+        protected EffectManager m_effect_manager;
+        protected ICommandHandler m_command_handler;
+        protected FactionManager m_faction_manager;
+
+        public LogicWorld(IOutsideWorld outside_world, bool need_render_message)
+        {
+            m_outside_world = outside_world;
+            m_need_render_message = need_render_message;
+            if (m_need_render_message)
+                m_render_messages = new List<RenderMessage>();
+
+            m_scheduler = new TaskScheduler<LogicWorld>(this);
+
+            m_random_generator = new RandomGenerator();
+
+            m_player_manager = new PlayerManager(this);
+            m_entity_manager = new EntityManager(this);
+            m_effect_manager = new EffectManager(this);
+            m_command_handler = CreateCommandHandler();
+            m_faction_manager = new FactionManager(this);
+        }
+
+        public virtual void Destruct()
+        {
+            m_scheduler.Destruct();
+            m_scheduler = null;
+            m_player_manager.Destruct();
+            m_player_manager = null;
+            m_entity_manager.Destruct();
+            m_entity_manager = null;
+            m_effect_manager.Destruct();
+            m_effect_manager = null;
+            m_command_handler.Destruct();
+            m_command_handler = null;
+        }
 
         #region GETTER
         public bool NeedRenderMessage
@@ -57,13 +76,9 @@ namespace Combat
         {
             get { return m_current_turn_time; }
         }
-        public TaskScheduler GetTaskScheduler()
+        public TaskScheduler<LogicWorld> GetTaskScheduler()
         {
             return m_scheduler;
-        }
-        public TaskScheduler GetTurnTaskScheduler()
-        {
-            return m_turn_scheduler;
         }
         public PlayerManager GetPlayerManager()
         {
@@ -83,50 +98,17 @@ namespace Combat
         }
         #endregion
 
-        public LogicWorld(IOutsideWorld outside_world, bool need_render_message)
-        {
-            m_outside_world = outside_world;
-            m_need_render_message = need_render_message;
-            if (m_need_render_message)
-                m_render_messages = new List<RenderMessage>();
-
-            m_scheduler = new TaskScheduler(this);
-            m_turn_scheduler = new TaskScheduler(this);
-
-            m_random_generator = new RandomGenerator();
-
-            m_player_manager = new PlayerManager(this);
-            m_entity_manager = new EntityManager(this);
-            m_effect_manager = new EffectManager(this);
-            m_command_handler = new CommandHandler(this);
-            m_faction_manager = new FactionManager(this);
-        }
-
-        public void Destruct()
-        {
-            m_scheduler.Destruct();
-            m_scheduler = null;
-            m_turn_scheduler.Destruct();
-            m_turn_scheduler = null;
-            m_player_manager.Destruct();
-            m_player_manager = null;
-            m_entity_manager.Destruct();
-            m_entity_manager = null;
-            m_effect_manager.Destruct();
-            m_effect_manager = null;
-            m_command_handler.Destruct();
-            m_command_handler = null;
-        }
-
-        public void OnStart()
+        #region ILogicWorld 可被继承修改
+        public virtual void OnStart()
         {
             m_current_time = 0;
             m_current_frame = 0;
             m_current_turn_index = 0;
             m_current_turn_time = 0;
+            m_outside_world.OnGameStart();
         }
 
-        public bool OnUpdate(int delta_ms)
+        public virtual bool OnUpdate(int delta_ms)
         {
             m_current_time += delta_ms;
             ++m_current_frame;
@@ -141,10 +123,12 @@ namespace Combat
 
         public void HandleCommand(Command command)
         {
+            if (m_game_over)
+                return;
             m_command_handler.Handle(command);
         }
 
-        public void CopyFrom(ILogicWorld parallel_world)
+        public virtual void CopyFrom(ILogicWorld parallel_world)
         {
         }
 
@@ -156,20 +140,6 @@ namespace Combat
         public uint GetCRC()
         {
             return 0;
-        }
-
-        #region 回合制
-        public void OnTurnBegin()
-        {
-            ++m_current_turn_index;
-            m_current_turn_time = m_current_turn_index * 10;
-            m_turn_scheduler.Update(m_current_turn_time);
-        }
-
-        public void OnTurnEnd()
-        {
-            m_current_turn_time += 1;
-            m_turn_scheduler.Update(m_current_turn_time);
         }
         #endregion
 
@@ -186,6 +156,14 @@ namespace Combat
             m_render_messages.Add(render_message);
         }
 
+        public void AddSimpleRenderMessage(int type, int entity_id = -1)
+        {
+            if (m_render_messages == null)
+                return;
+            SimpleRenderMessage render_message = SimpleRenderMessage.Create(type, entity_id);
+            m_render_messages.Add(render_message);
+        }
+
         public List<RenderMessage> GetAllRenderMessages()
         {
             return m_render_messages;
@@ -198,7 +176,13 @@ namespace Combat
         }
         #endregion
 
-        public void BuildLogicWorld(WorldCreationContext world_context)
+        #region 可被继承修改
+        protected virtual ICommandHandler CreateCommandHandler()
+        {
+            return new DummyCommandHandler();
+        }
+
+        public virtual void BuildLogicWorld(WorldCreationContext world_context)
         {
             m_random_generator.ResetSeed(world_context.m_world_seed);
             m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
@@ -207,7 +191,6 @@ namespace Combat
             {
                 ObjectCreationContext context = world_context.m_players[i];
                 context.m_logic_world = this;
-                context.m_class_type = typeof(Player);
                 context.m_type_data = object_config.GetTypeData(context.m_object_type_id);
                 context.m_proto_data = object_config.GetProtoData(context.m_object_proto_id);
                 m_player_manager.CreateObject(context);
@@ -216,19 +199,20 @@ namespace Combat
             {
                 ObjectCreationContext context = world_context.m_entities[i];
                 context.m_logic_world = this;
-                context.m_class_type = typeof(Entity);
                 context.m_type_data = object_config.GetTypeData(context.m_object_type_id);
                 context.m_proto_data = object_config.GetProtoData(context.m_object_proto_id);
                 m_entity_manager.CreateObject(context);
             }
         }
 
-        public void OnGameOver(bool is_dropout, long winner_player_pstid)
+        public virtual void OnGameOver(GameResult game_result)
         {
             if (m_game_over)
                 return;
             m_game_over = true;
-            m_outside_world.OnGameOver(is_dropout, m_current_frame, winner_player_pstid);
+            game_result.m_end_frame = m_current_frame;
+            m_outside_world.OnGameOver(game_result);
         }
+        #endregion
     }
 }

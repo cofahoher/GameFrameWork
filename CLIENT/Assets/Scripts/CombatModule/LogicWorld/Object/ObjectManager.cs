@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ObjectManager<TObject> : IDestruct where TObject : Object
+    public abstract class ObjectManager<TObject> : IDestruct where TObject : Object
     {
         protected LogicWorld m_logic_world;
         protected IDGenerator m_id_generator;
@@ -62,10 +62,13 @@ namespace Combat
 
         public TObject CreateObject(ObjectCreationContext context)
         {
-            int id = m_id_generator.GenID();
-            context.m_object_id = id;
-            TObject obj = System.Activator.CreateInstance(context.m_class_type) as TObject;
-            m_objects[id] = obj;
+            if (context.m_object_id < 0)
+            {
+                int id = m_id_generator.GenID();
+                context.m_object_id = id;
+            }
+            TObject obj = CreateObjectInstance();
+            m_objects[context.m_object_id] = obj;
             if (context.m_name != null && context.m_name.Length > 0)
                 m_named_objects[context.m_name] = obj;
             obj.InitializeObject(context);
@@ -73,6 +76,8 @@ namespace Combat
             m_is_dirty = true;
             return obj;
         }
+
+        protected abstract TObject CreateObjectInstance();
 
         protected virtual void AfterObjectCreated(TObject obj)
         {

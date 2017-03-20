@@ -4,7 +4,7 @@ namespace Combat
 {
     public interface ISyncClient : IDestruct
     {
-        void Init(ILogicWorld logic_world, IOutsideWorld outside_world);
+        void Init(ILogicWorld logic_world);
         void AddPlayer(long player_pstid);
         void RemovePlayer(long player_pstid);
         void Start(int current_time, long local_player_pstid, int latency);
@@ -20,14 +20,12 @@ namespace Combat
     public abstract class SyncClient : ISyncClient
     {
         protected ILogicWorld m_logic_world;
-        protected IOutsideWorld m_outside_world;
         protected ICommandSynchronizer m_command_synchronizer;
         protected IWorldSynchronizer m_world_syhchronizer;
         protected List<Command> m_output_commands = new List<Command>();
         public virtual void Destruct()
         {
             m_logic_world = null;
-            m_outside_world = null;
             if (m_command_synchronizer != null)
             {
                 m_command_synchronizer.Destruct();
@@ -39,7 +37,7 @@ namespace Combat
                 m_world_syhchronizer = null;
             }
         }
-        public abstract void Init(ILogicWorld logic_world, IOutsideWorld outside_world);
+        public abstract void Init(ILogicWorld logic_world);
         public abstract void AddPlayer(long player_pstid);
         public abstract void RemovePlayer(long player_pstid);
         public abstract void Start(int current_time, long local_player_pstid, int latency);

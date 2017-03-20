@@ -6,6 +6,7 @@ namespace Combat
     {
         bool CanGenerateRenderMessage();
         void AddRenderMessage(RenderMessage render_message);
+        void AddSimpleRenderMessage(int type, int entity_id = -1);
         List<RenderMessage> GetAllRenderMessages();
         void ClearRenderMessages();
     }

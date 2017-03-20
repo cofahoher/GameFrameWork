@@ -5,28 +5,41 @@ namespace Combat
     public class ComponentTypeRegistry
     {
         const int RENDER_COMPONENT_FIRST_ID = 10000;
+
         public static bool IsLogicComponent(int component_type_id)
         {
             return component_type_id < RENDER_COMPONENT_FIRST_ID;
         }
+
         public static bool IsRenderComponent(int component_type_id)
         {
             return component_type_id > RENDER_COMPONENT_FIRST_ID;
         }
-        public static System.Type GetComponentClassType(int component_type_id)
+
+        public static System.Type ComponentID2Type(int component_type_id)
         {
-            if (m_component_registry == null)
+            if (m_component_id2type == null)
                 InitializeRegistry();
             System.Type type = null;
-            m_component_registry.TryGetValue(component_type_id, out type);
+            m_component_id2type.TryGetValue(component_type_id, out type);
             return type;
         }
+
+        public static int ComponentType2ID(System.Type type)
+        {
+            if (m_component_type2id == null)
+                InitializeRegistry();
+            int component_type_id = -1; ;
+            m_component_type2id.TryGetValue(type, out component_type_id);
+            return component_type_id;
+        }
+
         public static Component CreateComponent(int component_type_id)
         {
-            if (m_component_registry == null)
+            if (m_component_id2type == null)
                 InitializeRegistry();
             System.Type type = null;
-            if (!m_component_registry.TryGetValue(component_type_id, out type))
+            if (!m_component_id2type.TryGetValue(component_type_id, out type))
                 return null;
             return System.Activator.CreateInstance(type) as Component;
         }
@@ -66,47 +79,61 @@ namespace Combat
         public const int CT_ApplyGeneratorEffectComponent = 4004;
 
         //【10001，】Render Component
+        public const int CT_ModelComponent = 10001;
         #endregion
 
 
-        static Dictionary<int, System.Type> m_component_registry = null;
+        static Dictionary<int, System.Type> m_component_id2type = null;
+        static Dictionary<System.Type, int> m_component_type2id = null;
         static void InitializeRegistry()
         {
-            m_component_registry = new Dictionary<int, System.Type>();
+            m_component_id2type = new Dictionary<int, System.Type>();
+            m_component_type2id = new Dictionary<System.Type, int>();
 
             //m_component_registry[] = typeof();
             //【0001, 1000】Object Component
-            m_component_registry[CT_TurnManagerComponent] = typeof(TurnManagerComponent);
+            AddRegistry(CT_TurnManagerComponent, typeof(TurnManagerComponent));
 
             //【1001, 2000】Player Component
-            m_component_registry[CT_FactionComponent] = typeof(FactionComponent);
-            m_component_registry[CT_PlayerAIComponent] = typeof(PlayerAIComponent);
-            m_component_registry[CT_PlayerTargetingComponent] = typeof(PlayerTargetingComponent);
+            AddRegistry(CT_FactionComponent, typeof(FactionComponent));
+            AddRegistry(CT_PlayerAIComponent, typeof(PlayerAIComponent));
+            AddRegistry(CT_PlayerTargetingComponent, typeof(PlayerTargetingComponent));
 
             //【2001, 3000】Entity Component
-            m_component_registry[CT_PositionComponent] = typeof(PositionComponent);
-            m_component_registry[CT_LocomotorComponent] = typeof(LocomotorComponent);
-            m_component_registry[CT_DamagableComponent] = typeof(DamagableComponent);
-            m_component_registry[CT_ManaComponent] = typeof(ManaComponent);
-            m_component_registry[CT_DeathComponent] = typeof(DeathComponent);
-            m_component_registry[CT_StateComponent] = typeof(StateComponent);
-            m_component_registry[CT_AttributeManagerComponent] = typeof(AttributeManagerComponent);
-            m_component_registry[CT_SkillManagerComponent] = typeof(SkillManagerComponent);
-            m_component_registry[CT_EffectManagerComponent] = typeof(EffectManagerComponent);
-            m_component_registry[CT_DamageModificationComponent] = typeof(DamageModificationComponent);
-            m_component_registry[CT_AIComponent] = typeof(AIComponent);
+            AddRegistry(CT_PositionComponent, typeof(PositionComponent));
+            AddRegistry(CT_LocomotorComponent, typeof(LocomotorComponent));
+            AddRegistry(CT_DamagableComponent, typeof(DamagableComponent));
+            AddRegistry(CT_ManaComponent, typeof(ManaComponent));
+            AddRegistry(CT_DeathComponent, typeof(DeathComponent));
+            AddRegistry(CT_StateComponent, typeof(StateComponent));
+            AddRegistry(CT_AttributeManagerComponent, typeof(AttributeManagerComponent));
+            AddRegistry(CT_SkillManagerComponent, typeof(SkillManagerComponent));
+            AddRegistry(CT_EffectManagerComponent, typeof(EffectManagerComponent));
+            AddRegistry(CT_DamageModificationComponent, typeof(DamageModificationComponent));
+            AddRegistry(CT_AIComponent, typeof(AIComponent));
 
             //【3001, 4000】Skill Component
-            m_component_registry[CT_SkillDefinitionComponent] = typeof(SkillDefinitionComponent);
-            m_component_registry[CT_WeaponSkillComponent] = typeof(WeaponSkillComponent);
-            m_component_registry[CT_EffectGeneratorSkillComponent] = typeof(EffectGeneratorSkillComponent);
-            m_component_registry[CT_CreateObjectSkillComponent] = typeof(CreateObjectSkillComponent);
+            AddRegistry(CT_SkillDefinitionComponent, typeof(SkillDefinitionComponent));
+            AddRegistry(CT_WeaponSkillComponent, typeof(WeaponSkillComponent));
+            AddRegistry(CT_EffectGeneratorSkillComponent, typeof(EffectGeneratorSkillComponent));
+            AddRegistry(CT_CreateObjectSkillComponent, typeof(CreateObjectSkillComponent));
 
             //【4001, 5000】Effect Component
-            m_component_registry[CT_DamageEffectComponent] = typeof(DamageEffectComponent);
-            m_component_registry[CT_HealEffectComponent] = typeof(HealEffectComponent);
-            m_component_registry[CT_AddStateEffectComponent] = typeof(AddStateEffectComponent);
-            m_component_registry[CT_ApplyGeneratorEffectComponent] = typeof(ApplyGeneratorEffectComponent);
+            AddRegistry(CT_DamageEffectComponent, typeof(DamageEffectComponent));
+            AddRegistry(CT_HealEffectComponent, typeof(HealEffectComponent));
+            AddRegistry(CT_AddStateEffectComponent, typeof(AddStateEffectComponent));
+            AddRegistry(CT_ApplyGeneratorEffectComponent, typeof(ApplyGeneratorEffectComponent));
+
+            //【10001，】Render Component
+#if COMBAT_CLIENT
+            AddRegistry(CT_ModelComponent, typeof(ModelComponent));
+#endif
+        }
+
+        static void AddRegistry(int id, System.Type type)
+        {
+            m_component_id2type[id] = type;
+            m_component_type2id[type] = id;
         }
     }
 }

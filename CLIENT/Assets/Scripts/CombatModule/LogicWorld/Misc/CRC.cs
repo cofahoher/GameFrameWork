@@ -56,6 +56,14 @@ namespace Combat
 	        return crc;
         }
 
+        public static uint Calculate(short data, uint old_crc = 0)
+        {
+            uint crc = Calculate((char)(data & 0xFF), old_crc);
+            crc = Calculate((char)((data >> 8) & 0xFF), crc);
+            crc ^= old_crc >> 8;
+            return crc;
+        }
+
         public static uint Calculate(int data, uint old_crc = 0)
         {
             uint crc = Calculate((char)(data & 0xFF), old_crc);

@@ -38,16 +38,10 @@ namespace Combat
             return m_network;
         }
 
-        public int GetCurrentTime()
-        {
-            TimeSpan ts = DateTime.Now - m_dt_original;
-            return (int)(ts.TotalMilliseconds);
-        }
-
         public void Update()
         {
             if (m_combat_client != null)
-                m_combat_client.OnUpdate(GetCurrentTime());
+                m_combat_client.OnUpdate(m_network.GetCurrentTime());
         }
 
         #region 模拟服务器消息处理
@@ -73,7 +67,7 @@ namespace Combat
 
         public void OnNetworkMessage_StartLoading(NetworkMessages_StartLoading msg)
         {
-            m_combat_client = new TestCombatClient(this);
+            m_combat_client = new TestCombatClient(m_network);
             m_combat_client.Initializa(m_local_player_pstid);
             for (int i = 0; i < msg.m_player_pstids.Count; ++i)
                 m_combat_client.AddPlayer(msg.m_player_pstids[i]);
@@ -81,13 +75,12 @@ namespace Combat
 
         public void OnNetworkMessage_StartGame(NetworkMessages_StartGame msg)
         {
-            m_combat_client.StartCombat(GetCurrentTime(), m_latency);
+            m_combat_client.StartCombat(m_network.GetCurrentTime(), m_latency);
         }
 
         public void OnNetworkMessage_SyncCommands(NetworkMessages_SyncCommands msg)
         {
             List<Command> commands = msg.m_commands;
-
             for (int i = 0; i < commands.Count; ++i)
                 m_combat_client.GetSyncClient().PushServerCommand(commands[i]);
         }

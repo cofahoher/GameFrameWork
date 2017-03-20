@@ -13,10 +13,9 @@ namespace Combat
         {
         }
 
-        public override void Init(ILogicWorld logic_world, IOutsideWorld outside_world)
+        public override void Init(ILogicWorld logic_world)
         {
             m_logic_world = logic_world;
-            m_outside_world = outside_world;
             m_command_synchronizer = new MNLPClientCommandSynchronizer();
             m_world_syhchronizer = new MNLPPlayerWorldSynchronizer(logic_world, m_command_synchronizer);
         }
@@ -56,7 +55,6 @@ namespace Combat
                 {
                     m_current_turn = 0;
                     m_world_syhchronizer.Start(m_start_time);
-                    m_outside_world.OnGameStart();
                 }
             }
             bool forward = m_world_syhchronizer.ForwardFrame(current_time);

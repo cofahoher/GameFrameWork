@@ -55,7 +55,6 @@ namespace Combat
             while (enumerator.MoveNext())
             {
                 AttributeDefinition definition = enumerator.Current.Value;
-                string name = definition.Name;
                 definition.BuildDependentAttribuites(dependencies);
                 for (int i = 0; i < dependencies.Count; ++i)
                 {

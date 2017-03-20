@@ -4,12 +4,11 @@ namespace Combat
 {
     public class SPSyncServer : SyncServer
     {
+        const int RUNNING_MODE = 1;
+        const int CHECKING_MODE = 1;
         int m_mode = CHECKING_MODE;
         Dictionary<long, PlayerSyncData> m_sync_data_of_players = new Dictionary<long, PlayerSyncData>();
         int m_start_time = 0;
-
-        const int RUNNING_MODE = 1;
-        const int CHECKING_MODE = 1;
 
         public SPSyncServer()
         {
@@ -18,7 +17,7 @@ namespace Combat
         public override void Init(ILogicWorld logic_world)
         {
             m_logic_world = logic_world;
-            m_command_synchronizer = new MNLPServerCommandSynchronizer();
+            m_command_synchronizer = new SPTrustedCommandSynchronizer();
             m_world_syhchronizer = new SPCheckerWorldSynchronizer(logic_world, m_command_synchronizer);
         }
 
@@ -71,7 +70,7 @@ namespace Combat
             if (command.SyncTurn <= m_world_syhchronizer.GetSynchronizedTurn())
                 return;
             psd.LastMsgSyncTurn = command.SyncTurn;
-            bool valid = m_world_syhchronizer.PushClientCommand(command);
+            bool valid = m_command_synchronizer.AddCommand(command);
             if (valid && m_mode == RUNNING_MODE && command.Type != CommandType.SyncTurnDone)
                 AddOutputCommand(command);
         }

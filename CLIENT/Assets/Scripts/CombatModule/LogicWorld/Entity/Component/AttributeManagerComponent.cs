@@ -11,7 +11,7 @@ namespace Combat
         {
         }
 
-        public void Destruct()
+        public override void OnDestruct()
         {
             var enumerator = m_attributes.GetEnumerator();
             while (enumerator.MoveNext())

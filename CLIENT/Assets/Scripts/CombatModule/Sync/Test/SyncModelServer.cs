@@ -25,21 +25,10 @@ namespace Combat
             m_network = network;
         }
 
-        public INetwork GetNetwork()
-        {
-            return m_network;
-        }
-
-        public int GetCurrentTime()
-        {
-            TimeSpan ts = DateTime.Now - m_dt_original;
-            return (int)(ts.TotalMilliseconds);
-        }
-
         public void Update()
         {
             if (m_combat_server != null)
-                m_combat_server.OnUpdate(GetCurrentTime());
+                m_combat_server.OnUpdate(m_network.GetCurrentTime());
         }
 
         #region 模拟客户端消息处理
@@ -106,7 +95,7 @@ namespace Combat
 
         public void OnNetworkMessage_GameOver(NetworkMessages_GameOver msg)
         {
-            UnityEngine.Debug.LogError("OnNetworkMessage_GameOver, client = " + msg.PlayerPstid + ", crc = " + msg.m_crc);
+            UnityEngine.Debug.LogError("测试同步模型：Client " + msg.PlayerPstid + " GameOver, CRC = " + msg.m_crc);
         }
         #endregion
 
@@ -135,7 +124,7 @@ namespace Combat
             }
             m_network.SendToClient(msg);
 
-            m_combat_server = new TestCombatServer(this);
+            m_combat_server = new TestCombatServer(m_network);
             m_combat_server.Initializa();
             for (int i = 0; i < msg.m_player_pstids.Count; ++i)
                 m_combat_server.AddPlayer(msg.m_player_pstids[i]);
@@ -161,7 +150,7 @@ namespace Combat
             msg.m_latency = latency;
             m_network.SendToClient(msg);
 
-            m_combat_server.StartCombat(GetCurrentTime(), latency);
+            m_combat_server.StartCombat(m_network.GetCurrentTime(), latency);
         }
     }
 }

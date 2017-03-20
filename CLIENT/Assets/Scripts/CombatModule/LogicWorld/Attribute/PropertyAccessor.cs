@@ -2,7 +2,14 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class PropertyAccessor
+    public class PropertyAccessor : IDestruct
     {
+        public PropertyAccessor()
+        {
+        }
+
+        public void Destruct()
+        {
+        }
     }
 }

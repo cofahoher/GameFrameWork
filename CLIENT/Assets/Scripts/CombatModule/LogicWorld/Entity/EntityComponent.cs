@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class EntityComponent : Component
+    public abstract class EntityComponent : Component
     {
         #region ILogicOwnerInfo
         public override int GetOwnerPlayerID()

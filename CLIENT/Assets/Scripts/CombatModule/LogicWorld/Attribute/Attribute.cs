@@ -43,6 +43,7 @@ namespace Combat
         }
         #endregion
 
+        #region DynamicDependen
         public void AddDynamicDependentAttribute(string attribute_name)
         {
             if (m_dynamic_dependent_attributes == null)
@@ -67,7 +68,9 @@ namespace Combat
             else
                 m_dynamic_dependent_attributes[attribute_name] = ref_cnt;
         }
+        #endregion
 
+        #region Modifier
         public void AddModifier(AttributeModifier modifier)
         {
             if (m_modifiers == null)
@@ -81,7 +84,9 @@ namespace Combat
             m_modifiers.Remove(modifier_id);
             MarkDirty();
         }
+        #endregion
 
+        #region Update
         void MarkDirty()
         {
             MarkDirtyStatic(m_owner_component, m_definition.Name);
@@ -108,6 +113,7 @@ namespace Combat
                 }
             }
         }
+        #endregion
 
         void ComputeValue()
         {

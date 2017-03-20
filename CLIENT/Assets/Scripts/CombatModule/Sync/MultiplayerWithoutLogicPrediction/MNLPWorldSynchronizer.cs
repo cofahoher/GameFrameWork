@@ -4,6 +4,7 @@ namespace Combat
 {
     public class MNLPPlayerWorldSynchronizer : WorldSynchronizer
     {
+        int m_synchronized_turn = -1;
         int m_forward_start_time = 0;
         int m_unturned_frame_count = 0;
         bool m_game_over = false;
@@ -14,10 +15,15 @@ namespace Combat
         {
         }
 
+        public override int GetSynchronizedTurn()
+        {
+            return m_synchronized_turn;
+        }
+
         public override void Start(int start_time)
         {
             m_forward_start_time = start_time;
-            base.Start(start_time);
+            m_logic_world.OnStart();
         }
 
         public override bool ForwardFrame(int forward_end_time)
@@ -28,6 +34,7 @@ namespace Combat
             if (frame_diff <= 0)
                 return false;
             int ready_turn = m_command_synchronizer.GetReadyTurn();
+            //ZZWTODO 可以稍微再复杂一点，然后再挤出一帧来
             int max_frame_diff = (ready_turn - m_synchronized_turn + 1) * SyncParam.FRAME_COUNT_PER_SYNCTURN - m_unturned_frame_count - 1;
             if (max_frame_diff <= 0)
             {
@@ -46,10 +53,8 @@ namespace Combat
                 {
                     ++m_synchronized_turn;
                     m_unturned_frame_count = 0;
-                    if ((m_synchronized_turn + 1) * SyncParam.FRAME_COUNT_PER_SYNCTURN != m_logic_world.GetCurrentFrame())
-                        m_unturned_frame_count = 0;
                     List<Command> commands = m_command_synchronizer.GetCommands(m_synchronized_turn);
-                    if (commands != null && commands.Count > 0)
+                    if (commands != null)
                     {
                         for (int j = 0; j < commands.Count; ++j)
                             m_logic_world.HandleCommand(commands[j]);
@@ -60,10 +65,16 @@ namespace Combat
             }
             return true;
         }
+
+        public override bool ForwardTurn()
+        {
+            return false;
+        }
     }
 
     public class MNLPServerWorldSynchronizer : WorldSynchronizer
     {
+        int m_synchronized_turn = -1;
         int m_forward_start_time = 0;
         int m_unturned_frame_count = 0;
         bool m_game_over = false;
@@ -71,27 +82,17 @@ namespace Combat
         public MNLPServerWorldSynchronizer(ILogicWorld logic_world, ICommandSynchronizer command_synchronizer)
             : base(logic_world, command_synchronizer)
         {
-            m_synchronized_turn = -1;
-            m_unturned_frame_count = 0;
+        }
+
+        public override int GetSynchronizedTurn()
+        {
+            return m_synchronized_turn;
         }
 
         public override void Start(int start_time)
         {
             m_forward_start_time = start_time;
-            base.Start(start_time);
-        }
-
-        public override bool PushLocalCommand(Command command)
-        {
-            return false;
-        }
-        public override bool PushClientCommand(Command command)
-        {
-            return false;
-        }
-        public override bool PushServerCommand(Command command)
-        {
-            return false;
+            m_logic_world.OnStart();
         }
 
         public override bool ForwardFrame(int forward_end_time)
@@ -108,12 +109,10 @@ namespace Combat
                 m_forward_start_time += SyncParam.FRAME_TIME;
                 if (m_unturned_frame_count == SyncParam.FRAME_COUNT_PER_SYNCTURN)
                 {
-                    if ((m_synchronized_turn + 2) * SyncParam.FRAME_COUNT_PER_SYNCTURN != m_logic_world.GetCurrentFrame())
-                        m_unturned_frame_count = 0;
                     ++m_synchronized_turn;
                     m_unturned_frame_count = 0;
                     List<Command> commands = m_command_synchronizer.GetCommands(m_synchronized_turn);
-                    if (commands != null && commands.Count > 0)
+                    if (commands != null)
                     {
                         for (int j = 0; j < commands.Count; ++j)
                             m_logic_world.HandleCommand(commands[j]);

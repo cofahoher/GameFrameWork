@@ -35,10 +35,10 @@ namespace Combat
         {
         }
 
-        public void SetPstidAndProxyid(Dictionary<long, int> pstid2proxyid, Dictionary<int, long> proxyid2pstid)
+        #region 初始化
+        protected override Player CreateObjectInstance()
         {
-            m_pstid2proxyid = pstid2proxyid;
-            m_proxyid2pstid = proxyid2pstid;
+            return new Player();
         }
 
         protected override void AfterObjectCreated(Player player)
@@ -52,6 +52,13 @@ namespace Combat
             else if (proxy_id == AI_ENEMY_PLAYER_PROXYID)
                 m_ai_enemy_player_id = object_id;
         }
+
+        public void SetPstidAndProxyid(Dictionary<long, int> pstid2proxyid, Dictionary<int, long> proxyid2pstid)
+        {
+            m_pstid2proxyid = pstid2proxyid;
+            m_proxyid2pstid = proxyid2pstid;
+        }
+        #endregion
 
         #region ID
         public int Pstid2Proxyid(long pstid)

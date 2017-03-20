@@ -1,17 +1,26 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 namespace Combat
 {
     public interface INetwork
     {
+        int GetCurrentTime();
         void SendToServer(NetworkMessage msg);
         void SendToClient(NetworkMessage msg);
     }
 
     public class DummyNetwork : INetwork
     {
+        DateTime m_dt_original = DateTime.Now;
         protected List<NetworkMessage> m_server_msgs = new List<NetworkMessage>();
         protected Dictionary<long,List<NetworkMessage>> m_clients_msgs = new Dictionary<long,List<NetworkMessage>>();
+
+        public int GetCurrentTime()
+        {
+            TimeSpan ts = DateTime.Now - m_dt_original;
+            return (int)(ts.TotalMilliseconds);
+        }
 
         public void SendToServer(NetworkMessage msg)
         {
@@ -58,10 +67,7 @@ namespace Combat
         }
     }
 
-
-
-
-    public class Tester : DummyNetwork
+    public class SyncTester : DummyNetwork
     {
         bool m_init = false;
         UnityEngine.MonoBehaviour m_mono;
@@ -69,9 +75,9 @@ namespace Combat
 
         SyncModelServer m_server;
         List<SyncModelClient> m_clients = new List<SyncModelClient>();
-        int CLIENT_COUNT = 1;
+        int CLIENT_COUNT = 2;
 
-        public Tester(UnityEngine.MonoBehaviour mono)
+        public SyncTester(UnityEngine.MonoBehaviour mono)
         {
             m_mono = mono;
         }
@@ -102,6 +108,7 @@ namespace Combat
                 return;
 
             List<NetworkMessage> msgs;
+
             for (int i = 0; i < m_clients.Count; ++i)
             {
                 SyncModelClient client = m_clients[i];
