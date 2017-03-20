@@ -15,5 +15,12 @@ namespace Combat
         {
             m_type = CommandType.EntityMove;
         }
+
+        public override void Reset()
+        {
+            base.Reset();
+            m_entity_id = 0;
+            m_destination.Zero();
+        }
     }
 }

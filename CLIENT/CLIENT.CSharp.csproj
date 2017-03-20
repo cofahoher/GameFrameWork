@@ -68,6 +68,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\CombatModule\Customization\CombatClient.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\CombatServer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\CombatStartInfo.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\ICombatFactory.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\IOutsideWorld.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\LogicWorld\CommandHandler.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\LogicWorld\MyCommand.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\LogicWorld\MyGameResult.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\LogicWorld\MyLogicWorld.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\LogicWorld\MyRenderMessage.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\MyCombatFactory.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\CameraController.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyRenderWorld.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\RenderMessageProcessor.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\BehaviorTree\BehaviorTree.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\Attribute.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeFormula.cs" />
@@ -117,11 +132,6 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\IExpressionEngionVariableInterface.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\IntProgram.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\Program.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameCustom\CommandHandler.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameCustom\MyCommand.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameCustom\MyGameResult.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameCustom\MyLogicWorld.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameCustom\MyRenderMessage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameResult.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\LogicWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\CRC.cs" />
@@ -167,9 +177,6 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Skill.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\WorldCreationContext.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\RenderWorld\GameCustom\CameraController.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\RenderWorld\GameCustom\MyRenderWorld.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\RenderWorld\GameCustom\RenderMessageProcessor.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimationComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\ModelComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntity.cs" />
@@ -178,15 +185,12 @@
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\UnityObjectBinding.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\UnityResourceManager.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\CombatClient.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\CombatServer.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\CombatStartInfo.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ICommandSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ILogicWorld.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\IOutsideWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ISyncClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ISyncServer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\IWorldSynchronizer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithLogicPrediction\MultiplayerWithLogicPrediction.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithoutLogicPrediction\MNLPCommandSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithoutLogicPrediction\MNLPSyncClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithoutLogicPrediction\MNLPSyncServer.cs" />
@@ -196,15 +200,15 @@
     <Compile Include="Assets\Scripts\CombatModule\Sync\SinglePlayer\SPSyncServer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\SinglePlayer\SPWorldSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\SyncParam.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\CombatTester.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\SyncModelClient.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\SyncModelServer.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\SyncTester.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\TestCombatClient.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\TestCombatServer.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\TestLogicWorld.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\TestNetworkMessages.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\Test\TestRenderWorld.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\CombatTester.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelClient.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelServer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\SyncTester.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\TestCombatClient.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\TestCombatServer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\TestLogicWorld.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\TestNetworkMessages.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\TestRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\_CodingConventions.cs" />
     <Compile Include="Assets\Scripts\GameGlobal.cs" />
     <Compile Include="Assets\Scripts\LogWrapper.cs" />

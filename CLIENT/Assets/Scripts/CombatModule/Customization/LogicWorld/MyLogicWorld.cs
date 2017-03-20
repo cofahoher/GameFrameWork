@@ -18,9 +18,13 @@ namespace Combat
     {
         protected TaskScheduler<LogicWorld> m_turn_scheduler;
 
-        public MyLogicWorld(IOutsideWorld outside_world, bool need_render_message)
-            : base(outside_world, need_render_message)
+        public MyLogicWorld()
         {
+        }
+
+        public override void Initialize(IOutsideWorld outside_world, bool need_render_message)
+        {
+            base.Initialize(outside_world, need_render_message);
             m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
         }
 

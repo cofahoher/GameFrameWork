@@ -15,6 +15,7 @@ namespace Combat
 
     public class CombatClient : IOutsideWorld
     {
+        ICombatFactory m_combat_factory;
         long m_local_player_pstid = -1;
 
         CombatClientState m_state = CombatClientState.None;
@@ -26,8 +27,9 @@ namespace Combat
         RenderWorld m_render_world;
         ISyncClient m_sync_client;
 
-        public CombatClient()
+        public CombatClient(ICombatFactory combat_factory)
         {
+            m_combat_factory = combat_factory;
         }
 
         public void Destruct()
@@ -73,12 +75,18 @@ namespace Combat
             m_waiting_cnt = 0;
 
             AttributeSystem.Instance.InitializeAllDefinition();
-            m_logic_world = new MyLogicWorld(this, true);
-            m_render_world = new MyRenderWorld(this, m_logic_world);
-            m_sync_client = new SPSyncClient();
+            m_combat_factory.RegisterComponents();
+            m_combat_factory.RegisterCommands();
+            m_combat_factory.RegisterRenderMessages();
+
+            m_logic_world = m_combat_factory.CreateLogicWorld();
+            m_logic_world.Initialize(this, true);
+            m_render_world = m_combat_factory.CreateRenderWorld();
+            m_render_world.Initialize(this, m_logic_world);
+            m_sync_client = m_combat_factory.CreateSyncClient();
             m_sync_client.Init(m_logic_world);
 
-            WorldCreationContext world_context = WorldCreationContext.CreateWorldCreationContext(combat_start_info);
+            WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
             ++m_waiting_cnt;
             LevelData level_data = GlobalConfigManager.Instance.GetLevelConfig().GetLevelData(combat_start_info.m_level_id);

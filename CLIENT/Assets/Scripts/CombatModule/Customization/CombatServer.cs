@@ -9,6 +9,7 @@ namespace Combat
     }
     public class CombatServer : IOutsideWorld
     {
+        ICombatFactory m_combat_factory;
         CombatServerState m_state = CombatServerState.NotRunning;
         int m_start_time = -1;
         int m_last_update_time = -1;
@@ -16,8 +17,9 @@ namespace Combat
         LogicWorld m_logic_world;
         ISyncServer m_sync_server;
 
-        public CombatServer()
+        public CombatServer(ICombatFactory combat_factory)
         {
+            m_combat_factory = combat_factory;
         }
 
         public void Destruct()
@@ -39,13 +41,15 @@ namespace Combat
         }
         #endregion
 
+        #region 和局外的接口
         public void Initializa(CombatStartInfo combat_start_info)
         {
             AttributeSystem.Instance.InitializeAllDefinition();
-            m_logic_world = new MyLogicWorld(this, false);
-            m_sync_server = new SPSyncServer();
+            m_logic_world = m_combat_factory.CreateLogicWorld();
+            m_logic_world.Initialize(this, false);
+            m_sync_server = m_combat_factory.CreateSyncServer();
             m_sync_server.Init(m_logic_world);
-            WorldCreationContext world_context = WorldCreationContext.CreateWorldCreationContext(combat_start_info);
+            WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
         }
         
@@ -61,7 +65,9 @@ namespace Combat
             m_last_update_time = 0;
             m_sync_server.Start(0, 0);
         }
+        #endregion
 
+        #region IOutsideWorld
         public int GetCurrentTime()
         {
             return m_last_update_time;
@@ -75,6 +81,7 @@ namespace Combat
         public void OnGameOver(GameResult game_result)
         {
         }
+        #endregion
 
         public void OnUpdate(int current_time_int)
         {

@@ -8,9 +8,13 @@ namespace Combat
     {
         CameraController m_camera_controller;
 
-        public MyRenderWorld(CombatClient combat_client, LogicWorld logic_world)
-            : base(combat_client, logic_world)
+        public MyRenderWorld()
         {
+        }
+
+        public override void Initialize(CombatClient combat_client, LogicWorld logic_world)
+        {
+            base.Initialize(combat_client, logic_world);
             m_camera_controller = new CameraController(this);
         }
 

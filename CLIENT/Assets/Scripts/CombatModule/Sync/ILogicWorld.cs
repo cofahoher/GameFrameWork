@@ -4,9 +4,6 @@ namespace Combat
 {
     public interface ILogicWorld : IDestruct
     {
-        /*
-         * 逻辑世界实现这个接口
-         */
         //逻辑世界真正开始
         void OnStart();
         //更新，返回游戏是否结束（true结束）
@@ -15,7 +12,7 @@ namespace Combat
         bool IsGameOver();
         //处理各玩家的操作命令
         void HandleCommand(Command command);
-        //世界拷贝，不用实现
+        //世界拷贝
         void CopyFrom(ILogicWorld parallel_world);
         //FRAME
         int GetCurrentFrame();

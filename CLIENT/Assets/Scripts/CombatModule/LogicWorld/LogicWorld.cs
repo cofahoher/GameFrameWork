@@ -23,7 +23,11 @@ namespace Combat
         protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
 
-        public LogicWorld(IOutsideWorld outside_world, bool need_render_message)
+        public LogicWorld()
+        {
+        }
+
+        public virtual void Initialize(IOutsideWorld outside_world, bool need_render_message)
         {
             m_outside_world = outside_world;
             m_need_render_message = need_render_message;

@@ -15,7 +15,11 @@ namespace Combat
                     return false;
                 int syncturn = command.SyncTurn;
                 if (syncturn > m_ready_turn)
+                {
                     m_ready_turn = syncturn;
+                    //LogWrapper.LogErrorDebugWrapper("Receive Server SyncTurnDone : ", m_ready_turn);
+                }
+                    
                 return false;
             }
             return base.AddCommand(command);

@@ -4,6 +4,12 @@ namespace Combat
 {
     public class BirthPositionInfo
     {
+        /*
+         * 如果是地球上的3D游戏，需要一个位置和一个绕Y轴的朝向，只是位置的Y不是任意的，根据地形或轨道或重力算得
+         * 如果是XZ平面的2D游戏，-Y轴视角，也需要一个位置和一个绕Y轴的朝向，只是Y永远是0
+         * 如果是XY平面的2D游戏，Z轴视角，也需要一个位置和一个绕Y轴的朝向，只是Z永远是0，并且绕Y的朝向只能是0或180
+         * 如果是宇宙空间的3D游戏，再说。。。。。。
+         */
         public Vector3I m_birth_position;
         public int m_birth_angle = 0; //绕Y轴的旋转角度
         public BirthPositionInfo(int x = 0, int y = 0, int z = 0, int angle = 0)

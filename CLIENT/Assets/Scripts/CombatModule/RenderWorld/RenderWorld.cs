@@ -22,7 +22,11 @@ namespace Combat
         protected TaskScheduler<RenderWorld> m_scheduler;
         protected IRenderMessageProcessor m_render_message_processor;
 
-        public RenderWorld(CombatClient combat_client, LogicWorld logic_world)
+        public RenderWorld()
+        {
+        }
+
+        public virtual void Initialize(CombatClient combat_client, LogicWorld logic_world)
         {
             m_combat_client = combat_client;
             m_logic_world = logic_world;
