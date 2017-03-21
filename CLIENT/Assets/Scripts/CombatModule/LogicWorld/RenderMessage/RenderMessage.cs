@@ -5,6 +5,10 @@ namespace Combat
     public partial class RenderMessageType
     {
         public const int Invalid = 0;
+        public const int CreateEntity = 1;              //SimpleRenderMessage
+        public const int DestroyEntity = 2;             //SimpleRenderMessage
+        public const int StartMoving = 3;               //SimpleRenderMessage
+        public const int StopMoving = 4;                //SimpleRenderMessage
     }
 
     public abstract class RenderMessage : IRecyclable

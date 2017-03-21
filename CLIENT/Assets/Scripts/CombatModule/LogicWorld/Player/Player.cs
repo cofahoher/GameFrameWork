@@ -42,6 +42,11 @@ namespace Combat
         {
             m_entities.Remove(entity.ID);
         }
+
+        public SortedDictionary<int, Entity> GetAllEntities()
+        {
+            return m_entities;
+        }
         #endregion
 
         #region Faction

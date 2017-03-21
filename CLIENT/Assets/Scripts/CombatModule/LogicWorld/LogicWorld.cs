@@ -190,21 +190,21 @@ namespace Combat
         {
             m_random_generator.ResetSeed(world_context.m_world_seed);
             m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
-            ObjectConfig object_config = GlobalConfigManager.Instance.GetObjectConfig();
+            IConfigProvider config = m_outside_world.GetConfigProvider();
             for (int i = 0; i < world_context.m_players.Count; ++i)
             {
                 ObjectCreationContext context = world_context.m_players[i];
                 context.m_logic_world = this;
-                context.m_type_data = object_config.GetTypeData(context.m_object_type_id);
-                context.m_proto_data = object_config.GetProtoData(context.m_object_proto_id);
+                context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
+                context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
                 m_player_manager.CreateObject(context);
             }
             for (int i = 0; i < world_context.m_entities.Count; ++i)
             {
                 ObjectCreationContext context = world_context.m_entities[i];
                 context.m_logic_world = this;
-                context.m_type_data = object_config.GetTypeData(context.m_object_type_id);
-                context.m_proto_data = object_config.GetProtoData(context.m_object_proto_id);
+                context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
+                context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
                 m_entity_manager.CreateObject(context);
             }
         }

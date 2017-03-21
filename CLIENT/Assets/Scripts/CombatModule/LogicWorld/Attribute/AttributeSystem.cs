@@ -4,6 +4,7 @@ namespace Combat
 {
     public class AttributeSystem : Singleton<AttributeSystem>
     {
+        static List<int> ms_all_ids = new List<int>();
         bool m_initialized = false;
         SortedDictionary<int, AttributeDefinition> m_definitions_by_id = new SortedDictionary<int, AttributeDefinition>();
         SortedDictionary<string, AttributeDefinition> m_definitions_by_name = new SortedDictionary<string, AttributeDefinition>();
@@ -24,18 +25,22 @@ namespace Combat
             m_definitions_by_name.Clear();
         }
 
-        public void InitializeAllDefinition()
+        public static void AddAttributeID(int id)
+        {
+            ms_all_ids.Add(id);
+        }
+
+        public void InitializeAllDefinition(IConfigProvider config)
         {
             if (m_initialized)
                 return;
-            var all_attribute_config = GlobalConfigManager.Instance.GetAttrubuteConfig().GetAllAttributeData();
-            var enumerator = all_attribute_config.GetEnumerator();
-            while (enumerator.MoveNext())
+            ms_all_ids.Sort();
+            for (int i = 0; i < ms_all_ids.Count; ++i)
             {
-                AttributeData config = enumerator.Current.Value;
-                AttributeDefinition definition = new AttributeDefinition(config);
-                m_definitions_by_id[config.m_attribute_id] = definition;
-                m_definitions_by_name[config.m_attribute_name] = definition;
+                AttributeData data = config.GetAttributeData(ms_all_ids[i]);
+                AttributeDefinition definition = new AttributeDefinition(data);
+                m_definitions_by_id[data.m_attribute_id] = definition;
+                m_definitions_by_name[data.m_attribute_name] = definition;
             }
             BuildStaticDependency();
             m_initialized = true;

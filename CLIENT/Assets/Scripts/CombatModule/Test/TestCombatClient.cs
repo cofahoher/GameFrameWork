@@ -114,6 +114,11 @@ namespace Combat
         }
         #endregion
 
+        public IConfigProvider GetConfigProvider()
+        {
+            return null;
+        }
+
         public int GetCurrentTime()
         {
             return m_network.GetCurrentTime();

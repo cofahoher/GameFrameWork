@@ -44,7 +44,7 @@ namespace Combat
         #region 和局外的接口
         public void Initializa(CombatStartInfo combat_start_info)
         {
-            AttributeSystem.Instance.InitializeAllDefinition();
+            AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
             m_logic_world = m_combat_factory.CreateLogicWorld();
             m_logic_world.Initialize(this, false);
             m_sync_server = m_combat_factory.CreateSyncServer();
@@ -68,6 +68,11 @@ namespace Combat
         #endregion
 
         #region IOutsideWorld
+        public IConfigProvider GetConfigProvider()
+        {
+            return m_combat_factory.GetConfigProvider();
+        }
+
         public int GetCurrentTime()
         {
             return m_last_update_time;

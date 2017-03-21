@@ -4,6 +4,11 @@ namespace Combat
 {
     public class MyCombatFactory : ICombatFactory
     {
+        public IConfigProvider GetConfigProvider()
+        {
+            return ManualConfigProvider.Instance;
+        }
+
         public LogicWorld CreateLogicWorld()
         {
             return new MyLogicWorld();

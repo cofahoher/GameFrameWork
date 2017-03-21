@@ -94,11 +94,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\PropertyAccessorManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\AttributeConfig.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ComponentTypeRegistry.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\GlobalConfigManager.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\LevelConfig.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectConfig.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\IConfigProvider.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ManualConfigProvider.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\Damage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddStateEffectComponent.cs" />

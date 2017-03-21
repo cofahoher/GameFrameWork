@@ -74,7 +74,7 @@ namespace Combat
             m_last_update_time = -1;
             m_waiting_cnt = 0;
 
-            AttributeSystem.Instance.InitializeAllDefinition();
+            AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
             m_combat_factory.RegisterComponents();
             m_combat_factory.RegisterCommands();
             m_combat_factory.RegisterRenderMessages();
@@ -89,7 +89,7 @@ namespace Combat
             WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
             ++m_waiting_cnt;
-            LevelData level_data = GlobalConfigManager.Instance.GetLevelConfig().GetLevelData(combat_start_info.m_level_id);
+            LevelData level_data = GetConfigProvider().GetLevelData(combat_start_info.m_level_id);
             m_render_world.LoadScene(level_data.m_scene_name);
         }
 
@@ -135,6 +135,11 @@ namespace Combat
         #endregion
 
         #region IOutsideWorld
+        public IConfigProvider GetConfigProvider()
+        {
+            return m_combat_factory.GetConfigProvider();
+        }
+
         public int GetCurrentTime()
         {
             float float_time = UnityEngine.Time.unscaledTime;

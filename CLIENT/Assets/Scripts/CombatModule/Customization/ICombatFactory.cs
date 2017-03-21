@@ -4,6 +4,7 @@ namespace Combat
 {
     public interface ICombatFactory
     {
+        IConfigProvider GetConfigProvider();
         LogicWorld CreateLogicWorld();
         RenderWorld CreateRenderWorld();
         ISyncClient CreateSyncClient();

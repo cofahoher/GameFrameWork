@@ -62,6 +62,11 @@ namespace Combat
             m_sync_server.Start(0, latency);
         }
 
+        public IConfigProvider GetConfigProvider()
+        {
+            return null;
+        }
+
         public int GetCurrentTime()
         {
             return m_last_update_time;
