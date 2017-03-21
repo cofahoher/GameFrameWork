@@ -26,7 +26,7 @@ namespace Combat
             CombatStartInfo csi = new CombatStartInfo();
             csi.m_level_id = 1;
             csi.m_world_seed = 1;
-            m_combat_client = new CombatClient();
+            m_combat_client = new CombatClient(new MyCombatFactory());
             m_combat_client.Initializa(TEST_LOCAL_PLAYER_PSTID, csi);
             m_combat_client.AddPlayer(TEST_LOCAL_PLAYER_PSTID);
             m_init = true;
