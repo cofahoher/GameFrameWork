@@ -13,9 +13,11 @@ namespace Combat
         protected int m_current_turn_index = 0;
         protected int m_current_turn_time = 0;
         protected bool m_game_over = false;
+        protected bool m_collapsing = false;
         protected TaskScheduler<LogicWorld> m_scheduler;
 
         protected RandomGenerator m_random_generator;
+        protected IDGenerator m_signal_listener_id_generator;
 
         protected PlayerManager m_player_manager;
         protected EntityManager m_entity_manager;
@@ -37,29 +39,46 @@ namespace Combat
             m_scheduler = new TaskScheduler<LogicWorld>(this);
 
             m_random_generator = new RandomGenerator();
+            m_signal_listener_id_generator = new IDGenerator(IDGenerator.SIGNAL_LISTENER_FIRST_ID);
 
             m_player_manager = new PlayerManager(this);
             m_entity_manager = new EntityManager(this);
             m_effect_manager = new EffectManager(this);
-            m_command_handler = CreateCommandHandler();
             m_faction_manager = new FactionManager(this);
+
+            m_command_handler = CreateCommandHandler();
         }
 
         public virtual void Destruct()
         {
+            m_collapsing = true;
+
             m_scheduler.Destruct();
             m_scheduler = null;
-            m_player_manager.Destruct();
-            m_player_manager = null;
+            m_random_generator.Destruct();
+            m_random_generator = null;
+            m_signal_listener_id_generator.Destruct();
+            m_signal_listener_id_generator = null;
+
             m_entity_manager.Destruct();
             m_entity_manager = null;
+            m_player_manager.Destruct();
+            m_player_manager = null;
+
             m_effect_manager.Destruct();
             m_effect_manager = null;
+            m_faction_manager.Destruct();
+            m_faction_manager = null;
+
             m_command_handler.Destruct();
             m_command_handler = null;
         }
 
         #region GETTER
+        public bool IsCollapsing
+        {
+            get { return m_collapsing; }
+        }
         public bool NeedRenderMessage
         {
             get { return m_need_render_message; }
@@ -83,6 +102,14 @@ namespace Combat
         public TaskScheduler<LogicWorld> GetTaskScheduler()
         {
             return m_scheduler;
+        }
+        public RandomGenerator GetRandomGenerator()
+        {
+            return m_random_generator;
+        }
+        public IDGenerator GetSignalListenerIDGenerator()
+        {
+            return m_signal_listener_id_generator;
         }
         public PlayerManager GetPlayerManager()
         {
@@ -218,5 +245,10 @@ namespace Combat
             m_outside_world.OnGameOver(game_result);
         }
         #endregion
+
+        public int GenerateSignalListenerID()
+        {
+            return m_signal_listener_id_generator.GenID();
+        }
     }
 }

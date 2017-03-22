@@ -22,7 +22,7 @@ namespace Combat
         }
     }
 
-    public class Heap<T> : IDestruct where T : HeapItem
+    public class Heap<T> where T : HeapItem
     {
         public enum CheckPriorityMethod
         {
@@ -110,8 +110,7 @@ namespace Combat
 
         public bool Contains(T item)
         {
-            int hi = item._heap_index;
-            return hi >= 0;
+            return item._heap_index >= 0;
         }
 
         public void Enqueue(T item)
@@ -174,16 +173,13 @@ namespace Combat
 
         public void Remove(T item)
         {
-            int hi = item._heap_index;
-            if (hi >= 0)
-                RemoveByIndex(hi);
+            RemoveByIndex(item._heap_index);
         }
 
         public void RemoveByIndex(int hi)
         {
             if (hi < 0 || hi >= m_data.Count)
                 return;
-
             m_data[hi]._heap_index = -1;
             int size = m_data.Count;
             if (hi == (size - 1))
@@ -286,7 +282,7 @@ namespace Combat
             int result = higher.CompareTo(lower);
             if (result > 0)
                 return true;
-            else if (result > 0)
+            else if (result < 0)
                 return false;
             else
                 return higher._insertion_index < lower._insertion_index;

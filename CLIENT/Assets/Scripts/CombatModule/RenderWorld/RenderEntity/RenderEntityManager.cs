@@ -29,7 +29,6 @@ namespace Combat
 
         protected override void PreDestroyObject(RenderEntity entity)
         {
-            //ZZWTODO
         }
     }
 }

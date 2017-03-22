@@ -38,7 +38,6 @@ namespace Combat
     {
         public static SimpleRenderMessage Create(int type, int entity_id)
         {
-
             SimpleRenderMessage msg = ResuableObjectFactory<RenderMessage>.Create<SimpleRenderMessage>();
             msg.Type = type;
             msg.EntityID = entity_id;

@@ -199,6 +199,7 @@
     <Compile Include="Assets\Scripts\CombatModule\Sync\SinglePlayer\SPWorldSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\SyncParam.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\CombatTester.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\HeapTest.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelServer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncTester.cs" />

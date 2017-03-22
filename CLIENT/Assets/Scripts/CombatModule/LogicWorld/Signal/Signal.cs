@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public enum SignalType
+    public partial class SignalType
     {
-        Invalid = 0,
+        public const int Invalid = 0;
+        public const int StartMoving = 1;
+        public const int StopMoving = 2;
     }
 
-    public class Signal
+    public abstract class Signal
     {
     }
 }

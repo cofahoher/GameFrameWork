@@ -97,11 +97,13 @@ namespace Combat
 
         protected void OnMovementStarted()
         {
+            ParentObject.SendSignal(SignalType.StartMoving);
             GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
         }
 
         protected void OnMovementStopped()
         {
+            ParentObject.SendSignal(SignalType.StopMoving);
             GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID);
         }
 

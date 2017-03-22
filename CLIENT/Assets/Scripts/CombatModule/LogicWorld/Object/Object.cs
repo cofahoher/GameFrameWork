@@ -25,8 +25,7 @@ namespace Combat
         public void Destruct()
         {
             OnDestruct();
-            NotifyGeneratorDestroy();
-            RemoveAllListeners();
+            NotifyGeneratorDestroyAndRemoveAllListeners();
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {

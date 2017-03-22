@@ -4,11 +4,11 @@ namespace Combat
 {
     public interface ISignalGenerator
     {
-        void AddListener(SignalType signal_type, SignalListenerContext listener_context);
-        void RemoveListener(SignalType signal_type, int listener_id);
+        void AddListener(int signal_type, SignalListenerContext listener_context);
+        void RemoveListener(int signal_type, int listener_id);
         void RemoveAllListeners();
-        void SendSignal(SignalType signal_type, Signal signal);
-        void NotifyGeneratorDestroy();
+        void SendSignal(int signal_type, Signal signal = null);
+        void NotifyGeneratorDestroyAndRemoveAllListeners();
     }
 
     public abstract class SignalGenerator : ISignalGenerator
@@ -17,9 +17,8 @@ namespace Combat
 
         protected abstract LogicWorld GetLogicWorldForSignal();
 
-        public void AddListener(SignalType signal_type_enum, SignalListenerContext listener_context)
+        public void AddListener(int signal_type, SignalListenerContext listener_context)
         {
-            int signal_type = (int)(signal_type_enum);
             if (m_all_type_listeners == null)
                 m_all_type_listeners = new SortedDictionary<int, List<SignalListenerContext>>();
             List<SignalListenerContext> listeners;
@@ -36,9 +35,8 @@ namespace Combat
             listeners.Add(listener_context);
         }
 
-        public void RemoveListener(SignalType signal_type_enum, int listener_id)
+        public void RemoveListener(int signal_type, int listener_id)
         {
-            int signal_type = (int)(signal_type_enum);
             if (m_all_type_listeners == null)
                 return;
             List<SignalListenerContext> listeners;
@@ -58,15 +56,16 @@ namespace Combat
             m_all_type_listeners.Clear();
         }
 
-        public void SendSignal(SignalType signal_type_enum, Signal signal)
+        public void SendSignal(int signal_type, Signal signal = null)
         {
-            int signal_type = (int)(signal_type_enum);
             if (m_all_type_listeners == null)
                 return;
             List<SignalListenerContext> listeners;
             if (!m_all_type_listeners.TryGetValue(signal_type, out listeners))
                 return;
             int pre_count = listeners.Count;
+            if (pre_count == 0)
+                return;
             int left_count = pre_count;
             int index = 0;
             LogicWorld logic_world = GetLogicWorldForSignal();
@@ -78,7 +77,7 @@ namespace Combat
                 if (listener == null)
                     listeners.RemoveAt(index);
                 else
-                    listener.ReceiveSignal(this, signal_type_enum, signal);
+                    listener.ReceiveSignal(this, signal_type, signal);
                 int cur_count = listeners.Count;
                 if (cur_count < pre_count)
                     pre_count = cur_count;
@@ -87,18 +86,24 @@ namespace Combat
             }
         }
 
-        public void NotifyGeneratorDestroy()
+        public void NotifyGeneratorDestroyAndRemoveAllListeners()
         {
             if (m_all_type_listeners == null)
                 return;
+            var all_type_listeners = m_all_type_listeners;
+            m_all_type_listeners = null;
             LogicWorld logic_world = GetLogicWorldForSignal();
-            var enumerator = m_all_type_listeners.GetEnumerator();
+            var enumerator = all_type_listeners.GetEnumerator();
+            HashSet<int> notified = new HashSet<int>();
             while (enumerator.MoveNext())
             {
                 List<SignalListenerContext> listeners = enumerator.Current.Value;
                 for (int i = 0; i < listeners.Count; ++i)
                 {
                     SignalListenerContext context = listeners[i];
+                    if (notified.Contains(context.ID))
+                        continue;
+                    notified.Add(context.ID);
                     ISignalListener listener = context.GetListener(logic_world);
                     if (listener != null)
                         listener.OnGeneratorDestroyed(this);

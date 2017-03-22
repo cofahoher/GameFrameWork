@@ -47,6 +47,15 @@ namespace Combat
                 binding = m_unity_go.AddComponent<UnityObjectBinding>();
             binding.EntityID = logic_entity.ID;
         }
+
+        public override void OnDestruct()
+        {
+            if (m_unity_go != null)
+            {
+                GameObject.Destroy(m_unity_go);
+                m_unity_go = null;
+            }
+        }
         #endregion
 
         public void UpdatePosition()

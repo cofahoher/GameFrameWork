@@ -21,7 +21,7 @@ namespace Combat
             return m_combat_client;
         }
 
-        public void Init()
+        public void Initialize()
         {
             CombatStartInfo csi = new CombatStartInfo();
             csi.m_level_id = 1;
@@ -37,6 +37,11 @@ namespace Combat
             if (!m_init)
                 return;
             m_combat_client.OnUpdate(m_combat_client.GetCurrentTime());
+        }
+
+        public void Finalize()
+        {
+            m_combat_client.Destruct();
         }
     }
 }

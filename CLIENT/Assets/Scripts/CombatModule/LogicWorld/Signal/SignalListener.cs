@@ -4,8 +4,7 @@ namespace Combat
 {
     public interface ISignalListener
     {
-        int GetListenerID();
-        void ReceiveSignal(ISignalGenerator generator, SignalType signal_type, Signal signal);
+        void ReceiveSignal(ISignalGenerator generator, int signal_type, Signal signal = null);
         void OnGeneratorDestroyed(ISignalGenerator generator);
     }
 }
