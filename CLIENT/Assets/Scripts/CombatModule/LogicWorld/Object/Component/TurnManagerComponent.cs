@@ -4,16 +4,16 @@ namespace Combat
 {
     public class TurnManagerComponent
     {
-        int m_current_turn_index = 0;
-        int m_current_turn_time = 0;
+        FixPoint m_current_turn_index = FixPoint.Zero;
+        FixPoint m_current_turn_time = FixPoint.Zero;
         TaskScheduler<LogicWorld> m_turn_scheduler;
 
-        public int CurrentTurnIndex
+        public FixPoint CurrentTurnIndex
         {
             get { return m_current_turn_index; }            
         }
 
-        public int CurrentTurnTime
+        public FixPoint CurrentTurnTime
         {
             get { return m_current_turn_index; }   
         }
@@ -25,14 +25,14 @@ namespace Combat
 
         public void OnTurnBegin()
         {
-            ++m_current_turn_index;
-            m_current_turn_time = m_current_turn_index * 10;
+            m_current_turn_index += FixPoint.One;
+            m_current_turn_time = m_current_turn_index * FixPoint.Ten;
             m_turn_scheduler.Update(m_current_turn_time);
         }
 
         public void OnTurnEnd()
         {
-            m_current_turn_time += 1;
+            m_current_turn_time += FixPoint.One;
             m_turn_scheduler.Update(m_current_turn_time);
         }
     }

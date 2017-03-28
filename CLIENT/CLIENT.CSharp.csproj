@@ -135,6 +135,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\CRC.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\CommonDefinition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\FactionManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\FixPoint.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\FixPointAtan2Table.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\FixPointSinTable.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Heap.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDestruct.cs" />
@@ -147,7 +150,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Target.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\TaskScheduler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\TimeType.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector2FP.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector2I.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector3FP.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector3I.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\Component.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\Component\TurnManagerComponent.cs" />
@@ -199,6 +204,7 @@
     <Compile Include="Assets\Scripts\CombatModule\Sync\SinglePlayer\SPWorldSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\SyncParam.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\CombatTester.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\FixPointTester.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\HeapTest.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelServer.cs" />
@@ -209,6 +215,7 @@
     <Compile Include="Assets\Scripts\CombatModule\Test\TestNetworkMessages.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\TestRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\_CodingConventions.cs" />
+    <Compile Include="Assets\Scripts\ConfigProvider.cs" />
     <Compile Include="Assets\Scripts\GameGlobal.cs" />
     <Compile Include="Assets\Scripts\LogWrapper.cs" />
     <Compile Include="Assets\Scripts\SingletonMonobehaviour.cs" />
@@ -216,6 +223,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
+    <None Include="Assets\Resources\Config\AttributeConfig.xml" />
+    <None Include="Assets\Resources\Config\LevelConfig.xml" />
+    <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
+    <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

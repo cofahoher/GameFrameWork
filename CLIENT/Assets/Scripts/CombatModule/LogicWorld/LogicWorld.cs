@@ -8,10 +8,8 @@ namespace Combat
         protected bool m_need_render_message = false;
         protected List<RenderMessage> m_render_messages;
 
-        protected int m_current_time = 0;
+        protected FixPoint m_current_time = FixPoint.Zero;
         protected int m_current_frame = 0;
-        protected int m_current_turn_index = 0;
-        protected int m_current_turn_time = 0;
         protected bool m_game_over = false;
         protected bool m_collapsing = false;
         protected TaskScheduler<LogicWorld> m_scheduler;
@@ -83,21 +81,13 @@ namespace Combat
         {
             get { return m_need_render_message; }
         }
-        public int CurrentTime
+        public FixPoint CurrentTime
         {
             get { return m_current_time; }
         }
         public int CurrentFrame
         {
             get { return m_current_frame; }
-        }
-        public int CurrentTurnIndex
-        {
-            get { return m_current_turn_index; }
-        }
-        public int CurrentTurnTime
-        {
-            get { return m_current_turn_time; }
         }
         public TaskScheduler<LogicWorld> GetTaskScheduler()
         {
@@ -132,16 +122,15 @@ namespace Combat
         #region ILogicWorld 可被继承修改
         public virtual void OnStart()
         {
-            m_current_time = 0;
+            m_current_time = FixPoint.Zero;
             m_current_frame = 0;
-            m_current_turn_index = 0;
-            m_current_turn_time = 0;
             m_outside_world.OnGameStart();
         }
 
         public virtual bool OnUpdate(int delta_ms)
         {
-            m_current_time += delta_ms;
+            FixPoint delta_time = new FixPoint(delta_ms) / FixPoint.Thousand;
+            m_current_time += delta_time;
             ++m_current_frame;
             m_scheduler.Update(m_current_time);
             return m_game_over;

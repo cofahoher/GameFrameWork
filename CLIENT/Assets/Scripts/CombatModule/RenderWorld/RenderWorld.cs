@@ -6,14 +6,13 @@ namespace Combat
 {
     public class RenderWorld : IDestruct
     {
-        public static Vector3 LogiocPosition2RenderPosition(Vector3I v3i)
+        public static Vector3 LogiocPosition2RenderPosition(Vector3FP v3fp)
         {
-            return new Vector3((float)v3i.x / IntMath.METER_MAGNIFICATION, (float)v3i.y / IntMath.METER_MAGNIFICATION, (float)v3i.z / IntMath.METER_MAGNIFICATION);
+            return new Vector3((float)v3fp.x, (float)v3fp.y, (float)v3fp.z);
         }
-
-        public static Vector3I RenderPosition2LogiocPosition(Vector3 v3)
+        public static Vector3FP RenderPosition2LogiocPosition(Vector3 v3)
         {
-            return new Vector3I(v3.x * IntMath.METER_MAGNIFICATION, v3.y * IntMath.METER_MAGNIFICATION, v3.z * IntMath.METER_MAGNIFICATION);
+            return new Vector3FP(FixPoint.CreateFromFloat(v3.x), FixPoint.CreateFromFloat(v3.y), FixPoint.CreateFromFloat(v3.z));
         }
 
         protected CombatClient m_combat_client;
@@ -92,8 +91,9 @@ namespace Combat
         {
         }
 
-        public virtual void OnUpdate(int delta_ms, int current_time)
+        public virtual void OnUpdate(int delta_ms, int current_time_ms)
         {
+            FixPoint current_time = new FixPoint(current_time_ms) / FixPoint.Thousand;
             UpdateMovingEntities();
             ProcessRenderMessages();
             m_scheduler.Update(current_time);

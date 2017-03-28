@@ -70,7 +70,7 @@ namespace Combat
         {
             return m_context.m_logic_world;
         }
-        public int GetCurrentTime()
+        public FixPoint GetCurrentTime()
         {
             return m_context.m_logic_world.CurrentTime;
         }

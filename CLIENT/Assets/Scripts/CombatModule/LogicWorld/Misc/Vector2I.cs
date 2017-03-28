@@ -9,28 +9,17 @@ namespace Combat
      * XZ对应Unity的XZ：X轴朝右，Y轴朝上，Z轴朝前，顺时针逆时针都是从上往下看的，即-Y轴视角
      * 也可以按需定义为XY平面，这时候用XY属性，这时候假设Z轴朝向屏幕外
     */
-    public struct Vector2I
+    public struct Vector2I : IEquatable<Vector2I>
     {
         public int x;
         public int z;
-
-        public int X
-        {
-            get { return x; }
-            set { x = value; }
-        }
-        public int Y
-        {
-            get { return z; }
-            set { z = value; }
-        }
 
         public Vector2I(int a = 0, int b = 0)
         {
             x = a;
             z = b;
         }
-        public Vector2I(float a, int b)
+        public Vector2I(float a, float b)
         {
             x = (int)a;
             z = (int)b;
@@ -40,33 +29,29 @@ namespace Combat
             x = rhs.x;
             z = rhs.z;
         }
-        public void Set(int a, int b)
-        {
-            x = a;
-            z = b;
-        }
 
-        public override string ToString()
+        public override int GetHashCode()
         {
-            return "(" + x + ", " + z + ")";
+            return 0;
         }
         public override bool Equals(object rhs)
         {
             return (rhs is Vector2I) && Equals((Vector2I)rhs);
         }
-        public bool Equals(Vector3I rhs)
+        public bool Equals(Vector2I rhs)
         {
             return x == rhs.x && z == rhs.z;
         }
-        public override int GetHashCode()
+        public override string ToString()
         {
-            return 0;
+            return "(" + x + ", " + z + ")";
         }
 
         public static Vector2I operator -(Vector2I v2i)
         {
             return new Vector2I(-v2i.x, -v2i.z);
         }
+
         public static Vector2I operator +(Vector2I lhs, Vector2I rhs)
         {
             return new Vector2I(lhs.x + rhs.x, lhs.z + rhs.z);
@@ -99,34 +84,19 @@ namespace Combat
             return lhs.x != rhs.x || lhs.z != rhs.z;
         }
 
+        public int Normalize()
+        {
+            int length = Length();
+            if (length == 0)
+                return 0;
+            x = x * IntMath.METER_MAGNIFICATION / length;
+            z = z * IntMath.METER_MAGNIFICATION / length;
+            return length;
+        }
+
         public int Dot(ref Vector2I v2i)
         {
             return x * v2i.x + z * v2i.z;
-        }
-
-        public void Zero()
-        {
-            x = 0;
-            z = 0;
-        }
-        public bool IsZero()
-        {
-            return x == 0 && z == 0;
-        }
-
-        public void Reverse()
-        {
-            x = -x;
-            z = -z;
-        }
-        public Vector2I GetReverse()
-        {
-            return new Vector2I(-x, -z);
-        }
-        public void GetReverse(ref Vector2I v2i)
-        {
-            v2i.x = -x;
-            v2i.z = -z;
         }
 
         public int LengthSquare()
@@ -149,16 +119,6 @@ namespace Combat
         public int Distance(ref Vector2I v2i)
         {
             return IntMath.Distance2D(v2i.x - x, v2i.z - z);
-        }
-
-        public int Normalize()
-        {
-            int length = Length();
-            if (length == 0)
-                return 0;
-            x = x * IntMath.METER_MAGNIFICATION / length;
-            z = z * IntMath.METER_MAGNIFICATION / length;
-            return length;
         }
 
         public int ScaleToLength(int expected_length)
@@ -186,6 +146,17 @@ namespace Combat
         {
             x = x * multiply / divide;
             z = z * multiply / divide;
+        }
+
+        public void MakeZero()
+        {
+            x = 0;
+            z = 0;
+        }
+        public void Reverse()
+        {
+            x = -x;
+            z = -z;
         }
 
         //v2i在当前向量的哪个方向
@@ -250,14 +221,6 @@ namespace Combat
             return this - reflect;
         }
 
-        static public void Lerp(ref Vector2I from, ref Vector2I to, int cur_t, int total_t, ref Vector2I result)
-        {
-            if (cur_t > total_t)
-                cur_t = total_t;
-            result.x = from.x + (to.x - from.x) * cur_t / total_t;
-            result.z = from.z + (to.z - from.z) * cur_t / total_t;
-        }
-
         public int ToDegree()
         {
             //ZZWTODO 和美术资源的默认朝向相关
@@ -272,32 +235,37 @@ namespace Combat
             Normalize();
         }
 
-        public static bool NotInsideRegion(ref Vector2I p, ref Vector2I top_left, ref Vector2I bottom_right)
+        public static bool InsideRegion(ref Vector2I p, ref Vector2I min_xz, ref Vector2I max_xz)
         {
-            return p.x < top_left.x || p.x > bottom_right.x || p.z > top_left.z || p.z < bottom_right.z;
-        }
-
-        public static bool NotInsideRegion(ref Vector2I p, int left, int top, int right, int bottom)
-        {
-            return p.x < left || p.x > right || p.z > top || p.z < bottom;
-        }
-
-        public static bool InsideRegion(ref Vector2I p, ref Vector2I top_left, ref Vector2I bottom_right)
-        {
-            return !(p.x < top_left.x || p.x > bottom_right.x || p.z > top_left.z || p.z < bottom_right.z);
-        }
-
-        public static bool InsideRegion(ref Vector2I p, int left, int top, int right, int bottom)
-        {
-            return !(p.x < left || p.x > right || p.z > top || p.z < bottom);
+            return !(p.x < min_xz.x || p.z < min_xz.z || p.x > max_xz.x || p.z > max_xz.z);
         }
 
         // 判断target是否在以source为中心的朝向为facing的角度范围fov_deg里面
-        public static bool InsideFOV(ref Vector2I source, ref Vector2I facing, int fov_deg, ref Vector2I target)
+        public static bool InsideFov(ref Vector2I source, ref Vector2I facing, int fov_deg, ref Vector2I target)
         {
-            Vector2I to_second = target - source;
-            to_second.Normalize();
-            return to_second.Dot(ref facing) >= IntMath.CosI(fov_deg / 2);
+            Vector2I to_target = target - source;
+            to_target.Normalize();
+            return to_target.Dot(ref facing) >= IntMath.CosI(fov_deg / 2);
+        }
+
+        static public void Lerp(ref Vector2I from, ref Vector2I to, int cur_t, int total_t, ref Vector2I result)
+        {
+            if (cur_t >= total_t)
+            {
+                result = to;
+                return;
+            }
+            result.x = from.x + (to.x - from.x) * cur_t / total_t;
+            result.z = from.z + (to.z - from.z) * cur_t / total_t;
+        }
+
+        static public Vector2I Lerp(ref Vector2I from, ref Vector2I to, int cur_t, int total_t)
+        {
+            if (cur_t >= total_t)
+                return to;
+            int result_x = from.x + (to.x - from.x) * cur_t / total_t;
+            int result_z = from.z + (to.z - from.z) * cur_t / total_t;
+            return new Vector2I(result_x, result_z);
         }
     }
 }

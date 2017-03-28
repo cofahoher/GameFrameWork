@@ -1,0 +1,25 @@
+<ConfigSystem>
+	<ObjectTypeConfig>
+		<ConfigItem id="1" name="EnvironmentPlayer">
+		</ConfigItem>
+		<ConfigItem id="2" name="AIEnemyPlayer">
+		</ConfigItem>
+		<ConfigItem id="3" name="LocalPlayer">
+		</ConfigItem>
+		<ConfigItem id="101" name="Hero">
+			<Component id="2001">
+				<var key="ext_x" value="0.5"/>
+				<var key="ext_y" value="0.5"/>
+				<var key="ext_z" value="0.5"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="2002">
+				<var key="max_speed" value="5.0"/>
+			</Component>
+			<Component id="2008">
+			</Component>
+			<Component id="10001">
+			</Component>
+		</ConfigItem>
+	</ObjectTypeConfig>
+</ConfigSystem>

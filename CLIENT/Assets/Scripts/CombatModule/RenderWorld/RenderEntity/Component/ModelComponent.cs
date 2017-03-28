@@ -40,7 +40,7 @@ namespace Combat
             if (m_position_component != null)
             {
                 m_unity_go.transform.position = RenderWorld.LogiocPosition2RenderPosition(m_position_component.CurrentPosition);
-                m_unity_go.transform.localEulerAngles = new Vector3(0, m_position_component.CurrentAngle, 0);
+                m_unity_go.transform.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
             }
             UnityObjectBinding binding = m_unity_go.GetComponent<UnityObjectBinding>();
             if (binding == null)
@@ -61,7 +61,7 @@ namespace Combat
         public void UpdatePosition()
         {
             m_unity_go.transform.position = RenderWorld.LogiocPosition2RenderPosition(m_position_component.CurrentPosition);
-            m_unity_go.transform.localEulerAngles = new Vector3(0, m_position_component.CurrentAngle, 0);
+            m_unity_go.transform.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
         }
     }
 }

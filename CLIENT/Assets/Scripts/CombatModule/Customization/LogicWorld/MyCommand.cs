@@ -10,7 +10,7 @@ namespace Combat
     public class EntityMoveCommand : Command
     {
         public int m_entity_id = 0;
-        public Vector3I m_destination;
+        public Vector3FP m_destination;
         public EntityMoveCommand()
         {
             m_type = CommandType.EntityMove;
@@ -20,7 +20,7 @@ namespace Combat
         {
             base.Reset();
             m_entity_id = 0;
-            m_destination.Zero();
+            m_destination.MakeZero();
         }
     }
 }

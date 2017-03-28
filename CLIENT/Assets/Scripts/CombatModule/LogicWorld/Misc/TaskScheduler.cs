@@ -18,7 +18,7 @@ namespace Combat
             m_queue.Clear();
         }
 
-        public void Schedule(Task<TContext> task, int current_time, int delay = 0, int period = -1)
+        public void Schedule(Task<TContext> task, FixPoint current_time, FixPoint delay = default(FixPoint), FixPoint period = default(FixPoint))
         {
             task.SetTaskScheduler(this);
             task.ScheduleTime = current_time;
@@ -32,15 +32,15 @@ namespace Combat
             m_queue.Remove(task);
         }
 
-        public void Update(int current_time)
+        public void Update(FixPoint current_time)
         {
             while (true)
             {
                 Task<TContext> task = m_queue.Peek();
                 if (task == null || task.NextExecutionTime > current_time)
                     break;
-                int delta_time = 0;
-                if (task.Period > 0)
+                FixPoint delta_time;
+                if (task.Period.RawValue > 0)
                 {
                     delta_time = task.NextExecutionTime - task.ScheduleTime;
                     task.ScheduleTime = task.NextExecutionTime;
@@ -60,21 +60,21 @@ namespace Combat
     public abstract class Task<TContext> : HeapItem, IRecyclable, IDestruct
     {
         protected TaskScheduler<TContext> m_scheduler;
-        protected int m_schedule_time = -1;
-        protected int m_period = -1;
-        protected int m_next_execution_time = -1;
+        protected FixPoint m_schedule_time = default(FixPoint);
+        protected FixPoint m_period = default(FixPoint);
+        protected FixPoint m_next_execution_time = default(FixPoint);
 
-        public int ScheduleTime
+        public FixPoint ScheduleTime
         {
             get { return m_schedule_time; }
             set { m_schedule_time = value; }
         }
-        public int Period
+        public FixPoint Period
         {
             get { return m_period; }
             set { m_period = value; }
         }
-        public int NextExecutionTime
+        public FixPoint NextExecutionTime
         {
             get { return m_next_execution_time; }
             set { m_next_execution_time = value; }
@@ -104,12 +104,12 @@ namespace Combat
             _insertion_index = -1;
 
             m_scheduler = null;
-            m_schedule_time = -1;
-            m_period = -1;
-            m_next_execution_time = -1;
+            m_schedule_time = default(FixPoint);
+            m_period = default(FixPoint);
+            m_next_execution_time = default(FixPoint);
         }
 
-        public virtual void Schedule(int current_time, int delay = 0, int period = -1)
+        public virtual void Schedule(FixPoint current_time, FixPoint delay = default(FixPoint), FixPoint period = default(FixPoint))
         {
             if (m_scheduler != null)
                 m_scheduler.Schedule(this, current_time, delay, period);
@@ -126,14 +126,14 @@ namespace Combat
             return IsInHeap();
         }
 
-        public abstract void Run(TContext context, int current_time, int delta_time);
+        public abstract void Run(TContext context, FixPoint current_time, FixPoint delta_time);
 
         public override int CompareTo(object obj)
         {
             Task<TContext> item = obj as Task<TContext>;
             if (item == null)
                 return -1;
-            int result = m_next_execution_time - item.m_next_execution_time;
+            int result = m_next_execution_time.CompareTo(item.m_next_execution_time);
             if (result != 0)
                 return result;
             else

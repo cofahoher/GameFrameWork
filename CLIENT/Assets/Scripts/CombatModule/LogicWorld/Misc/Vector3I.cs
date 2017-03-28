@@ -27,16 +27,10 @@ namespace Combat
             y = rhs.y;
             z = rhs.z;
         }
-        public void Set(int a, int b, int c)
-        {
-            x = a;
-            y = b;
-            z = c;
-        }
 
-        public override string ToString()
+        public override int GetHashCode()
         {
-            return "(" + x + ", " + y + ", " + z + ")";
+            return 0;
         }
         public override bool Equals(object rhs)
         {
@@ -46,15 +40,16 @@ namespace Combat
         {
             return x == rhs.x && y == rhs.y && z == rhs.z;
         }
-        public override int GetHashCode()
+        public override string ToString()
         {
-            return 0;
+            return "(" + x + ", " + y + ", " + z + ")";
         }
 
         public static Vector3I operator -(Vector3I v3i)
         {
             return new Vector3I(-v3i.x, -v3i.y, -v3i.z);
         }
+
         public static Vector3I operator +(Vector3I lhs, Vector3I rhs)
         {
             return new Vector3I(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
@@ -88,6 +83,17 @@ namespace Combat
             return lhs.x != rhs.x || lhs.y != rhs.y || lhs.z != rhs.z;
         }
 
+        public int Normalize()
+        {
+            int length = Length();
+            if (length == 0)
+                return 0;
+            x = x * IntMath.METER_MAGNIFICATION / length;
+            y = y * IntMath.METER_MAGNIFICATION / length;
+            z = z * IntMath.METER_MAGNIFICATION / length;
+            return length;
+        }
+
         public int Dot(Vector3I v3i)
         {
             return x * v3i.x + y * v3i.y + z * v3i.z;
@@ -100,30 +106,6 @@ namespace Combat
                 z * v3i.x - x * v3i.z,
                 x * v3i.y - y * v3i.x
             );
-        }
-
-        public void Zero()
-        {
-            x = y = z = 0;
-        }
-        public void UnitX()
-        {
-            x = 1;
-            y = z = 0;
-        }
-        public void UnitY()
-        {
-            y = 1;
-            x = z = 0;
-        }
-        public void UnitZ()
-        {
-            z = 1;
-            x = y = 0;
-        }
-        public void One()
-        {
-            x = y = z = 1;
         }
 
         public int LengthSquare()
@@ -145,31 +127,56 @@ namespace Combat
             return dx * dx + dy * dy + dz * dz;
         }
 
-        public int Distance(ref Vector3I v2i)
+        public int Distance(ref Vector3I v3i)
         {
-            int temp = IntMath.Distance2D(v2i.x - x, v2i.z - z);
-            return IntMath.Distance2D(temp, v2i.y - y);
+            int temp = IntMath.Distance2D(v3i.x - x, v3i.z - z);
+            return IntMath.Distance2D(temp, v3i.y - y);
         }
 
-        public int Normalize()
+        public void MakeZero()
         {
-            int length = Length();
-            if (length == 0)
-                return 0;
-            x = x * IntMath.METER_MAGNIFICATION / length;
-            y = y * IntMath.METER_MAGNIFICATION / length;
-            z = z * IntMath.METER_MAGNIFICATION / length;
-            return length;
+            x = y = z = 0;
+        }
+        public void MakeUnitX()
+        {
+            x = 1;
+            y = z = 0;
+        }
+        public void MakeUnitY()
+        {
+            y = 1;
+            x = z = 0;
+        }
+        public void MakeUnitZ()
+        {
+            z = 1;
+            x = y = 0;
+        }
+        public void MakeOne()
+        {
+            x = y = z = 1;
         }
 
-        public static Vector3I Lerp(Vector3I from, Vector3I to, int cur_t, int total_t, Vector3I result)
+        public static void Lerp(Vector3I from, Vector3I to, int cur_t, int total_t, ref Vector3I result)
         {
-            if (cur_t > total_t)
-                cur_t = total_t;
+            if (cur_t >= total_t)
+            {
+                result = to;
+                return;
+            }
             result.x = from.x + (to.x - from.x) * cur_t / total_t;
             result.y = from.y + (to.y - from.y) * cur_t / total_t;
             result.z = from.z + (to.z - from.z) * cur_t / total_t;
-            return result;
+        }
+
+        public static Vector3I Lerp(Vector3I from, Vector3I to, int cur_t, int total_t)
+        {
+            if (cur_t >= total_t)
+                return to;
+            int result_x = from.x + (to.x - from.x) * cur_t / total_t;
+            int result_y = from.y + (to.y - from.y) * cur_t / total_t;
+            int result_z = from.z + (to.z - from.z) * cur_t / total_t;
+            return new Vector3I(result_x, result_y, result_z);
         }
     };
 }

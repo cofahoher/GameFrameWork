@@ -5,34 +5,90 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 {
     readonly long m_raw_value;
 
-    public FixPoint(int value)
+    public FixPoint(int value = 0)
     {
         m_raw_value = value * ONE;
     }
 
+    public static FixPoint CreateFromFloat(float value)
+    {
+        return new FixPoint((long)(value * ONE));
+    }
+
+    public static FixPoint FromRaw(long raw_value)
+    {
+        return new FixPoint(raw_value);
+    }
+
+    public long RawValue
+    {
+        get { return m_raw_value; }
+    }
+
     public static FixPoint Parse(string str)
     {
-        int index = str.IndexOf('/');
-        if (index == 0)
+        int sign = 0;
+        bool fractional = false;
+        FixPoint fractional_base = FixPoint.One;
+        FixPoint result = FixPoint.Zero;
+        for (int i = 0; i < str.Length; ++i)
         {
-            return new FixPoint(int.Parse(str));
+            char ch = str[i];
+            char code = ParseCodeTable[ch];
+            if (code == Digit_____)
+            {
+                int num = ch - '0';
+                if (fractional)
+                {
+                    fractional_base *= FixPoint.Ten;
+                    result += FixPointDigit[num] / fractional_base;
+                }
+                else
+                {
+                    result *= FixPoint.Ten;
+                    result += FixPointDigit[num];
+                }
+            }
+            else if (code == Point_____)
+            {
+                if (fractional)
+                    break;
+                fractional = true;
+            }
+            else if (code == Sign______)
+            {
+                if (sign != 0 || result.RawValue != 0 || fractional)
+                    break;
+                if (ch == '-')
+                    sign = -1;
+                else
+                    sign = 1;
+            }
+            else if (code == WhiteSpace)
+                continue;
+            else
+                break;
         }
-        else
-        {
-            string temp = str.Substring(0, index);
-            FixPoint a = new FixPoint(int.Parse(temp));
-            temp = str.Substring(index + 1);
-            FixPoint b = new FixPoint(int.Parse(temp));
-            return a / b;
-        }
+        if (sign < 0)
+            result = -result;
+        return result;
     }
 
     public static readonly decimal Precision = (decimal)(new FixPoint(1L));//0.0000152587890625m
     public static readonly FixPoint MaxValue = new FixPoint(MAX_VALUE);
     public static readonly FixPoint MinValue = new FixPoint(MIN_VALUE);
-    public static readonly FixPoint One = new FixPoint(ONE);
     public static readonly FixPoint Zero = new FixPoint(0L);
+    public static readonly FixPoint One = new FixPoint(ONE);
+    public static readonly FixPoint MinusOne = new FixPoint(-ONE);
+    public static readonly FixPoint Two = new FixPoint(ONE * 2L);
+    public static readonly FixPoint Ten = new FixPoint(ONE * 10L);
+    public static readonly FixPoint Hundred = new FixPoint(ONE * 100L);
+    public static readonly FixPoint Thousand = new FixPoint(ONE * 1000L);
+    public static readonly FixPoint Million = new FixPoint(ONE * 1000000L);
     public static readonly FixPoint PrecisionFP = new FixPoint(1L);
+    public static readonly FixPoint[] FixPointDigit = new[]{
+        (FixPoint)0, (FixPoint)1, (FixPoint)2, (FixPoint)3, (FixPoint)4, (FixPoint)5, (FixPoint)6, (FixPoint)7, (FixPoint)8, (FixPoint)9
+    };
 
     public static readonly FixPoint QuarterPi = new FixPoint(QUARTER_PI);
     public static readonly FixPoint HalfPi = new FixPoint(HALF_PI);
@@ -41,6 +97,13 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     public static readonly FixPoint TwoPi = new FixPoint(TWO_PI);
     public static readonly FixPoint InvPi = new FixPoint(INV_PI);
 
+    public static readonly FixPoint RadianPerDegree = new FixPoint(1144L);
+    public static readonly FixPoint DegreePerRadian = new FixPoint(3754936L);
+
+    public static explicit operator FixPoint(int value)
+    {
+        return new FixPoint(value * ONE);
+    }
     public static explicit operator FixPoint(long value)
     {
         return new FixPoint(value * ONE);
@@ -81,13 +144,13 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return (decimal)value.m_raw_value / ONE;
     }
 
-    public override bool Equals(object obj)
-    {
-        return obj is FixPoint && ((FixPoint)obj).m_raw_value == m_raw_value;
-    }
     public override int GetHashCode()
     {
         return m_raw_value.GetHashCode();
+    }
+    public override bool Equals(object obj)
+    {
+        return obj is FixPoint && ((FixPoint)obj).m_raw_value == m_raw_value;
     }
     public bool Equals(FixPoint other)
     {
@@ -196,6 +259,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             g1 = (g0 + (x / g0)) >> 1;
         }
         return new FixPoint(g0);
+    }
+
+    public static FixPoint Distance(FixPoint x, FixPoint y)
+    {
+        return Sqrt(x * x + y * y);
     }
 
     public static FixPoint FastDistance(FixPoint x, FixPoint y)
@@ -312,6 +380,16 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         }
     }
 
+    public static FixPoint Degree2Radian(FixPoint degree)
+    {
+        return degree * RadianPerDegree;
+    }
+
+    public static FixPoint Radian2Degree(FixPoint radian)
+    {
+        return radian * DegreePerRadian;
+    }
+
     #region 内部
     const int NUM_BITS = 64;
     const int FRACTIONAL_PLACES = 16;
@@ -325,7 +403,6 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long ONE_AND_HALF_PI = 308826L;
     const long TWO_PI = 411768L;
     const long INV_PI = 20860L;
-    const long ATAN2_TABLE_SIZE = 1L << FRACTIONAL_PLACES;
 
     internal static void GenerateSinTable()
     {
@@ -388,14 +465,38 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         m_raw_value = raw_value;
     }
 
-    public static FixPoint FromRaw(long raw_value)
-    {
-        return new FixPoint(raw_value);
-    }
-
-    public long RawValue
-    {
-        get { return m_raw_value; }
-    }
+    static readonly char WhiteSpace = (char)1;
+    static readonly char Error_____ = (char)2;
+    static readonly char Digit_____ = (char)3;
+    static readonly char Sign______ = (char)4;
+    static readonly char Point_____ = (char)5;
+    static readonly char[] ParseCodeTable = new[]{
+        WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,WhiteSpace,  // 0
+        WhiteSpace,Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 10
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 20
+        Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 30
+        Error_____,Error_____,Error_____,Sign______,WhiteSpace,Sign______,Point_____,Error_____,Digit_____,Digit_____,  // 40
+        Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Error_____,Error_____,  // 50
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 60
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 70
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 80
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 90
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 100
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 110
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 120
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 130
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 140
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 150
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 160
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 170
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 180
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 190
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 200
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 210
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 220
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 230
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 240
+        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____                                               // 250
+    };
     #endregion
 }

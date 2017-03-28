@@ -1,0 +1,6 @@
+<ConfigSystem>
+	<AttributeConfig>
+		<ConfigItem id="1" name="MaxHealth" formula="BaseAttributes.MaxHealth" reflection="CurrentMaxHealth" clamp="CurrentHealth" clamp_min="1">
+		</ConfigItem>
+	</AttributeConfig>
+</ConfigSystem>

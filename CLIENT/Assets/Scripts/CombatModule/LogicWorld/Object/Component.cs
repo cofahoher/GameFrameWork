@@ -40,7 +40,7 @@ namespace Combat
         {
             return m_parent_object.GetLogicWorld();
         }
-        public int GetCurrentTime()
+        public FixPoint GetCurrentTime()
         {
             return m_parent_object.GetCurrentTime();
         }

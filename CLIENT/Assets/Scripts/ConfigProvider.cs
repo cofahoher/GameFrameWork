@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ManualConfigProvider : Singleton<ManualConfigProvider>, IConfigProvider
+    public class ConfigProvider : Singleton<ConfigProvider>, IConfigProvider
     {
         Dictionary<int, LevelData> m_level_data = new Dictionary<int, LevelData>();
         public Dictionary<int, ObjectTypeData> m_object_type_data = new Dictionary<int, ObjectTypeData>();
         public Dictionary<int, ObjectProtoData> m_object_proto_data = new Dictionary<int, ObjectProtoData>();
 
-        private ManualConfigProvider()
+        private ConfigProvider()
         {
             InitLevelData();
             InitObjectTypeData();

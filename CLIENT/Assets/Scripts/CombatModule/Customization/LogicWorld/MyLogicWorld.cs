@@ -16,7 +16,9 @@ namespace Combat
 
     public class MyLogicWorld : LogicWorld
     {
-        protected TaskScheduler<LogicWorld> m_turn_scheduler;
+        FixPoint m_current_turn_index = FixPoint.Zero;
+        FixPoint m_current_turn_time = FixPoint.Zero;
+        TaskScheduler<LogicWorld> m_turn_scheduler;
 
         public MyLogicWorld()
         {
@@ -41,23 +43,40 @@ namespace Combat
         }
 
         #region GETTER
+        public FixPoint CurrentTurnIndex
+        {
+            get { return m_current_turn_index; }
+        }
+        public FixPoint CurrentTurnTime
+        {
+            get { return m_current_turn_time; }
+        }
         public TaskScheduler<LogicWorld> GetTurnTaskScheduler()
         {
             return m_turn_scheduler;
         }
         #endregion
-        
+
+        #region ILogicWorld
+        public override void OnStart()
+        {
+            m_current_turn_index = FixPoint.Zero;
+            m_current_turn_time = FixPoint.Zero;
+            base.OnStart();
+        }
+        #endregion
+
         #region 回合制
         public void OnTurnBegin()
         {
-            ++m_current_turn_index;
-            m_current_turn_time = m_current_turn_index * 10;
+            m_current_turn_index += FixPoint.One;
+            m_current_turn_time = m_current_turn_index * FixPoint.Ten;
             m_turn_scheduler.Update(m_current_turn_time);
         }
 
         public void OnTurnEnd()
         {
-            m_current_turn_time += 1;
+            m_current_turn_time += FixPoint.One;
             m_turn_scheduler.Update(m_current_turn_time);
         }
         #endregion

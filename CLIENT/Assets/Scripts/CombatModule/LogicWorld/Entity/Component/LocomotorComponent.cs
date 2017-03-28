@@ -11,20 +11,20 @@ namespace Combat
             ByDestination = 2,
         }
         //配置数据
-        int m_max_speed = 0;
+        FixPoint m_current_max_speed = FixPoint.Zero;
         //运行数据
         PositionComponent m_position_component;
         MovingMode m_mode = MovingMode.Invalid;
         bool m_is_moving = false;
-        Vector3I m_direction;
-        Vector3I m_destination;
+        Vector3FP m_direction;
+        Vector3FP m_destination;
         LocomoterTask m_task;
-        int m_remain_time = 0;
+        FixPoint m_remain_time = FixPoint.Zero;
 
         #region GETTER
-        public int MaxSpeed
+        public FixPoint MaxSpeed
         {
-            get { return m_max_speed; }
+            get { return m_current_max_speed; }
         }
         public bool IsMoving
         {
@@ -37,7 +37,7 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("max_speed", out value))
-                m_max_speed = int.Parse(value);
+                m_current_max_speed = FixPoint.Parse(value);
         }
 
         protected override void PostInitializeComponent()
@@ -47,27 +47,27 @@ namespace Combat
         #endregion
 
         #region 接口操作
-        public void MoveByDirection(Vector3I direction)
+        public void MoveByDirection(Vector3FP direction)
         {
             if (!IsEnable())
                 return;
             m_mode = MovingMode.ByDirection;
             m_direction = direction;
             m_direction.Normalize();
-            m_position_component.SetAngle(IntMath.XZToDegree(m_direction.x, -m_direction.z));
+            m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
             StartMoving();
         }
 
-        public void MoveByDestination(Vector3I destination)
+        public void MoveByDestination(Vector3FP destination)
         {
             if (!IsEnable())
                 return;
             m_mode = MovingMode.ByDestination;
             m_direction = destination - m_position_component.CurrentPosition;
-            int length = m_direction.Normalize();
+            FixPoint length = m_direction.Normalize();
             m_destination = destination;
-            m_position_component.SetAngle(IntMath.XZToDegree(m_direction.x, -m_direction.z));
-            m_remain_time = length * 1000 / m_max_speed;
+            m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
+            m_remain_time = length / m_current_max_speed;
             StartMoving();
         }
 
@@ -87,7 +87,8 @@ namespace Combat
             if (m_task == null)
                 m_task = new LocomoterTask(this);
             var schedeler = GetLogicWorld().GetTaskScheduler();
-            schedeler.Schedule(m_task, GetCurrentTime(), SyncParam.FRAME_TIME, SyncParam.FRAME_TIME);
+            FixPoint period = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
+            schedeler.Schedule(m_task, GetCurrentTime(), period, period);
             if (!m_is_moving)
             {
                 m_is_moving = true;
@@ -107,13 +108,13 @@ namespace Combat
             GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID);
         }
 
-        public void UpdatePosition(int delta_ms)
+        public void UpdatePosition(FixPoint delta_time)
         {
-            m_position_component.CurrentPosition += m_direction * m_max_speed * delta_ms / 100000;
+            m_position_component.CurrentPosition += m_direction * m_current_max_speed * delta_time;
             if (m_mode == MovingMode.ByDestination)
             {
-                m_remain_time -= delta_ms;
-                if (m_remain_time <= 0)
+                m_remain_time -= delta_time;
+                if (m_remain_time <= FixPoint.Zero)
                     StopMoving();
             }
         }
@@ -134,7 +135,7 @@ namespace Combat
             m_locomotor_component = locomotor_component;
         }
 
-        public override void Run(LogicWorld logic_world, int current_time, int delta_time)
+        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
             m_locomotor_component.UpdatePosition(delta_time);
         }

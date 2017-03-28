@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Combat
 {
-    public class AnimationComponent
+    public class AnimationComponent : RenderEntityComponent
     {
     }
 }

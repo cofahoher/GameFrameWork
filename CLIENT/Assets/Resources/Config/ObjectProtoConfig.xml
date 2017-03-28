@@ -1,0 +1,14 @@
+<ConfigSystem>
+	<ObjectProtoConfig>
+		<ConfigItem id="101001" name="Cube">
+			<Component>
+				<var key="asset" value="Objects/3D/zzw_cube"/>
+			</Component>
+		</ConfigItem>
+		<ConfigItem id="101002" name="Cube">
+			<Component>
+				<var key="asset" value="Objects/3D/zzw_sphere"/>
+			</Component>
+		</ConfigItem>
+	</ObjectProtoConfig>
+</ConfigSystem>

@@ -5,7 +5,7 @@ namespace Combat
     public interface ILogicOwnerInfo
     {
         LogicWorld GetLogicWorld();
-        int GetCurrentTime();
+        FixPoint GetCurrentTime();
         int GetOwnerObjectID();
         Object GetOwnerObject();
         int GetOwnerPlayerID();
