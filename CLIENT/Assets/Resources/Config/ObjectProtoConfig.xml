@@ -10,5 +10,15 @@
 				<var key="asset" value="Objects/3D/zzw_sphere"/>
 			</Component>
 		</ConfigItem>
+		<ConfigItem id="102001" name="ssx_legacy">
+			<Component>
+				<var key="asset" value="Objects/3D/zzw_ssx_legacy"/>
+			</Component>
+		</ConfigItem>
+		<ConfigItem id="103001" name="ssx_mecanim">
+			<Component>
+				<var key="asset" value="Objects/3D/zzw_ssx_mecanim"/>
+			</Component>
+		</ConfigItem>
 	</ObjectProtoConfig>
 </ConfigSystem>

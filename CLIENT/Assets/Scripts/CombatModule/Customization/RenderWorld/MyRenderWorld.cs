@@ -94,6 +94,12 @@ namespace Combat
                 Debug.Log("RenderWorld.OnPick(), YOU CHOOSE A POINT" + hit.point.ToString());
                 if (m_current_operate_entityi_id < 0)
                     return;
+                RenderEntity render_entity = m_render_entity_manager.GetObject(m_current_operate_entityi_id);
+                if (render_entity == null)
+                    return;
+                LocomotorComponent locomotor_component = render_entity.GetLogicEntity().GetComponent<LocomotorComponent>();
+                if (locomotor_component == null || !locomotor_component.IsEnable())
+                    return;
                 EntityMoveCommand cmd = new EntityMoveCommand();
                 cmd.m_entity_id = m_current_operate_entityi_id;
                 cmd.m_destination = RenderPosition2LogiocPosition(hit.point);

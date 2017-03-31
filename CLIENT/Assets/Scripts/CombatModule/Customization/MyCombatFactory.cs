@@ -32,9 +32,9 @@ namespace Combat
         public void RegisterComponents()
         {
             ComponentTypeRegistry.RegisterDefaultComponents();
-#if COMBAT_CLIENT
-            ComponentTypeRegistry.Register(ComponentTypeRegistry.CT_ModelComponent, typeof(ModelComponent));
-#endif
+//#if COMBAT_CLIENT
+//            ComponentTypeRegistry.Register(ComponentTypeRegistry.CT_ModelComponent, typeof(ModelComponent));
+//#endif
         }
 
         public void RegisterCommands()
@@ -71,7 +71,7 @@ namespace Combat
             obj_context.m_object_proto_id = -1;
             world_context.m_players.Add(obj_context);
 
-            //敌人
+            //NPC敌人玩家
             long proxy_pstid = PlayerManager.AI_ENEMY_PLAYER_PROXYID;
             world_context.m_pstid2proxyid[proxy_pstid] = PlayerManager.AI_ENEMY_PLAYER_PROXYID;
             world_context.m_proxyid2pstid[PlayerManager.AI_ENEMY_PLAYER_PROXYID] = proxy_pstid;
@@ -84,16 +84,30 @@ namespace Combat
             //本地玩家的Entity
             obj_context = new ObjectCreationContext();
             obj_context.m_object_proxy_id = PlayerManager.LOCAL_PLAYER_PROXYID;
+            obj_context.m_object_type_id = 102;
+            obj_context.m_object_proto_id = 102001;
+            obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-5), new FixPoint(0), new FixPoint(-5), new FixPoint(90));
+            world_context.m_entities.Add(obj_context);
+
+            obj_context = new ObjectCreationContext();
+            obj_context.m_object_proxy_id = PlayerManager.LOCAL_PLAYER_PROXYID;
             obj_context.m_object_type_id = 101;
             obj_context.m_object_proto_id = 101001;
-            obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-10), new FixPoint(0), new FixPoint(0), new FixPoint(90));
+            obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-5), new FixPoint(0), new FixPoint(0), new FixPoint(90));
+            world_context.m_entities.Add(obj_context);
+
+            obj_context = new ObjectCreationContext();
+            obj_context.m_object_proxy_id = PlayerManager.LOCAL_PLAYER_PROXYID;
+            obj_context.m_object_type_id = 103;
+            obj_context.m_object_proto_id = 103001;
+            obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-5), new FixPoint(0), new FixPoint(5), new FixPoint(90));
             world_context.m_entities.Add(obj_context);
 
             obj_context = new ObjectCreationContext();
             obj_context.m_object_proxy_id = PlayerManager.AI_ENEMY_PLAYER_PROXYID;
             obj_context.m_object_type_id = 101;
             obj_context.m_object_proto_id = 101002;
-            obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(10), new FixPoint(0), new FixPoint(0), new FixPoint(90)); ;
+            obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(5), new FixPoint(0), new FixPoint(0), new FixPoint(90)); ;
             world_context.m_entities.Add(obj_context);
 
             return world_context;

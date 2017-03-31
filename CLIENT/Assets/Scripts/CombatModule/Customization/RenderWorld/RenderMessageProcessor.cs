@@ -55,6 +55,12 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
+            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            if (animation_component != null)
+                animation_component.PlayerAnimation(AnimationName.RUN, true);
+            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+            if (animator_component != null)
+                animator_component.SetParameter(AnimatorParameter.MOVING, true);
             m_render_world.RegisterMovingEntity(model_component);
         }
 
@@ -66,6 +72,12 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
+            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            if (animation_component != null)
+                animation_component.PlayerAnimation(AnimationName.IDLE, true);
+            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+            if (animator_component != null)
+                animator_component.SetParameter(AnimatorParameter.MOVING, false);
             m_render_world.UnregisterMovingEntity(model_component);
         }
 

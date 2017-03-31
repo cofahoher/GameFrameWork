@@ -2,16 +2,32 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class Attribute : IDestruct
+    public class Attribute : IRecyclable, IDestruct
     {
+        #region Create/Recycle
+        public static Attribute Create()
+        {
+            return ResuableObjectPool<IRecyclable>.Instance.Create<Attribute>();
+        }
+
+        public static void Recycle(Attribute instance)
+        {
+            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+        }
+        #endregion
+
         AttributeManagerComponent m_owner_component;
         AttributeDefinition m_definition;
-        int m_base_value = 0;
-        int m_value = 0;
+        FixPoint m_base_value = default(FixPoint);
+        FixPoint m_value = default(FixPoint);
         SortedDictionary<string, int> m_dynamic_dependent_attributes;
         SortedDictionary<int, AttributeModifier> m_modifiers;
 
-        public Attribute(AttributeManagerComponent owner_component, AttributeDefinition definition, int base_value)
+        public Attribute()
+        {
+        }
+
+        public void Construct(AttributeManagerComponent owner_component, AttributeDefinition definition, FixPoint base_value)
         {
             m_owner_component = owner_component;
             m_definition = definition;
@@ -21,29 +37,38 @@ namespace Combat
 
         public void Destruct()
         {
+            Reset();
+        }
+
+        public void Reset()
+        {
             m_owner_component = null;
             m_definition = null;
-            var enumerator = m_modifiers.GetEnumerator();
-            while (enumerator.MoveNext())
+            m_base_value = default(FixPoint);
+            m_value = default(FixPoint);
+            if (m_dynamic_dependent_attributes != null)
+                m_dynamic_dependent_attributes.Clear();
+            if (m_modifiers != null)
             {
-                AttributeModifier modifier = enumerator.Current.Value;
-                modifier.Destruct();
+                var enumerator = m_modifiers.GetEnumerator();
+                while (enumerator.MoveNext())
+                    AttributeModifier.Recycle(enumerator.Current.Value);
+                m_modifiers.Clear();
             }
-            m_modifiers.Clear();
         }
 
         #region GETTER
-        public int BaseValue
+        public FixPoint BaseValue
         {
             get { return m_base_value; }
         }
-        public int Value
+        public FixPoint Value
         {
             get { return m_value; }
         }
         #endregion
 
-        #region DynamicDependen
+        #region DynamicDependent
         public void AddDynamicDependentAttribute(string attribute_name)
         {
             if (m_dynamic_dependent_attributes == null)
@@ -81,7 +106,11 @@ namespace Combat
 
         public void RemoveModifier(int modifier_id)
         {
+            AttributeModifier modifier;
+            if (!m_modifiers.TryGetValue(modifier_id, out modifier))
+                return;
             m_modifiers.Remove(modifier_id);
+            AttributeModifier.Recycle(modifier);
             MarkDirty();
         }
         #endregion
@@ -98,7 +127,7 @@ namespace Combat
             if (attribute == null)
                 return;
             attribute.ComputeValue();
-            AttributeDefinition definition = AttributeSystem.Instance.GetDefinition(attribute_name);
+            AttributeDefinition definition = AttributeSystem.Instance.GetDefinitionByName(attribute_name);
             Object owner = owner_component.ParentObject;
             definition.Reflect(owner, attribute);
             List<string> static_dependent_attributes = definition.GetStaticDependentAttributes();
@@ -108,9 +137,7 @@ namespace Combat
             {
                 var enumerator = attribute.m_dynamic_dependent_attributes.GetEnumerator();
                 while (enumerator.MoveNext())
-                {
                     MarkDirtyStatic(owner_component, enumerator.Current.Key);
-                }
             }
         }
         #endregion

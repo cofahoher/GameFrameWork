@@ -79,7 +79,6 @@ namespace Combat
                     m_extents.z = FixPoint.Parse(value);
             }
 
-
             if (variables.TryGetValue("visible", out value))
                 m_visible = bool.Parse(value);
         }

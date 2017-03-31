@@ -125,7 +125,8 @@ namespace Combat
             return ResuableObjectPool<TBaseClass>.Instance.Create<TClass>();
         }
     }
-
+    
+#if UNITY_EDITOR
     public class TestRecyclable : IRecyclable
     {
         /*
@@ -154,4 +155,5 @@ namespace Combat
         {
         }
     }
+#endif
 }

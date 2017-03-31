@@ -7,12 +7,14 @@ namespace Combat
         Dictionary<int, LevelData> m_level_data = new Dictionary<int, LevelData>();
         public Dictionary<int, ObjectTypeData> m_object_type_data = new Dictionary<int, ObjectTypeData>();
         public Dictionary<int, ObjectProtoData> m_object_proto_data = new Dictionary<int, ObjectProtoData>();
+        public Dictionary<int, AttributeData> m_attribute_data = new Dictionary<int, AttributeData>();
 
         private ConfigProvider()
         {
             InitLevelData();
             InitObjectTypeData();
             InitObjectProtoData();
+            InitAttributeData();
         }
 
         public override void Destruct()
@@ -46,7 +48,10 @@ namespace Combat
 
         public AttributeData GetAttributeData(int id)
         {
-            return null;
+            AttributeData attribute_data = null;
+            if (!m_attribute_data.TryGetValue(id, out attribute_data))
+                return null;
+            return attribute_data;
         }
         #endregion
         
@@ -60,7 +65,7 @@ namespace Combat
 
         void InitObjectTypeData()
         {
-            //Player
+            //一些Player
             ObjectTypeData type_data = new ObjectTypeData();
             type_data.m_name = "EnvironmentPlayer";
             m_object_type_data[1] = type_data;
@@ -73,10 +78,27 @@ namespace Combat
             type_data.m_name = "LocalPlayer";
             m_object_type_data[3] = type_data;
 
-            //Entity
+            //障碍物
             type_data = new ObjectTypeData();
-            type_data.m_name = "Hero";
+            type_data.m_name = "Obstruct";
             ComponentData cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_PositionComponent;
+            cd.m_component_variables["ext_x"] = "0.5";
+            cd.m_component_variables["ext_y"] = "0.5";
+            cd.m_component_variables["ext_z"] = "0.5";
+            cd.m_component_variables["visible"] = "True";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_ModelComponent;
+            type_data.m_components_data.Add(cd);
+
+            m_object_type_data[101] = type_data;
+
+            //Legacy英雄
+            type_data = new ObjectTypeData();
+            type_data.m_name = "LegacyHero";
+            cd = new ComponentData();
             cd.m_component_type_id = ComponentTypeRegistry.CT_PositionComponent;
             cd.m_component_variables["ext_x"] = "0.5";
             cd.m_component_variables["ext_y"] = "0.5";
@@ -90,10 +112,50 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_SkillManagerComponent;
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
             cd.m_component_type_id = ComponentTypeRegistry.CT_ModelComponent;
             type_data.m_components_data.Add(cd);
 
-            m_object_type_data[101] = type_data;
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_AnimationComponent;
+            cd.m_component_variables["animation_path"] = "bodyctrl";
+            type_data.m_components_data.Add(cd);
+
+            m_object_type_data[102] = type_data;
+
+            //Mecanim英雄
+            type_data = new ObjectTypeData();
+            type_data.m_name = "MecanimHero";
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_PositionComponent;
+            cd.m_component_variables["ext_x"] = "0.5";
+            cd.m_component_variables["ext_y"] = "0.5";
+            cd.m_component_variables["ext_z"] = "0.5";
+            cd.m_component_variables["visible"] = "True";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_LocomotorComponent;
+            cd.m_component_variables["max_speed"] = "5.0";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_SkillManagerComponent;
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_ModelComponent;
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = ComponentTypeRegistry.CT_AnimatorComponent;
+            cd.m_component_variables["animator_path"] = "bodyctrl";
+            type_data.m_components_data.Add(cd);
+
+            m_object_type_data[103] = type_data;
         }
 
         void InitObjectProtoData()
@@ -107,6 +169,39 @@ namespace Combat
             proto_data.m_name = "Sphere";
             proto_data.m_component_variables["asset"] = "Objects/3D/zzw_sphere";
             m_object_proto_data[101002] = proto_data;
+
+            proto_data = new ObjectProtoData();
+            proto_data.m_name = "ssx_legacy";
+            proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_legacy";
+            m_object_proto_data[102001] = proto_data;
+
+            proto_data = new ObjectProtoData();
+            proto_data.m_name = "ssx_mecanim";
+            proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_mecanim";
+            m_object_proto_data[103001] = proto_data;
+        }
+
+        void InitAttributeData()
+        {
+            AttributeData attribute_data = new AttributeData();
+            attribute_data.m_attribute_id = 1;
+            attribute_data.m_attribute_name = "MaxHealth";
+            attribute_data.m_formula = "BaseAttributes.MaxHealth";
+            attribute_data.m_reflection_property = "CurrentMaxHealth";
+            attribute_data.m_clamp_property = "CurrentHealth";
+            attribute_data.m_clamp_min_value = FixPoint.Zero;
+            AttributeSystem.RegisterAttribute(attribute_data.m_attribute_id);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            //attribute_data = new AttributeData();
+            //attribute_data.m_attribute_id = 2;
+            //attribute_data.m_attribute_name = "";
+            //attribute_data.m_formula = "";
+            //attribute_data.m_reflection_property = "";
+            //attribute_data.m_clamp_property = "";
+            //attribute_data.m_clamp_min_value = FixPoint.Zero;
+            //AttributeSystem.RegisterAttribute(attribute_data.m_attribute_id);
+            //m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
         }
         #endregion
     }

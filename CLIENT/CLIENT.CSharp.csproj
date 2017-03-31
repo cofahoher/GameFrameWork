@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\CombatModule\Customization\LogicWorld\MyRenderMessage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\MyCombatFactory.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\CameraController.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyAnimation.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\RenderMessageProcessor.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\BehaviorTree\BehaviorTree.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeFormula.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeFormulaEvaluationContext.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeFormulaVariableInterface.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeFormulaVariableProvider.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeSystem.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\PropertyAccessor.cs" />
@@ -133,9 +134,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityUtil.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\IExpressionEngionVariableInterface.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\IntProgram.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\Program.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\ExpressionProgram.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\IExpressionVariableProvider.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\TextBuffer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameResult.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\LogicWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\CRC.cs" />
@@ -148,18 +149,14 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDestruct.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\ILogicOwnerInfo.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IntMath.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\RandomGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\ResuableObjectPool.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\SinCosTable.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Singleton.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Target.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\TaskScheduler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\TimeType.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector2FP.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector2I.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector3FP.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Vector3I.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\Component.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\Component\TurnManagerComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\Object.cs" />
@@ -187,6 +184,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\WorldCreationContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimationComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimatorComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\ModelComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntity.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntityComponent.cs" />
@@ -212,6 +210,8 @@
     <Compile Include="Assets\Scripts\CombatModule\Test\CombatTester.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\FixPointTester.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\HeapTest.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\IntMath.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\SinCosTable.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncModelServer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\SyncTester.cs" />
@@ -220,6 +220,8 @@
     <Compile Include="Assets\Scripts\CombatModule\Test\TestLogicWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\TestNetworkMessages.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Test\TestRenderWorld.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\Vector2I.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Test\Vector3I.cs" />
     <Compile Include="Assets\Scripts\CombatModule\_CodingConventions.cs" />
     <Compile Include="Assets\Scripts\ConfigProvider.cs" />
     <Compile Include="Assets\Scripts\GameGlobal.cs" />

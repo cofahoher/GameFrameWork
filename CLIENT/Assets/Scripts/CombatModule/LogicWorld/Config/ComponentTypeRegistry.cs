@@ -77,6 +77,8 @@ namespace Combat
 
         //【10001，】Render Component
         public const int CT_ModelComponent = 10001;
+        public const int CT_AnimationComponent = 10002;
+        public const int CT_AnimatorComponent = 10003;
         #endregion
 
         static public void Register(int id, System.Type type)
@@ -124,9 +126,11 @@ namespace Combat
             Register(CT_ApplyGeneratorEffectComponent, typeof(ApplyGeneratorEffectComponent));
 
             //【10001，】Render Component
-//#if COMBAT_CLIENT
-//            Register(CT_ModelComponent, typeof(ModelComponent));
-//#endif
+#if COMBAT_CLIENT
+            Register(CT_ModelComponent, typeof(ModelComponent));
+            Register(CT_AnimationComponent, typeof(AnimationComponent));
+            Register(CT_AnimatorComponent, typeof(AnimatorComponent));
+#endif
         }
     }
 }

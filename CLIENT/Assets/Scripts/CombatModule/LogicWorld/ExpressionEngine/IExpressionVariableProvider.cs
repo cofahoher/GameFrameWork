@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class FormulaVariable
+    public class ExpressionVariable
     {
         List<string> m_scope_name;
         string m_variable_name;
@@ -10,10 +10,10 @@ namespace Combat
         int m_variable_handler;
     }
 
-    public interface IExpressionEngionVariableInterface
+    public interface IExpressionVariableProvider
     {
-        void LookupValiable(FormulaVariable variable);
-        int GetVariable(FormulaVariable variable);
+        void LookupValiable(ExpressionVariable variable);
+        FixPoint GetVariable(ExpressionVariable variable);
     }
 
     //public interface IExpressionEngionScope

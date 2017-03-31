@@ -2,28 +2,31 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    enum CombatServerState
+    public enum CombatServerState
     {
         NotRunning = 0,
         Running,
     }
     public class CombatServer : IOutsideWorld
     {
-        ICombatFactory m_combat_factory;
-        CombatServerState m_state = CombatServerState.NotRunning;
-        int m_start_time = -1;
-        int m_last_update_time = -1;
+        protected ICombatFactory m_combat_factory;
+        protected CombatServerState m_state = CombatServerState.NotRunning;
+        protected int m_start_time = -1;
+        protected int m_last_update_time = -1;
 
-        LogicWorld m_logic_world;
-        ISyncServer m_sync_server;
+        protected LogicWorld m_logic_world;
+        protected ISyncServer m_sync_server;
+
+        protected GameResult m_game_result;
 
         public CombatServer(ICombatFactory combat_factory)
         {
             m_combat_factory = combat_factory;
         }
 
-        public void Destruct()
+        public virtual void Destruct()
         {
+            m_combat_factory = null;
             m_sync_server.Destruct();
             m_sync_server = null;
             m_logic_world.Destruct();
@@ -42,7 +45,7 @@ namespace Combat
         #endregion
 
         #region 和局外的接口
-        public void Initializa(CombatStartInfo combat_start_info)
+        public virtual void Initializa(CombatStartInfo combat_start_info)
         {
             AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
             m_logic_world = m_combat_factory.CreateLogicWorld();
@@ -52,13 +55,13 @@ namespace Combat
             WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
         }
-        
-        public void AddPlayer(long player_pstid)
+
+        public virtual void AddPlayer(long player_pstid)
         {
             m_sync_server.AddPlayer(player_pstid);
         }
 
-        public void StartCombat(int current_time_int)
+        public virtual void StartCombat(int current_time_int)
         {
             m_state = CombatServerState.Running;
             m_start_time = current_time_int;
@@ -73,18 +76,19 @@ namespace Combat
             return m_combat_factory.GetConfigProvider();
         }
 
-        public int GetCurrentTime()
+        public virtual int GetCurrentTime()
         {
             return m_last_update_time;
         }
 
-        public void OnGameStart()
+        public virtual void OnGameStart()
         {
-            //NOUSE
         }
 
-        public void OnGameOver(GameResult game_result)
+        public virtual void OnGameOver(GameResult game_result)
         {
+            m_game_result = game_result;
+            ProcessGameOver();
         }
         #endregion
 
@@ -97,7 +101,23 @@ namespace Combat
             if (delta_ms < 0)
                 return;
             m_sync_server.Update(current_time);
+            List<Command> commands = m_sync_server.GetOutputCommands();
+            if (commands.Count > 0)
+            {
+                SendCommands(commands);
+                m_sync_server.ClearOutputCommand();
+            }
             m_last_update_time = current_time;
         }
+
+        #region 继承类自己实现
+        protected virtual void SendCommands(List<Command> commands)
+        {
+        }
+
+        protected virtual void ProcessGameOver()
+        {
+        }
+        #endregion
     }
 }

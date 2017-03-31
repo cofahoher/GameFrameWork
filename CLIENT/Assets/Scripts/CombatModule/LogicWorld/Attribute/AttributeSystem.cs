@@ -25,19 +25,37 @@ namespace Combat
             m_definitions_by_name.Clear();
         }
 
-        public static void AddAttributeID(int id)
+        public static void RegisterAttribute(int id)
         {
             ms_all_ids.Add(id);
         }
 
-        public void InitializeAllDefinition(IConfigProvider config)
+        public AttributeDefinition GetDefinitionByName(string attribute_name)
+        {
+            AttributeDefinition definition;
+            m_definitions_by_name.TryGetValue(attribute_name, out definition);
+            return definition;
+        }
+
+        public AttributeDefinition GetDefinitionByID(int attribute_id)
+        {
+            AttributeDefinition definition;
+            m_definitions_by_id.TryGetValue(attribute_id, out definition);
+            return definition;
+        }
+
+        public void InitializeAllDefinition(IConfigProvider config_provider)
         {
             if (m_initialized)
                 return;
             ms_all_ids.Sort();
+            int pre_id = 0;
             for (int i = 0; i < ms_all_ids.Count; ++i)
             {
-                AttributeData data = config.GetAttributeData(ms_all_ids[i]);
+                if (ms_all_ids[i] == pre_id)
+                    continue;
+                pre_id = ms_all_ids[i];
+                AttributeData data = config_provider.GetAttributeData(ms_all_ids[i]);
                 AttributeDefinition definition = new AttributeDefinition(data);
                 m_definitions_by_id[data.m_attribute_id] = definition;
                 m_definitions_by_name[data.m_attribute_name] = definition;
@@ -46,26 +64,18 @@ namespace Combat
             m_initialized = true;
         }
 
-        public AttributeDefinition GetDefinition(string attribute_name)
-        {
-            AttributeDefinition definition;
-            m_definitions_by_name.TryGetValue(attribute_name, out definition);
-            return definition;
-        }
-
         public void BuildStaticDependency()
         {
             var enumerator = m_definitions_by_name.GetEnumerator();
-            List<string> dependencies = new List<string>();
             while (enumerator.MoveNext())
             {
                 AttributeDefinition definition = enumerator.Current.Value;
-                definition.BuildDependentAttribuites(dependencies);
-                for (int i = 0; i < dependencies.Count; ++i)
+                List<string> referenced_attributes = definition.BuildReferencedAttributes();
+                for (int i = 0; i < referenced_attributes.Count; ++i)
                 {
-                    AttributeDefinition dependent_definition;
-                    m_definitions_by_name.TryGetValue(dependencies[i], out dependent_definition);
-                    definition.AddStaticDependentAttribute(dependent_definition.Name);
+                    AttributeDefinition referenced_definition;
+                    if (m_definitions_by_name.TryGetValue(referenced_attributes[i], out referenced_definition))
+                        referenced_definition.AddStaticDependentAttribute(definition.Name);
                 }
             }
         }

@@ -4,49 +4,50 @@ namespace Combat
 {
     public class AttributeFormula : IDestruct
     {
-        int m_constant = 0;
-        IntProgram m_program;
+        FixPoint m_constant = default(FixPoint);
+        ExpressionProgram m_program;
 
         public AttributeFormula(string formula_string)
         {
-            IntProgram program = IntProgram.Create();
-            AttributeFormulaVariableInterface face = AttributeFormulaVariableInterface.Create();
+            ExpressionProgram program = ExpressionProgram.Create();
+            AttributeFormulaVariableProvider face = AttributeFormulaVariableProvider.Create();
             if (program.Compile(formula_string, face))
             {
                 if (program.IsConstant())
                 {
                     m_constant = program.Evaluate();
-                    IntProgram.Recycle(program);
+                    m_program = null;
+                    ExpressionProgram.Recycle(program);
                 }
                 else
                 {
                     m_program = program;
                 }
             }
-            AttributeFormulaVariableInterface.Recycle(face);
+            AttributeFormulaVariableProvider.Recycle(face);
         }
 
         public void Destruct()
         {
             if (m_program != null)
-                IntProgram.Recycle(m_program);
+                ExpressionProgram.Recycle(m_program);
         }
 
-        public int ComputeValue(AttributeFormulaEvaluationContext context)
+        public FixPoint ComputeValue(AttributeFormulaEvaluationContext context)
         {
             if (m_program == null)
                 return m_constant;
-            AttributeFormulaVariableInterface face = AttributeFormulaVariableInterface.Create();
+            AttributeFormulaVariableProvider face = AttributeFormulaVariableProvider.Create();
             face.SetContext(context);
-            int result = m_program.Evaluate(face);
-            AttributeFormulaVariableInterface.Recycle(face);
+            FixPoint result = m_program.Evaluate(face);
+            AttributeFormulaVariableProvider.Recycle(face);
             return result;
         }
 
         public void BuildReferencedList(List<string> output)
         {
             output.Clear();
-            //ZZWTODO
+            //ZZWTODO 找出依赖的属性
         }
     }
 }

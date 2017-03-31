@@ -11,6 +11,11 @@ namespace Combat
         GameObject m_unity_go;
         PositionComponent m_position_component;
 
+        public GameObject GetUnityGameObject()
+        {
+            return m_unity_go;
+        }
+
         #region 初始化
         public override void InitializeVariable(Dictionary<string, string> variables)
         {

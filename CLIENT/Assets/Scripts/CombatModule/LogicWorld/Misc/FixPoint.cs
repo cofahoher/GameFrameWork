@@ -165,6 +165,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return ((decimal)this).ToString();
     }
 
+    public static FixPoint operator -(FixPoint x)
+    {
+        return x.m_raw_value == MIN_VALUE ? MaxValue : new FixPoint(-x.m_raw_value);
+    }
+
     public static FixPoint operator +(FixPoint x, FixPoint y)
     {
         return new FixPoint(x.m_raw_value + y.m_raw_value);
@@ -188,10 +193,15 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return new FixPoint(x.m_raw_value % y.m_raw_value);
     }
 
-    public static FixPoint operator -(FixPoint x)
+    public static FixPoint operator <<(FixPoint fp, int bits)
     {
-        return x.m_raw_value == MIN_VALUE ? MaxValue : new FixPoint(-x.m_raw_value);
+        return new FixPoint(fp.m_raw_value << bits);
     }
+    public static FixPoint operator >>(FixPoint fp, int bits)
+    {
+        return new FixPoint(fp.m_raw_value >> bits);
+    }
+
     public static bool operator ==(FixPoint x, FixPoint y)
     {
         return x.m_raw_value == y.m_raw_value;

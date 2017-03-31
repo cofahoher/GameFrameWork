@@ -45,6 +45,6 @@ namespace Combat
         public string m_formula;
         public string m_reflection_property;
         public string m_clamp_property;
-        public int m_clamp_min_value = -1;
+        public FixPoint m_clamp_min_value = FixPoint.Zero;
     }
 }

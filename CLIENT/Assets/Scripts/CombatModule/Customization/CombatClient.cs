@@ -15,25 +15,28 @@ namespace Combat
 
     public class CombatClient : IOutsideWorld
     {
-        ICombatFactory m_combat_factory;
-        long m_local_player_pstid = -1;
+        protected ICombatFactory m_combat_factory;
+        protected long m_local_player_pstid = -1;
 
-        CombatClientState m_state = CombatClientState.None;
-        int m_state_start_time = -1;
-        int m_last_update_time = -1;
-        int m_waiting_cnt = 0;
+        protected CombatClientState m_state = CombatClientState.None;
+        protected int m_state_start_time = -1;
+        protected int m_last_update_time = -1;
+        protected int m_waiting_cnt = 0;
 
-        LogicWorld m_logic_world;
-        RenderWorld m_render_world;
-        ISyncClient m_sync_client;
+        protected LogicWorld m_logic_world;
+        protected RenderWorld m_render_world;
+        protected ISyncClient m_sync_client;
+
+        protected GameResult m_game_result;
 
         public CombatClient(ICombatFactory combat_factory)
         {
             m_combat_factory = combat_factory;
         }
 
-        public void Destruct()
+        public virtual void Destruct()
         {
+            m_combat_factory = null;
             m_sync_client.Destruct();
             m_sync_client = null;
             m_render_world.Destruct();
@@ -43,9 +46,9 @@ namespace Combat
         }
 
         #region GETTER
-        public CombatClientState CurrentState
+        public ICombatFactory GetCombatFactory()
         {
-            get { return m_state; }
+            return m_combat_factory;
         }
         public LogicWorld GetLogicWorld()
         {
@@ -59,6 +62,10 @@ namespace Combat
         {
             return m_sync_client;
         }
+        public CombatClientState CurrentState
+        {
+            get { return m_state; }
+        }
         public long LocalPlayerPstid
         {
             get { return m_local_player_pstid; }
@@ -66,7 +73,7 @@ namespace Combat
         #endregion
 
         #region 和局外的接口
-        public void Initializa(long local_player_pstid, CombatStartInfo combat_start_info)
+        public virtual void Initializa(long local_player_pstid, CombatStartInfo combat_start_info)
         {
             m_local_player_pstid = local_player_pstid;
             m_state = CombatClientState.Loading;
@@ -93,12 +100,12 @@ namespace Combat
             m_render_world.LoadScene(level_data.m_scene_name);
         }
 
-        public void AddPlayer(long player_pstid)
+        public virtual void AddPlayer(long player_pstid)
         {
             m_sync_client.AddPlayer(player_pstid);
         }
 
-        public void StartCombat(int current_time_int)
+        public virtual void StartCombat(int current_time_int)
         {
             m_state = CombatClientState.Running;
             m_state_start_time = current_time_int;
@@ -107,14 +114,14 @@ namespace Combat
         }
         #endregion
 
-        #region RESOURCE
+        #region RESOURCE，这里只是YY，具体的资源缓存策略具体处理
         public void OnSceneLoaded()
         {
             CacheResources();
             OnOneResourceCached();
         }
 
-        void CacheResources()
+        protected virtual void CacheResources()
         {
         }
 
@@ -125,7 +132,7 @@ namespace Combat
                 OnAllResourceCached();
         }
 
-        void OnAllResourceCached()
+        protected virtual void OnAllResourceCached()
         {
             m_render_world.OnUpdate(0, 0);
             m_state = CombatClientState.Loaded;
@@ -140,20 +147,21 @@ namespace Combat
             return m_combat_factory.GetConfigProvider();
         }
 
-        public int GetCurrentTime()
+        public virtual int GetCurrentTime()
         {
             float float_time = UnityEngine.Time.unscaledTime;
             return (int)(float_time * 1000);
         }
 
-        public void OnGameStart()
+        public virtual void OnGameStart()
         {
             m_render_world.OnGameStart();
         }
 
-        public void OnGameOver(GameResult game_result)
+        public virtual void OnGameOver(GameResult game_result)
         {
             m_state = CombatClientState.GameOver;
+            m_game_result = game_result;
         }
         #endregion
 
@@ -188,31 +196,29 @@ namespace Combat
             }
         }
 
-        void OnUpdateNone(int current_time_int)
+        protected void OnUpdateNone(int current_time_int)
         {
         }
 
-        void OnUpdateLoading(int current_time_int)
+        protected virtual void OnUpdateLoading(int current_time_int)
         {
         }
 
-        void OnUpdateLoaded(int current_time_int)
+        protected void OnUpdateLoaded(int current_time_int)
         {
-            //ZZWTODO 通知服务器
             m_state = CombatClientState.WaitingForStart;
             m_state_start_time = current_time_int;
             m_last_update_time = current_time_int;
             m_render_world.OnUpdate(0, 0);
+            ProcessReadyForStart();
         }
 
-        void OnUpdateWaitingForStart(int current_time_int)
+        protected void OnUpdateWaitingForStart(int current_time_int)
         {
             m_last_update_time = current_time_int;
-            //ZZWTODO 等待服务器或者自己直接开始
-            StartCombat(current_time_int);
         }
 
-        void OnUpdateRunning(int current_time_int)
+        protected void OnUpdateRunning(int current_time_int)
         {
             current_time_int -= m_state_start_time;
             int delta_ms = current_time_int - m_last_update_time;
@@ -222,27 +228,42 @@ namespace Combat
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
-                //ZZWTODO 这里发送或者局外自己取
+                SendCommands(commands);
                 m_sync_client.ClearOutputCommand();
             }
             m_render_world.OnUpdate(delta_ms, current_time_int);
             m_last_update_time = current_time_int;
         }
 
-        void OnUpdateGameOver(int current_time_int)
+        protected void OnUpdateGameOver(int current_time_int)
         {
             m_sync_client.Stop();
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
-                //ZZWTODO 这里发送或者局外自己取
+                SendCommands(commands);
                 m_sync_client.ClearOutputCommand();
             }
             m_state = CombatClientState.Ending;
-            //ZZWTODO 通知局外
+            ProcessGameOver();
         }
 
-        void OnUpdateEnding(int current_time_int)
+        protected virtual void OnUpdateEnding(int current_time_int)
+        {
+        }
+        #endregion
+
+        #region 继承类自己实现
+        protected virtual void ProcessReadyForStart()
+        {
+            StartCombat(GetCurrentTime());
+        }
+
+        protected virtual void SendCommands(List<Command> commands)
+        {
+        }
+
+        protected virtual void ProcessGameOver()
         {
         }
         #endregion

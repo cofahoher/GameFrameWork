@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class AttributeFormulaVariableInterface : IExpressionEngionVariableInterface, IRecyclable, IDestruct
+    public class AttributeFormulaVariableProvider : IExpressionVariableProvider, IRecyclable, IDestruct
     {
         #region Create/Recycle
-        public static AttributeFormulaVariableInterface Create()
+        public static AttributeFormulaVariableProvider Create()
         {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<AttributeFormulaVariableInterface>();
+            return ResuableObjectPool<IRecyclable>.Instance.Create<AttributeFormulaVariableProvider>();
         }
 
-        public static void Recycle(AttributeFormulaVariableInterface instance)
+        public static void Recycle(AttributeFormulaVariableProvider instance)
         {
             ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
         }
@@ -18,7 +18,7 @@ namespace Combat
 
         AttributeFormulaEvaluationContext m_context;
 
-        public AttributeFormulaVariableInterface()
+        public AttributeFormulaVariableProvider()
         {
         }
 
@@ -37,13 +37,13 @@ namespace Combat
             m_context = context;
         }
 
-        public void LookupValiable(FormulaVariable variable)
+        public void LookupValiable(ExpressionVariable variable)
         {
         }
 
-        public int GetVariable(FormulaVariable variable)
+        public FixPoint GetVariable(ExpressionVariable variable)
         {
-            return 0;
+            return FixPoint.Zero;
         }
     }
 }

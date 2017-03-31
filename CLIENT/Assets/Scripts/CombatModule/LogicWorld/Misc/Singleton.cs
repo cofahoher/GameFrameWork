@@ -62,6 +62,7 @@ namespace Combat
         }
     }
 
+#if UNITY_EDITOR
     class TestSingleton : Singleton<TestSingleton>
     {
         private TestSingleton()
@@ -71,4 +72,5 @@ namespace Combat
         {
         }
     }
+#endif
 }

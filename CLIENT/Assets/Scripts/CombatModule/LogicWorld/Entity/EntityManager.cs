@@ -18,7 +18,9 @@ namespace Combat
         {
             Player player = entity.GetOwnerPlayer();
             player.AddEntity(entity);
-            m_logic_world.AddSimpleRenderMessage(RenderMessageType.CreateEntity, entity.ID);
+            PositionComponent position_component = entity.GetComponent<PositionComponent>();
+            if (position_component != null && position_component.Visible)
+                m_logic_world.AddSimpleRenderMessage(RenderMessageType.CreateEntity, entity.ID);
         }
 
         protected override void PreDestroyObject(Entity entity)
