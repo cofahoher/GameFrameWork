@@ -141,7 +141,7 @@ namespace Combat
             return m_game_over;
         }
 
-        public void HandleCommand(Command command)
+        public virtual void HandleCommand(Command command)
         {
             if (m_game_over)
                 return;
@@ -223,6 +223,15 @@ namespace Combat
                 context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
                 m_entity_manager.CreateObject(context);
             }
+        }
+
+        public void CreateEntity(ObjectCreationContext context)
+        {
+            IConfigProvider config = m_outside_world.GetConfigProvider();
+            context.m_logic_world = this;
+            context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
+            context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
+            m_entity_manager.CreateObject(context);
         }
 
         public virtual void OnGameOver(GameResult game_result)

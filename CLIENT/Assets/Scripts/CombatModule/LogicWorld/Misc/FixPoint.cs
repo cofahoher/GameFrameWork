@@ -325,6 +325,15 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             return new FixPoint(SinTable[p1]);
     }
 
+    public static FixPoint Tan(FixPoint radian)
+    {
+        FixPoint cos_value = Cos(radian);
+        if (cos_value.m_raw_value == 0L)
+            return FixPoint.MaxValue;
+        FixPoint sin_value = Sin(radian);
+        return sin_value / cos_value;
+    }
+
     public static FixPoint Atan2(FixPoint y, FixPoint x)
     {
         //返回[0, FixPoint.TwoPi]
@@ -399,6 +408,31 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         return radian * DegreePerRadian;
     }
+
+    #region 方便函数
+    public static FixPoint Min(FixPoint term1, FixPoint term2)
+    {
+        if (term2 < term1)
+            return term2;
+        return term1;
+    }
+
+    public static FixPoint Max(FixPoint term1, FixPoint term2)
+    {
+        if (term2 > term1)
+            return term2;
+        return term1;
+    }
+
+    public static FixPoint Clamp(FixPoint term, FixPoint min_value, FixPoint max_value)
+    {
+        if (term < min_value)
+            return min_value;
+        if (term > max_value)
+            return max_value;
+        return term;
+    }
+    #endregion
 
     #region 内部
     const int NUM_BITS = 64;
@@ -481,32 +515,33 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     static readonly char Sign______ = (char)4;
     static readonly char Point_____ = (char)5;
     static readonly char[] ParseCodeTable = new[]{
-        WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,WhiteSpace,  // 0
-        WhiteSpace,Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 10
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 20
-        Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 30
-        Error_____,Error_____,Error_____,Sign______,WhiteSpace,Sign______,Point_____,Error_____,Digit_____,Digit_____,  // 40
-        Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Error_____,Error_____,  // 50
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 60
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 70
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 80
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 90
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 100
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 110
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 120
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 130
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 140
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 150
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 160
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 170
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 180
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 190
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 200
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 210
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 220
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 230
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,  // 240
-        Error_____,Error_____,Error_____,Error_____,Error_____,Error_____                                               // 250
+        /*     0          1          2          3          4          5          6          7          8          9               */
+        /*  0*/WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,WhiteSpace,/*  0*/
+        /* 10*/WhiteSpace,Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 10*/
+        /* 20*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 20*/
+        /* 30*/Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 30*/
+        /* 40*/Error_____,Error_____,Error_____,Sign______,WhiteSpace,Sign______,Point_____,Error_____,Digit_____,Digit_____,/* 40*/
+        /* 50*/Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Error_____,Error_____,/* 50*/
+        /* 60*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 60*/
+        /* 70*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 70*/
+        /* 80*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 80*/
+        /* 90*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 90*/
+        /*100*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*100*/
+        /*110*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*110*/
+        /*120*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*120*/
+        /*130*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*130*/
+        /*140*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*140*/
+        /*150*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*150*/
+        /*160*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*160*/
+        /*170*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*170*/
+        /*180*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*180*/
+        /*190*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*190*/
+        /*200*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*200*/
+        /*210*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*210*/
+        /*220*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*220*/
+        /*230*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*230*/
+        /*240*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*240*/
+        /*250*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____                                             /*250*/
     };
     #endregion
 }

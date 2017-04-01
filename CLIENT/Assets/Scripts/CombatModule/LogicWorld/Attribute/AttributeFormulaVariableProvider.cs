@@ -37,7 +37,7 @@ namespace Combat
             m_context = context;
         }
 
-        public void LookupValiable(ExpressionVariable variable)
+        public void LookupValiable(List<string> scopes, ExpressionVariable variable)
         {
         }
 

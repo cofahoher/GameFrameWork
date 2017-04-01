@@ -12,6 +12,7 @@ namespace Combat
          * 2和3也许可以用同一个，但是为了更灵活和以防万一，还是把动态生成的和写死的隔离开吧
          * 
          * 每个模式都应该有个创建CombatStartInfo的函数，把persist id和proxy id对应起来
+         * 对于多人联机，且没有场景指定归属的entity，proxy id可以动态指定为CRC(pstid)
          */
         public const int ENVIRONMENT_PLAYER_PROXYID = -1;
         public const int AI_ENEMY_PLAYER_PROXYID = -2;

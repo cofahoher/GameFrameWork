@@ -64,7 +64,10 @@ namespace Combat
     {
         [ProtoBufAttribute(Index = 1)]
         public int m_random = 0;
-
+        [ProtoBufAttribute(Index = 2)]
+        public int m_gen_time = 0;
+        [ProtoBufAttribute(Index = 3)]
+        public int m_gen_logic_frame = 0;
         public RandomTestCommand()
         {
             m_type = CommandType.RandomTest;
@@ -74,6 +77,8 @@ namespace Combat
         {
             base.Reset();
             m_random = 0;
+            m_gen_time = 0;
+            m_gen_logic_frame = 0;
         }
     }
 }

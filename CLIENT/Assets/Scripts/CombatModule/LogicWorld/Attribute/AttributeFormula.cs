@@ -10,8 +10,8 @@ namespace Combat
         public AttributeFormula(string formula_string)
         {
             ExpressionProgram program = ExpressionProgram.Create();
-            AttributeFormulaVariableProvider face = AttributeFormulaVariableProvider.Create();
-            if (program.Compile(formula_string, face))
+            AttributeFormulaVariableProvider variable_provider = AttributeFormulaVariableProvider.Create();
+            if (program.Compile(formula_string, variable_provider))
             {
                 if (program.IsConstant())
                 {
@@ -24,7 +24,7 @@ namespace Combat
                     m_program = program;
                 }
             }
-            AttributeFormulaVariableProvider.Recycle(face);
+            AttributeFormulaVariableProvider.Recycle(variable_provider);
         }
 
         public void Destruct()

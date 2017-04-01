@@ -2,23 +2,38 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ExpressionVariable
+    public delegate FixPoint ExpressionVariableDelegate(string variable_name);
+
+    public class ExpressionVariable : IRecyclable, IDestruct
     {
-        List<string> m_scope_name;
-        string m_variable_name;
-        List<int> m_scope_handler;
-        int m_variable_handler;
+        #region Create/Recycle
+        public static ExpressionVariable Create()
+        {
+            return ResuableObjectPool<IRecyclable>.Instance.Create<ExpressionVariable>();
+        }
+
+        public static void Recycle(ExpressionVariable instance)
+        {
+            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+        }
+        #endregion
+
+        public ExpressionVariableDelegate m_delegate;
+        public string m_variable_name;
+
+        public void Reset()
+        {
+        }
+
+        public void Destruct()
+        {
+        }
     }
+
 
     public interface IExpressionVariableProvider
     {
-        void LookupValiable(ExpressionVariable variable);
+        void LookupValiable(List<string> scopes, ExpressionVariable variable);
         FixPoint GetVariable(ExpressionVariable variable);
     }
-
-    //public interface IExpressionEngionScope
-    //{
-    //    IExpressionEngionScope GetScope();
-    //    int GetVariable();
-    //}
 }
