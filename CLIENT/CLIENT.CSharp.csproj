@@ -137,6 +137,8 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\ExpressionProgram.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\IExpressionVariableProvider.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\TextBuffer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\Token.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\Tokenizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameResult.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\LogicWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\CRC.cs" />
