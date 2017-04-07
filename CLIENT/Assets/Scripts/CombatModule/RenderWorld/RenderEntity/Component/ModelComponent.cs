@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Combat
 {
-    public class ModelComponent : RenderEntityComponent
+    public partial class ModelComponent : RenderEntityComponent
     {
         //配置数据
         string m_asset_name;
@@ -17,10 +17,10 @@ namespace Combat
         }
 
         #region 初始化
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            variables.TryGetValue("asset", out m_asset_name);
-        }
+        //public override void InitializeVariable(Dictionary<string, string> variables)
+        //{
+        //    variables.TryGetValue("asset", out m_asset_name);
+        //}
 
         public override void InitializeComponent()
         {

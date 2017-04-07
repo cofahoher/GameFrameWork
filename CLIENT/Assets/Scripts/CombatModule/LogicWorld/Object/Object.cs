@@ -12,7 +12,7 @@ namespace Combat
         RenderEntity,
     }
 
-    public abstract class Object : SignalGenerator, ILogicOwnerInfo, IDestruct
+    public abstract class Object : SignalGenerator, ILogicOwnerInfo, IDestruct, IExpressionVariableProvider
     {
         protected ObjectCreationContext m_context;
         protected SortedDictionary<int, Component> m_components = new SortedDictionary<int, Component>();
@@ -117,22 +117,23 @@ namespace Combat
         {
             List<ComponentData> components_data = context.m_type_data.m_components_data;
             for (int i = 0; i < components_data.Count; ++i)
-                AddComponent(components_data[i].m_component_type_id);
-            InitializeComponentVariables(context.m_type_data);
+                AddComponent(components_data[i]);
 
             //ZZWTODO context.m_proto_data attribute skill
 
-            var enumerator = m_components.GetEnumerator();
-            while (enumerator.MoveNext())
+            for (int i = 0; i < components_data.Count; ++i)
             {
-                Component component = enumerator.Current.Value;
+                Component component = GetComponent(components_data[i].m_component_type_id);
+                if (component == null)
+                    continue;
                 component.InitializeComponent();
             }
 
-            enumerator = m_components.GetEnumerator();
-            while (enumerator.MoveNext())
+            for (int i = 0; i < components_data.Count; ++i)
             {
-                Component component = enumerator.Current.Value;
+                Component component = GetComponent(components_data[i].m_component_type_id);
+                if (component == null)
+                    continue;
                 component.OnObjectCreated();
             }
         }
@@ -144,8 +145,6 @@ namespace Combat
             List<ComponentData> components_data = type_data.m_components_data;
             for (int i = 0; i < components_data.Count; ++i)
             {
-                if (!IsSuitableComponent(components_data[i].m_component_type_id))
-                    continue;
                 Dictionary<string, string> variables = components_data[i].m_component_variables;
                 if (variables == null || variables.Count == 0)
                     continue;
@@ -160,8 +159,9 @@ namespace Combat
         {
         }
 
-        Component AddComponent(int component_type_id)
+        public Component AddComponent(ComponentData component_data)
         {
+            int component_type_id = component_data.m_component_type_id;
             if (!IsSuitableComponent(component_type_id))
                 return null;
             Component component = ComponentTypeRegistry.CreateComponent(component_type_id);
@@ -170,7 +170,16 @@ namespace Combat
             component.ParentObject = this;
             component.ComponentTypeID = component_type_id;
             m_components[component_type_id] = component;
+            if (component_data.m_component_variables != null)
+                component.InitializeVariable(component_data.m_component_variables);
             return component;
+        }
+
+        public Component AddComponent(int component_type_id)
+        {
+            ComponentData component_data = new ComponentData();
+            component_data.m_component_type_id = component_type_id;
+            return AddComponent(component_data);
         }
 
         protected virtual bool IsSuitableComponent(int component_type_id)
@@ -180,10 +189,20 @@ namespace Combat
         #endregion
 
         #region Components
+        public T GetComponent<T>(int component_type_id) where T : Component
+        {
+            // PositionComponent cmp = object.GetComponent<PositionComponent>(PositionComponent.ID);
+            Component component;
+            if (!m_components.TryGetValue(component_type_id, out component))
+                return null;
+            return component as T;
+        }
+
         public T GetComponent<T>() where T : Component
         {
-            Component component;
+            // PositionComponent cmp = object.GetComponent<PositionComponent>();
             int component_type_id = ComponentTypeRegistry.ComponentType2ID(typeof(T));
+            Component component;
             if (!m_components.TryGetValue(component_type_id, out component))
                 return null;
             return component as T;
@@ -191,19 +210,67 @@ namespace Combat
 
         public Component GetComponent(System.Type type)
         {
-            Component component;
+            // PositionComponent cmp = object.GetComponent(typeof(PositionComponent)) as PositionComponent;
             int component_type_id = ComponentTypeRegistry.ComponentType2ID(type);
+            Component component;
             m_components.TryGetValue(component_type_id, out component);
             return component;
         }
 
         public Component GetComponent(int component_type_id)
         {
+            // PositionComponent cmp = object.GetComponent(PositionComponent.ID) as PositionComponent;
+            Component component;
+            m_components.TryGetValue(component_type_id, out component);
+            return component;
+        }
+
+        public Component GetComponent(string component_name)
+        {
+            // PositionComponent cmp = object.GetComponent("PositionComponent") as PositionComponent;
+            int component_type_id = (int)CRC.Calculate(component_name);
             Component component;
             m_components.TryGetValue(component_type_id, out component);
             return component;
         }
         #endregion
+
+        public FixPoint GetVariable(ExpressionVariable variable, int index)
+        {
+            int vid = variable[index];
+            if (index == variable.MaxIndex)
+            {
+                int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
+                Component component = GetComponent(component_type_id);
+                if (component != null)
+                    return component.GetVariable(vid);
+            }
+            else if (vid == ExpressionVariable.VID_Attribute)
+            {
+                AttributeManagerComponent cmp = GetComponent<AttributeManagerComponent>(AttributeManagerComponent.ID);
+                if (cmp != null)
+                    return cmp.GetVariable(variable, index + 1);
+            }
+            else if (vid == ExpressionVariable.VID_Object)
+            {
+                Object owner_object = GetOwnerObject();
+                if(owner_object != null)
+                    return owner_object.GetVariable(variable, index + 1);
+            }
+            else if (vid == ExpressionVariable.VID_Entity)
+            {
+                Object owner_entity = GetOwnerEntity();
+                if (owner_entity != null)
+                    return owner_entity.GetVariable(variable, index + 1);
+            }
+            else if (vid == ExpressionVariable.VID_Player)
+            {
+                Object owner_player = GetOwnerPlayer();
+                if (owner_player != null)
+                    return owner_player.GetVariable(variable, index + 1);
+            }
+            return FixPoint.Zero;
+        }
 
         public bool IsDead()
         {

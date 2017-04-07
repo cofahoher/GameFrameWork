@@ -8,6 +8,8 @@ namespace Combat
         ObjectTypeData GetObjectTypeData(int id);
         ObjectProtoData GetObjectProtoData(int id);
         AttributeData GetAttributeData(int id);
+        FixPoint GetLevelBasedNumber(string table_name, int level);
+        FixPoint GetLevelBasedNumber(int table_id, int level);
     }
 
 

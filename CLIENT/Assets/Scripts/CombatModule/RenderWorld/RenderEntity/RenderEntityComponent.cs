@@ -23,6 +23,29 @@ namespace Combat
         }
         #endregion
 
+        #region Variable
+        public override FixPoint GetVariable(ExpressionVariable variable, int index)
+        {
+            return FixPoint.Zero;
+        }
+
+        public override FixPoint GetVariable(int id)
+        {
+            return FixPoint.Zero;
+        }
+
+        public override bool GetVariable(int id, out FixPoint value)
+        {
+            value = FixPoint.Zero;
+            return false;
+        }
+
+        public override bool SetVariable(int id, FixPoint value)
+        {
+            return false;
+        }
+        #endregion
+
         public RenderWorld GetRenderWorld()
         {
             return GetRenderEntity().GetRenderWorld();

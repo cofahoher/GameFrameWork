@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class StateComponent
+    public partial class StateComponent
     {
     }
 }

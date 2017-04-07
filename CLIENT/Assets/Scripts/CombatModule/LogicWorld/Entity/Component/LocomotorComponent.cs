@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class LocomotorComponent : EntityComponent
+    public partial class LocomotorComponent : EntityComponent
     {
         enum MovingMode
         {
@@ -10,9 +10,9 @@ namespace Combat
             ByDirection = 1,
             ByDestination = 2,
         }
-        //配置数据
-        FixPoint m_current_max_speed = FixPoint.Zero;
+        //需要备份的初始数据
         //运行数据
+        FixPoint m_current_max_speed = FixPoint.Zero;
         PositionComponent m_position_component;
         MovingMode m_mode = MovingMode.Invalid;
         bool m_is_moving = false;
@@ -33,13 +33,6 @@ namespace Combat
         #endregion
 
         #region 初始化
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            string value;
-            if (variables.TryGetValue("max_speed", out value))
-                m_current_max_speed = FixPoint.Parse(value);
-        }
-
         protected override void PostInitializeComponent()
         {
             m_position_component = ParentObject.GetComponent<PositionComponent>();

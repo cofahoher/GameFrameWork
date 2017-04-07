@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class Attribute : IRecyclable, IDestruct
+    public class Attribute : IExpressionVariableProvider, IRecyclable, IDestruct
     {
         #region Create/Recycle
         public static Attribute Create()
@@ -123,7 +123,7 @@ namespace Combat
 
         static void MarkDirtyStatic(AttributeManagerComponent owner_component, string attribute_name)
         {
-            Attribute attribute = owner_component.GetAttribute(attribute_name);
+            Attribute attribute = owner_component.GetAttributeByName(attribute_name);
             if (attribute == null)
                 return;
             attribute.ComputeValue();
@@ -144,10 +144,31 @@ namespace Combat
 
         void ComputeValue()
         {
-            AttributeFormulaEvaluationContext context = AttributeFormulaEvaluationContext.Create();
-            context.Initialize(m_owner_component.ParentObject, this);
-            m_value = m_definition.ComputeValue(context);
-            AttributeFormulaEvaluationContext.Recycle(context);
+            m_value = m_definition.ComputeValue(this);
+        }
+
+        public FixPoint GetVariable(ExpressionVariable variable, int index)
+        {
+            int vid = variable[index];
+            if (index == variable.MaxIndex)
+            {
+                if (vid == ExpressionVariable.VID_Value)
+                    return Value;
+                else if (vid == ExpressionVariable.VID_BaseValue)
+                    return BaseValue;
+                else
+                {
+                    int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
+                    Component component = m_owner_component.ParentObject.GetComponent(component_type_id);
+                    if (component != null)
+                        return component.GetVariable(vid);
+                }
+            }
+            else
+            {
+                return m_owner_component.GetVariable(variable, index);
+            }
+            return FixPoint.Zero;
         }
     }
 }

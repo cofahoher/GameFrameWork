@@ -8,7 +8,7 @@ namespace Combat
         public const string MOVING = "moving";
     }
 
-    public class AnimatorComponent : RenderEntityComponent
+    public partial class AnimatorComponent : RenderEntityComponent
     {
         //配置数据
         string m_animator_path;

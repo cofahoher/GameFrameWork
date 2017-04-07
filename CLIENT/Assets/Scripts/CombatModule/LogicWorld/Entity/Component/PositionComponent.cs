@@ -24,15 +24,15 @@ namespace Combat
         }
     }
 
-    public class PositionComponent : EntityComponent
+    public partial class PositionComponent : EntityComponent
     {
-        //配置数据
+        //需要备份的初始数据
         BirthPositionInfo m_birth_info = new BirthPositionInfo(FixPoint.Zero, FixPoint.Zero, FixPoint.Zero, FixPoint.Zero);
-        Vector3FP m_extents = new Vector3FP();
-        bool m_visible = true;
         //运行数据
         Vector3FP m_current_position;
         FixPoint m_current_angle;
+        Vector3FP m_extents = new Vector3FP();
+        bool m_visible = true;
 
         #region GETTER
         public Vector3FP CurrentPosition
@@ -56,40 +56,20 @@ namespace Combat
         #endregion
 
         #region 初始化
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            string value;
-            if (variables.TryGetValue("x", out value))
-            {
-                m_birth_info.m_birth_position.x = FixPoint.Parse(value);
-                if (variables.TryGetValue("y", out value))
-                    m_birth_info.m_birth_position.y = FixPoint.Parse(value);
-                if (variables.TryGetValue("z", out value))
-                    m_birth_info.m_birth_position.z = FixPoint.Parse(value);
-                if (variables.TryGetValue("angle", out value))
-                    m_birth_info.m_birth_angle = FixPoint.Parse(value);
-            }
-
-            if (variables.TryGetValue("ext_x", out value))
-            {
-                m_extents.x = FixPoint.Parse(value);
-                if (variables.TryGetValue("ext_y", out value))
-                    m_extents.y = FixPoint.Parse(value);
-                if (variables.TryGetValue("ext_z", out value))
-                    m_extents.z = FixPoint.Parse(value);
-            }
-
-            if (variables.TryGetValue("visible", out value))
-                m_visible = bool.Parse(value);
-        }
-
         public override void InitializeComponent()
         {
             BirthPositionInfo birth_info = ParentObject.GetCreationContext().m_birth_info;
             if (birth_info != null)
+            {
                 m_birth_info.CopyFrom(birth_info);
-            m_current_position = m_birth_info.m_birth_position;
-            m_current_angle = m_birth_info.m_birth_angle;
+                m_current_position = m_birth_info.m_birth_position;
+                m_current_angle = m_birth_info.m_birth_angle;
+            }
+            else
+            {
+                m_birth_info.m_birth_position = m_current_position;
+                m_birth_info.m_birth_angle = m_current_angle;
+            }
         }
         #endregion
 

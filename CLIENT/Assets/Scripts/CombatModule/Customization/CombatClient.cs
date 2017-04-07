@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 namespace Combat
 {
@@ -15,6 +16,7 @@ namespace Combat
 
     public class CombatClient : IOutsideWorld
     {
+        protected DateTime m_dt_original = DateTime.Now;
         protected ICombatFactory m_combat_factory;
         protected long m_local_player_pstid = -1;
 
@@ -149,8 +151,13 @@ namespace Combat
 
         public virtual int GetCurrentTime()
         {
+#if CONSOLE_CLIENT
+            TimeSpan ts = DateTime.Now - m_dt_original;
+            return (int)(ts.TotalMilliseconds);
+#else
             float float_time = UnityEngine.Time.unscaledTime;
             return (int)(float_time * 1000);
+#endif
         }
 
         public virtual void OnGameStart()
@@ -204,7 +211,7 @@ namespace Combat
         {
         }
 
-        protected void OnUpdateLoaded(int current_time_int)
+        protected virtual void OnUpdateLoaded(int current_time_int)
         {
             m_state = CombatClientState.WaitingForStart;
             m_state_start_time = current_time_int;
@@ -225,13 +232,13 @@ namespace Combat
             if (delta_ms < 0)
                 return;
             m_sync_client.Update(current_time_int);
+            m_render_world.OnUpdate(delta_ms, current_time_int);
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {
                 SendCommands(commands);
                 m_sync_client.ClearOutputCommand();
             }
-            m_render_world.OnUpdate(delta_ms, current_time_int);
             m_last_update_time = current_time_int;
         }
 

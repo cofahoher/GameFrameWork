@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class AddStateEffectComponent
+    public partial class AddStateEffectComponent
     {
     }
 }

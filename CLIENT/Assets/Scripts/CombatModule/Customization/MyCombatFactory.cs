@@ -33,7 +33,7 @@ namespace Combat
         {
             ComponentTypeRegistry.RegisterDefaultComponents();
 //#if COMBAT_CLIENT
-//            ComponentTypeRegistry.Register(ComponentTypeRegistry.CT_ModelComponent, typeof(ModelComponent));
+//            ComponentTypeRegistry.Register(typeof(ModelComponent), false);
 //#endif
         }
 

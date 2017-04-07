@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class EffectGeneratorSkillComponent
+    public partial class EffectGeneratorSkillComponent : SkillComponent
     {
     }
 }

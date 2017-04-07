@@ -30,6 +30,7 @@ namespace Combat
         public const char Symbol____ = Symbol;
         public const char Letter____ = Letter;
         public const char Quote_____ = Quote;
+
         public static readonly char[] CodeMap = new[]{
             /*     0          1          2          3          4          5          6          7          8          9               */
             /*  0*/WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,WhiteSpace,/*  0*/
@@ -44,21 +45,16 @@ namespace Combat
             /* 90*/Letter____,Symbol____,Error_____,Symbol____,Error_____,Letter____,Error_____,Letter____,Letter____,Letter____,/* 90*/
             /*100*/Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,/*100*/
             /*110*/Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,/*110*/
-            /*120*/Letter____,Letter____,Letter____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*120*/
-            /*130*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*130*/
-            /*140*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*140*/
-            /*150*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*150*/
-            /*160*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*160*/
-            /*170*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*170*/
-            /*180*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*180*/
-            /*190*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*190*/
-            /*200*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*200*/
-            /*210*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*210*/
-            /*220*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*220*/
-            /*230*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*230*/
-            /*240*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*240*/
-            /*250*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____                                             /*250*/
+            /*120*/Letter____,Letter____,Letter____,Error_____,Error_____,Error_____,Error_____,Error_____/*127*/
         };
+
+        static public char GetCode(char ch)
+        {
+            if (ch > 127)
+                return Error;
+            else
+                return CodeMap[ch];
+        }
         #endregion
         
         TextBuffer m_text_buffer;
@@ -89,12 +85,6 @@ namespace Combat
             if (m_text_buffer != null)
                 TextBuffer.Recycle(m_text_buffer);
             m_text_buffer = null;
-        }
-
-        public bool HasError
-        {
-            get { return m_error; }
-            set { m_error = value; }
         }
 
         public Token GetCurrentToken()
@@ -140,11 +130,15 @@ namespace Combat
                         m_current_token = m_string_token;
                         break;
                     default:
+                        m_error = true;
                         m_current_token = m_error_token;
                         break;
                     }
                     if (!m_current_token.Get(m_text_buffer))
+                    {
                         m_error = true;
+                        m_current_token = m_error_token;
+                    }
                 }
             }
             return m_current_token;
@@ -154,7 +148,7 @@ namespace Combat
         {
             while (!m_text_buffer.Eof())
             {
-                char code = CodeMap[m_text_buffer.Char()];
+                char code = Tokenizer.GetCode(m_text_buffer.Char());
                 switch (code)
                 {
                 case WhiteSpace:

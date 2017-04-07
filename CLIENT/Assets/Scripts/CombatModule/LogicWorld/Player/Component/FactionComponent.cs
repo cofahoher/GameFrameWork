@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class FactionComponent : PlayerComponent
+    public partial class FactionComponent : PlayerComponent
     {
         int m_faction_id = 0;
 

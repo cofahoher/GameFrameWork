@@ -34,7 +34,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         for (int i = 0; i < str.Length; ++i)
         {
             char ch = str[i];
-            char code = ParseCodeTable[ch];
+            char code = GetCode(ch);
             if (code == Digit_____)
             {
                 int num = ch - '0';
@@ -74,6 +74,17 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return result;
     }
 
+    public static bool TryParse(string str, out FixPoint result)
+    {
+        if (str == null)
+        {
+            result = FixPoint.Zero;
+            return false;
+        }
+        result = Parse(str);
+        return true;
+    }
+
     public static readonly decimal Precision = (decimal)(new FixPoint(1L));//0.0000152587890625m
     public static readonly FixPoint MaxValue = new FixPoint(MAX_VALUE);
     public static readonly FixPoint MinValue = new FixPoint(MIN_VALUE);
@@ -108,6 +119,13 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         return new FixPoint(value * ONE);
     }
+    public static explicit operator FixPoint(bool value)
+    {
+        if (value)
+            return FixPoint.One;
+        else
+            return FixPoint.Zero;
+    }
     #region 正式的时候不开放这几个
     public static explicit operator FixPoint(float value)
     {
@@ -130,6 +148,10 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     public static explicit operator long(FixPoint value)
     {
         return value.m_raw_value >> FRACTIONAL_PLACES;
+    }
+    public static explicit operator bool(FixPoint value)
+    {
+        return value.m_raw_value != 0L;
     }
     public static explicit operator float(FixPoint value)
     {
@@ -514,7 +536,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     static readonly char Digit_____ = (char)3;
     static readonly char Sign______ = (char)4;
     static readonly char Point_____ = (char)5;
-    static readonly char[] ParseCodeTable = new[]{
+
+    static readonly char[] CodeMap = new[]{
         /*     0          1          2          3          4          5          6          7          8          9               */
         /*  0*/WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,WhiteSpace,/*  0*/
         /* 10*/WhiteSpace,Error_____,Error_____,WhiteSpace,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 10*/
@@ -528,20 +551,15 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         /* 90*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 90*/
         /*100*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*100*/
         /*110*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*110*/
-        /*120*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*120*/
-        /*130*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*130*/
-        /*140*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*140*/
-        /*150*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*150*/
-        /*160*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*160*/
-        /*170*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*170*/
-        /*180*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*180*/
-        /*190*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*190*/
-        /*200*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*200*/
-        /*210*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*210*/
-        /*220*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*220*/
-        /*230*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*230*/
-        /*240*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/*240*/
-        /*250*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____                                             /*250*/
+        /*120*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____/*127*/
     };
+
+    static char GetCode(char ch)
+    {
+        if (ch > 127)
+            return Error_____;
+        else
+            return CodeMap[ch];
+    }
     #endregion
 }

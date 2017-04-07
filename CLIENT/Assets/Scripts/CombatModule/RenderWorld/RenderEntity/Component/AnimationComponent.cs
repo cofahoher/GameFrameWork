@@ -11,7 +11,7 @@ namespace Combat
         public const string ATTACK = "attack";
     }
 
-    public class AnimationComponent : RenderEntityComponent
+    public partial class AnimationComponent : RenderEntityComponent
     {
         //配置数据
         string m_animation_path;

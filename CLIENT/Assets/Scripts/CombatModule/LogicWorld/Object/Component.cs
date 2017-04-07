@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public abstract class Component : ILogicOwnerInfo, IDestruct
+    public abstract class Component : ILogicOwnerInfo, IDestruct, IExpressionVariableProvider
     {
         protected Object m_parent_object;
         protected int m_component_type_id = -1;
@@ -52,10 +52,22 @@ namespace Combat
         {
             return m_parent_object;
         }
-        public abstract int GetOwnerPlayerID();
-        public abstract Player GetOwnerPlayer();
-        public abstract int GetOwnerEntityID();
-        public abstract Entity GetOwnerEntity();
+        public virtual int GetOwnerPlayerID()
+        {
+            return m_parent_object.GetOwnerPlayerID();
+        }
+        public virtual Player GetOwnerPlayer()
+        {
+            return m_parent_object.GetOwnerPlayer();
+        }
+        public virtual int GetOwnerEntityID()
+        {
+            return m_parent_object.GetOwnerEntityID();
+        }
+        public virtual Entity GetOwnerEntity()
+        {
+            return m_parent_object.GetOwnerEntity();
+        }
         #endregion
 
         #region 初始化
@@ -111,6 +123,71 @@ namespace Combat
 
         protected virtual void OnDisable()
         {
+        }
+        #endregion
+
+        #region Variable
+        public virtual FixPoint GetVariable(ExpressionVariable variable, int index)
+        {
+            int vid = variable[index];
+            if (index == variable.MaxIndex)
+            {
+                FixPoint value;
+                if (GetVariable(vid, out value))
+                    return value;
+                Object owner_object = GetOwnerObject();
+                if (owner_object != null)
+                {
+                    int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
+                    Component component = owner_object.GetComponent(component_type_id);
+                    if (component != null)
+                        component.GetVariable(vid, out value);
+                }
+                return value;
+            }
+            else if (vid == ExpressionVariable.VID_Object)
+            {
+                Object owner_object = GetOwnerObject();
+                if (owner_object != null)
+                    return owner_object.GetVariable(variable, index + 1);
+            }
+            else if (vid == ExpressionVariable.VID_Entity)
+            {
+                Object owner_entity = GetOwnerEntity();
+                if (owner_entity != null)
+                    return owner_entity.GetVariable(variable, index + 1);
+            }
+            else if (vid == ExpressionVariable.VID_Player)
+            {
+                Object owner_player = GetOwnerPlayer();
+                if (owner_player != null)
+                    return owner_player.GetVariable(variable, index + 1);
+            }
+            else
+            {
+                Object owner_object = GetOwnerObject();
+                if (owner_object != null)
+                    return owner_object.GetVariable(variable, index);
+            }
+            return FixPoint.Zero;
+        }
+
+        public virtual FixPoint GetVariable(int id)
+        {
+            FixPoint value;
+            GetVariable(id, out value);
+            return value;
+        }
+
+        public virtual bool GetVariable(int id, out FixPoint value)
+        {
+            value = FixPoint.Zero;
+            return false;
+        }
+
+        public virtual bool SetVariable(int id, FixPoint value)
+        {
+            return false;
         }
         #endregion
     }

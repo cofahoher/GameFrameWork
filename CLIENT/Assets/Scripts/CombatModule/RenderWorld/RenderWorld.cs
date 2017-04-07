@@ -102,6 +102,8 @@ namespace Combat
         protected void ProcessRenderMessages()
         {
             List<RenderMessage> msgs = m_logic_world.GetAllRenderMessages();
+            if(msgs == null)
+                return;
             int count = msgs.Count;
             if (count == 0)
                 return;

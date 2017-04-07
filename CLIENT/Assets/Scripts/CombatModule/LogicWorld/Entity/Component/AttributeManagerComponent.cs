@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class AttributeManagerComponent : EntityComponent
+    public partial class AttributeManagerComponent : EntityComponent
     {
         SortedDictionary<string, FixPoint> m_base_value = new SortedDictionary<string, FixPoint>();
         SortedDictionary<string, Attribute> m_attributes = new SortedDictionary<string,Attribute>();
@@ -55,27 +55,47 @@ namespace Combat
         }
         #endregion
 
-        public Attribute GetAttribute(string attribute_name)
+        public Attribute GetAttributeByName(string attribute_name)
         {
             Attribute attribute;
             m_attributes.TryGetValue(attribute_name, out attribute);
             return attribute;
         }
 
-        public FixPoint GetAttributeValue(string attribute_name)
+        public Attribute GetAttributeByID(int attribute_id)
         {
+            string attribute_name = AttributeSystem.Instance.AttributeID2Name(attribute_id);
             Attribute attribute;
-            if (!m_attributes.TryGetValue(attribute_name, out attribute))
-                return FixPoint.Zero;
-            return attribute.Value;
+            m_attributes.TryGetValue(attribute_name, out attribute);
+            return attribute;
         }
 
-        public FixPoint GetAttributeBaseValue(string attribute_name)
+        //public FixPoint GetAttributeValue(string attribute_name)
+        //{
+        //    Attribute attribute;
+        //    if (!m_attributes.TryGetValue(attribute_name, out attribute))
+        //        return FixPoint.Zero;
+        //    return attribute.Value;
+        //}
+
+        //public FixPoint GetAttributeBaseValue(string attribute_name)
+        //{
+        //    Attribute attribute;
+        //    if (!m_attributes.TryGetValue(attribute_name, out attribute))
+        //        return FixPoint.Zero;
+        //    return attribute.BaseValue;
+        //}
+
+        public override FixPoint GetVariable(ExpressionVariable variable, int index)
         {
-            Attribute attribute;
-            if (!m_attributes.TryGetValue(attribute_name, out attribute))
-                return FixPoint.Zero;
-            return attribute.BaseValue;
+            if (index < variable.MaxIndex)
+            {
+                int vid = variable[index];
+                Attribute attribute = GetAttributeByID(vid);
+                if (attribute != null)
+                    return attribute.GetVariable(variable, index + 1);
+            }
+            return base.GetVariable(variable, index);
         }
     }
 }

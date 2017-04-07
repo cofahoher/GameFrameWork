@@ -19,6 +19,7 @@ namespace Combat
 
         protected PlayerManager m_player_manager;
         protected EntityManager m_entity_manager;
+        protected SkillManager m_skill_manager;
         protected EffectManager m_effect_manager;
         protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
@@ -41,6 +42,7 @@ namespace Combat
 
             m_player_manager = new PlayerManager(this);
             m_entity_manager = new EntityManager(this);
+            m_skill_manager = new SkillManager(this);
             m_effect_manager = new EffectManager(this);
             m_faction_manager = new FactionManager(this);
 
@@ -63,6 +65,8 @@ namespace Combat
             m_player_manager.Destruct();
             m_player_manager = null;
 
+            m_skill_manager.Destruct();
+            m_skill_manager = null;
             m_effect_manager.Destruct();
             m_effect_manager = null;
             m_faction_manager.Destruct();
@@ -108,6 +112,10 @@ namespace Combat
         public EntityManager GetEntityManager()
         {
             return m_entity_manager;
+        }
+        public SkillManager GetSkillManager()
+        {
+            return m_skill_manager;
         }
         public EffectManager GetEffectManager()
         {

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class TurnManagerComponent
+    public partial class TurnManagerComponent : Component
     {
+        //运行数据
         FixPoint m_current_turn_index = FixPoint.Zero;
         FixPoint m_current_turn_time = FixPoint.Zero;
         TaskScheduler<LogicWorld> m_turn_scheduler;

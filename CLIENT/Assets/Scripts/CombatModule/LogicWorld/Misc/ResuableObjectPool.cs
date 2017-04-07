@@ -53,6 +53,8 @@ namespace Combat
 
         public void Recycle(TBaseClassOrInterface instance)
         {
+            if (instance == null)
+                return;
             instance.Reset();
             System.Type type = instance.GetType();
             List<TBaseClassOrInterface> pool = null;

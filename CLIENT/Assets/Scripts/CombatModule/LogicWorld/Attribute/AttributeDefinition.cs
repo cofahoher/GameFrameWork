@@ -5,20 +5,21 @@ namespace Combat
     public class AttributeDefinition : IDestruct
     {
         AttributeData m_config;
-        AttributeFormula m_formula;
+        Formula m_formula;
         List<string> m_static_dependent_attributes = new List<string>();
         List<string> m_referenced_attributes = new List<string>();
 
         public AttributeDefinition(AttributeData config)
         {
             m_config = config;
-            m_formula = new AttributeFormula(config.m_formula);
+            m_formula = Formula.Create();
+            m_formula.Compile(config.m_formula);
         }
 
         public void Destruct()
         {
             m_config = null;
-            m_formula.Destruct();
+            Formula.Recycle(m_formula);
             m_formula = null; 
         }
 
@@ -51,22 +52,19 @@ namespace Combat
 
         public List<string> BuildReferencedAttributes()
         {
-            m_formula.BuildReferencedList(m_referenced_attributes);
+            int count = 0;
+            List<ExpressionVariable> variables = m_formula.GetAllVariables();
+            if (variables != null)
+                count = variables.Count;
+            for (int i = 0; i < count; ++i)
+            {
+            }
             return m_referenced_attributes;
         }
 
-        public FixPoint ComputeValue(AttributeFormulaEvaluationContext context)
+        public FixPoint ComputeValue(IExpressionVariableProvider variable_provider)
         {
-            return m_formula.ComputeValue(context);
-        }
-
-        public FixPoint GetDefaultValue(Object obj)
-        {
-            AttributeFormulaEvaluationContext context = AttributeFormulaEvaluationContext.Create();
-            context.Initialize(obj, null);
-            FixPoint result = m_formula.ComputeValue(context);
-            AttributeFormulaEvaluationContext.Recycle(context);
-            return result;
+            return m_formula.Evaluate(variable_provider);
         }
 
         public void Reflect(Object obj, Attribute attribute)

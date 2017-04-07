@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public delegate FixPoint ExpressionVariableDelegate(string variable_name);
-
     public class ExpressionVariable : IRecyclable, IDestruct
     {
         #region Create/Recycle
@@ -18,22 +16,68 @@ namespace Combat
         }
         #endregion
 
-        public ExpressionVariableDelegate m_delegate;
-        public string m_variable_name;
+        public static readonly int VID_Object = (int)CRC.Calculate("Object");
+        public static readonly int VID_Entity = (int)CRC.Calculate("Entity");
+        public static readonly int VID_Player = (int)CRC.Calculate("Player");
+        public static readonly int VID_Attribute = (int)CRC.Calculate("Attribute");
+        public static readonly int VID_Value = (int)CRC.Calculate("Value");
+        public static readonly int VID_BaseValue = (int)CRC.Calculate("BaseValue");
+        /*
+         * 在各种上下文（指IExpressionVariableProvider实现者），都可以这样写公式的一部分
+         * max_speed
+         * angle
+         * Object.angle
+         * Object.max_speed
+         * Entity.max_speed
+         * Attribute.Strength.Value
+         * Object.Attribute.Strength.Value
+         * 
+         * 在AttributeManagerComponent和Attribute上下文，还可以这么写
+         * Strength.Value
+         * 
+         * 在Attribute上下文，还可以这么写
+         * Value
+         * BaseValue
+         */
 
-        public void Reset()
+        public List<int> m_variable = new List<int>();
+
+        public void Construct(List<string> raw_variable)
         {
+            int count = raw_variable.Count;
+            for (int i = 0; i < count; ++i)
+                m_variable.Add((int)CRC.Calculate(raw_variable[i]));
         }
 
         public void Destruct()
         {
+            m_variable = null;
+        }
+
+        public void Reset()
+        {
+            m_variable.Clear();
+        }
+
+        public int this[int index]
+        {
+            get
+            {
+                if (index > 0 && index < m_variable.Count)
+                    return m_variable[index];
+                else
+                    return 0;
+            }
+        }
+
+        public int MaxIndex
+        {
+            get { return m_variable.Count - 1; }
         }
     }
 
-
     public interface IExpressionVariableProvider
     {
-        void LookupValiable(List<string> scopes, ExpressionVariable variable);
-        FixPoint GetVariable(ExpressionVariable variable);
+        FixPoint GetVariable(ExpressionVariable variable, int index);
     }
 }

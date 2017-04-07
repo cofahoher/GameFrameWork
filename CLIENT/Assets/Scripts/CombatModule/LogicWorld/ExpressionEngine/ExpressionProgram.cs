@@ -16,33 +16,26 @@ namespace Combat
         }
         #endregion
 
-        List<ExpressionVariable> m_variables = new List<ExpressionVariable>();
-        List<long> m_instructions = new List<long>();
+        protected bool m_error_occurred = false;
+        protected List<ExpressionVariable> m_variables = new List<ExpressionVariable>();
+        protected List<long> m_instructions = new List<long>();
 
-        Tokenizer m_tokenizer;
-        IExpressionVariableProvider m_variable_provider;
+        #region Compile的临时变量，Destruct和Reset不用关心
+        protected Tokenizer m_tokenizer;
+        protected Token m_token;
+        protected TokenType m_token_type;
+        protected List<string> m_raw_variable = new List<string>();
+        #endregion
 
-        Token m_token;
-        TokenType m_token_type;
-        List<string> m_raw_variable = new List<string>();
-
-        public void Destruct()
+        public virtual void Destruct()
         {
             RecycleVariable();
-            m_tokenizer = null;
-            m_variable_provider = null;
-            m_token = null;
         }
 
-        public void Reset()
+        public virtual void Reset()
         {
             RecycleVariable();
             m_instructions.Clear();
-            m_tokenizer = null;
-            m_variable_provider = null;
-            m_token = null;
-            m_token_type = TokenType.ERROR;
-            m_raw_variable.Clear();
         }
 
         void RecycleVariable()
@@ -52,44 +45,26 @@ namespace Combat
             m_variables.Clear();
         }
 
-        enum OperationCode
+        public virtual bool Compile(string formula_string)
         {
-            END = 0,
-            NEGATE,
-            ADD,
-            SUBTRACT,
-            MULTIPLY,
-            DIVIDE,
-
-            SIN,
-            COS,
-            TAN,
-            SQRT,
-            MIN,
-            MAX,
-            CLAMP,
-
-            PUSH_NUMBER,
-            PUSH_VARIABLE,
-        };
-
-        public bool Compile(string formula_string, IExpressionVariableProvider variable_provider)
-        {
+            m_error_occurred = false;
             m_tokenizer = Tokenizer.Create();
             m_tokenizer.Construct(formula_string);
-            m_variable_provider = variable_provider;
             m_token = null;
             m_token_type = TokenType.ERROR;
             GetToken();
             ParseExpression();
-            bool success = !m_tokenizer.HasError;
             Tokenizer.Recycle(m_tokenizer);
             m_tokenizer = null;
-            m_variable_provider = null;
             m_token = null;
             m_token_type = TokenType.ERROR;
             m_raw_variable.Clear();
-            return success;
+            return !m_error_occurred;
+        }
+
+        public List<ExpressionVariable> GetAllVariables()
+        {
+            return m_variables;
         }
 
         public bool IsConstant()
@@ -97,9 +72,8 @@ namespace Combat
             return m_variables.Count == 0;
         }
 
-        public FixPoint Evaluate(IExpressionVariableProvider variable_provider = null)
+        public virtual FixPoint Evaluate(IExpressionVariableProvider variable_provider)
         {
-            m_variable_provider = variable_provider;
             Stack<FixPoint> stack = new Stack<FixPoint>();
             FixPoint var1, var2, var3;
             int index = 0;
@@ -115,9 +89,9 @@ namespace Combat
                     ++index;
                     break;
                 case OperationCode.PUSH_VARIABLE:
-                    if (m_variable_provider != null)
+                    if (variable_provider != null)
                     {
-                        var1 = m_variable_provider.GetVariable(m_variables[(int)m_instructions[index]]);
+                        var1 = variable_provider.GetVariable(m_variables[(int)m_instructions[index]], 0);
                         stack.Push(var1);
                     }
                     else
@@ -190,6 +164,35 @@ namespace Combat
         }
 
         #region Compile
+        enum OperationCode
+        {
+            END = 0,
+            NEGATE,
+            ADD,
+            SUBTRACT,
+            MULTIPLY,
+            DIVIDE,
+
+            SIN,
+            COS,
+            TAN,
+            SQRT,
+            MIN,
+            MAX,
+            CLAMP,
+
+            PUSH_NUMBER,
+            PUSH_VARIABLE,
+        };
+
+        void GetToken()
+        {
+            m_token = m_tokenizer.GetNextToken();
+            m_token_type = m_token.Type;
+            if (m_token_type == TokenType.ERROR)
+                m_error_occurred = true;
+        }
+
         void ParseExpression()
         {
             OperationCode unary_op = OperationCode.END;
@@ -243,7 +246,7 @@ namespace Combat
 		        ParseExpression();
                 if (m_token_type != TokenType.RIGHT_PAREN)
                 {
-                    m_tokenizer.HasError = true;
+                    m_error_occurred = true;
                     LogWrapper.LogError("Expression: ParseFactor(), ')' expected");
                     return;
                 }
@@ -258,7 +261,7 @@ namespace Combat
                     GetToken();
                     if (m_token_type != TokenType.IDENTIFIER)
                     {
-                        m_tokenizer.HasError = true;
+                        m_error_occurred = true;
                         LogWrapper.LogError("Expression: ParseFactor(), TokenType.Identifier expected");
                         return;
                     }
@@ -266,6 +269,7 @@ namespace Combat
                     GetToken();
                 }
                 AppendVariable(m_raw_variable);
+                m_raw_variable.Clear();
                 break;
             case TokenType.SINE:
                 ParseBuildInFunction(OperationCode.SIN, 1);
@@ -307,7 +311,7 @@ namespace Combat
                 {
                     if (m_token_type != TokenType.COMMA)
                     {
-                        m_tokenizer.HasError = true;
+                        m_error_occurred = true;
                         LogWrapper.LogError("Expression: ParseBuildInFunction, ',' expected");
                         return;
                     }
@@ -318,18 +322,12 @@ namespace Combat
             }
             if (m_token_type != TokenType.RIGHT_PAREN)
             {
-                m_tokenizer.HasError = true;
+                m_error_occurred = true;
                 LogWrapper.LogError("Expression: ParseBuildInFunction, ')' expected");
                 return;
             }
             AppendOperation(opcode);
             GetToken();
-        }
-
-        void GetToken()
-        {
-            m_token = m_tokenizer.GetNextToken();
-            m_token_type = m_token.Type;
         }
 
         void AppendOperation(OperationCode op_code)
@@ -346,16 +344,14 @@ namespace Combat
         void AppendVariable(List<string> variable)
         {
             AppendOperation(OperationCode.PUSH_VARIABLE);
-            m_instructions.Add(AddVariable(variable));
+            int index = AddVariable(variable);
+            m_instructions.Add(index);
         }
 
         int AddVariable(List<string> raw_variable)
         {
             ExpressionVariable variable = ExpressionVariable.Create();
-            int count = raw_variable.Count;
-            variable.m_variable_name = raw_variable[count - 1];
-            raw_variable.RemoveAt(count - 1);
-            m_variable_provider.LookupValiable(raw_variable, variable);
+            variable.Construct(raw_variable);
             int index = m_variables.Count;
             m_variables.Add(variable);
             return index;

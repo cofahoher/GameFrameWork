@@ -4,7 +4,7 @@ namespace Combat
 {
     public class AttributeSystem : Singleton<AttributeSystem>
     {
-        static List<int> ms_all_ids = new List<int>();
+        static SortedDictionary<int, string> ms_all_ids = new SortedDictionary<int, string>();
         bool m_initialized = false;
         SortedDictionary<int, AttributeDefinition> m_definitions_by_id = new SortedDictionary<int, AttributeDefinition>();
         SortedDictionary<string, AttributeDefinition> m_definitions_by_name = new SortedDictionary<string, AttributeDefinition>();
@@ -25,9 +25,14 @@ namespace Combat
             m_definitions_by_name.Clear();
         }
 
-        public static void RegisterAttribute(int id)
+        public static void RegisterAttribute(AttributeData data)
         {
-            ms_all_ids.Add(id);
+#if UNITY_EDITOR
+            string existed_name;
+            if (ms_all_ids.TryGetValue(data.m_attribute_id, out existed_name))
+                LogWrapper.LogError("AttributeSystem, attribute ", data.m_attribute_name, " has same crcid with existed attribute ", existed_name);
+#endif
+            ms_all_ids[data.m_attribute_id] = data.m_attribute_name;
         }
 
         public AttributeDefinition GetDefinitionByName(string attribute_name)
@@ -44,18 +49,32 @@ namespace Combat
             return definition;
         }
 
+        public string AttributeID2Name(int attribute_id)
+        {
+            AttributeDefinition definition;
+            if(m_definitions_by_id.TryGetValue(attribute_id, out definition))
+                return definition.Name;
+            else
+                return null;
+        }
+
+        public int AttributeName2ID(string attribute_name)
+        {
+            AttributeDefinition definition;
+            if (m_definitions_by_name.TryGetValue(attribute_name, out definition))
+                return definition.ID;
+            else
+                return 0;
+        }
+
         public void InitializeAllDefinition(IConfigProvider config_provider)
         {
             if (m_initialized)
                 return;
-            ms_all_ids.Sort();
-            int pre_id = 0;
-            for (int i = 0; i < ms_all_ids.Count; ++i)
+            var enumerator = ms_all_ids.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                if (ms_all_ids[i] == pre_id)
-                    continue;
-                pre_id = ms_all_ids[i];
-                AttributeData data = config_provider.GetAttributeData(ms_all_ids[i]);
+                AttributeData data = config_provider.GetAttributeData(enumerator.Current.Key);
                 AttributeDefinition definition = new AttributeDefinition(data);
                 m_definitions_by_id[data.m_attribute_id] = definition;
                 m_definitions_by_name[data.m_attribute_name] = definition;

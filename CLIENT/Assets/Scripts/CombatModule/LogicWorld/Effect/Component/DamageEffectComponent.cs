@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class DamageEffectComponent
+    public partial class DamageEffectComponent
     {
     }
 }

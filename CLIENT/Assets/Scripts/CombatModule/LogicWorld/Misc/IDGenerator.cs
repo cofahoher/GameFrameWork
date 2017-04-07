@@ -7,7 +7,7 @@ namespace Combat
         public const int INVALID_FIRST_ID             = -1000000;
         public const int PLAYER_FIRST_ID              =  1;
         public const int ENTITY_FIRST_ID              =  100;
-        public const int ABILITY_FIRST_ID             =  1000000;
+        public const int SKILL_FIRST_ID               =  1000000;
         public const int EFFECT_GENERATOR_FIRST_ID    =  2000000;
         public const int EFFECT_FIRST_ID              =  3000000;
         public const int ATTRIBUTE_MODIFIER_FIRST_ID  =  4000000;

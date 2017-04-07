@@ -53,6 +53,17 @@ namespace Combat
                 return null;
             return attribute_data;
         }
+
+        public FixPoint GetLevelBasedNumber(string table_name, int level)
+        {
+            int table_id = (int)CRC.Calculate(table_name);
+            return GetLevelBasedNumber(table_id, level);
+        }
+
+        public FixPoint GetLevelBasedNumber(int table_id, int level)
+        {
+            return FixPoint.Zero;
+        }
         #endregion
         
         #region 手工配置
@@ -82,7 +93,7 @@ namespace Combat
             type_data = new ObjectTypeData();
             type_data.m_name = "Obstruct";
             ComponentData cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_PositionComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables["ext_x"] = "0.5";
             cd.m_component_variables["ext_y"] = "0.5";
             cd.m_component_variables["ext_z"] = "0.5";
@@ -90,7 +101,7 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_ModelComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
             type_data.m_components_data.Add(cd);
 
             m_object_type_data[101] = type_data;
@@ -99,7 +110,7 @@ namespace Combat
             type_data = new ObjectTypeData();
             type_data.m_name = "LegacyHero";
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_PositionComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables["ext_x"] = "0.5";
             cd.m_component_variables["ext_y"] = "0.5";
             cd.m_component_variables["ext_z"] = "0.5";
@@ -107,20 +118,20 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_LocomotorComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("LocomotorComponent");
             cd.m_component_variables["max_speed"] = "5.0";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_SkillManagerComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("SkillManagerComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_ModelComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_AnimationComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("AnimationComponent");
             cd.m_component_variables["animation_path"] = "bodyctrl";
             type_data.m_components_data.Add(cd);
 
@@ -130,7 +141,7 @@ namespace Combat
             type_data = new ObjectTypeData();
             type_data.m_name = "MecanimHero";
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_PositionComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables["ext_x"] = "0.5";
             cd.m_component_variables["ext_y"] = "0.5";
             cd.m_component_variables["ext_z"] = "0.5";
@@ -138,20 +149,20 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_LocomotorComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("LocomotorComponent");
             cd.m_component_variables["max_speed"] = "5.0";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_SkillManagerComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("SkillManagerComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_ModelComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
-            cd.m_component_type_id = ComponentTypeRegistry.CT_AnimatorComponent;
+            cd.m_component_type_id = (int)CRC.Calculate("AnimatorComponent");
             cd.m_component_variables["animator_path"] = "bodyctrl";
             type_data.m_components_data.Add(cd);
 
@@ -184,13 +195,13 @@ namespace Combat
         void InitAttributeData()
         {
             AttributeData attribute_data = new AttributeData();
-            attribute_data.m_attribute_id = 1;
             attribute_data.m_attribute_name = "MaxHealth";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
             attribute_data.m_formula = "BaseAttributes.MaxHealth";
             attribute_data.m_reflection_property = "CurrentMaxHealth";
             attribute_data.m_clamp_property = "CurrentHealth";
             attribute_data.m_clamp_min_value = FixPoint.Zero;
-            AttributeSystem.RegisterAttribute(attribute_data.m_attribute_id);
+            AttributeSystem.RegisterAttribute(attribute_data);
             m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
 
             //attribute_data = new AttributeData();

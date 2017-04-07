@@ -29,7 +29,7 @@ namespace Combat
 
         public int RandBetween(int min_value, int max_value)
         {
-            if (max_value > min_value)
+            if (min_value > max_value)
             {
                 int temp = max_value;
                 max_value = min_value;

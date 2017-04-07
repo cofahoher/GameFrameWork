@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class DamagableComponent : EntityComponent
+    public partial class DamagableComponent : EntityComponent
     {
         //配置数据
         int m_current_max_health = 0;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class WeaponSkillComponent
+    public partial class WeaponSkillComponent : SkillComponent
     {
     }
 }

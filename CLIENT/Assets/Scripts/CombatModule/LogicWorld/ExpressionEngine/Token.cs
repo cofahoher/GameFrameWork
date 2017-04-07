@@ -96,7 +96,7 @@ namespace Combat
             while (true)
             {
                 char ch = text_buffer.NextChar();
-                if (ch == '.' || Tokenizer.CodeMap[ch] == Tokenizer.Digit)
+                if (ch == '.' || Tokenizer.GetCode(ch) == Tokenizer.Digit)
                     ++length;
                 else
                     break;
@@ -198,7 +198,7 @@ namespace Combat
             while (true)
             {
                 char ch = text_buffer.NextChar();
-                char code = Tokenizer.CodeMap[ch];
+                char code = Tokenizer.GetCode(ch);
                 if (code == Tokenizer.Letter || code == Tokenizer.Digit)
                     ++length;
                 else
@@ -237,7 +237,7 @@ namespace Combat
                 char ch = text_buffer.NextChar();
                 if (text_buffer.Eof())
                     break;
-                if (Tokenizer.CodeMap[ch] == Tokenizer.Quote)
+                if (Tokenizer.GetCode(ch) == Tokenizer.Quote)
                     break;
                 ++length;
             }
