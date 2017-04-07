@@ -141,9 +141,11 @@ namespace Combat
                     int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
                     Component component = owner_object.GetComponent(component_type_id);
                     if (component != null)
-                        component.GetVariable(vid, out value);
+                    {
+                        if (component.GetVariable(vid, out value))
+                            return value;
+                    }
                 }
-                return value;
             }
             else if (vid == ExpressionVariable.VID_Object)
             {
@@ -163,13 +165,11 @@ namespace Combat
                 if (owner_player != null)
                     return owner_player.GetVariable(variable, index + 1);
             }
+            Object owner = GetOwnerObject();
+            if (owner != null)
+                return owner.GetVariable(variable, index);
             else
-            {
-                Object owner_object = GetOwnerObject();
-                if (owner_object != null)
-                    return owner_object.GetVariable(variable, index);
-            }
-            return FixPoint.Zero;
+                return FixPoint.Zero;
         }
 
         public virtual FixPoint GetVariable(int id)

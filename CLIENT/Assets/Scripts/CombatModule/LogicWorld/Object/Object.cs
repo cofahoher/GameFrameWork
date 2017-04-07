@@ -243,7 +243,11 @@ namespace Combat
                 int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
                 Component component = GetComponent(component_type_id);
                 if (component != null)
-                    return component.GetVariable(vid);
+                {
+                    FixPoint value;
+                    if (component.GetVariable(vid, out value))
+                        return value;
+                }
             }
             else if (vid == ExpressionVariable.VID_Attribute)
             {
@@ -269,7 +273,11 @@ namespace Combat
                 if (owner_player != null)
                     return owner_player.GetVariable(variable, index + 1);
             }
-            return FixPoint.Zero;
+            Object owner = GetOwnerObject();
+            if (owner != null)
+                return owner.GetVariable(variable, index);
+            else
+                return FixPoint.Zero;
         }
 
         public bool IsDead()
