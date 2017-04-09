@@ -1,1 +1,2 @@
 adb logcat -s Unity -d > xxx.txt
+Debug.Log ("默认颜色" + "<color=darkblue>" + " 蓝色的" + "</color>" + "默认颜色" + "<color=#800000ff>" + "红色的" + "</color>"); 

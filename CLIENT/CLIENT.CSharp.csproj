@@ -231,6 +231,7 @@
     <Compile Include="Assets\Scripts\GameGlobal.cs" />
     <Compile Include="Assets\Scripts\LogWrapper.cs" />
     <Compile Include="Assets\Scripts\SingletonMonobehaviour.cs" />
+    <Compile Include="Assets\Scripts\Statistics.cs" />
     <Compile Include="Assets\Scripts\Util\ProtoBufMessage.cs" />
   </ItemGroup>
   <ItemGroup>
