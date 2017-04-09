@@ -1,3 +1,4 @@
 [plain] view plaincopy
 CLIENT/Library/
 CLIENT/Temp/
+*.suo
