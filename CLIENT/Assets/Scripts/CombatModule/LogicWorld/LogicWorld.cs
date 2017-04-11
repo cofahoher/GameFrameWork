@@ -93,6 +93,10 @@ namespace Combat
         {
             get { return m_current_frame; }
         }
+        public IConfigProvider GetConfigProvider()
+        {
+            return m_outside_world.GetConfigProvider();
+        }
         public TaskScheduler<LogicWorld> GetTaskScheduler()
         {
             return m_scheduler;

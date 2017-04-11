@@ -19,6 +19,15 @@
 			<Component>
 				<var key="asset" value="Objects/3D/zzw_ssx_mecanim"/>
 			</Component>
+			<Attributes>
+				<var key="TestAttribute1" value="1"/>
+				<var key="TestAttribute2" value="2"/>
+				<var key="TestAttribute3" value="3"/>
+				<var key="TestAttribute4" value="4"/>
+				<var key="TestAttribute5" value="5"/>
+				<var key="TestAttribute6" value="6"/>
+				<var key="MaxHealth" value="1000"/>
+			</Attributes>
 		</ConfigItem>
 	</ObjectProtoConfig>
 </ConfigSystem>

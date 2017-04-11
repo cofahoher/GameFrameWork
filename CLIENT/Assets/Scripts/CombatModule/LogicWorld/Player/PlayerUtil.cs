@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class PlayerUtil
+    public partial class PlayerUtil
     {
     }
 }

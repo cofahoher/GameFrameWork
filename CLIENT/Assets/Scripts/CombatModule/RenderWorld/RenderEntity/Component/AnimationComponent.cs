@@ -46,7 +46,7 @@ namespace Combat
             PlayerAnimation(AnimationName.IDLE, true);
         }
 
-        public override void OnDestruct()
+        protected override void OnDestruct()
         {
             m_unity_animation_cmp = null;
         }

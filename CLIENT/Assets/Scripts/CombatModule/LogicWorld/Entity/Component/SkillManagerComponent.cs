@@ -65,7 +65,7 @@ namespace Combat
             ParentObject.AddListener(SignalType.StopMoving, m_listener_context);
         }
 
-        public override void OnDestruct()
+        protected override void OnDestruct()
         {
             ParentObject.RemoveListener(SignalType.StartMoving, m_listener_context.ID);
             ParentObject.RemoveListener(SignalType.StopMoving, m_listener_context.ID);
@@ -101,7 +101,7 @@ namespace Combat
                 if(skill != null)
                 {
                     var def_cmp = skill.GetSkillDefinitionComponent();
-                    if (def_cmp.DeactivateWhenMoving())
+                    if (def_cmp.DeactivateWhenMoving)
                         skill.Interrupt();
                 }
             }
@@ -139,7 +139,7 @@ namespace Combat
         public void OnSkillActivated(Skill skill)
         {
             var def_cmp = skill.GetSkillDefinitionComponent();
-            if(def_cmp.BlocksMovementWhenActive())
+            if(def_cmp.BlocksMovementWhenActive)
             {
                 ++m_move_block_count;
                 if(m_move_block_count == 1)
@@ -148,7 +148,7 @@ namespace Combat
                         m_locomotor_cmp.Disable();
                 }
             }
-            if (def_cmp.BlocksOtherSkillsWhenActive())
+            if (def_cmp.BlocksOtherSkillsWhenActive)
                 ++m_active_block_count;
             m_active_skill_ids.AddLast(skill.ID);
         }
@@ -156,7 +156,7 @@ namespace Combat
         public void OnSkillDeactivated(Skill skill)
         {
             var def_cmp = skill.GetSkillDefinitionComponent();
-            if (def_cmp.BlocksMovementWhenActive())
+            if (def_cmp.BlocksMovementWhenActive)
             {
                 --m_move_block_count;
                 if(m_move_block_count == 0)
@@ -165,7 +165,7 @@ namespace Combat
                         m_locomotor_cmp.Enable();
                 }
             }
-            if (def_cmp.BlocksOtherSkillsWhenActive())
+            if (def_cmp.BlocksOtherSkillsWhenActive)
                 --m_active_block_count;
             m_active_skill_ids.Remove(skill.ID);
         }

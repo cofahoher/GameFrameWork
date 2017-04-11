@@ -1,11 +1,12 @@
-﻿// 统计当前帧FPS，前10帧平均FPS，前100帧平均FPS
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class Statistics : MonoBehaviour
 {
-    bool m_start = false;
+    public static Statistics Instance = null;
+
+    bool m_enabled = false;
+    bool m_started = false;
     int m_frame_cnt = 0;
     float m_start_time = 0;
     float m_last_frame_realtime = 0;
@@ -16,26 +17,30 @@ public class Statistics : MonoBehaviour
 
     const int STATISTICS_CNT_1 = 10;
     const int STATISTICS_CNT_2 = 100;
-    private float[] m_time = new float[STATISTICS_CNT_2];
+    float[] m_time = new float[STATISTICS_CNT_2];
+
+    public bool Enabled
+    {
+        get { return m_enabled; }
+        set
+        {
+            m_enabled = value;
+            m_started = false;
+            m_frame_cnt = 0;
+        }
+    }
 
     void Start()
     {
-        m_start = false;
-    }
-
-    void OnEnable()
-    {
-    }
-
-    void OnDisable()
-    {
-        m_start = false;
+        Instance = this;
     }
 
     void Update()
     {
+        if (!m_enabled)
+            return;
         ++m_frame_cnt;
-        if (m_start)
+        if (m_started)
         {
             float cur_realtime = Time.realtimeSinceStartup;
             float delta_time = cur_realtime - m_last_frame_realtime;  // Time.deltaTime
@@ -55,15 +60,16 @@ public class Statistics : MonoBehaviour
         }
         else if (m_frame_cnt == 200)
         {
-            m_start = true;
+            m_started = true;
             m_frame_cnt = 0;
             m_start_time = Time.realtimeSinceStartup;
             m_last_frame_realtime = m_start_time;
         }
     }
+
     void OnGUI()
     {
-        if (m_start)
+        if (m_started)
             GUI.Label(new Rect(20, 10, 960, 50), "FPS_1 = " + m_current_fps + ", FPS_10 = " + m_statistics_fps1 + ", FPS_100 = " + m_statistics_fps2 + "\r\nLATENCY = ??");
     }
 }

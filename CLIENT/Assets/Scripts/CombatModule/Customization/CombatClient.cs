@@ -24,6 +24,9 @@ namespace Combat
         protected int m_state_start_time = -1;
         protected int m_last_update_time = -1;
         protected int m_waiting_cnt = 0;
+#if UNITY_EDITOR
+        protected bool m_is_first_frame = true;
+#endif
 
         protected LogicWorld m_logic_world;
         protected RenderWorld m_render_world;
@@ -82,6 +85,9 @@ namespace Combat
             m_state_start_time = -1;
             m_last_update_time = -1;
             m_waiting_cnt = 0;
+#if UNITY_EDITOR
+            m_is_first_frame = true;
+#endif
 
             AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
             m_combat_factory.RegisterComponents();
@@ -113,6 +119,8 @@ namespace Combat
             m_state_start_time = current_time_int;
             m_last_update_time = 0;
             m_sync_client.Start(0, m_local_player_pstid, 200);
+            if (Statistics.Instance != null)
+                Statistics.Instance.Enabled = true;
         }
         #endregion
 
@@ -231,6 +239,15 @@ namespace Combat
             int delta_ms = current_time_int - m_last_update_time;
             if (delta_ms < 0)
                 return;
+#if UNITY_EDITOR
+            if (m_is_first_frame)
+            {
+                m_is_first_frame = false;
+                LogWrapper.LogError("CombatClient.OnUpdateRunning, first delta_ms = ", delta_ms);
+            }
+            if (delta_ms > 100)
+                LogWrapper.LogError("CombatClient.OnUpdateRunning, delta_ms = ", delta_ms);
+#endif
             m_sync_client.Update(current_time_int);
             m_render_world.OnUpdate(delta_ms, current_time_int);
             List<Command> commands = m_sync_client.GetOutputCommands();
@@ -253,6 +270,8 @@ namespace Combat
             }
             m_state = CombatClientState.Ending;
             ProcessGameOver();
+            if (Statistics.Instance != null)
+                Statistics.Instance.Enabled = false;
         }
 
         protected virtual void OnUpdateEnding(int current_time_int)

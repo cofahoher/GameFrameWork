@@ -53,7 +53,7 @@ namespace Combat
             binding.EntityID = logic_entity.ID;
         }
 
-        public override void OnDestruct()
+        protected override void OnDestruct()
         {
             if (m_unity_go != null)
             {

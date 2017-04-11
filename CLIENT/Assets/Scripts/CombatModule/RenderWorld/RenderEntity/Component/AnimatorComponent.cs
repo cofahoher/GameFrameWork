@@ -42,7 +42,7 @@ namespace Combat
             m_unity_animator_cmp = child.GetComponent<Animator>();
         }
 
-        public override void OnDestruct()
+        protected override void OnDestruct()
         {
             m_unity_animator_cmp = null;
         }

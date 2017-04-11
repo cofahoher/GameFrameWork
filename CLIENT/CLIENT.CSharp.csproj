@@ -94,8 +94,6 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeSystem.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\PropertyAccessor.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\PropertyAccessorManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\IConfigProvider.cs" />
@@ -164,6 +162,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\Object.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\ObjectCreationContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\ObjectManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\ObjectUtil.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\FactionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerAIComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerTargetingComponent.cs" />
@@ -196,6 +195,7 @@
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\UnityObjectBinding.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\UnityResourceManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Statistics.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ICommandSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ILogicWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ISyncClient.cs" />
@@ -231,7 +231,6 @@
     <Compile Include="Assets\Scripts\GameGlobal.cs" />
     <Compile Include="Assets\Scripts\LogWrapper.cs" />
     <Compile Include="Assets\Scripts\SingletonMonobehaviour.cs" />
-    <Compile Include="Assets\Scripts\Statistics.cs" />
     <Compile Include="Assets\Scripts\Util\ProtoBufMessage.cs" />
   </ItemGroup>
   <ItemGroup>

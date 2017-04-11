@@ -18,7 +18,7 @@ namespace Combat
             m_parent_object = null;
         }
 
-        public virtual void OnDestruct()
+        protected virtual void OnDestruct()
         {
         }
 
@@ -73,7 +73,7 @@ namespace Combat
         #region 初始化
         public virtual void InitializeVariable(Dictionary<string, string> variables)
         {
-            //ZZWTODO 有没有更好的方式？
+            //ZZWTODO 有没有更好的方式？List？crc？
         }
 
         public virtual void InitializeComponent()
@@ -135,17 +135,12 @@ namespace Combat
                 FixPoint value;
                 if (GetVariable(vid, out value))
                     return value;
-                Object owner_object = GetOwnerObject();
-                if (owner_object != null)
-                {
-                    int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
-                    Component component = owner_object.GetComponent(component_type_id);
-                    if (component != null)
-                    {
-                        if (component.GetVariable(vid, out value))
-                            return value;
-                    }
-                }
+                else
+                    return ObjectUtil.GetVariable(GetOwnerObject(), vid);
+            }
+            else if (vid == ExpressionVariable.VID_LevelTable)
+            {
+                return GetLogicWorld().GetConfigProvider().GetLevelBasedNumber(variable[index + 1], ObjectUtil.GetLevel(GetOwnerObject()));
             }
             else if (vid == ExpressionVariable.VID_Object)
             {

@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 namespace Combat
 {
+    public enum CheckSkillResult
+    {
+        Success = 0,
+        CoolDown,
+        ManaNotEnough,
+        RequireStillButMove,
+        SkillDisabled,
+    }
     public class Skill : Object
     {
         bool m_is_active = false;
@@ -10,6 +18,9 @@ namespace Combat
         SkillDefinitionComponent m_definition_cmp;
         EffectGeneratorSkillComponent m_effect_generator_cmp;
         WeaponSkillComponent m_weapon_cmp;
+        LocomotorComponent m_locomotor_cmp;
+        ManaComponent m_mana_cmp;
+
         SkillCountdownTask m_task;
 
         protected override void OnDestruct()
@@ -20,6 +31,8 @@ namespace Combat
             m_definition_cmp = null;
             m_effect_generator_cmp = null;
             m_weapon_cmp = null;
+            m_locomotor_cmp = null;
+            m_mana_cmp = null;
             m_task.Cancel();
             m_task = null;
         }
@@ -31,6 +44,8 @@ namespace Combat
             if(ownerEntity != null)
             {
                 m_skill_manager_cmp = ownerEntity.GetComponent<SkillManagerComponent>();
+                m_locomotor_cmp = ownerEntity.GetComponent<LocomotorComponent>();
+                m_mana_cmp = ownerEntity.GetComponent<ManaComponent>();
             }
         }
 
@@ -43,6 +58,10 @@ namespace Combat
         #endregion
 
         #region ILogicOwnerInfo
+        public override Object GetOwnerObject()
+        {
+            return m_skill_manager_cmp.GetOwnerObject();
+        }
         public override int GetOwnerPlayerID()
         {
             return m_skill_manager_cmp.GetOwnerPlayerID();
@@ -118,7 +137,7 @@ namespace Combat
         public FixPoint GetNextReadyTime()
         {
             var timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
-            if(timer.Active())
+            if(timer.Active)
             {
                 return timer.GetRemaining(GetCurrentTime());
             }
@@ -127,19 +146,141 @@ namespace Combat
         #endregion
 
         #region 技能的Activate流程
+        /// <summary>
+        /// 是否可以激活技能
+        /// </summary>
+        /// <param name="is_skill">true表示技能 false表示普通攻击</param>
+        /// <returns></returns>
+        public bool CanActivate(bool is_skill = true)
+        {
+            CheckSkillResult result = CheckActivate();
+            //普通攻击
+            if (!is_skill)
+                return CheckSkillResult.Success == result;
+
+            //技能
+            if (CheckSkillResult.Success == result)
+            {
+                //查找目标
+
+            }
+            return false;
+        }
+
+        private CheckSkillResult CheckActivate()
+        {
+            if (!IsReady())
+                return CheckSkillResult.CoolDown;
+
+            if (!m_definition_cmp.CanActivateWhileMoving)
+            {
+                if (m_locomotor_cmp != null && m_locomotor_cmp.IsMoving)
+                    return CheckSkillResult.RequireStillButMove;
+            }
+
+            FixPoint mana_cost = m_definition_cmp.ManaCost;
+            if (mana_cost > FixPoint.Zero)
+            {
+                if (m_mana_cmp.GetCurrentManaPoint() < mana_cost)
+                    return CheckSkillResult.ManaNotEnough;
+            }
+
+            if (!IsSkillEnable())
+            {
+                if (!m_definition_cmp.CanActivateWhenDisabled)
+                    return CheckSkillResult.SkillDisabled;
+            }
+
+            return CheckSkillResult.Success;
+        }
+
+        private bool IsSkillEnable()
+        {
+            if (!m_skill_manager_cmp.CanActivateSkill())
+                return false;
+            if (m_definition_cmp.IsSkill)
+                return m_effect_generator_cmp.IsEnable();
+            else
+                return m_weapon_cmp.IsEnable();
+        }
+
         public bool Activate(FixPoint start_time)
         {
+            SetSkillActive(true);
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                SkillComponent cmp = enumerator.Current.Value as SkillComponent;
+                cmp.Activate(start_time);
+            }
+
+            m_definition_cmp.ClearTimer(SkillTimerType.ExpirationTimer);
+
+            if (m_definition_cmp.CastingTime > FixPoint.Zero)
+                m_definition_cmp.StartCastingTimer(start_time);
+            else
+                PostActivate(start_time);
+            ScheduleServiceCountdown();
+
             return true;
+        }
+
+        private void SetSkillActive(bool is_active)
+        {
+            bool pre_is_active = m_is_active;
+            m_is_active = is_active;
+            if (is_active)
+            {
+                if (!pre_is_active)
+                    m_skill_manager_cmp.OnSkillActivated(this);
+            }
+            else
+            {
+                if (pre_is_active)
+                    m_skill_manager_cmp.OnSkillDeactivated(this);
+            }
         }
 
         public bool PostActivate(FixPoint start_time)
         {
-            return true;
+            FixPoint mana_cost = m_definition_cmp.ManaCost;
+            if (mana_cost > FixPoint.Zero)
+            {
+                m_mana_cmp.ChangeMana(-mana_cost);
+            }
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                SkillComponent cmp = enumerator.Current.Value as SkillComponent;
+                cmp.PostActivate(start_time);
+            }
 
+            //开始CD
+            m_definition_cmp.StartCooldownTimer(start_time);
+
+            if (m_definition_cmp.ExpirationTime > FixPoint.Zero)
+                m_definition_cmp.StartExpirationTimer(start_time);
+            else
+                Deactivate();
+
+            return true;
         }
 
         public bool Deactivate()
         {
+            if (!m_is_active)
+                return false;
+
+            m_definition_cmp.ClearTimer(SkillTimerType.CastingTimer);
+            m_definition_cmp.ClearTimer(SkillTimerType.ExpirationTimer);
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                SkillComponent cmp = enumerator.Current.Value as SkillComponent;
+                cmp.Deactivate();
+            }
+            SetSkillActive(false);
+            ClearTargets();
 
             return true;
         }
@@ -151,14 +292,79 @@ namespace Combat
                 ScheduleServiceCountdown();
         }
         #endregion
+
+        #region 技能计时器Task相关
         private void ScheduleServiceCountdown()
         {
+            FixPoint time_remaining = GetLowestRemainingAmongActiveTimer();
+            if (time_remaining <= FixPoint.Zero)
+                time_remaining = FixPoint.One;
+
+            var task_scheduler = GetLogicWorld().GetTaskScheduler();
+            if(m_task == null)
+            {
+                m_task = new SkillCountdownTask(this);
+            }
+            task_scheduler.Schedule(m_task, GetCurrentTime(), time_remaining);
 
         }
         public void ServiceCountdown(FixPoint current_time, FixPoint delta_time)
         {
+            var casting_timer = m_definition_cmp.GetTimer(SkillTimerType.CastingTimer);
+            if(casting_timer.Active)
+            {
+                if(casting_timer.GetRemaining(current_time) == FixPoint.Zero)
+                {
+                    casting_timer.Reset();
+                    PostActivate(current_time);
+                }
+                ScheduleServiceCountdown();
+            }
+            else
+            {
+                bool reschedule = false;
+                //recharging
+                var cooldown_timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
+                if(cooldown_timer.Active)
+                {
+                    if (cooldown_timer.GetRemaining(current_time) == FixPoint.Zero)
+                    {
+                        cooldown_timer.Reset();
+                        NotifySkillReady();
+                    }
+                    else
+                        reschedule = true;
+                }
+                //expiring
+                var expiration_timer = m_definition_cmp.GetTimer(SkillTimerType.ExpirationTimer);
+                if(expiration_timer.Active)
+                {
+                    if (expiration_timer.GetRemaining(current_time) == FixPoint.Zero)
+                    {
+                        expiration_timer.Reset();
+                        NotifySkillExpired();
+                    }
+                    else
+                        reschedule = true;
+                }
+
+                if (reschedule)
+                    ScheduleServiceCountdown();
+            }
+        }
+
+        //通知CD结束
+        private void NotifySkillReady()
+        {
 
         }
+
+        //通知引导结束
+        private void NotifySkillExpired()
+        {
+            Deactivate();
+        }
+        #endregion
 
         #region Getter
         public SkillDefinitionComponent GetSkillDefinitionComponent()

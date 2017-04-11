@@ -44,15 +44,6 @@ namespace Combat
         {
             get { return m_extents; }
         }
-        public FixPoint CurrentAngle
-        {
-            get { return m_current_angle; }
-            set { m_current_angle = value; }
-        }
-        public bool Visible
-        {
-            get { return m_visible; }
-        }
         #endregion
 
         #region 初始化

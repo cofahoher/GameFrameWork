@@ -119,7 +119,17 @@ namespace Combat
             for (int i = 0; i < components_data.Count; ++i)
                 AddComponent(components_data[i]);
 
-            //ZZWTODO context.m_proto_data attribute skill
+            var attributes = context.m_proto_data == null ? null : context.m_proto_data.m_attributes;
+            if (attributes != null && attributes.Count > 0)
+            {
+                AttributeManagerComponent cmp = GetComponent<AttributeManagerComponent>(AttributeManagerComponent.ID);
+                if (cmp != null)
+                {
+                    var enumerator = attributes.GetEnumerator();
+                    while (enumerator.MoveNext())
+                        cmp.SetAttributeBaseValue(enumerator.Current.Key, enumerator.Current.Value);
+                }
+            }
 
             for (int i = 0; i < components_data.Count; ++i)
             {
@@ -173,6 +183,13 @@ namespace Combat
             if (component_data.m_component_variables != null)
                 component.InitializeVariable(component_data.m_component_variables);
             return component;
+        }
+
+        public T AddComponent<T>() where T : Component
+        {
+            int component_type_id = ComponentTypeRegistry.ComponentType2ID(typeof(T));
+            Component component = AddComponent(component_type_id);
+            return component as T;
         }
 
         public Component AddComponent(int component_type_id)
@@ -240,14 +257,11 @@ namespace Combat
             int vid = variable[index];
             if (index == variable.MaxIndex)
             {
-                int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);
-                Component component = GetComponent(component_type_id);
-                if (component != null)
-                {
-                    FixPoint value;
-                    if (component.GetVariable(vid, out value))
-                        return value;
-                }
+                return ObjectUtil.GetVariable(this, vid);
+            }
+            else if (vid == ExpressionVariable.VID_LevelTable)
+            {
+                return GetLogicWorld().GetConfigProvider().GetLevelBasedNumber(variable[index + 1], ObjectUtil.GetLevel(this));
             }
             else if (vid == ExpressionVariable.VID_Attribute)
             {
@@ -258,7 +272,7 @@ namespace Combat
             else if (vid == ExpressionVariable.VID_Object)
             {
                 Object owner_object = GetOwnerObject();
-                if(owner_object != null)
+                if (owner_object != null)
                     return owner_object.GetVariable(variable, index + 1);
             }
             else if (vid == ExpressionVariable.VID_Entity)

@@ -69,9 +69,9 @@ namespace Combat
             return remain_time;
         }
 
-        public bool Active()
+        public bool Active
         {
-            return m_active;
+            get { return m_active; }
         }
     }
 }

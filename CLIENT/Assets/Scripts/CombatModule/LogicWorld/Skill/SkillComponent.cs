@@ -4,28 +4,6 @@ namespace Combat
 {
     public abstract class SkillComponent : Component
     {
-        #region ILogicOwnerInfo
-        public override int GetOwnerPlayerID()
-        {
-            return ParentObject.GetOwnerPlayerID();
-        }
-
-        public override Player GetOwnerPlayer()
-        {
-            return ParentObject.GetOwnerPlayer();
-        }
-
-        public override int GetOwnerEntityID()
-        {
-            return ParentObject.GetOwnerEntityID();
-        }
-
-        public override Entity GetOwnerEntity()
-        {
-            return ParentObject.GetOwnerEntity();
-        }
-        #endregion
-
         public Skill GetOwnerSkill()
         {
             return (Skill)ParentObject;

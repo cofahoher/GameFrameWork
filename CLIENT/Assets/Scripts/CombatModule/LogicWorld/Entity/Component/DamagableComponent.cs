@@ -4,33 +4,21 @@ namespace Combat
 {
     public partial class DamagableComponent : EntityComponent
     {
-        //配置数据
-        int m_current_max_health = 0;
         //运行数据
-        int m_current_health = 0;
-
-        #region GETTER
-        public int MaxHealth
-        {
-            get { return m_current_max_health; }
-        }
-        public int CurrentHealth
-        {
-            get { return m_current_health; }
-        }
-        #endregion
+        FixPoint m_current_max_health = FixPoint.Zero;
+        FixPoint m_current_health = FixPoint.MinusOne;
+        Formula m_test_formula = Formula.Create();
 
         #region 初始化
-        public override void InitializeVariable(Dictionary<string, string> variables)
+        protected override void OnDestruct()
         {
-            string value;
-            if (variables.TryGetValue("max_health", out value))
-                m_current_max_health = int.Parse(value);
+            Formula.Recycle(m_test_formula);
         }
 
-        protected override void PostInitializeComponent()
+        public override void InitializeComponent()
         {
-            m_current_health = m_current_max_health;
+            if (m_current_health < FixPoint.Zero)
+                m_current_health = m_current_max_health;
         }
         #endregion
     }

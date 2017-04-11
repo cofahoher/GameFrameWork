@@ -22,6 +22,7 @@ namespace Combat
         public static readonly int VID_Attribute = (int)CRC.Calculate("Attribute");
         public static readonly int VID_Value = (int)CRC.Calculate("Value");
         public static readonly int VID_BaseValue = (int)CRC.Calculate("BaseValue");
+        public static readonly int VID_LevelTable = (int)CRC.Calculate("LevelTable");
         /*
          * 在各种上下文（指IExpressionVariableProvider实现者），都可以这样写公式的一部分
          * max_speed
@@ -63,7 +64,7 @@ namespace Combat
         {
             get
             {
-                if (index > 0 && index < m_variable.Count)
+                if (index >= 0 && index < m_variable.Count)
                     return m_variable[index];
                 else
                     return 0;

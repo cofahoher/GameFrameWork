@@ -22,10 +22,6 @@ namespace Combat
         FixPoint m_remain_time = FixPoint.Zero;
 
         #region GETTER
-        public FixPoint MaxSpeed
-        {
-            get { return m_current_max_speed; }
-        }
         public bool IsMoving
         {
             get { return m_is_moving; }

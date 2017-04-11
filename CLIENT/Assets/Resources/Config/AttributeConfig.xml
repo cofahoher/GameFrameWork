@@ -1,6 +1,11 @@
 <ConfigSystem>
 	<AttributeConfig>
-		<ConfigItem id="1" name="MaxHealth" formula="BaseAttributes.MaxHealth" reflection="CurrentMaxHealth" clamp="CurrentHealth" clamp_min="0">
-		</ConfigItem>
+		<ConfigItem name="TestAttribute1" formula="BaseValue"/>
+		<ConfigItem name="TestAttribute2" formula="BaseValue + LevelTable.name3"/>
+		<ConfigItem name="TestAttribute3" formula="BaseValue + TestAttribute1.Value"/>
+		<ConfigItem name="TestAttribute4" formula="(BaseValue + TestAttribute2.Value) * LevelTable.name1"/>
+		<ConfigItem name="TestAttribute5" formula="BaseValue + Max(TestAttribute3.Value, Entity.Attribute.TestAttribute4.Value)"/>
+		<ConfigItem name="TestAttribute6" formula="BaseValue * TestAttribute2.Value * TestAttribute5.Value"/>
+		<ConfigItem name="MaxHealth" formula="BaseValue" reflection="max_health" clamp="current_health" clamp_min="0"/>
 	</AttributeConfig>
 </ConfigSystem>

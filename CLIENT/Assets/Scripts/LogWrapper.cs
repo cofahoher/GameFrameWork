@@ -25,7 +25,7 @@ public class LogWrapper
 
     public static void LogDebug(string info)
     {
-        LogDebug(info);
+        Debug.Log(info);
     }
 
     public static void LogInfo(params object[] data)
@@ -35,7 +35,7 @@ public class LogWrapper
 
     public static void LogInfo(string info)
     {
-        LogInfo(info);
+        Debug.Log(info);
     }
     public static void LogWarning(params object[] data)
     {
@@ -44,7 +44,7 @@ public class LogWrapper
 
     public static void LogWarning(string info)
     {
-        LogWarning(info);
+        Debug.LogWarning(info);
     }
 
     public static void LogError(params object[] data)
@@ -54,7 +54,7 @@ public class LogWrapper
 
     public static void LogError(string info)
     {
-        LogError(info);
+        Debug.LogError(info);
     }
 
     public static void LogCritical(params object[] data)
@@ -64,6 +64,6 @@ public class LogWrapper
 
     public static void LogCritical(string info)
     {
-        LogError(info);
+        Debug.LogError(info);
     }
 }

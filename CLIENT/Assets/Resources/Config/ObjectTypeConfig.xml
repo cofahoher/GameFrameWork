@@ -7,48 +7,63 @@
 		<ConfigItem id="3" name="LocalPlayer">
 		</ConfigItem>
 		<ConfigItem id="101" name="Obstruct">
-			<Component id="2001">
+			<Component id="PositionComponent">
 				<var key="ext_x" value="0.5"/>
 				<var key="ext_y" value="0.5"/>
 				<var key="ext_z" value="0.5"/>
 				<var key="visible" value="True"/>
 			</Component>
-			<Component id="10001">
+			<Component id="DamagableComponent">
+				<var key="max_health" value="1000"/>
+				<var key="current_health" value="900"/>
+			</Component>
+			<Component id="ModelComponent">
 			</Component>
 		</ConfigItem>
-		<ConfigItem id="102" name="Hero">
-			<Component id="2001">
+		<ConfigItem id="102" name="LegacyHero">
+			<Component id="AttributeManagerComponent">
+			</Component>
+			<Component id="PositionComponent">
 				<var key="ext_x" value="0.5"/>
 				<var key="ext_y" value="0.5"/>
 				<var key="ext_z" value="0.5"/>
 				<var key="visible" value="True"/>
 			</Component>
-			<Component id="2002">
+			<Component id="LocomotorComponent">
 				<var key="max_speed" value="5.0"/>
 			</Component>
-			<Component id="2008">
+			<Component id="DamagableComponent">
 			</Component>
-			<Component id="10001">
+			<Component id="SkillManagerComponent">
 			</Component>
-			<Component id="10002">
+			<Component id="ModelComponent">
+			</Component>
+			<Component id="AnimationComponent">
 				<var key="animation_path" value="bodyctrl"/>
 			</Component>
 		</ConfigItem>
 		<ConfigItem id="103" name="MecanimHero">
-			<Component id="2001">
+			<Component id="LevelComponent">
+				<var key="level" value="1"/>
+			</Component>
+			<Component id="AttributeManagerComponent">
+			</Component>
+			<Component id="PositionComponent">
 				<var key="ext_x" value="0.5"/>
 				<var key="ext_y" value="0.5"/>
 				<var key="ext_z" value="0.5"/>
 				<var key="visible" value="True"/>
 			</Component>
-			<Component id="2002">
+			<Component id="LocomotorComponent">
 				<var key="max_speed" value="5.0"/>
 			</Component>
-			<Component id="2008">
+			<Component id="DamagableComponent">
 			</Component>
-			<Component id="10001">
+			<Component id="SkillManagerComponent">
 			</Component>
-			<Component id="10003">
+			<Component id="ModelComponent">
+			</Component>
+			<Component id="AnimatorComponent">
 				<var key="animator_path" value="bodyctrl"/>
 			</Component>
 		</ConfigItem>
