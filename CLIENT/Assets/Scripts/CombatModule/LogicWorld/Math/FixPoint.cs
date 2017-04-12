@@ -7,7 +7,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public FixPoint(int value = 0)
     {
-        m_raw_value = value * ONE;
+        m_raw_value = ((long)value) << FRACTIONAL_PLACES;
     }
 
     public static FixPoint CreateFromFloat(float value)
@@ -113,11 +113,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static explicit operator FixPoint(int value)
     {
-        return new FixPoint(value * ONE);
+        return new FixPoint(((long)value) << FRACTIONAL_PLACES);
     }
     public static explicit operator FixPoint(long value)
     {
-        return new FixPoint(value * ONE);
+        return new FixPoint(value << FRACTIONAL_PLACES);
     }
     public static explicit operator FixPoint(bool value)
     {
@@ -248,6 +248,147 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         return x.m_raw_value <= y.m_raw_value;
     }
+
+    #region int
+    public static bool operator ==(FixPoint x, int y)
+    {
+        return x.m_raw_value == ((long)y) << FRACTIONAL_PLACES;
+    }
+    public static bool operator !=(FixPoint x, int y)
+    {
+        return x.m_raw_value != ((long)y) << FRACTIONAL_PLACES;
+    }
+    public static bool operator >(FixPoint x, int y)
+    {
+        return x.m_raw_value > ((long)y) << FRACTIONAL_PLACES;
+    }
+    public static bool operator <(FixPoint x, int y)
+    {
+        return x.m_raw_value < ((long)y) << FRACTIONAL_PLACES;
+    }
+    public static bool operator >=(FixPoint x, int y)
+    {
+        return x.m_raw_value >= ((long)y) << FRACTIONAL_PLACES;
+    }
+    public static bool operator <=(FixPoint x, int y)
+    {
+        return x.m_raw_value <= ((long)y) << FRACTIONAL_PLACES;
+    }
+    #endregion
+
+    #region long
+    public static bool operator ==(FixPoint x, long y)
+    {
+        return x.m_raw_value == y << FRACTIONAL_PLACES;
+    }
+    public static bool operator !=(FixPoint x, long y)
+    {
+        return x.m_raw_value != y << FRACTIONAL_PLACES;
+    }
+    public static bool operator >(FixPoint x, long y)
+    {
+        return x.m_raw_value > y << FRACTIONAL_PLACES;
+    }
+    public static bool operator <(FixPoint x, long y)
+    {
+        return x.m_raw_value < y << FRACTIONAL_PLACES;
+    }
+    public static bool operator >=(FixPoint x, long y)
+    {
+        return x.m_raw_value >= y << FRACTIONAL_PLACES;
+    }
+    public static bool operator <=(FixPoint x, long y)
+    {
+        return x.m_raw_value <= y << FRACTIONAL_PLACES;
+    }
+    #endregion
+
+    #region float
+#if FP_FLOAT
+    public static bool operator ==(FixPoint x, float y)
+    {
+        return x.m_raw_value == (long)(y * ONE);
+    }
+    public static bool operator !=(FixPoint x, float y)
+    {
+        return x.m_raw_value != (long)(y * ONE);
+    }
+    public static bool operator >(FixPoint x, float y)
+    {
+        return x.m_raw_value > (long)(y * ONE);
+    }
+    public static bool operator <(FixPoint x, float y)
+    {
+        return x.m_raw_value < (long)(y * ONE);
+    }
+    public static bool operator >=(FixPoint x, float y)
+    {
+        return x.m_raw_value >= (long)(y * ONE);
+    }
+    public static bool operator <=(FixPoint x, float y)
+    {
+        return x.m_raw_value <= (long)(y * ONE);
+    }
+#endif
+    #endregion
+
+    #region double
+#if FP_FLOAT
+    public static bool operator ==(FixPoint x, double y)
+    {
+        return x.m_raw_value == (long)(y * ONE);
+    }
+    public static bool operator !=(FixPoint x, double y)
+    {
+        return x.m_raw_value != (long)(y * ONE);
+    }
+    public static bool operator >(FixPoint x, double y)
+    {
+        return x.m_raw_value > (long)(y * ONE);
+    }
+    public static bool operator <(FixPoint x, double y)
+    {
+        return x.m_raw_value < (long)(y * ONE);
+    }
+    public static bool operator >=(FixPoint x, double y)
+    {
+        return x.m_raw_value >= (long)(y * ONE);
+    }
+    public static bool operator <=(FixPoint x, double y)
+    {
+        return x.m_raw_value <= (long)(y * ONE);
+    }
+#endif
+    #endregion
+
+    #region decimal
+#if FP_FLOAT
+    public static bool operator ==(FixPoint x, decimal y)
+    {
+        return x.m_raw_value == (long)(y * ONE);
+    }
+    public static bool operator !=(FixPoint x, decimal y)
+    {
+        return x.m_raw_value != (long)(y * ONE);
+    }
+    public static bool operator >(FixPoint x, decimal y)
+    {
+        return x.m_raw_value > (long)(y * ONE);
+    }
+    public static bool operator <(FixPoint x, decimal y)
+    {
+        return x.m_raw_value < (long)(y * ONE);
+    }
+    public static bool operator >=(FixPoint x, decimal y)
+    {
+        return x.m_raw_value >= (long)(y * ONE);
+    }
+    public static bool operator <=(FixPoint x, decimal y)
+    {
+        return x.m_raw_value <= (long)(y * ONE);
+    }
+#endif
+    #endregion
 
     public static int Sign(FixPoint value)
     {
@@ -526,11 +667,6 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         }
     }
 
-    private FixPoint(long raw_value)
-    {
-        m_raw_value = raw_value;
-    }
-
     static readonly char WhiteSpace = (char)1;
     static readonly char Error_____ = (char)2;
     static readonly char Digit_____ = (char)3;
@@ -560,6 +696,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             return Error_____;
         else
             return CodeMap[ch];
+    }
+
+    private FixPoint(long raw_value)
+    {
+        m_raw_value = raw_value;
     }
     #endregion
 }

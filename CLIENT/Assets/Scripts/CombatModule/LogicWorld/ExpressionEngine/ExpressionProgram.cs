@@ -4,18 +4,6 @@ namespace Combat
 {
     public class ExpressionProgram : IRecyclable, IDestruct
     {
-        #region Create/Recycle
-        public static ExpressionProgram Create()
-        {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<ExpressionProgram>();
-        }
-
-        public static void Recycle(ExpressionProgram instance)
-        {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
-        }
-        #endregion
-
         protected bool m_error_occurred = false;
         protected List<ExpressionVariable> m_variables = new List<ExpressionVariable>();
         protected List<long> m_instructions = new List<long>();
@@ -41,20 +29,20 @@ namespace Combat
         void RecycleVariable()
         {
             for (int i = 0; i < m_variables.Count; ++i)
-                ExpressionVariable.Recycle(m_variables[i]);
+                RecyclableObject.Recycle(m_variables[i]);
             m_variables.Clear();
         }
 
         public virtual bool Compile(string formula_string)
         {
             m_error_occurred = false;
-            m_tokenizer = Tokenizer.Create();
+            m_tokenizer = RecyclableObject.Create<Tokenizer>();
             m_tokenizer.Construct(formula_string);
             m_token = null;
             m_token_type = TokenType.ERROR;
             GetToken();
             ParseExpression();
-            Tokenizer.Recycle(m_tokenizer);
+            RecyclableObject.Recycle(m_tokenizer);
             m_tokenizer = null;
             m_token = null;
             m_token_type = TokenType.ERROR;
@@ -350,7 +338,7 @@ namespace Combat
 
         int AddVariable(List<string> raw_variable)
         {
-            ExpressionVariable variable = ExpressionVariable.Create();
+            ExpressionVariable variable = RecyclableObject.Create<ExpressionVariable>();
             variable.Construct(raw_variable);
             int index = m_variables.Count;
             m_variables.Add(variable);

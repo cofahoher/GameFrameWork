@@ -8,7 +8,7 @@ namespace Combat
         public FixPoint x;
         public FixPoint z;
 
-        public Vector2FP(FixPoint term_x, FixPoint term_y)
+        public Vector2FP(FixPoint term_x = default(FixPoint), FixPoint term_y = default(FixPoint))
         {
             x = term_x;
             z = term_y;

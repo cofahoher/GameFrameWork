@@ -6,13 +6,13 @@ namespace Combat
     {
         #region 配置数据
         //技能消耗
-        Formula m_mana_cost_formula = Formula.Create();
+        Formula m_mana_cost_formula = RecyclableObject.Create<Formula>();
         //技能CD,从PostActivate开始计算
-        Formula m_cooldown_time_formula = Formula.Create();
+        Formula m_cooldown_time_formula = RecyclableObject.Create<Formula>();
         //从施法到生效的时间，可以用作动作开始做到动作打中人的时间
-        Formula m_casting_time_formula = Formula.Create();
+        Formula m_casting_time_formula = RecyclableObject.Create<Formula>();
         //生效后的最长引导时间
-        Formula m_expiration_time_formula = Formula.Create();
+        Formula m_expiration_time_formula = RecyclableObject.Create<Formula>();
         //是否获得时就activate（适合做被动技能）
         bool m_starts_active = false;
         //是否在activate后deactivate前，阻止其他skill
@@ -52,17 +52,17 @@ namespace Combat
         {
             for (int i = 0; i < (int)SkillTimerType.TimerCount; ++i)
             {
-                SkillTimer.Recycle(m_timers[i]);
+                RecyclableObject.Recycle(m_timers[i]);
             }
             m_timers.Clear();
 
-            Formula.Recycle(m_mana_cost_formula);
+            RecyclableObject.Recycle(m_mana_cost_formula);
             m_mana_cost_formula = null;
-            Formula.Recycle(m_cooldown_time_formula);
+            RecyclableObject.Recycle(m_cooldown_time_formula);
             m_cooldown_time_formula = null;
-            Formula.Recycle(m_casting_time_formula);
+            RecyclableObject.Recycle(m_casting_time_formula);
             m_casting_time_formula = null;
-            Formula.Recycle(m_expiration_time_formula);
+            RecyclableObject.Recycle(m_expiration_time_formula);
             m_expiration_time_formula = null;
         }
 
@@ -72,7 +72,7 @@ namespace Combat
             m_timers.Clear();
             for (int i = 0; i < (int)SkillTimerType.TimerCount; ++i)
             {
-                SkillTimer timer = SkillTimer.Create();
+                SkillTimer timer = RecyclableObject.Create<SkillTimer>();
                 m_timers.Add(timer);
             }
         }

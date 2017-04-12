@@ -22,14 +22,17 @@ namespace Combat
         const int Flag_RenderComponent = GENERATE_InitializeVariable | GENERATE_CSharpAttribute;
 
         //控制单个变量的标志位
-        const int VARIABLE_INIT = 1 << 10;//在函数InitializeVariable()中存在
-        const int VARIABLE_GET  = 1 << 11;//在函数GetVariable()中存在
-        const int VARIABLE_SET  = 1 << 12;//在函数SetVariable()中存在
-        const int ATTRIBUTE_GET = 1 << 13;//需要get的CSharp属性
-        const int ATTRIBUTE_SET = 1 << 14;//需要set的CSharp属性
+        const int VARIABLE_INIT    = 1 << 10;//在函数InitializeVariable()中存在
+        const int VARIABLE_GET     = 1 << 11;//在函数GetVariable()中存在
+        const int VARIABLE_SET     = 1 << 12;//在函数SetVariable()中存在
+        const int CS_ATTRIBUTE_GET = 1 << 13;//需要get的CSharp属性
+        const int CS_ATTRIBUTE_SET = 1 << 14;//需要set的CSharp属性
 
-        const int Flag_LogicVariable_GetSet = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET | ATTRIBUTE_GET | ATTRIBUTE_SET;
-        const int Flag_LogicVariable_GetOnly = VARIABLE_INIT | VARIABLE_GET | ATTRIBUTE_GET;
+        const int Flag_Variable_GetSet_Attribute_GetSet = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET | CS_ATTRIBUTE_GET | CS_ATTRIBUTE_SET;
+        const int Flag_Variable_GetSet_Attribute_Get = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET | CS_ATTRIBUTE_GET;//这个应该做为默认值
+        const int Flag_Variable_Get_Attribute_Get = VARIABLE_INIT | VARIABLE_GET | CS_ATTRIBUTE_GET;
+        const int Flag_Variable_GetSet = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET;
+        const int Flag_Variable_Get = VARIABLE_INIT | VARIABLE_GET;
         
         static void InitLogicComponents()
         {
@@ -39,7 +42,7 @@ namespace Combat
 
             #region Object
             REGISTER_COMPONENT<LevelComponent>()
-                .REGISTER_VARIABLE<int>("level", "VID_CurrentLevel", "m_current_level", Flag_LogicVariable_GetOnly);
+                .REGISTER_VARIABLE<int>("level", "VID_CurrentLevel", "m_current_level", Flag_Variable_Get_Attribute_Get);
             REGISTER_COMPONENT<TurnManagerComponent>();
             #endregion
 
@@ -53,23 +56,22 @@ namespace Combat
             REGISTER_COMPONENT<AIComponent>();
             REGISTER_COMPONENT<AttributeManagerComponent>();
             REGISTER_COMPONENT<DamagableComponent>()
-                .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "m_current_max_health")
-                .REGISTER_VARIABLE<FixPoint>("current_health", "VID_CurrentHealth", "m_current_health")
-                .REGISTER_VARIABLE<Formula>("test_formula", "VID_TestFormula", "m_test_formula");
+                .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "m_current_max_health", Flag_Variable_GetSet_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("current_health", "VID_CurrentHealth", "CurrentHealth", Flag_Variable_GetSet);
             REGISTER_COMPONENT<DamageModificationComponent>();
             REGISTER_COMPONENT<DeathComponent>();
             REGISTER_COMPONENT<EffectManagerComponent>();
             REGISTER_COMPONENT<LocomotorComponent>()
-                .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "m_current_max_speed", Flag_LogicVariable_GetOnly);
+                .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "m_current_max_speed", Flag_Variable_Get_Attribute_Get);
             REGISTER_COMPONENT<ManaComponent>();
             REGISTER_COMPONENT<PositionComponent>()
                 .REGISTER_VARIABLE<FixPoint>("x", "VID_X", "m_current_position.x")
                 .REGISTER_VARIABLE<FixPoint>("y", "VID_Y", "m_current_position.y")
                 .REGISTER_VARIABLE<FixPoint>("z", "VID_Z", "m_current_position.z")
                 .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle")
-                .REGISTER_VARIABLE<FixPoint>("ext_x", "VID_ExtX", "m_extents.x", Flag_LogicVariable_GetOnly)
-                .REGISTER_VARIABLE<FixPoint>("ext_y", "VID_ExtY", "m_extents.y", Flag_LogicVariable_GetOnly)
-                .REGISTER_VARIABLE<FixPoint>("ext_z", "VID_ExtZ", "m_extents.z", Flag_LogicVariable_GetOnly)
+                .REGISTER_VARIABLE<FixPoint>("ext_x", "VID_ExtX", "m_extents.x", Flag_Variable_Get_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("ext_y", "VID_ExtY", "m_extents.y", Flag_Variable_Get_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("ext_z", "VID_ExtZ", "m_extents.z", Flag_Variable_Get_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible");
             REGISTER_COMPONENT<SkillManagerComponent>();
             REGISTER_COMPONENT<StateComponent>();
@@ -151,11 +153,11 @@ namespace Combat
             }
             public bool CanAttributeGet()
             {
-                return (m_flag & ATTRIBUTE_GET) != 0;
+                return (m_flag & CS_ATTRIBUTE_GET) != 0;
             }
             public bool CanAttributeSet()
             {
-                return (m_flag & ATTRIBUTE_SET) != 0 && !IsFormula();
+                return (m_flag & CS_ATTRIBUTE_SET) != 0 && !IsFormula();
             }
             public bool IsFormula()
             {
@@ -192,7 +194,7 @@ namespace Combat
             {
                 return (m_flag & GENERATE_CSharpAttribute) != 0;
             }
-            public EditorComponent REGISTER_VARIABLE<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_LogicVariable_GetSet)
+            public EditorComponent REGISTER_VARIABLE<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_GetSet)
             {
                 EditorVariable variable = new EditorVariable();
                 System.Type type = typeof(T);

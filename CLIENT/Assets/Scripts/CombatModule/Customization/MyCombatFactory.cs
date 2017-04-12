@@ -39,20 +39,21 @@ namespace Combat
 
         public void RegisterCommands()
         {
-            if (!ResuableObjectFactory<Command>.Registered)
-                ResuableObjectFactory<Command>.Registered = true;
-            ResuableObjectFactory<Command>.Register(CommandType.SyncTurnDone, typeof(SyncTurnDoneCommand));
-            ResuableObjectFactory<Command>.Register(CommandType.EntityMove, typeof(EntityMoveCommand));
+            if (!Command.Registered)
+                Command.Registered = true;
+            Command.Register(CommandType.SyncTurnDone, typeof(SyncTurnDoneCommand));
+            Command.Register(CommandType.EntityMove, typeof(EntityMoveCommand));
         }
 
         public void RegisterRenderMessages()
         {
-            if (!ResuableObjectFactory<RenderMessage>.Registered)
-                ResuableObjectFactory<RenderMessage>.Registered = true;
-            ResuableObjectFactory<RenderMessage>.Register(RenderMessageType.CreateEntity, typeof(SimpleRenderMessage));
-            ResuableObjectFactory<RenderMessage>.Register(RenderMessageType.DestroyEntity, typeof(SimpleRenderMessage));
-            ResuableObjectFactory<RenderMessage>.Register(RenderMessageType.StartMoving, typeof(SimpleRenderMessage));
-            ResuableObjectFactory<RenderMessage>.Register(RenderMessageType.StopMoving, typeof(SimpleRenderMessage));
+            if (!RenderMessage.Registered)
+                RenderMessage.Registered = true;
+            RenderMessage.Register(RenderMessageType.CreateEntity, typeof(SimpleRenderMessage));
+            RenderMessage.Register(RenderMessageType.DestroyEntity, typeof(SimpleRenderMessage));
+            RenderMessage.Register(RenderMessageType.StartMoving, typeof(SimpleRenderMessage));
+            RenderMessage.Register(RenderMessageType.StopMoving, typeof(SimpleRenderMessage));
+            RenderMessage.Register(RenderMessageType.ChangeHealth, typeof(ChangeHealthRenderMessage));
         }
 
         public WorldCreationContext CreateWorldCreationContext(CombatStartInfo combat_start_info)

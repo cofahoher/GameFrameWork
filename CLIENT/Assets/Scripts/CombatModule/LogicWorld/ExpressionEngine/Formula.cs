@@ -4,18 +4,6 @@ namespace Combat
 {
     public class Formula : IRecyclable, IDestruct
     {
-        #region Create/Recycle
-        public static Formula Create()
-        {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<Formula>();
-        }
-
-        public static void Recycle(Formula instance)
-        {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
-        }
-        #endregion
-
         FixPoint m_constant = default(FixPoint);
         ExpressionProgram m_program;
 
@@ -23,7 +11,7 @@ namespace Combat
         {
             if (m_program != null)
             {
-                ExpressionProgram.Recycle(m_program);
+                RecyclableObject.Recycle(m_program);
                 m_program = null;
             }
         }
@@ -33,7 +21,7 @@ namespace Combat
             m_constant = FixPoint.Zero;
             if (m_program != null)
             {
-                ExpressionProgram.Recycle(m_program);
+                RecyclableObject.Recycle(m_program);
                 m_program = null;
             }
         }
@@ -48,14 +36,14 @@ namespace Combat
 
         public bool Compile(string formula_string)
         {
-            ExpressionProgram program = ExpressionProgram.Create();
+            ExpressionProgram program = RecyclableObject.Create<ExpressionProgram>();
             if (!program.Compile(formula_string))
                 return false;
             if (program.IsConstant())
             {
                 m_constant = program.Evaluate(null);
                 m_program = null;
-                ExpressionProgram.Recycle(program);
+                RecyclableObject.Recycle(program);
             }
             else
             {

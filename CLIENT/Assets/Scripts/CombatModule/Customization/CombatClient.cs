@@ -21,6 +21,7 @@ namespace Combat
         protected long m_local_player_pstid = -1;
 
         protected CombatClientState m_state = CombatClientState.None;
+        protected int m_state_frame_cnt = 0;
         protected int m_state_start_time = -1;
         protected int m_last_update_time = -1;
         protected int m_waiting_cnt = 0;
@@ -82,6 +83,7 @@ namespace Combat
         {
             m_local_player_pstid = local_player_pstid;
             m_state = CombatClientState.Loading;
+            m_state_frame_cnt = 0;
             m_state_start_time = -1;
             m_last_update_time = -1;
             m_waiting_cnt = 0;
@@ -116,6 +118,7 @@ namespace Combat
         public virtual void StartCombat(int current_time_int)
         {
             m_state = CombatClientState.Running;
+            m_state_frame_cnt = 0;
             m_state_start_time = current_time_int;
             m_last_update_time = 0;
             m_sync_client.Start(0, m_local_player_pstid, 200);
@@ -146,6 +149,7 @@ namespace Combat
         {
             m_render_world.OnUpdate(0, 0);
             m_state = CombatClientState.Loaded;
+            m_state_frame_cnt = 0;
             m_state_start_time = -1;
             m_last_update_time = -1;
         }
@@ -178,6 +182,11 @@ namespace Combat
             m_state = CombatClientState.GameOver;
             m_game_result = game_result;
         }
+
+        public virtual void OnDisconnected()
+        {
+
+        }
         #endregion
 
         #region UPDATE
@@ -209,6 +218,7 @@ namespace Combat
             default:
                 break;
             }
+            ++m_state_frame_cnt;
         }
 
         protected void OnUpdateNone(int current_time_int)
@@ -221,11 +231,18 @@ namespace Combat
 
         protected virtual void OnUpdateLoaded(int current_time_int)
         {
-            m_state = CombatClientState.WaitingForStart;
-            m_state_start_time = current_time_int;
-            m_last_update_time = current_time_int;
-            m_render_world.OnUpdate(0, 0);
-            ProcessReadyForStart();
+            if (m_state_frame_cnt == 0)
+            {
+                m_render_world.OnUpdate(0, 0);
+            }
+            else if (m_state_frame_cnt == 1)
+            {
+                m_state = CombatClientState.WaitingForStart;
+                m_state_frame_cnt = 0;
+                m_state_start_time = current_time_int;
+                m_last_update_time = current_time_int;
+                ProcessReadyForStart();
+            }
         }
 
         protected void OnUpdateWaitingForStart(int current_time_int)

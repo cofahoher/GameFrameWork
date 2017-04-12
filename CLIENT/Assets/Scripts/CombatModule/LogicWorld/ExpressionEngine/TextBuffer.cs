@@ -4,18 +4,6 @@ namespace Combat
 {
     public class TextBuffer : IRecyclable, IDestruct
     {
-        #region Create/Recycle
-        public static TextBuffer Create()
-        {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<TextBuffer>();
-        }
-
-        public static void Recycle(TextBuffer instance)
-        {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
-        }
-        #endregion
-
         string m_buffer;
         int m_index = -1;
 

@@ -4,18 +4,6 @@ namespace Combat
 {
     public class Tokenizer : IRecyclable, IDestruct
     {
-        #region Create/Recycle
-        public static Tokenizer Create()
-        {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<Tokenizer>();
-        }
-
-        public static void Recycle(Tokenizer instance)
-        {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
-        }
-        #endregion
-
         public const char Eof        = (char)0;
         public const char WhiteSpace = (char)1;
         public const char Error      = (char)2;
@@ -69,21 +57,21 @@ namespace Combat
 
         public void Construct(string expression)
         {
-            m_text_buffer = TextBuffer.Create();
+            m_text_buffer = RecyclableObject.Create<TextBuffer>();
             m_text_buffer.Construct(expression);
         }
 
         public void Destruct()
         {
             if (m_text_buffer != null)
-                TextBuffer.Recycle(m_text_buffer);
+                RecyclableObject.Recycle(m_text_buffer);
             m_text_buffer = null;
         }
 
         public void Reset()
         {
             if (m_text_buffer != null)
-                TextBuffer.Recycle(m_text_buffer);
+                RecyclableObject.Recycle(m_text_buffer);
             m_text_buffer = null;
         }
 
@@ -162,7 +150,7 @@ namespace Combat
                 }
                 m_text_buffer.NextChar();
             }
-            TextBuffer.Recycle(m_text_buffer);
+            RecyclableObject.Recycle(m_text_buffer);
             m_text_buffer = null;
             return Eof;
         }

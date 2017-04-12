@@ -4,6 +4,13 @@ namespace Combat
 {
     public partial class ObjectUtil
     {
+        public static bool IsDead(Object obj)
+        {
+            if (obj.DeletePending)
+                return true;
+            return false;
+        }
+
         public static FixPoint GetVariable(Object obj, int vid)
         {
             int component_type_id = ComponentTypeRegistry.GetVariableOwnerComponentID(vid);

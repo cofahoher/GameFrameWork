@@ -32,7 +32,7 @@ namespace Combat
 
         public static SignalListenerContext CreateForEntityComponent(int listener_id, int entity_id, int component_type_id)
         {
-            SignalListenerContext context = ResuableObjectPool<IRecyclable>.Instance.Create<SignalListenerContext>();
+            SignalListenerContext context = RecyclableObject.Create<SignalListenerContext>();
             context.m_context_type = SignalListenerContextType.EntityComponent;
             context.m_listener_id = listener_id;
             context.m_object_id = entity_id;
@@ -42,7 +42,7 @@ namespace Combat
 
         public static void Recycle(SignalListenerContext instance)
         {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+            RecyclableObject.Recycle(instance);
         }
 
         public ISignalListener GetListener(LogicWorld logic_world)

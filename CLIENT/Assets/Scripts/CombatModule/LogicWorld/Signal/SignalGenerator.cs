@@ -7,7 +7,7 @@ namespace Combat
         void AddListener(int signal_type, SignalListenerContext listener_context);
         void RemoveListener(int signal_type, int listener_id);
         void RemoveAllListeners();
-        void SendSignal(int signal_type, Signal signal = null);
+        void SendSignal(int signal_type, System.Object signal = null);
         void NotifyGeneratorDestroyAndRemoveAllListeners();
     }
 
@@ -56,7 +56,7 @@ namespace Combat
             m_all_type_listeners.Clear();
         }
 
-        public void SendSignal(int signal_type, Signal signal = null)
+        public void SendSignal(int signal_type, System.Object signal = null)
         {
             if (m_all_type_listeners == null)
                 return;

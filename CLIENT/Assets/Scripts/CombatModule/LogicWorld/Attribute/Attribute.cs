@@ -4,18 +4,6 @@ namespace Combat
 {
     public class Attribute : IExpressionVariableProvider, IRecyclable, IDestruct
     {
-        #region Create/Recycle
-        public static Attribute Create()
-        {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<Attribute>();
-        }
-
-        public static void Recycle(Attribute instance)
-        {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
-        }
-        #endregion
-
         AttributeManagerComponent m_owner_component;
         AttributeDefinition m_definition;
         FixPoint m_base_value = default(FixPoint);
@@ -53,7 +41,7 @@ namespace Combat
             {
                 var enumerator = m_modifiers.GetEnumerator();
                 while (enumerator.MoveNext())
-                    AttributeModifier.Recycle(enumerator.Current.Value);
+                    RecyclableObject.Recycle(enumerator.Current.Value);
                 m_modifiers.Clear();
             }
         }
@@ -111,7 +99,7 @@ namespace Combat
             if (!m_modifiers.TryGetValue(modifier_id, out modifier))
                 return;
             m_modifiers.Remove(modifier_id);
-            AttributeModifier.Recycle(modifier);
+            RecyclableObject.Recycle(modifier);
             MarkDirty();
         }
         #endregion

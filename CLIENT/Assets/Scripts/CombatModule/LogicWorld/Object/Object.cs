@@ -131,6 +131,9 @@ namespace Combat
                 }
             }
 
+            if (context.m_custom_data != null)
+                context.m_logic_world.CustomInitializeObject(this, context.m_custom_data);
+
             for (int i = 0; i < components_data.Count; ++i)
             {
                 Component component = GetComponent(components_data[i].m_component_type_id);
@@ -292,14 +295,6 @@ namespace Combat
                 return owner.GetVariable(variable, index);
             else
                 return FixPoint.Zero;
-        }
-
-        public bool IsDead()
-        {
-            if (m_is_delete_pending)
-                return true;
-            //ZZWTODO Death State
-            return false;
         }
     }
 }

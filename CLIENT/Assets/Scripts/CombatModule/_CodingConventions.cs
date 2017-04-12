@@ -8,7 +8,7 @@ namespace Combat
      *      函数名：SomeFunction
      *      类成员变量：m_some_variable
      *      临时变量：some_variable
-     *      其他：尽量用全称，不用简写
+     *      其他：尽量用全称，不用简写；不要滥用var，降低代码的可读性
      *      
      * Getter、Setter函数和属性：
      *      基本类型用属性，自己写的类用函数吧

@@ -76,7 +76,7 @@ namespace Combat
         #endregion
 
         #region ISignalListener
-        public void ReceiveSignal(ISignalGenerator generator, int signal_type, Signal signal = null)
+        public void ReceiveSignal(ISignalGenerator generator, int signal_type, System.Object signal = null)
         {
             switch (signal_type)
             {

@@ -9,7 +9,7 @@ namespace Combat
         public FixPoint y;
         public FixPoint z;
 
-        public Vector3FP(FixPoint term_x, FixPoint term_y, FixPoint term_z)
+        public Vector3FP(FixPoint term_x = default(FixPoint), FixPoint term_y = default(FixPoint), FixPoint term_z = default(FixPoint))
         {
             x = term_x;
             y = term_y;

@@ -100,7 +100,7 @@ namespace Combat
                 LocomotorComponent locomotor_component = render_entity.GetLogicEntity().GetComponent<LocomotorComponent>();
                 if (locomotor_component == null || !locomotor_component.IsEnable())
                     return;
-                EntityMoveCommand cmd = new EntityMoveCommand();
+                EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
                 cmd.m_entity_id = m_current_operate_entityi_id;
                 cmd.m_destination = RenderPosition2LogiocPosition(hit.point);
                 m_combat_client.GetSyncClient().PushLocalCommand(cmd);

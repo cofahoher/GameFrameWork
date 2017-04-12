@@ -12,14 +12,14 @@ namespace Combat
         public AttributeDefinition(AttributeData config)
         {
             m_config = config;
-            m_formula = Formula.Create();
+            m_formula = RecyclableObject.Create<Formula>();
             m_formula.Compile(config.m_formula);
         }
 
         public void Destruct()
         {
             m_config = null;
-            Formula.Recycle(m_formula);
+            RecyclableObject.Recycle(m_formula);
             m_formula = null; 
         }
 
@@ -104,7 +104,7 @@ namespace Combat
                         FixPoint old_value = component.GetVariable(vid);
                         if (initialize)
                         {
-                            if (old_value < m_config.m_clamp_min_value)
+                            if (old_value < m_config.m_clamp_min_value)  //ZZWTODO tricky
                                 component.SetVariable(vid, attribute.Value);
                         }
                         else

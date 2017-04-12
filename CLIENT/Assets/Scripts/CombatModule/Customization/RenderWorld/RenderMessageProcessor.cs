@@ -28,23 +28,36 @@ namespace Combat
             {
             case RenderMessageType.StartMoving:
                 ProcessRenderMessage_StartMoving(msg.EntityID);
-                SimpleRenderMessage.Recycle(msg as SimpleRenderMessage);
                 break;
             case RenderMessageType.StopMoving:
                 ProcessRenderMessage_StopMoving(msg.EntityID);
-                SimpleRenderMessage.Recycle(msg as SimpleRenderMessage);
                 break;
             case RenderMessageType.CreateEntity:
                 ProcessRenderMessage_CreateEntity(msg.EntityID);
-                SimpleRenderMessage.Recycle(msg as SimpleRenderMessage);
                 break;
             case RenderMessageType.DestroyEntity:
                 ProcessRenderMessage_DestroyEntity(msg.EntityID);
-                SimpleRenderMessage.Recycle(msg as SimpleRenderMessage);
+                break;
+            case RenderMessageType.ChangeHealth:
+                ProcessRenderMessage_ChangeHealth(msg as ChangeHealthRenderMessage);
                 break;
             default:
                 break;
             }
+            RenderMessage.Recycle(msg);
+        }
+
+        void ProcessRenderMessage_CreateEntity(int entity_id)
+        {
+            Entity entity = m_logic_world.GetEntityManager().GetObject(entity_id);
+            if (entity == null)
+                return;
+            m_render_entity_manager.CreateObject(entity.GetCreationContext());
+        }
+
+        void ProcessRenderMessage_DestroyEntity(int entity_id)
+        {
+            m_render_entity_manager.DestroyObject(entity_id);
         }
 
         void ProcessRenderMessage_StartMoving(int entity_id)
@@ -81,17 +94,8 @@ namespace Combat
             m_render_world.UnregisterMovingEntity(model_component);
         }
 
-        void ProcessRenderMessage_CreateEntity(int entity_id)
+        void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)
         {
-            Entity entity = m_logic_world.GetEntityManager().GetObject(entity_id);
-            if (entity == null)
-                return;
-            m_render_entity_manager.CreateObject(entity.GetCreationContext());
-        }
-
-        void ProcessRenderMessage_DestroyEntity(int entity_id)
-        {
-            m_render_entity_manager.DestroyObject(entity_id);
         }
     }
 }

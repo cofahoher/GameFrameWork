@@ -4,7 +4,7 @@ namespace Combat
 {
     public interface ISignalListener
     {
-        void ReceiveSignal(ISignalGenerator generator, int signal_type, Signal signal = null);
+        void ReceiveSignal(ISignalGenerator generator, int signal_type, System.Object signal = null);
         void OnGeneratorDestroyed(ISignalGenerator generator);
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 namespace Combat
 {
-    public class RenderWorld : IDestruct
+    public class RenderWorld : GeneralComposableObject<RenderWorld, int>, IDestruct
     {
         public static Vector3 LogiocPosition2RenderPosition(Vector3FP v3fp)
         {
@@ -58,6 +58,10 @@ namespace Combat
         {
             return m_render_entity_manager;
         }
+        public TaskScheduler<RenderWorld> GetTaskScheduler()
+        {
+            return m_scheduler;
+        }
         #endregion
 
         #region RESOURCE
@@ -97,6 +101,7 @@ namespace Combat
             UpdateMovingEntities();
             ProcessRenderMessages();
             m_scheduler.Update(current_time);
+            UpdateGeneralComponent(delta_ms, current_time_ms);
         }
 
         protected void ProcessRenderMessages()
@@ -110,6 +115,13 @@ namespace Combat
             for (int i = 0; i < count; ++i)
                 m_render_message_processor.Process(msgs[i]);
             m_logic_world.ClearRenderMessages();
+        }
+        #endregion
+
+        #region GeneralComposableObject
+        protected override RenderWorld GetSelf()
+        {
+            return this;
         }
         #endregion
         

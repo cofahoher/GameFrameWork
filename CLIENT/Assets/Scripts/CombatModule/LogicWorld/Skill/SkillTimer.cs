@@ -19,18 +19,6 @@ namespace Combat
         FixPoint m_total_time = FixPoint.Zero;
         bool m_active = false;
 
-        #region Create/Recycle
-        public static SkillTimer Create()
-        {
-            return ResuableObjectPool<IRecyclable>.Instance.Create<SkillTimer>();
-        }
-
-        public static void Recycle(SkillTimer instance)
-        {
-            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
-        }
-        #endregion
-
         public void Reset()
         {
             m_strat_time = FixPoint.Zero;

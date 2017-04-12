@@ -13,6 +13,32 @@ namespace Combat
 
     public class Command : IRecyclable
     {
+        //ZZWTODO 现在在客户端保存了所有的Command，因此没有回收
+        public static TCommand Create<TCommand>() where TCommand : Command, new()
+        {
+            TCommand command = ResuableObjectFactory<Command>.Create<TCommand>();
+            return command;
+        }
+        public static void Recycle(Command instance)
+        {
+            ResuableObjectFactory<Command>.Recycle(instance);
+        }
+
+        public static bool Registered
+        {
+            get { return ResuableObjectFactory<Command>.Registered; }
+            set { ResuableObjectFactory<Command>.Registered = value; }
+        }
+        public static void Register(int id, System.Type type)
+        {
+            ResuableObjectFactory<Command>.Register(id, type);
+        }
+        public static Command Create(int id)
+        {
+            Command command = ResuableObjectFactory<Command>.Create(id);
+            return command;
+        }
+
         [ProtoBufAttribute(Index = 1)] 
         public long m_player_pstid = -1;
         [ProtoBufAttribute(Index = 2)]

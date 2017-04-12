@@ -117,13 +117,11 @@ namespace Combat
         public const int ID = 1470729607;
         public const int VID_MaxHealth = 1505485722;
         public const int VID_CurrentHealth = -921437827;
-        public const int VID_TestFormula = -1150251959;
 
         static DamagableComponent()
         {
             ComponentTypeRegistry.RegisterVariable(VID_MaxHealth, ID);
             ComponentTypeRegistry.RegisterVariable(VID_CurrentHealth, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_TestFormula, ID);
         }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
@@ -132,9 +130,7 @@ namespace Combat
             if (variables.TryGetValue("max_health", out value))
                 m_current_max_health = FixPoint.Parse(value);
             if (variables.TryGetValue("current_health", out value))
-                m_current_health = FixPoint.Parse(value);
-            if (variables.TryGetValue("test_formula", out value))
-                m_test_formula.Compile(value);
+                CurrentHealth = FixPoint.Parse(value);
         }
 
         public override bool GetVariable(int id, out FixPoint value)
@@ -145,10 +141,7 @@ namespace Combat
                 value = m_current_max_health;
                 return true;
             case VID_CurrentHealth:
-                value = m_current_health;
-                return true;
-            case VID_TestFormula:
-                value = m_test_formula.Evaluate(this);
+                value = CurrentHealth;
                 return true;
             default:
                 value = FixPoint.Zero;
@@ -164,7 +157,7 @@ namespace Combat
                 m_current_max_health = value;
                 return true;
             case VID_CurrentHealth:
-                m_current_health = value;
+                CurrentHealth = value;
                 return true;
             default:
                 return false;
@@ -175,18 +168,6 @@ namespace Combat
         public FixPoint MaxHealth
         {
             get { return m_current_max_health; }
-            set { m_current_max_health = value; }
-        }
-
-        public FixPoint CurrentHealth
-        {
-            get { return m_current_health; }
-            set { m_current_health = value; }
-        }
-
-        public FixPoint TestFormula
-        {
-            get { return m_test_formula.Evaluate(this); }
         }
 #endregion
     }

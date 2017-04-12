@@ -41,7 +41,7 @@ namespace Combat
                     CreateAttribute(referenced_ids[i], referenced_attribute_base_value);
                 }
             }
-            Attribute attribute = Attribute.Create();
+            Attribute attribute = RecyclableObject.Create<Attribute>();
             attribute.Construct(this, definition, base_value);
             m_attributes[id] = attribute;
         }
@@ -50,7 +50,7 @@ namespace Combat
         {
             var enumerator = m_attributes.GetEnumerator();
             while (enumerator.MoveNext())
-                Attribute.Recycle(enumerator.Current.Value);
+                RecyclableObject.Recycle(enumerator.Current.Value);
             m_attributes.Clear();
         }
         #endregion

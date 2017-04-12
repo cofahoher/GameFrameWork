@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class LogicWorld : ILogicWorld, IRenderMessageGenerator
+    public class LogicWorld : GeneralComposableObject<LogicWorld, FixPoint>, ILogicWorld, IRenderMessageGenerator
     {
         protected IOutsideWorld m_outside_world;
         protected bool m_need_render_message = false;
@@ -74,6 +74,8 @@ namespace Combat
 
             m_command_handler.Destruct();
             m_command_handler = null;
+
+            DestroyAllGeneralComponent();
         }
 
         #region GETTER
@@ -145,6 +147,7 @@ namespace Combat
             m_current_time += delta_time;
             ++m_current_frame;
             m_scheduler.Update(m_current_time);
+            UpdateGeneralComponent(delta_time, m_current_time);
             return m_game_over;
         }
 
@@ -184,7 +187,10 @@ namespace Combat
         public void AddRenderMessage(RenderMessage render_message)
         {
             if (m_render_messages == null)
+            {
+                RenderMessage.Recycle(render_message);
                 return;
+            }
             m_render_messages.Add(render_message);
         }
 
@@ -192,7 +198,8 @@ namespace Combat
         {
             if (m_render_messages == null)
                 return;
-            SimpleRenderMessage render_message = SimpleRenderMessage.Create(type, entity_id);
+            SimpleRenderMessage render_message = RenderMessage.Create<SimpleRenderMessage>();
+            render_message.Construct(type, entity_id);
             m_render_messages.Add(render_message);
         }
 
@@ -246,6 +253,10 @@ namespace Combat
             m_entity_manager.CreateObject(context);
         }
 
+        public virtual void CustomInitializeObject(Object obj, System.Object custom_data)
+        {
+        }
+
         public virtual void OnGameOver(GameResult game_result)
         {
             if (m_game_over)
@@ -260,5 +271,12 @@ namespace Combat
         {
             return m_signal_listener_id_generator.GenID();
         }
+
+        #region GeneralComposableObject
+        protected override LogicWorld GetSelf()
+        {
+            return this;
+        }
+        #endregion
     }
 }

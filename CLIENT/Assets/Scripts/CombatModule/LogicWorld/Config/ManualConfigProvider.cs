@@ -157,6 +157,10 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("DeathComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
             type_data.m_components_data.Add(cd);
 
@@ -187,6 +191,10 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DamagableComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("DeathComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
@@ -236,6 +244,10 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DamagableComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("DeathComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();

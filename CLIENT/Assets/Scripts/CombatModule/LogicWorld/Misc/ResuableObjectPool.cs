@@ -8,6 +8,18 @@ namespace Combat
         void Reset();  //Reset后，如同刚被构造
     }
 
+    public class RecyclableObject
+    {
+        public static TClass Create<TClass>() where TClass : class, IRecyclable, new()
+        {
+            return ResuableObjectPool<IRecyclable>.Instance.Create<TClass>();
+        }
+        public static void Recycle(IRecyclable instance)
+        {
+            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+        }
+    }
+
     public class ResuableObjectPool<TBaseClassOrInterface> : Singleton<ResuableObjectPool<TBaseClassOrInterface>> where TBaseClassOrInterface : IRecyclable
     {
         Dictionary<System.Type, List<TBaseClassOrInterface>> m_pools = new Dictionary<System.Type, List<TBaseClassOrInterface>>();
