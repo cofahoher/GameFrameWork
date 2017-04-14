@@ -22,7 +22,7 @@ namespace Combat
             set { m_animation_speed = value; }
         }
 
-        #region 初始化
+        #region 初始化/销毁
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             variables.TryGetValue("animator_path", out m_animator_path);

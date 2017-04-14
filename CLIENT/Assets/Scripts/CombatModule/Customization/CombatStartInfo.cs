@@ -8,12 +8,13 @@ namespace Combat
         public int m_level_id = -1;
         public int m_game_mode = -1;
         public int m_world_seed = -1;
+        public long m_local_player_pstid = 0;
         public List<CombatPlayerInfo> m_players;
     }
 
     public class CombatPlayerInfo
     {
-        long m_pstid = -1;
+        public long m_pstid = -1;
         public List<CombatObjectInfo> m_objects;
     }
 

@@ -23,6 +23,7 @@ namespace Combat
         protected EffectManager m_effect_manager;
         protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
+        protected TargetGatheringManager m_target_gathering_manager;
 
         public LogicWorld()
         {
@@ -45,6 +46,7 @@ namespace Combat
             m_skill_manager = new SkillManager(this);
             m_effect_manager = new EffectManager(this);
             m_faction_manager = new FactionManager(this);
+            m_target_gathering_manager = new TargetGatheringManager(this);
 
             m_command_handler = CreateCommandHandler();
         }
@@ -71,6 +73,8 @@ namespace Combat
             m_effect_manager = null;
             m_faction_manager.Destruct();
             m_faction_manager = null;
+            m_target_gathering_manager.Destruct();
+            m_target_gathering_manager = null;
 
             m_command_handler.Destruct();
             m_command_handler = null;
@@ -130,6 +134,11 @@ namespace Combat
         public FactionManager GetFactionManager()
         {
             return m_faction_manager;
+        }
+
+        public TargetGatheringManager GetTargetGatheringManager()
+        {
+            return m_target_gathering_manager;
         }
         #endregion
 
@@ -278,5 +287,17 @@ namespace Combat
             return this;
         }
         #endregion
+    }
+
+    class LogicTask
+    {
+        public static TTask Create<TTask>() where TTask : Task<LogicWorld>, new()
+        {
+            return ResuableObjectPool<IRecyclable>.Instance.Create<TTask>();
+        }
+        public static void Recycle(Task<LogicWorld> instance)
+        {
+            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+        }
     }
 }

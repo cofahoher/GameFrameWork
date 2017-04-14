@@ -29,8 +29,11 @@ namespace Combat
         int m_expected_target_count = -1;
         //AI技能释放期望目标数量，默认找所有
         int m_ai_expected_target_count = -1;
-        //是否技能(false表示普通攻击)
-        bool m_is_skill = false;
+        //目标查找类型
+        int m_target_gathering_type = -1;
+        //目标查找参数
+        FixPoint m_target_gathering_param1;
+        FixPoint m_target_gathering_param2;
         //技能优先级（1为最高）
         int m_priority = 1;
         //表现 - 技能描述
@@ -43,10 +46,21 @@ namespace Combat
         FixPoint m_ps_delay = FixPoint.Zero;
         #endregion
 
-        #region 运行数据       
+        #region 运行数据
         //各种技能时间器
         List<SkillTimer> m_timers = new List<SkillTimer>();
         #endregion
+
+        #region 初始化/销毁
+        public override void InitializeComponent()
+        {
+            m_timers.Clear();
+            for (int i = 0; i < (int)SkillTimerType.TimerCount; ++i)
+            {
+                SkillTimer timer = RecyclableObject.Create<SkillTimer>();
+                m_timers.Add(timer);
+            }
+        }
 
         protected override void OnDestruct()
         {
@@ -65,23 +79,12 @@ namespace Combat
             RecyclableObject.Recycle(m_expiration_time_formula);
             m_expiration_time_formula = null;
         }
-
-        #region 初始化
-        public override void InitializeComponent()
-        {
-            m_timers.Clear();
-            for (int i = 0; i < (int)SkillTimerType.TimerCount; ++i)
-            {
-                SkillTimer timer = RecyclableObject.Create<SkillTimer>();
-                m_timers.Add(timer);
-            }
-        }
         #endregion
 
         #region 计时器
         public void ClearTimer(SkillTimerType skill_timer_type)
         {
-            var timer = m_timers[(int)skill_timer_type];
+            SkillTimer timer = m_timers[(int)skill_timer_type];
             if (timer.Active)
                 timer.Reset();
         }
@@ -98,19 +101,19 @@ namespace Combat
 
         public void StartCastingTimer(FixPoint start_time)
         {
-            var timer = m_timers[(int)SkillTimerType.CastingTimer];
+            SkillTimer timer = m_timers[(int)SkillTimerType.CastingTimer];
             timer.SetStartTotalTimes(start_time, CastingTime);
         }
 
         public void StartCooldownTimer(FixPoint start_time)
         {
-            var timer = m_timers[(int)SkillTimerType.CooldownTimer];
+            SkillTimer timer = m_timers[(int)SkillTimerType.CooldownTimer];
             timer.SetStartTotalTimes(start_time, CooldownTime);
         }
 
         public void StartExpirationTimer(FixPoint start_time)
         {
-            var timer = m_timers[(int)SkillTimerType.ExpirationTimer];
+            SkillTimer timer = m_timers[(int)SkillTimerType.ExpirationTimer];
             timer.SetStartTotalTimes(start_time, ExpirationTime);
         }
 
@@ -121,7 +124,7 @@ namespace Combat
             FixPoint current_time = GetCurrentTime();
             for(int i = 0; i <　(int)SkillTimerType.TimerCount; ++i)
             {
-                var timer = m_timers[i];
+                SkillTimer timer = m_timers[i];
                 if(timer.Active)
                 {
                     FixPoint time_left = timer.GetRemaining(current_time);

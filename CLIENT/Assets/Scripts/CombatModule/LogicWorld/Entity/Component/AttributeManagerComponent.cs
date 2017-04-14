@@ -7,7 +7,7 @@ namespace Combat
         SortedDictionary<int, FixPoint> m_base_value = new SortedDictionary<int, FixPoint>();
         SortedDictionary<int, Attribute> m_attributes = new SortedDictionary<int, Attribute>();
 
-        #region 初始化
+        #region 初始化/销毁
         public void SetAttributeBaseValue(int id, FixPoint value)
         {
             m_base_value[id] = value;

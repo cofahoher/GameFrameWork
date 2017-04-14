@@ -180,6 +180,15 @@ namespace Combat
     public partial class DeathComponent
     {
         public const int ID = -2008540504;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("hide_delay", out value))
+                m_hide_delay = FixPoint.Parse(value);
+            if (variables.TryGetValue("delete_delay", out value))
+                m_delete_delay = FixPoint.Parse(value);
+        }
     }
 
     public partial class EffectManagerComponent
@@ -217,6 +226,18 @@ namespace Combat
             }
         }
 
+        public override bool SetVariable(int id, FixPoint value)
+        {
+            switch (id)
+            {
+            case VID_MaxSpeed:
+                m_current_max_speed = value;
+                return true;
+            default:
+                return false;
+            }
+        }
+
 #region GETTER/SETTER
         public FixPoint MaxSpeed
         {
@@ -240,7 +261,6 @@ namespace Combat
         public const int VID_ExtX = 159317834;
         public const int VID_ExtY = 2121912284;
         public const int VID_ExtZ = -412049818;
-        public const int VID_Visible = 2058414169;
 
         static PositionComponent()
         {
@@ -251,7 +271,6 @@ namespace Combat
             ComponentTypeRegistry.RegisterVariable(VID_ExtX, ID);
             ComponentTypeRegistry.RegisterVariable(VID_ExtY, ID);
             ComponentTypeRegistry.RegisterVariable(VID_ExtZ, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_Visible, ID);
         }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
@@ -300,9 +319,6 @@ namespace Combat
             case VID_ExtZ:
                 value = m_extents.z;
                 return true;
-            case VID_Visible:
-                value = (FixPoint)(m_visible);
-                return true;
             default:
                 value = FixPoint.Zero;
                 return false;
@@ -325,9 +341,6 @@ namespace Combat
             case VID_CurrentAngle:
                 m_current_angle = value;
                 return true;
-            case VID_Visible:
-                m_visible = (bool)value;
-                return true;
             default:
                 return false;
             }
@@ -337,25 +350,21 @@ namespace Combat
         public FixPoint X
         {
             get { return m_current_position.x; }
-            set { m_current_position.x = value; }
         }
 
         public FixPoint Y
         {
             get { return m_current_position.y; }
-            set { m_current_position.y = value; }
         }
 
         public FixPoint Z
         {
             get { return m_current_position.z; }
-            set { m_current_position.z = value; }
         }
 
         public FixPoint CurrentAngle
         {
             get { return m_current_angle; }
-            set { m_current_angle = value; }
         }
 
         public FixPoint ExtX
@@ -376,7 +385,6 @@ namespace Combat
         public bool Visible
         {
             get { return m_visible; }
-            set { m_visible = value; }
         }
 #endregion
     }
@@ -416,7 +424,6 @@ namespace Combat
         public const int VID_CanActivateWhenDisabled = 2062940555;
         public const int VID_ExpectedTargetCount = 626351239;
         public const int VID_AIExpectedTargetCount = -1116078248;
-        public const int VID_IsSkill = 314640135;
         public const int VID_Priority = 1655102503;
         public const int VID_PsDelay = -1651357205;
 
@@ -434,7 +441,6 @@ namespace Combat
             ComponentTypeRegistry.RegisterVariable(VID_CanActivateWhenDisabled, ID);
             ComponentTypeRegistry.RegisterVariable(VID_ExpectedTargetCount, ID);
             ComponentTypeRegistry.RegisterVariable(VID_AIExpectedTargetCount, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_IsSkill, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Priority, ID);
             ComponentTypeRegistry.RegisterVariable(VID_PsDelay, ID);
         }
@@ -466,8 +472,12 @@ namespace Combat
                 m_expected_target_count = int.Parse(value);
             if (variables.TryGetValue("ai_expected_target_count", out value))
                 m_ai_expected_target_count = int.Parse(value);
-            if (variables.TryGetValue("is_skill", out value))
-                m_is_skill = bool.Parse(value);
+            if (variables.TryGetValue("target_gathering_type", out value))
+                m_target_gathering_type = int.Parse(value);
+            if (variables.TryGetValue("target_gathering_param1", out value))
+                m_target_gathering_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("target_gathering_param2", out value))
+                m_target_gathering_param2 = FixPoint.Parse(value);
             if (variables.TryGetValue("priority", out value))
                 m_priority = int.Parse(value);
             if (variables.TryGetValue("skill_desc", out value))
@@ -520,9 +530,6 @@ namespace Combat
             case VID_AIExpectedTargetCount:
                 value = (FixPoint)(m_ai_expected_target_count);
                 return true;
-            case VID_IsSkill:
-                value = (FixPoint)(m_is_skill);
-                return true;
             case VID_Priority:
                 value = (FixPoint)(m_priority);
                 return true;
@@ -563,9 +570,6 @@ namespace Combat
             case VID_AIExpectedTargetCount:
                 m_ai_expected_target_count = (int)value;
                 return true;
-            case VID_IsSkill:
-                m_is_skill = (bool)value;
-                return true;
             case VID_Priority:
                 m_priority = (int)value;
                 return true;
@@ -601,67 +605,66 @@ namespace Combat
         public bool StartsActive
         {
             get { return m_starts_active; }
-            set { m_starts_active = value; }
         }
 
         public bool BlocksOtherSkillsWhenActive
         {
             get { return m_blocks_other_skills_when_active; }
-            set { m_blocks_other_skills_when_active = value; }
         }
 
         public bool BlocksMovementWhenActive
         {
             get { return m_blocks_movement_when_active; }
-            set { m_blocks_movement_when_active = value; }
         }
 
         public bool DeactivateWhenMoving
         {
             get { return m_deactivate_when_moving; }
-            set { m_deactivate_when_moving = value; }
         }
 
         public bool CanActivateWhileMoving
         {
             get { return m_can_activate_while_moving; }
-            set { m_can_activate_while_moving = value; }
         }
 
         public bool CanActivateWhenDisabled
         {
             get { return m_can_activate_when_disabled; }
-            set { m_can_activate_when_disabled = value; }
         }
 
         public int ExpectedTargetCount
         {
             get { return m_expected_target_count; }
-            set { m_expected_target_count = value; }
         }
 
         public int AIExpectedTargetCount
         {
             get { return m_ai_expected_target_count; }
-            set { m_ai_expected_target_count = value; }
         }
 
-        public bool IsSkill
+        public int TargetGatheringType
         {
-            get { return m_is_skill; }
-            set { m_is_skill = value; }
+            get { return m_target_gathering_type; }
+        }
+
+        public FixPoint TargetGatheringParam1
+        {
+            get { return m_target_gathering_param1; }
+        }
+
+        public FixPoint TargetGatheringParam2
+        {
+            get { return m_target_gathering_param2; }
         }
 
         public int Priority
         {
             get { return m_priority; }
-            set { m_priority = value; }
         }
 
         public FixPoint PsDelay
         {
             get { return m_ps_delay; }
-            set { m_ps_delay = value; }
         }
 #endregion
     }
@@ -669,6 +672,17 @@ namespace Combat
     public partial class WeaponSkillComponent
     {
         public const int ID = -1579537349;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("target_gathering_type", out value))
+                m_target_gathering_type = int.Parse(value);
+            if (variables.TryGetValue("target_gathering_param1", out value))
+                m_target_gathering_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("target_gathering_param2", out value))
+                m_target_gathering_param2 = FixPoint.Parse(value);
+        }
     }
 
     public partial class AddStateEffectComponent

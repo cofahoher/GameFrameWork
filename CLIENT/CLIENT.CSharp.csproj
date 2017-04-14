@@ -89,6 +89,8 @@
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyAnimation.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\RenderMessageProcessor.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\Empty.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\GeneralComposableObject.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\BehaviorTree\BehaviorTree.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\Attribute.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
@@ -96,8 +98,15 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeSystem.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\AttributeData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\EffectGeneratorData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\IConfigProvider.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\LevelData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\LevelTableData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ManualConfigProvider.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectProtoData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectTypeData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\WeaponData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\Damage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddStateEffectComponent.cs" />
@@ -177,6 +186,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Signal\SignalGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Signal\SignalListener.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Signal\SignalListenerContext.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\BehaviorTreeSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\CreateObjectSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\EffectGeneratorSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\SkillDefinitionComponent.cs" />
@@ -185,6 +195,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillTimer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\TargetGatheringManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\WorldCreationContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimationComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimatorComponent.cs" />

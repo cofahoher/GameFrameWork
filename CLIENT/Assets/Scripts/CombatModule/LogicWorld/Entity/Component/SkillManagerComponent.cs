@@ -13,7 +13,7 @@ namespace Combat
         int m_default_skill_cfgid = -1;
 
         //技能
-        Dictionary<int, int> m_skill_cfgid2id = new Dictionary<int, int>();
+        SortedDictionary<int, int> m_skill_cfgid2id = new SortedDictionary<int, int>();
 
         //有多少个active的skill在阻止移动
         int m_move_block_count = 0;
@@ -36,7 +36,7 @@ namespace Combat
             m_skill_cfgid2id[cfgid] = -1;
         }
 
-        #region 初始化
+        #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
             //根据配置创建skill object
@@ -93,14 +93,14 @@ namespace Combat
 
         private void OnMovementStart()
         {
-            var skill_manager = GetLogicWorld().GetSkillManager();
+            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
             var enumerator = m_active_skill_ids.GetEnumerator();
             while(enumerator.MoveNext())
             {
-                var skill = skill_manager.GetObject(enumerator.Current);
+                Skill skill = skill_manager.GetObject(enumerator.Current);
                 if(skill != null)
                 {
-                    var def_cmp = skill.GetSkillDefinitionComponent();
+                    SkillDefinitionComponent def_cmp = skill.GetSkillDefinitionComponent();
                     if (def_cmp.DeactivateWhenMoving)
                         skill.Interrupt();
                 }
@@ -117,14 +117,14 @@ namespace Combat
 
         public Skill GetDefaultSkill()
         {
-            var default_skill_id = -1;
+            int default_skill_id = -1;
             m_skill_cfgid2id.TryGetValue(m_default_skill_cfgid, out default_skill_id);
             return GetLogicWorld().GetSkillManager().GetObject(default_skill_id);
         }
 
         public Skill GetSkill(int skill_cfgid)
         {
-            var skill_id = -1;
+            int skill_id = -1;
             m_skill_cfgid2id.TryGetValue(skill_cfgid, out skill_id);
             return GetLogicWorld().GetSkillManager().GetObject(skill_id);
         }
@@ -138,7 +138,7 @@ namespace Combat
 
         public void OnSkillActivated(Skill skill)
         {
-            var def_cmp = skill.GetSkillDefinitionComponent();
+            SkillDefinitionComponent def_cmp = skill.GetSkillDefinitionComponent();
             if(def_cmp.BlocksMovementWhenActive)
             {
                 ++m_move_block_count;
@@ -155,7 +155,7 @@ namespace Combat
 
         public void OnSkillDeactivated(Skill skill)
         {
-            var def_cmp = skill.GetSkillDefinitionComponent();
+            SkillDefinitionComponent def_cmp = skill.GetSkillDefinitionComponent();
             if (def_cmp.BlocksMovementWhenActive)
             {
                 --m_move_block_count;

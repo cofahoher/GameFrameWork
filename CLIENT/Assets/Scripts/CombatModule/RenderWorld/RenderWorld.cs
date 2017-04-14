@@ -144,4 +144,16 @@ namespace Combat
         }
         #endregion
     }
+
+    class RenderTask
+    {
+        public static TTask Create<TTask>() where TTask : Task<RenderWorld>, new()
+        {
+            return ResuableObjectPool<IRecyclable>.Instance.Create<TTask>();
+        }
+        public static void Recycle(Task<LogicWorld> instance)
+        {
+            ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
+        }
+    }
 }

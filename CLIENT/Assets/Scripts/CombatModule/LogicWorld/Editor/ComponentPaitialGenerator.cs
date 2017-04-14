@@ -33,6 +33,8 @@ namespace Combat
         const int Flag_Variable_Get_Attribute_Get = VARIABLE_INIT | VARIABLE_GET | CS_ATTRIBUTE_GET;
         const int Flag_Variable_GetSet = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET;
         const int Flag_Variable_Get = VARIABLE_INIT | VARIABLE_GET;
+        const int Flag_Attribute_GetSet = VARIABLE_INIT | CS_ATTRIBUTE_GET | CS_ATTRIBUTE_SET;
+        const int Flag_Attribute_Get = VARIABLE_INIT | CS_ATTRIBUTE_GET;
         
         static void InitLogicComponents()
         {
@@ -56,13 +58,15 @@ namespace Combat
             REGISTER_COMPONENT<AIComponent>();
             REGISTER_COMPONENT<AttributeManagerComponent>();
             REGISTER_COMPONENT<DamagableComponent>()
-                .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "m_current_max_health", Flag_Variable_GetSet_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "m_current_max_health")
                 .REGISTER_VARIABLE<FixPoint>("current_health", "VID_CurrentHealth", "CurrentHealth", Flag_Variable_GetSet);
             REGISTER_COMPONENT<DamageModificationComponent>();
-            REGISTER_COMPONENT<DeathComponent>();
+            REGISTER_COMPONENT<DeathComponent>()
+                .REGISTER_VARIABLE<FixPoint>("hide_delay", null, "m_hide_delay")
+                .REGISTER_VARIABLE<FixPoint>("delete_delay", null, "m_delete_delay");
             REGISTER_COMPONENT<EffectManagerComponent>();
             REGISTER_COMPONENT<LocomotorComponent>()
-                .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "m_current_max_speed", Flag_Variable_Get_Attribute_Get);
+                .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "m_current_max_speed");
             REGISTER_COMPONENT<ManaComponent>();
             REGISTER_COMPONENT<PositionComponent>()
                 .REGISTER_VARIABLE<FixPoint>("x", "VID_X", "m_current_position.x")
@@ -72,7 +76,7 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("ext_x", "VID_ExtX", "m_extents.x", Flag_Variable_Get_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("ext_y", "VID_ExtY", "m_extents.y", Flag_Variable_Get_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("ext_z", "VID_ExtZ", "m_extents.z", Flag_Variable_Get_Attribute_Get)
-                .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible");
+                .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<SkillManagerComponent>();
             REGISTER_COMPONENT<StateComponent>();
             #endregion
@@ -93,13 +97,18 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled")
                 .REGISTER_VARIABLE<int>("expected_target_count", "VID_ExpectedTargetCount", "m_expected_target_count")
                 .REGISTER_VARIABLE<int>("ai_expected_target_count", "VID_AIExpectedTargetCount", "m_ai_expected_target_count")
-                .REGISTER_VARIABLE<bool>("is_skill", "VID_IsSkill", "m_is_skill")
+                .REGISTER_VARIABLE<int>("target_gathering_type", "VID_TargetGatheringType", "m_target_gathering_type", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<int>("priority", "VID_Priority", "m_priority")
                 .REGISTER_VARIABLE<string>("skill_desc", null, "m_skill_desc")
                 .REGISTER_VARIABLE<string>("animation_res", null, "m_animation_res")
                 .REGISTER_VARIABLE<string>("ps_res", null, "m_ps_res")
                 .REGISTER_VARIABLE<FixPoint>("ps_delay", "VID_PsDelay", "m_ps_delay");
-            REGISTER_COMPONENT<WeaponSkillComponent>();
+            REGISTER_COMPONENT<WeaponSkillComponent>()
+                .REGISTER_VARIABLE<int>("target_gathering_type", "VID_TargetGatheringType", "m_target_gathering_type", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get);
             #endregion
 
             #region Effect
@@ -142,6 +151,10 @@ namespace Combat
             public bool CanVariableInit()
             {
                 return (m_flag & VARIABLE_INIT) != 0;
+            }
+            public bool NeedDeclareVariable()
+            {
+                return (m_flag & (VARIABLE_GET | VARIABLE_SET)) != 0;
             }
             public bool CanVariableGet()
             {
@@ -194,7 +207,7 @@ namespace Combat
             {
                 return (m_flag & GENERATE_CSharpAttribute) != 0;
             }
-            public EditorComponent REGISTER_VARIABLE<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_GetSet)
+            public EditorComponent REGISTER_VARIABLE<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_Get)
             {
                 EditorVariable variable = new EditorVariable();
                 System.Type type = typeof(T);
@@ -347,7 +360,7 @@ namespace Combat
             for (int i = 0; i < component.m_variables.Count; ++i)
             {
                 EditorVariable variable = component.m_variables[i];
-                if (variable.m_code_name == null)
+                if (variable.m_code_name == null || !variable.NeedDeclareVariable())
                     continue;
                 ++code_variable_count;
                 writer.Write("\r\n        public const int ");
@@ -377,7 +390,7 @@ namespace Combat
             for (int i = 0; i < component.m_variables.Count; ++i)
             {
                 EditorVariable variable = component.m_variables[i];
-                if (variable.m_code_name == null)
+                if (variable.m_code_name == null || !variable.NeedDeclareVariable())
                     continue;
                 writer.Write("\r\n            ComponentTypeRegistry.RegisterVariable(");
                 writer.Write(variable.m_code_name);

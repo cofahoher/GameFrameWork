@@ -41,6 +41,12 @@ namespace Combat
             case RenderMessageType.ChangeHealth:
                 ProcessRenderMessage_ChangeHealth(msg as ChangeHealthRenderMessage);
                 break;
+            case RenderMessageType.Die:
+                ProcessRenderMessage_Die(msg.EntityID);
+                break;
+            case RenderMessageType.Hide:
+                ProcessRenderMessage_Hide(msg.EntityID);
+                break;
             default:
                 break;
             }
@@ -96,6 +102,26 @@ namespace Combat
 
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)
         {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+        }
+
+        void ProcessRenderMessage_Die(int entity_id)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
+            if (render_entity == null)
+                return;
+            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            if (animation_component != null)
+                animation_component.PlayerAnimation(AnimationName.DIE);
+        }
+
+        void ProcessRenderMessage_Hide(int entity_id)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
+            if (render_entity == null)
+                return;
         }
     }
 }

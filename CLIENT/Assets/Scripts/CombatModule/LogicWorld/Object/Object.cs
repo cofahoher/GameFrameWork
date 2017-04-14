@@ -55,6 +55,21 @@ namespace Combat
         public bool DeletePending
         {
             get { return m_is_delete_pending; }
+            set
+            {
+                if (m_is_delete_pending == value)
+                    return;
+                m_is_delete_pending = value;
+                if (m_is_delete_pending)
+                {
+                    var enumerator = m_components.GetEnumerator();
+                    while (enumerator.MoveNext())
+                    {
+                        Component component = enumerator.Current.Value;
+                        component.OnDeletePending();
+                    }
+                }
+            }
         }
         #endregion
 

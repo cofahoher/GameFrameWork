@@ -13,7 +13,6 @@ namespace Combat
     public class Skill : Object
     {
         bool m_is_active = false;
-        List<Target> m_skill_targets = new List<Target>();
         SkillManagerComponent m_skill_manager_cmp;
         SkillDefinitionComponent m_definition_cmp;
         EffectGeneratorSkillComponent m_effect_generator_cmp;
@@ -21,26 +20,14 @@ namespace Combat
         LocomotorComponent m_locomotor_cmp;
         ManaComponent m_mana_cmp;
 
+        List<Target> m_skill_targets = new List<Target>();
+
         SkillCountdownTask m_task;
 
-        protected override void OnDestruct()
-        {
-            m_is_active = false;
-            m_skill_targets.Clear();
-            m_skill_manager_cmp = null;
-            m_definition_cmp = null;
-            m_effect_generator_cmp = null;
-            m_weapon_cmp = null;
-            m_locomotor_cmp = null;
-            m_mana_cmp = null;
-            m_task.Cancel();
-            m_task = null;
-        }
-
-        #region 初始化
+        #region 初始化/销毁
         protected override void PreInitializeObject(ObjectCreationContext context)
         {
-            var ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_object_id);
+            Entity ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_object_id);
             if(ownerEntity != null)
             {
                 m_skill_manager_cmp = ownerEntity.GetComponent<SkillManagerComponent>();
@@ -54,6 +41,23 @@ namespace Combat
             m_definition_cmp = this.GetComponent<SkillDefinitionComponent>();
             m_effect_generator_cmp = this.GetComponent<EffectGeneratorSkillComponent>();
             m_weapon_cmp = this.GetComponent<WeaponSkillComponent>();
+        }
+
+        protected override void OnDestruct()
+        {
+            m_is_active = false;
+            m_skill_targets.Clear();
+            m_skill_manager_cmp = null;
+            m_definition_cmp = null;
+            m_effect_generator_cmp = null;
+            m_weapon_cmp = null;
+            m_locomotor_cmp = null;
+            m_mana_cmp = null;
+            if (m_task != null)
+            {
+                m_task.Cancel();
+                m_task = null;
+            }
         }
         #endregion
 
@@ -109,6 +113,10 @@ namespace Combat
 
         private void ClearTargets()
         {
+            for (int i = 0; i < m_skill_targets.Count; ++i)
+            {
+                RecyclableObject.Recycle(m_skill_targets[i]);
+            }
             m_skill_targets.Clear();
         }
         #endregion
@@ -136,7 +144,7 @@ namespace Combat
 
         public FixPoint GetNextReadyTime()
         {
-            var timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
+            SkillTimer timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
             if(timer.Active)
             {
                 return timer.GetRemaining(GetCurrentTime());
@@ -149,21 +157,28 @@ namespace Combat
         /// <summary>
         /// 是否可以激活技能
         /// </summary>
-        /// <param name="is_skill">true表示技能 false表示普通攻击</param>
-        /// <returns></returns>
-        public bool CanActivate(bool is_skill = true)
+        public bool CanActivate()
         {
             CheckSkillResult result = CheckActivate();
-            //普通攻击
-            if (!is_skill)
-                return CheckSkillResult.Success == result;
 
-            //技能
             if (CheckSkillResult.Success == result)
             {
-                //查找目标
-
+                return true;
             }
+            return false;
+        }
+
+        public bool BuildSkillTargets(Target ai_target = null)
+        {
+            if (ai_target != null)
+                SetTarget(ai_target);
+            //查找目标
+            TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
+            List<Target> targets = target_gathering_manager.BuildTargetList(m_definition_cmp.TargetGatheringType,
+                m_definition_cmp.TargetGatheringParam1, m_definition_cmp.TargetGatheringParam2, this, GetOwnerEntity());
+            if (targets.Count >= m_definition_cmp.ExpectedTargetCount)
+                SetTargets(targets);
+
             return false;
         }
 
@@ -198,10 +213,11 @@ namespace Combat
         {
             if (!m_skill_manager_cmp.CanActivateSkill())
                 return false;
-            if (m_definition_cmp.IsSkill)
+            if (m_effect_generator_cmp != null)
                 return m_effect_generator_cmp.IsEnable();
-            else
+            else if(m_weapon_cmp != null)
                 return m_weapon_cmp.IsEnable();
+            return false;
         }
 
         public bool Activate(FixPoint start_time)
@@ -310,7 +326,7 @@ namespace Combat
         }
         public void ServiceCountdown(FixPoint current_time, FixPoint delta_time)
         {
-            var casting_timer = m_definition_cmp.GetTimer(SkillTimerType.CastingTimer);
+            SkillTimer casting_timer = m_definition_cmp.GetTimer(SkillTimerType.CastingTimer);
             if(casting_timer.Active)
             {
                 if(casting_timer.GetRemaining(current_time) == FixPoint.Zero)
@@ -324,7 +340,7 @@ namespace Combat
             {
                 bool reschedule = false;
                 //recharging
-                var cooldown_timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
+                SkillTimer cooldown_timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
                 if(cooldown_timer.Active)
                 {
                     if (cooldown_timer.GetRemaining(current_time) == FixPoint.Zero)
@@ -336,7 +352,7 @@ namespace Combat
                         reschedule = true;
                 }
                 //expiring
-                var expiration_timer = m_definition_cmp.GetTimer(SkillTimerType.ExpirationTimer);
+                SkillTimer expiration_timer = m_definition_cmp.GetTimer(SkillTimerType.ExpirationTimer);
                 if(expiration_timer.Active)
                 {
                     if (expiration_timer.GetRemaining(current_time) == FixPoint.Zero)
@@ -374,7 +390,9 @@ namespace Combat
         #endregion
     }
 
-
+    //******************************************************************
+    //技能倒计时的Task
+    //******************************************************************
     class SkillCountdownTask : Task<LogicWorld>
     {
         Skill m_skill;
