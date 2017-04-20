@@ -16,8 +16,7 @@ namespace Combat
         //ZZWTODO 现在在客户端保存了所有的Command，因此没有回收
         public static TCommand Create<TCommand>() where TCommand : Command, new()
         {
-            TCommand command = ResuableObjectFactory<Command>.Create<TCommand>();
-            return command;
+            return ResuableObjectFactory<Command>.Create<TCommand>();
         }
         public static void Recycle(Command instance)
         {
@@ -35,8 +34,7 @@ namespace Combat
         }
         public static Command Create(int id)
         {
-            Command command = ResuableObjectFactory<Command>.Create(id);
-            return command;
+            return ResuableObjectFactory<Command>.Create(id);
         }
 
         [ProtoBufAttribute(Index = 1)] 

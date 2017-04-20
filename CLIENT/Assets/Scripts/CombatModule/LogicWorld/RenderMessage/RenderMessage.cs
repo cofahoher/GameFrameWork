@@ -11,14 +11,15 @@ namespace Combat
         public const int StartMoving = 3;               //SimpleRenderMessage
         public const int StopMoving = 4;                //SimpleRenderMessage
         public const int ChangeHealth = 5;              //ChangeHealthRenderMessage
+        public const int Die = 6;                       //SimpleRenderMessage
+        public const int Hide = 7;                      //SimpleRenderMessage
     }
 
     public abstract class RenderMessage : IRecyclable, IDestruct
     {
         public static TRenderMessage Create<TRenderMessage>() where TRenderMessage : RenderMessage, new()
         {
-            TRenderMessage msg = ResuableObjectFactory<RenderMessage>.Create<TRenderMessage>();
-            return msg;
+            return ResuableObjectFactory<RenderMessage>.Create<TRenderMessage>();
         }
         public static void Recycle(RenderMessage instance)
         {
@@ -36,8 +37,7 @@ namespace Combat
         }
         public static RenderMessage Create(int id)
         {
-            RenderMessage msg = ResuableObjectFactory<RenderMessage>.Create(id);
-            return msg;
+            return ResuableObjectFactory<RenderMessage>.Create(id);
         }
 
         protected int m_entity_id = -1;

@@ -158,6 +158,9 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DeathComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["hide_delay"] = "1";
+            cd.m_component_variables["delete_delay"] = "2";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
@@ -195,6 +198,9 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DeathComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["hide_delay"] = "1";
+            cd.m_component_variables["delete_delay"] = "2";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
@@ -248,6 +254,9 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DeathComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["hide_delay"] = "1";
+            cd.m_component_variables["delete_delay"] = "2";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();

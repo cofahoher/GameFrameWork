@@ -28,7 +28,18 @@ namespace Combat
         }
         #endregion
 
-        #region 初始化
+        #region 初始化/销毁
+        public override void OnDeletePending()
+        {
+            StopMoving();
+        }
+
+        protected override void OnDestruct()
+        {
+            LogicTask.Recycle(m_task);
+            m_task = null;
+        }
+ 
         protected override void PostInitializeComponent()
         {
             m_position_component = ParentObject.GetComponent<PositionComponent>();
@@ -74,7 +85,10 @@ namespace Combat
         void StartMoving()
         {
             if (m_task == null)
-                m_task = new LocomoterTask(this);
+            {
+                m_task = LogicTask.Create<LocomoterTask>();
+                m_task.Construct(this);
+            }
             var schedeler = GetLogicWorld().GetTaskScheduler();
             FixPoint period = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
             schedeler.Schedule(m_task, GetCurrentTime(), period, period);
@@ -115,11 +129,11 @@ namespace Combat
         #endregion
     }
 
-
     class LocomoterTask : Task<LogicWorld>
     {
         LocomotorComponent m_locomotor_component;
-        public LocomoterTask(LocomotorComponent locomotor_component)
+
+        public void Construct(LocomotorComponent locomotor_component)
         {
             m_locomotor_component = locomotor_component;
         }

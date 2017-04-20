@@ -9,7 +9,7 @@ namespace Combat
         FixPoint m_current_health = FixPoint.MinusOne;
         Damage m_last_damage;
 
-        #region 初始化
+        #region 初始化/销毁
         protected override void OnDestruct()
         {
             RecyclableObject.Recycle(m_last_damage);

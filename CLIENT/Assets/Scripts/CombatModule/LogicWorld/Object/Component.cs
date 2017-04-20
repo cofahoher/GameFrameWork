@@ -18,10 +18,6 @@ namespace Combat
             m_parent_object = null;
         }
 
-        protected virtual void OnDestruct()
-        {
-        }
-
         #region GETTER
         public Object ParentObject
         {
@@ -70,7 +66,7 @@ namespace Combat
         }
         #endregion
 
-        #region 初始化
+        #region 初始化/销毁
         public virtual void InitializeVariable(Dictionary<string, string> variables)
         {
             //ZZWTODO 有没有更好的方式？List？crc？
@@ -92,9 +88,17 @@ namespace Combat
         protected virtual void PostInitializeComponent()
         {
         }
+
+        public virtual void OnDeletePending()
+        {
+        }
+
+        protected virtual void OnDestruct()
+        {
+        }
         #endregion
 
-        #region Enable&Disable
+        #region Enable/Disable
         public void Enable()
         {
             if (m_disable_count > 0)

@@ -21,13 +21,14 @@ namespace Combat
         public bool m_is_ai = false;
         public bool m_is_local = false;
 
-        public void SetProxyIDFromPstid(long pstid)
+        public int SetProxyIDFromPstid(long pstid)
         {
             /*
              * 如果一种模式没有在关卡中，给予指定的玩家Object，那么可以用pstid做为proxy_id
              * 单人可以继续用LOCAL_PLAYER_PROXYID
              */
             m_object_proxy_id = (int)CRC.Calculate(pstid);
+            return m_object_proxy_id;
         }
     }
 }

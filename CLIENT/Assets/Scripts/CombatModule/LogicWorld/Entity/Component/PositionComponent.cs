@@ -46,7 +46,7 @@ namespace Combat
         }
         #endregion
 
-        #region 初始化
+        #region 初始化/销毁
         public override void InitializeComponent()
         {
             BirthPositionInfo birth_info = ParentObject.GetCreationContext().m_birth_info;

@@ -16,7 +16,7 @@ namespace Combat
             return m_unity_go;
         }
 
-        #region 初始化
+        #region 初始化/销毁
         //public override void InitializeVariable(Dictionary<string, string> variables)
         //{
         //    variables.TryGetValue("asset", out m_asset_name);

@@ -81,6 +81,7 @@ namespace Combat
         #region 和局外的接口
         public virtual void Initializa(long local_player_pstid, CombatStartInfo combat_start_info)
         {
+            //真正的local_player_pstid在局外，传进来就好；combat_start_info是给所有玩家、观战者、以及录像回放时，都一致的消息
             m_local_player_pstid = local_player_pstid;
             m_state = CombatClientState.Loading;
             m_state_frame_cnt = 0;
