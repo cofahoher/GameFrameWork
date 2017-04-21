@@ -77,6 +77,11 @@ namespace Combat
             //NOUSE
         }
 
+        public long GetLocalPlayerPstid()
+        {
+            return 0L;
+        }
+
         public void OnGameOver(GameResult game_result)
         {
             UnityEngine.Debug.LogError("测试同步模型：Server GameOver, CRC = " + m_logic_world.GetCRC());

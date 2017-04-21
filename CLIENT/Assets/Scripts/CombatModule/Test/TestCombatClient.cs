@@ -89,6 +89,11 @@ namespace Combat
             m_sync_client.Start(0, m_local_player_pstid, latency);
         }
 
+        public long GetLocalPlayerPstid()
+        {
+            return 0L;
+        }
+
         #region RESOURCE
         public void OnSceneLoaded()
         {
