@@ -9,6 +9,7 @@ namespace Combat
         Dictionary<int, ObjectTypeData> m_object_type_data = new Dictionary<int, ObjectTypeData>();
         Dictionary<int, ObjectProtoData> m_object_proto_data = new Dictionary<int, ObjectProtoData>();
         Dictionary<int, AttributeData> m_attribute_data = new Dictionary<int, AttributeData>();
+        Dictionary<int, SkillData> m_skill_data = new Dictionary<int, SkillData>();
 
         private ManualConfigProvider()
         {
@@ -17,6 +18,7 @@ namespace Combat
             InitObjectTypeData();
             InitObjectProtoData();
             InitAttributeData();
+            InitSkillData();
         }
 
         public override void Destruct()
@@ -68,6 +70,14 @@ namespace Combat
             if (!m_attribute_data.TryGetValue(id, out attribute_data))
                 return null;
             return attribute_data;
+        }
+
+        public SkillData GetSkillData(int id)
+        {
+            SkillData skill_data = null;
+            if (!m_skill_data.TryGetValue(id, out skill_data))
+                return null;
+            return skill_data;
         }
         #endregion
         
@@ -165,6 +175,8 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["bodyctrl_path"] = "bodyctrl";
             type_data.m_components_data.Add(cd);
 
             m_object_type_data[101] = type_data;
@@ -209,12 +221,14 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["bodyctrl_path"] = "bodyctrl";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("AnimationComponent");
             cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["animation_path"] = "bodyctrl";
+            cd.m_component_variables["animation_path"] = "bodyctrl/animationctrl";
             type_data.m_components_data.Add(cd);
 
             m_object_type_data[102] = type_data;
@@ -265,12 +279,14 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["bodyctrl_path"] = "bodyctrl";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("AnimatorComponent");
             cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["animator_path"] = "bodyctrl";
+            cd.m_component_variables["animator_path"] = "bodyctrl/animationctrl";
             type_data.m_components_data.Add(cd);
 
             m_object_type_data[103] = type_data;
@@ -359,6 +375,55 @@ namespace Combat
             attribute_data.m_formula = "BaseValue * TestAttribute2.Value * TestAttribute5.Value";
             AttributeSystem.RegisterAttribute(attribute_data);
             m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+        }
+
+        void InitSkillData()
+        {
+            //普攻技能
+            SkillData skill_data = new SkillData();
+            skill_data.m_name = "default_skill";
+
+            ComponentData cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["mana_cost_formula"] = "10";
+            cd.m_component_variables["cooldown_time_formula"] = "1";
+            cd.m_component_variables["expiration_time_formula"] = "1";
+            cd.m_component_variables["target_gathering_type"] = "AITarget";
+            cd.m_component_variables["inflict_delay"] = "0.5";
+            cd.m_component_variables["main_animation"] = "bodyctrl";
+            skill_data.m_components_data.Add(cd);
+
+            //cd = new ComponentData();
+            //cd.m_component_type_id = (int)CRC.Calculate("DirectDamageSkillComponent");
+            //cd.m_component_variables = new Dictionary<string, string>();
+            //skill_data.m_components_data.Add(cd);
+
+            m_skill_data[1001] = skill_data;
+
+
+            //技能1
+            skill_data = new SkillData();
+            skill_data.m_name = "skill_name1";
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["mana_cost_formula"] = "10";
+            cd.m_component_variables["cooldown_time_formula"] = "1";
+            cd.m_component_variables["expiration_time_formula"] = "1";
+            cd.m_component_variables["target_gathering_type"] = "AITarget";
+            cd.m_component_variables["inflict_delay"] = "0.5";
+            cd.m_component_variables["main_animation"] = "bodyctrl";
+            skill_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("EffectGeneratorSkillComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["effect_generator_id"] = "1";
+            skill_data.m_components_data.Add(cd);
+
+            m_skill_data[1002] = skill_data;
         }
         #endregion
     }

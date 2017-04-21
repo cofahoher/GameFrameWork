@@ -117,11 +117,11 @@
     <Reference Include="Pathfinding.ClipperLib">
       <HintPath>Assets\AstarPathfindingProject\Plugins\Clipper\Pathfinding.ClipperLib.dll</HintPath>
     </Reference>
-    <Reference Include="Pathfinding.Poly2Tri">
-      <HintPath>Assets\AstarPathfindingProject\Plugins\Poly2Tri\Pathfinding.Poly2Tri.dll</HintPath>
-    </Reference>
     <Reference Include="Pathfinding.Ionic.Zip.Reduced">
       <HintPath>Assets\AstarPathfindingProject\Plugins\DotNetZip\Pathfinding.Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
+    <Reference Include="Pathfinding.Poly2Tri">
+      <HintPath>Assets\AstarPathfindingProject\Plugins\Poly2Tri\Pathfinding.Poly2Tri.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +153,7 @@
     <None Include="Assets\Resources\Config\LevelConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />
+    <None Include="Assets\Resources\Config\SkillConfig.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

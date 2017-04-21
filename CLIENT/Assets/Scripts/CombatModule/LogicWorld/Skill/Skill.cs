@@ -7,22 +7,25 @@ namespace Combat
         Success = 0,
         CoolDown,
         ManaNotEnough,
-        RequireStillButMove,
+        ObjectIsMoving,
         SkillDisabled,
     }
+
     public class Skill : Object
     {
         bool m_is_active = false;
-        SkillManagerComponent m_skill_manager_cmp;
-        SkillDefinitionComponent m_definition_cmp;
-        EffectGeneratorSkillComponent m_effect_generator_cmp;
-        WeaponSkillComponent m_weapon_cmp;
-        LocomotorComponent m_locomotor_cmp;
-        ManaComponent m_mana_cmp;
-
+        SkillManagerComponent m_owner_component;
+        SkillDefinitionComponent m_definition_component;
+        ManaComponent m_mana_component;
+        SkillCountdownTask m_task;
         List<Target> m_skill_targets = new List<Target>();
 
-        SkillCountdownTask m_task;
+        #region Getter
+        public SkillDefinitionComponent GetSkillDefinitionComponent()
+        {
+            return m_definition_component;
+        }
+        #endregion
 
         #region 初始化/销毁
         protected override void PreInitializeObject(ObjectCreationContext context)
@@ -30,69 +33,71 @@ namespace Combat
             Entity ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_object_id);
             if(ownerEntity != null)
             {
-                m_skill_manager_cmp = ownerEntity.GetComponent<SkillManagerComponent>();
-                m_locomotor_cmp = ownerEntity.GetComponent<LocomotorComponent>();
-                m_mana_cmp = ownerEntity.GetComponent<ManaComponent>();
+                m_owner_component = ownerEntity.GetComponent<SkillManagerComponent>();
+                m_mana_component = ownerEntity.GetComponent<ManaComponent>();
             }
         }
 
         protected override void PostInitializeObject(ObjectCreationContext context)
         {
-            m_definition_cmp = this.GetComponent<SkillDefinitionComponent>();
-            m_effect_generator_cmp = this.GetComponent<EffectGeneratorSkillComponent>();
-            m_weapon_cmp = this.GetComponent<WeaponSkillComponent>();
+            m_definition_component = this.GetComponent<SkillDefinitionComponent>();
         }
 
         protected override void OnDestruct()
         {
             m_is_active = false;
-            m_skill_targets.Clear();
-            m_skill_manager_cmp = null;
-            m_definition_cmp = null;
-            m_effect_generator_cmp = null;
-            m_weapon_cmp = null;
-            m_locomotor_cmp = null;
-            m_mana_cmp = null;
+            m_owner_component = null;
+            m_definition_component = null;
+            m_mana_component = null;
             if (m_task != null)
             {
                 m_task.Cancel();
+                LogicTask.Recycle(m_task);
                 m_task = null;
             }
+            ClearTargets();
         }
         #endregion
 
         #region ILogicOwnerInfo
         public override Object GetOwnerObject()
         {
-            return m_skill_manager_cmp.GetOwnerObject();
+            return m_owner_component.GetOwnerObject();
         }
         public override int GetOwnerPlayerID()
         {
-            return m_skill_manager_cmp.GetOwnerPlayerID();
+            return m_owner_component.GetOwnerPlayerID();
         }
         public override Player GetOwnerPlayer()
         {
-            return m_skill_manager_cmp.GetOwnerPlayer();
+            return m_owner_component.GetOwnerPlayer();
         }
         public override int GetOwnerEntityID()
         {
-            return m_skill_manager_cmp.GetOwnerEntityID();
+            return m_owner_component.GetOwnerEntityID();
         }
         public override Entity GetOwnerEntity()
         {
-            return m_skill_manager_cmp.GetOwnerEntity();
+            return m_owner_component.GetOwnerEntity();
         }
         #endregion
 
         #region 技能目标
-        //for WeaponSkillComponent 默认武器技能
-        public void SetTarget(Target target)
+        public void BuildSkillTargets()
+        {
+            TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
+            target_gathering_manager.BuildTargetList(m_definition_component.TargetGatheringType, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2,
+                this, GetOwnerEntity(), m_skill_targets);
+        }
+
+        public void AddTarget(Target target)
         {
             if(target != null)
             {
                 m_skill_targets.Add(target);
             }
         }
+
         public Target GetTarget()
         {
             if (m_skill_targets.Count > 0)
@@ -100,12 +105,6 @@ namespace Combat
             return null;
         }
 
-        //for EffectGeneratorSkillComponent 技能
-        public void SetTargets(List<Target> targets)
-        {
-            if (targets != null)
-                m_skill_targets = targets;
-        }
         public List<Target> GetTargets()
         {
             return m_skill_targets;
@@ -114,171 +113,107 @@ namespace Combat
         private void ClearTargets()
         {
             for (int i = 0; i < m_skill_targets.Count; ++i)
-            {
                 RecyclableObject.Recycle(m_skill_targets[i]);
-            }
             m_skill_targets.Clear();
         }
         #endregion
 
-        #region 技能计时器
-        private FixPoint GetLowestRemainingAmongActiveTimer()
-        {
-            return m_definition_cmp.GetLowestRemainingAmongActiveTimers();
-        }
-
-        private bool IsRecharging()
-        {
-            return m_definition_cmp.IsTimerActive(SkillTimerType.CooldownTimer);
-        }
-
-        public bool IsExpiring()
-        {
-            return m_definition_cmp.IsTimerActive(SkillTimerType.ExpirationTimer);
-        }
-
-        public bool IsReady()
-        {
-            return !IsRecharging();
-        }
-
-        public FixPoint GetNextReadyTime()
-        {
-            SkillTimer timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
-            if(timer.Active)
-            {
-                return timer.GetRemaining(GetCurrentTime());
-            }
-            return FixPoint.Zero;
-        }
-        #endregion
-
-        #region 技能的Activate流程
-        /// <summary>
-        /// 是否可以激活技能
-        /// </summary>
+        #region 技能流程
         public bool CanActivate()
         {
-            CheckSkillResult result = CheckActivate();
-
-            if (CheckSkillResult.Success == result)
-            {
-                return true;
-            }
-            return false;
+            return CheckActivate() == CheckSkillResult.Success;
         }
 
-        public bool BuildSkillTargets(Target ai_target = null)
-        {
-            if (ai_target != null)
-                SetTarget(ai_target);
-            //查找目标
-            TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            List<Target> targets = target_gathering_manager.BuildTargetList(m_definition_cmp.TargetGatheringType,
-                m_definition_cmp.TargetGatheringParam1, m_definition_cmp.TargetGatheringParam2, this, GetOwnerEntity());
-            if (targets.Count >= m_definition_cmp.ExpectedTargetCount)
-                SetTargets(targets);
-
-            return false;
-        }
-
-        private CheckSkillResult CheckActivate()
+        public CheckSkillResult CheckActivate()
         {
             if (!IsReady())
                 return CheckSkillResult.CoolDown;
 
-            if (!m_definition_cmp.CanActivateWhileMoving)
+            if (!m_owner_component.CanActivateSkill())
             {
-                if (m_locomotor_cmp != null && m_locomotor_cmp.IsMoving)
-                    return CheckSkillResult.RequireStillButMove;
+                if (!m_definition_component.CanActivateWhenDisabled)
+                    return CheckSkillResult.SkillDisabled;
             }
 
-            FixPoint mana_cost = m_definition_cmp.ManaCost;
+            FixPoint mana_cost = m_definition_component.ManaCost;
             if (mana_cost > FixPoint.Zero)
             {
-                if (m_mana_cmp.GetCurrentManaPoint() < mana_cost)
+                if (m_mana_component.GetCurrentManaPoint(m_definition_component.ManaType) < mana_cost)
                     return CheckSkillResult.ManaNotEnough;
             }
 
-            if (!IsSkillEnable())
+            if (!m_definition_component.CanActivateWhileMoving)
             {
-                if (!m_definition_cmp.CanActivateWhenDisabled)
-                    return CheckSkillResult.SkillDisabled;
+                LocomotorComponent locomotor_cmp = GetOwnerEntity().GetComponent<LocomotorComponent>(LocomotorComponent.ID);
+                if (locomotor_cmp != null && locomotor_cmp.IsMoving)
+                    return CheckSkillResult.ObjectIsMoving;
             }
 
             return CheckSkillResult.Success;
         }
 
-        private bool IsSkillEnable()
-        {
-            if (!m_skill_manager_cmp.CanActivateSkill())
-                return false;
-            if (m_effect_generator_cmp != null)
-                return m_effect_generator_cmp.IsEnable();
-            else if(m_weapon_cmp != null)
-                return m_weapon_cmp.IsEnable();
-            return false;
-        }
-
         public bool Activate(FixPoint start_time)
         {
             SetSkillActive(true);
+
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 SkillComponent cmp = enumerator.Current.Value as SkillComponent;
-                cmp.Activate(start_time);
+                if (cmp != null)
+                    cmp.Activate(start_time);
             }
 
-            m_definition_cmp.ClearTimer(SkillTimerType.ExpirationTimer);
-
-            if (m_definition_cmp.CastingTime > FixPoint.Zero)
-                m_definition_cmp.StartCastingTimer(start_time);
+            m_definition_component.ClearTimer(SkillTimer.ExpirationTimer);
+            if (m_definition_component.CastingTime > FixPoint.Zero)
+                m_definition_component.StartCastingTimer(start_time);
             else
                 PostActivate(start_time);
-            ScheduleServiceCountdown();
 
+            ScheduleTimers();
             return true;
-        }
-
-        private void SetSkillActive(bool is_active)
-        {
-            bool pre_is_active = m_is_active;
-            m_is_active = is_active;
-            if (is_active)
-            {
-                if (!pre_is_active)
-                    m_skill_manager_cmp.OnSkillActivated(this);
-            }
-            else
-            {
-                if (pre_is_active)
-                    m_skill_manager_cmp.OnSkillDeactivated(this);
-            }
         }
 
         public bool PostActivate(FixPoint start_time)
         {
-            FixPoint mana_cost = m_definition_cmp.ManaCost;
+            FixPoint mana_cost = m_definition_component.ManaCost;
             if (mana_cost > FixPoint.Zero)
             {
-                m_mana_cmp.ChangeMana(-mana_cost);
+                m_mana_component.ChangeMana(m_definition_component.ManaType, -mana_cost);
             }
+
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 SkillComponent cmp = enumerator.Current.Value as SkillComponent;
-                cmp.PostActivate(start_time);
+                if (cmp != null)
+                    cmp.PostActivate(start_time);
             }
 
-            //开始CD
-            m_definition_cmp.StartCooldownTimer(start_time);
+            m_definition_component.StartCooldownTimer(start_time);
 
-            if (m_definition_cmp.ExpirationTime > FixPoint.Zero)
-                m_definition_cmp.StartExpirationTimer(start_time);
+            if (m_definition_component.InflictTime > FixPoint.Zero)
+                m_definition_component.StartInflictingTimer(start_time);
+            else
+                Inflict(start_time);
+            return true;
+        }
+
+        public bool Inflict(FixPoint start_time)
+        {
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                SkillComponent cmp = enumerator.Current.Value as SkillComponent;
+                if (cmp != null)
+                    cmp.Inflict(start_time);
+            }
+
+
+            if (m_definition_component.ExpirationTime > FixPoint.Zero)
+                m_definition_component.StartExpirationTimer(start_time);
             else
                 Deactivate();
-
             return true;
         }
 
@@ -287,123 +222,158 @@ namespace Combat
             if (!m_is_active)
                 return false;
 
-            m_definition_cmp.ClearTimer(SkillTimerType.CastingTimer);
-            m_definition_cmp.ClearTimer(SkillTimerType.ExpirationTimer);
+            m_definition_component.ClearTimer(SkillTimer.CastingTimer);
+            m_definition_component.ClearTimer(SkillTimer.InflictingTimer);
+            m_definition_component.ClearTimer(SkillTimer.ExpirationTimer);
+
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 SkillComponent cmp = enumerator.Current.Value as SkillComponent;
-                cmp.Deactivate();
+                if (cmp != null)
+                    cmp.Deactivate();
             }
+
             SetSkillActive(false);
             ClearTargets();
-
             return true;
         }
 
-        //打断
         public void Interrupt()
         {
             if(Deactivate())
-                ScheduleServiceCountdown();
+                ScheduleTimers();
+        }
+
+        void SetSkillActive(bool is_active)
+        {
+            bool pre_is_active = m_is_active;
+            m_is_active = is_active;
+            if (m_is_active != pre_is_active)
+            {
+                if (is_active)
+                    m_owner_component.OnSkillActivated(this);
+                else
+                    m_owner_component.OnSkillDeactivated(this);
+            }
         }
         #endregion
 
-        #region 技能计时器Task相关
-        private void ScheduleServiceCountdown()
+        #region 技能计时器
+        public bool IsReady()
         {
-            FixPoint time_remaining = GetLowestRemainingAmongActiveTimer();
-            if (time_remaining <= FixPoint.Zero)
-                time_remaining = FixPoint.One;
+            return !m_definition_component.IsRecharging();
+        }
 
+        public FixPoint GetNextReadyTime()
+        {
+            SkillTimer timer = m_definition_component.GetTimer(SkillTimer.CooldownTimer);
+            if (timer.Active)
+                return timer.GetRemaining(GetCurrentTime());
+            return FixPoint.Zero;
+        }
+
+        private void ScheduleTimers()
+        {
+            FixPoint time_remaining = m_definition_component.GetLowestCountdownTimerRemaining();
+            if (time_remaining <= FixPoint.Zero)
+                time_remaining = FixPoint.PrecisionFP;
             var task_scheduler = GetLogicWorld().GetTaskScheduler();
             if(m_task == null)
             {
-                m_task = new SkillCountdownTask(this);
+                m_task = LogicTask.Create<SkillCountdownTask>();
+                m_task.Construct(this);
             }
             task_scheduler.Schedule(m_task, GetCurrentTime(), time_remaining);
 
         }
-        public void ServiceCountdown(FixPoint current_time, FixPoint delta_time)
+
+        public void ServiceCountdownTimers(FixPoint current_time, FixPoint delta_time)
         {
-            SkillTimer casting_timer = m_definition_cmp.GetTimer(SkillTimerType.CastingTimer);
-            if(casting_timer.Active)
+            bool reschedule = false;
+
+            SkillTimer casting_timer = m_definition_component.GetTimer(SkillTimer.CastingTimer);
+            if (casting_timer.Active)
             {
-                if(casting_timer.GetRemaining(current_time) == FixPoint.Zero)
+                if (casting_timer.GetRemaining(current_time) == FixPoint.Zero)
                 {
                     casting_timer.Reset();
                     PostActivate(current_time);
                 }
-                ScheduleServiceCountdown();
+                reschedule = true;
             }
-            else
+
+            SkillTimer inflicting_timer = m_definition_component.GetTimer(SkillTimer.InflictingTimer);
+            if (inflicting_timer.Active)
             {
-                bool reschedule = false;
-                //recharging
-                SkillTimer cooldown_timer = m_definition_cmp.GetTimer(SkillTimerType.CooldownTimer);
-                if(cooldown_timer.Active)
+                if (inflicting_timer.GetRemaining(current_time) == FixPoint.Zero)
                 {
-                    if (cooldown_timer.GetRemaining(current_time) == FixPoint.Zero)
-                    {
-                        cooldown_timer.Reset();
-                        NotifySkillReady();
-                    }
-                    else
-                        reschedule = true;
+                    inflicting_timer.Reset();
+                    Inflict(current_time);
                 }
-                //expiring
-                SkillTimer expiration_timer = m_definition_cmp.GetTimer(SkillTimerType.ExpirationTimer);
-                if(expiration_timer.Active)
-                {
-                    if (expiration_timer.GetRemaining(current_time) == FixPoint.Zero)
-                    {
-                        expiration_timer.Reset();
-                        NotifySkillExpired();
-                    }
-                    else
-                        reschedule = true;
-                }
-
-                if (reschedule)
-                    ScheduleServiceCountdown();
+                reschedule = true;
             }
+
+            SkillTimer expiration_timer = m_definition_component.GetTimer(SkillTimer.ExpirationTimer);
+            if (expiration_timer.Active)
+            {
+                if (expiration_timer.GetRemaining(current_time) == FixPoint.Zero)
+                {
+                    expiration_timer.Reset();
+                    Deactivate();
+                    NotifySkillExpired();
+                }
+                else
+                {
+                    reschedule = true;
+                }
+            }
+
+            SkillTimer cooldown_timer = m_definition_component.GetTimer(SkillTimer.CooldownTimer);
+            if (cooldown_timer.Active)
+            {
+                if (cooldown_timer.GetRemaining(current_time) == FixPoint.Zero)
+                {
+                    cooldown_timer.Reset();
+                    NotifySkillReady();
+                }
+                else
+                {
+                    reschedule = true;
+                }
+            }
+
+            if (reschedule)
+                ScheduleTimers();
         }
 
-        //通知CD结束
-        private void NotifySkillReady()
+        void NotifySkillReady()
         {
-
         }
 
-        //通知引导结束
-        private void NotifySkillExpired()
+        void NotifySkillExpired()
         {
-            Deactivate();
         }
         #endregion
 
-        #region Getter
-        public SkillDefinitionComponent GetSkillDefinitionComponent()
-        {
-            return m_definition_cmp;
-        }
-        #endregion
     }
 
-    //******************************************************************
-    //技能倒计时的Task
-    //******************************************************************
     class SkillCountdownTask : Task<LogicWorld>
     {
         Skill m_skill;
-        public SkillCountdownTask(Skill skill)
+
+        public void Construct(Skill skill)
         {
             m_skill = skill;
+        }
+        public override void OnReset()
+        {
+            m_skill = null;
         }
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
-            m_skill.ServiceCountdown(current_time, delta_time);
+            m_skill.ServiceCountdownTimers(current_time, delta_time);
         }
     }
 }

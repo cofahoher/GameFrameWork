@@ -52,13 +52,14 @@ namespace Combat
         {
 #if UNITY_EDITOR
             MousePick();
+            UpdateKeyboardEvent();
 #else
             MobilePick();
 #endif
             base.OnUpdate(delta_ms, current_time);
         }
 
-        #region 测试点选Entity
+        #region 测试操作：点选Entity和键盘控制
         void MousePick()
         {
             if (!Input.GetMouseButtonUp(0))
@@ -85,7 +86,7 @@ namespace Combat
 
         int m_current_operate_entityi_id = -1;
 
-        public void OnPick(RaycastHit hit)
+        void OnPick(RaycastHit hit)
         {
             GameObject go = hit.transform.gameObject;
             UnityObjectBinding binding = go.GetComponent<UnityObjectBinding>();
@@ -100,10 +101,11 @@ namespace Combat
                 LocomotorComponent locomotor_component = render_entity.GetLogicEntity().GetComponent<LocomotorComponent>();
                 if (locomotor_component == null || !locomotor_component.IsEnable())
                     return;
-                EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
-                cmd.m_entity_id = m_current_operate_entityi_id;
-                cmd.m_destination = RenderPosition2LogiocPosition(hit.point);
-                m_combat_client.GetSyncClient().PushLocalCommand(cmd);
+                //EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
+                //cmd.m_entity_id = m_current_operate_entityi_id;
+                //cmd.m_move_type = EntityMoveCommand.DestinationType;
+                //cmd.m_vector = Vector3_To_Vector3FP(hit.point);
+                //PushLocalCommand(cmd);
             }
             else
             {
@@ -120,6 +122,66 @@ namespace Combat
                     m_current_operate_entityi_id = -1;
                     Debug.Log("RenderWorld.OnPick(), " + hit.transform.name + " IS NOT YOUR Entity");
                 }
+            }
+        }
+
+        Vector3FP m_direction = new Vector3FP();
+        int m_wsad_state = 0;
+        const int W_STATE = 1 << 0;
+        const int S_STATE = 1 << 1;
+        const int A_STATE = 1 << 2;
+        const int D_STATE = 1 << 3;
+
+        void UpdateKeyboardEvent()
+        {
+            if (m_current_operate_entityi_id < 0)
+                return;
+            int old_state = m_wsad_state;
+            if (Input.GetKeyDown(KeyCode.W))
+                m_wsad_state |= W_STATE;
+            if (Input.GetKeyDown(KeyCode.S))
+                m_wsad_state |= S_STATE;
+            if (Input.GetKeyDown(KeyCode.A))
+                m_wsad_state |= A_STATE;
+            if (Input.GetKeyDown(KeyCode.D))
+                m_wsad_state |= D_STATE;
+            if (Input.GetKeyUp(KeyCode.W))
+                m_wsad_state &= ~W_STATE;
+            if (Input.GetKeyUp(KeyCode.S))
+                m_wsad_state &= ~S_STATE;
+            if (Input.GetKeyUp(KeyCode.A))
+                m_wsad_state &= ~A_STATE;
+            if (Input.GetKeyUp(KeyCode.D))
+                m_wsad_state &= ~D_STATE;
+            if (m_wsad_state == old_state)
+                return;
+            if (m_wsad_state == 0)
+            {
+                EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
+                cmd.m_entity_id = m_current_operate_entityi_id;
+                cmd.m_move_type = EntityMoveCommand.StopMoving;
+                PushLocalCommand(cmd);
+            }
+            else
+            {
+                RenderEntity render_entity = m_render_entity_manager.GetObject(m_current_operate_entityi_id);
+                if (render_entity == null)
+                    return;
+                m_direction.MakeZero();
+                if ((m_wsad_state & W_STATE) != 0)
+                    m_direction.z += FixPoint.One;
+                if ((m_wsad_state & S_STATE) != 0)
+                    m_direction.z -= FixPoint.One;
+                if ((m_wsad_state & A_STATE) != 0)
+                    m_direction.x -= FixPoint.One;
+                if ((m_wsad_state & D_STATE) != 0)
+                    m_direction.x += FixPoint.One;
+                m_direction.Normalize();
+                EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
+                cmd.m_entity_id = m_current_operate_entityi_id;
+                cmd.m_move_type = EntityMoveCommand.DirectionType;
+                cmd.m_vector = m_direction;
+                PushLocalCommand(cmd);
             }
         }
         #endregion

@@ -43,6 +43,8 @@ namespace Combat
         public int m_type = CommandType.Invalid;
         [ProtoBufAttribute(Index = 3)]
         public int m_syncturn = -1;
+        [ProtoBufAttribute(Index = 4)]
+        public int m_entity_id = 0;
 
         public long PlayerPstid
         {
@@ -58,12 +60,18 @@ namespace Combat
             get { return m_syncturn; }
             set { m_syncturn = value; }
         }
+        public int EntityID
+        {
+            get { return m_entity_id; }
+            set { m_entity_id = value; }
+        }
 
         public virtual void Reset()
         {
             m_player_pstid = -1;
             m_type = CommandType.Invalid;
             m_syncturn = -1;
+            m_entity_id = 0;
         }
         ////具体数据是什么，可以固定为几个int；或者提供序列化接口，以下只是随便写写
         //public int Serialize(char[] buff, int index)

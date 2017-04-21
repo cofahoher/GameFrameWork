@@ -9,8 +9,13 @@ namespace Combat
 
     public class EntityMoveCommand : Command
     {
-        public int m_entity_id = 0;
-        public Vector3FP m_destination;
+        public const int StopMoving = 0;
+        public const int DirectionType = 1;
+        public const int DestinationType = 2;
+
+        public int m_move_type = 0; 
+        public Vector3FP m_vector;
+
         public EntityMoveCommand()
         {
             m_type = CommandType.EntityMove;
@@ -19,8 +24,8 @@ namespace Combat
         public override void Reset()
         {
             base.Reset();
-            m_entity_id = 0;
-            m_destination.MakeZero();
+            m_move_type = 0;
+            m_vector.MakeZero();
         }
     }
 }

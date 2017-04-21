@@ -27,11 +27,16 @@ namespace Combat
 
     class HideEntityTask : Task<LogicWorld>
     {
-        int m_entity_id;
+        int m_entity_id = 0;
 
         public void Construct(int entity_id)
         {
             m_entity_id = entity_id;
+        }
+
+        public override void OnReset()
+        {
+            m_entity_id = 0;
         }
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
@@ -48,6 +53,11 @@ namespace Combat
         public void Construct(int entity_id)
         {
             m_entity_id = entity_id;
+        }
+
+        public override void OnReset()
+        {
+            m_entity_id = 0;
         }
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)

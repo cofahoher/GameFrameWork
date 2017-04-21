@@ -11,16 +11,11 @@ namespace Combat
 
         //武器普通攻击
         int m_default_skill_cfgid = -1;
-
         //技能
         SortedDictionary<int, int> m_skill_cfgid2id = new SortedDictionary<int, int>();
-
-        //有多少个active的skill在阻止移动
         int m_move_block_count = 0;
-        //有多少个active的skill在阻止施放其他ability
         int m_active_block_count = 0;
-        //active的skill的id列表
-        LinkedList<int> m_active_skill_ids = new LinkedList<int>();
+        List<int> m_active_skill_ids = new List<int>();
 
         //缓存变量
         LocomotorComponent m_locomotor_cmp;
@@ -150,7 +145,7 @@ namespace Combat
             }
             if (def_cmp.BlocksOtherSkillsWhenActive)
                 ++m_active_block_count;
-            m_active_skill_ids.AddLast(skill.ID);
+            m_active_skill_ids.Add(skill.ID);
         }
 
         public void OnSkillDeactivated(Skill skill)

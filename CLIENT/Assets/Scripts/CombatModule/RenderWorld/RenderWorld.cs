@@ -4,17 +4,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 namespace Combat
 {
-    public class RenderWorld : GeneralComposableObject<RenderWorld, int>, IDestruct
+    public class RenderWorld : GeneralComposableObject<RenderWorld, int>, IRenderWorld, IDestruct
     {
-        public static Vector3 LogiocPosition2RenderPosition(Vector3FP v3fp)
+        public static Vector3 Vector3FP_To_Vector3(Vector3FP v3fp)
         {
             return new Vector3((float)v3fp.x, (float)v3fp.y, (float)v3fp.z);
         }
-        public static Vector3FP RenderPosition2LogiocPosition(Vector3 v3)
+        public static Vector3FP Vector3_To_Vector3FP(Vector3 v3)
         {
             return new Vector3FP(FixPoint.CreateFromFloat(v3.x), FixPoint.CreateFromFloat(v3.y), FixPoint.CreateFromFloat(v3.z));
         }
 
+        protected FixPoint m_current_time = FixPoint.Zero;
         protected CombatClient m_combat_client;
         protected LogicWorld m_logic_world;
         protected RenderEntityManager m_render_entity_manager;
@@ -27,6 +28,7 @@ namespace Combat
 
         public virtual void Initialize(CombatClient combat_client, LogicWorld logic_world)
         {
+            m_current_time = FixPoint.Zero;
             m_combat_client = combat_client;
             m_logic_world = logic_world;
             m_render_entity_manager = new RenderEntityManager(logic_world, this);
@@ -50,6 +52,10 @@ namespace Combat
         }
 
         #region GETTER
+        public FixPoint CurrentTime
+        {
+            get { return m_current_time; }
+        }
         public LogicWorld GetLogicWorld()
         {
             return m_logic_world;
@@ -93,14 +99,15 @@ namespace Combat
         #region UPDATE
         public virtual void OnGameStart()
         {
+            m_current_time = FixPoint.Zero;
         }
 
         public virtual void OnUpdate(int delta_ms, int current_time_ms)
         {
-            FixPoint current_time = new FixPoint(current_time_ms) / FixPoint.Thousand;
+            m_current_time = new FixPoint(current_time_ms) / FixPoint.Thousand;
             UpdateMovingEntities();
             ProcessRenderMessages();
-            m_scheduler.Update(current_time);
+            m_scheduler.Update(m_current_time);
             UpdateGeneralComponent(delta_ms, current_time_ms);
         }
 
@@ -143,6 +150,38 @@ namespace Combat
                 m_moving_entities[i].UpdatePosition();
         }
         #endregion
+
+
+        #region Command
+        public void PushLocalCommand(Command cmd)
+        {
+            PredictCommand(cmd);
+            m_combat_client.GetSyncClient().PushLocalCommand(cmd);
+        }
+
+        protected virtual void PredictCommand(Command cmd)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(cmd.m_entity_id);
+            if (render_entity == null)
+                return;
+            PredictLogicComponent predict_logic_component = render_entity.GetComponent<PredictLogicComponent>(PredictLogicComponent.ID);
+            if (predict_logic_component == null)
+                return;
+            predict_logic_component.PredictCommand(cmd);
+        }
+
+        public virtual void OnLogicWorldHandleCommand(Command cmd, bool result)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(cmd.m_entity_id);
+            if (render_entity == null)
+                return;
+            PredictLogicComponent predict_logic_component = render_entity.GetComponent<PredictLogicComponent>(PredictLogicComponent.ID);
+            if (predict_logic_component == null)
+                return;
+            predict_logic_component.ConfirmCommand(cmd);
+        }
+        #endregion
+
     }
 
     class RenderTask
@@ -151,7 +190,7 @@ namespace Combat
         {
             return ResuableObjectPool<IRecyclable>.Instance.Create<TTask>();
         }
-        public static void Recycle(Task<LogicWorld> instance)
+        public static void Recycle(Task<RenderWorld> instance)
         {
             ResuableObjectPool<IRecyclable>.Instance.Recycle(instance);
         }

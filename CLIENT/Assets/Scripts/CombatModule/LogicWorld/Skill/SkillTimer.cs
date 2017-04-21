@@ -3,27 +3,22 @@ using System.Collections.Generic;
 
 namespace Combat
 {
-    public enum SkillTimerType
-    {
-        CastingTimer = 0,
-        CooldownTimer,
-        ExpirationTimer,
-
-        TimerCount,
-    }
-
     public class SkillTimer : IRecyclable, IDestruct
     {
+        public const int CooldownTimer = 1;
+        public const int CastingTimer = 2;
+        public const int InflictingTimer = 3;
+        public const int ExpirationTimer = 4;
+        public const int TimerCount = 4;
+
         FixPoint m_strat_time = FixPoint.Zero;
         FixPoint m_end_time = FixPoint.Zero;
-        FixPoint m_total_time = FixPoint.Zero;
         bool m_active = false;
 
         public void Reset()
         {
             m_strat_time = FixPoint.Zero;
             m_end_time = FixPoint.Zero;
-            m_total_time = FixPoint.Zero;
             m_active = false;
         }
 
@@ -31,35 +26,24 @@ namespace Combat
         {
         }
 
-        public void SetStartTotalTimes(FixPoint start_time, FixPoint total_time)
+        public bool Active
         {
-            m_strat_time = start_time;
-            m_total_time = total_time;
-            m_end_time = start_time + total_time;
-            m_active = true;
+            get { return m_active; }
         }
 
-        public void SetStartEndTimes(FixPoint start_time, FixPoint end_time)
+        public void Start(FixPoint start_time, FixPoint total_time)
         {
             m_strat_time = start_time;
-            m_end_time = end_time;
-            m_total_time = end_time - start_time;
+            m_end_time = start_time + total_time;
             m_active = true;
         }
 
         public FixPoint GetRemaining(FixPoint current_time)
         {
-            if (m_total_time == FixPoint.Zero)
-                return FixPoint.Zero;
             FixPoint remain_time = m_end_time - current_time;
             if (remain_time < FixPoint.Zero)
                 remain_time = FixPoint.Zero;
             return remain_time;
-        }
-
-        public bool Active
-        {
-            get { return m_active; }
         }
     }
 }

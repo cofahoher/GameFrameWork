@@ -27,6 +27,7 @@ namespace Combat
         const int VARIABLE_SET     = 1 << 12;//在函数SetVariable()中存在
         const int CS_ATTRIBUTE_GET = 1 << 13;//需要get的CSharp属性
         const int CS_ATTRIBUTE_SET = 1 << 14;//需要set的CSharp属性
+        const int TRANSFORM2CRCID  = 1 << 15;
 
         const int Flag_Variable_GetSet_Attribute_GetSet = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET | CS_ATTRIBUTE_GET | CS_ATTRIBUTE_SET;
         const int Flag_Variable_GetSet_Attribute_Get = VARIABLE_INIT | VARIABLE_GET | VARIABLE_SET | CS_ATTRIBUTE_GET;//这个应该做为默认值
@@ -85,30 +86,34 @@ namespace Combat
             REGISTER_COMPONENT<CreateObjectSkillComponent>();
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>();
             REGISTER_COMPONENT<SkillDefinitionComponent>()
-                .REGISTER_VARIABLE<Formula>("mana_cost_formula", "VID_ManaCost", "m_mana_cost_formula")
-                .REGISTER_VARIABLE<Formula>("cooldown_time_formula", "VID_CooldownTime", "m_cooldown_time_formula")
-                .REGISTER_VARIABLE<Formula>("casting_time_formula", "VID_CastingTime", "m_casting_time_formula")
-                .REGISTER_VARIABLE<Formula>("expiration_time_formula", "VID_ExpirationTime", "m_expiration_time_formula")
+                .REGISTER_VARIABLE<string>("mana_type", null, "m_mana_type_name")
+                .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost_formula")
+                .REGISTER_VARIABLE<Formula>("cooldown_time", "VID_CooldownTime", "m_cooldown_time_formula", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("casting_time", "VID_CastingTime", "m_casting_time_formula", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("inflict_time", "VID_InflictTime", "m_inflict_time_formula", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("expiration_time", "VID_ExpirationTime", "m_expiration_time_formula", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("starts_active", "VID_StartsActive", "m_starts_active")
                 .REGISTER_VARIABLE<bool>("blocks_other_skills_when_active", "VID_BlocksOtherSkillsWhenActive", "m_blocks_other_skills_when_active")
                 .REGISTER_VARIABLE<bool>("blocks_movement_when_active", "VID_BlocksMovementWhenActive", "m_blocks_movement_when_active")
                 .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving")
                 .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving")
                 .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled")
-                .REGISTER_VARIABLE<int>("expected_target_count", "VID_ExpectedTargetCount", "m_expected_target_count")
-                .REGISTER_VARIABLE<int>("ai_expected_target_count", "VID_AIExpectedTargetCount", "m_ai_expected_target_count")
                 .REGISTER_VARIABLE<int>("target_gathering_type", "VID_TargetGatheringType", "m_target_gathering_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<int>("priority", "VID_Priority", "m_priority")
-                .REGISTER_VARIABLE<string>("skill_desc", null, "m_skill_desc")
-                .REGISTER_VARIABLE<string>("animation_res", null, "m_animation_res")
-                .REGISTER_VARIABLE<string>("ps_res", null, "m_ps_res")
-                .REGISTER_VARIABLE<FixPoint>("ps_delay", "VID_PsDelay", "m_ps_delay");
-            REGISTER_COMPONENT<WeaponSkillComponent>()
-                .REGISTER_VARIABLE<int>("target_gathering_type", "VID_TargetGatheringType", "m_target_gathering_type", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get);
+                .REGISTER_VARIABLE<int>("inflict_type", "VID_InflictType", "m_inflict_type", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<string>("inflict_missile", null, "m_inflict_missile")
+                .REGISTER_VARIABLE<FixPoint>("inflict_missile_speed", "VID_InflictMissileSpeed", "m_inflict_missile_speed", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("impact_delay", "VID_ImpactDelay", "m_impact_delay", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
+                .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
+                .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation");
+            REGISTER_COMPONENT<DirectDamageSkillComponent>()
+                .REGISTER_VARIABLE<string>("damage_type", null, "m_damage_type_name")
+                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount_formula")
+                .REGISTER_VARIABLE<bool>("can_critical", null, "m_can_critical")
+                .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
+                .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             #endregion
 
             #region Effect
@@ -125,7 +130,9 @@ namespace Combat
             REGISTER_COMPONENT<AnimationComponent>(Flag_RenderComponent);
             REGISTER_COMPONENT<AnimatorComponent>(Flag_RenderComponent);
             REGISTER_COMPONENT<ModelComponent>(Flag_RenderComponent)
-                .REGISTER_VARIABLE<string>("asset", null, "m_asset_name");
+                .REGISTER_VARIABLE<string>("asset", null, "m_asset_name")
+                .REGISTER_VARIABLE<string>("bodyctrl_path", null, "m_bodyctrl_path");
+            REGISTER_COMPONENT<PredictLogicComponent>(Flag_RenderComponent);
         }
 
         static ComponentPaitialGenerator()
@@ -209,6 +216,7 @@ namespace Combat
             }
             public EditorComponent REGISTER_VARIABLE<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_Get)
             {
+                //RegisterVariableInternal<T>(config_name, code_name, code_fragment, Flag_Variable_GetSet_Attribute_Get);
                 EditorVariable variable = new EditorVariable();
                 System.Type type = typeof(T);
                 if (!m_real_type.TryGetValue(type, out variable.m_type_name))
@@ -219,6 +227,26 @@ namespace Combat
                 variable.m_flag = flag;
                 m_variables.Add(variable);
                 return this;
+            }
+            public EditorComponent REGISTER_VARIABLE_CRC<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_Get)
+            {
+                EditorVariable variable = RegisterVariableInternal<T>(config_name, code_name, code_fragment, Flag_Variable_GetSet_Attribute_Get);
+                if (variable.m_type_name == "string")
+                    variable.m_flag |= TRANSFORM2CRCID;
+                return this;
+            }
+            EditorVariable RegisterVariableInternal<T>(string config_name, string code_name, string code_fragment, int flag)
+            {
+                EditorVariable variable = new EditorVariable();
+                System.Type type = typeof(T);
+                if (!m_real_type.TryGetValue(type, out variable.m_type_name))
+                    variable.m_type_name = type.Name;
+                variable.m_config_name = config_name;
+                variable.m_code_name = code_name;
+                variable.m_code_fragment = code_fragment;
+                variable.m_flag = flag;
+                m_variables.Add(variable);
+                return variable;
             }
         }
 

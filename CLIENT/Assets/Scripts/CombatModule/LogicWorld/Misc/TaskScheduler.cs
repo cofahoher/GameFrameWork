@@ -96,8 +96,10 @@ namespace Combat
             m_scheduler = null;
         }
 
-        public virtual void Reset()
+        public void Reset()
         {
+            OnReset();
+
             Destruct();
 
             _heap_index = -1;
@@ -108,6 +110,8 @@ namespace Combat
             m_period = default(FixPoint);
             m_next_execution_time = default(FixPoint);
         }
+
+        public abstract void OnReset();
 
         public virtual void Schedule(FixPoint current_time, FixPoint delay = default(FixPoint), FixPoint period = default(FixPoint))
         {

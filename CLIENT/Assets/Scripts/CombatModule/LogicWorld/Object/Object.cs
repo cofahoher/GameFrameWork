@@ -212,6 +212,8 @@ namespace Combat
 
         public Component AddComponent(int component_type_id)
         {
+            if (GetComponent(component_type_id) != null)
+                return null;
             ComponentData component_data = new ComponentData();
             component_data.m_component_type_id = component_type_id;
             return AddComponent(component_data);

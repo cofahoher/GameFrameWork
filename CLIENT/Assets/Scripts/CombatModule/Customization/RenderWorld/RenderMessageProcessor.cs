@@ -27,10 +27,13 @@ namespace Combat
             switch (msg.Type)
             {
             case RenderMessageType.StartMoving:
-                ProcessRenderMessage_StartMoving(msg.EntityID);
+                ProcessRenderMessage_StartMoving(msg as SimpleRenderMessage);
                 break;
             case RenderMessageType.StopMoving:
-                ProcessRenderMessage_StopMoving(msg.EntityID);
+                ProcessRenderMessage_StopMoving(msg as SimpleRenderMessage);
+                break;
+            case RenderMessageType.ChangeMoving:
+                ProcessRenderMessage_ChangeMoving(msg.EntityID);
                 break;
             case RenderMessageType.CreateEntity:
                 ProcessRenderMessage_CreateEntity(msg.EntityID);
@@ -66,24 +69,48 @@ namespace Combat
             m_render_entity_manager.DestroyObject(entity_id);
         }
 
-        void ProcessRenderMessage_StartMoving(int entity_id)
+        void ProcessRenderMessage_StartMoving(SimpleRenderMessage msg)
         {
-            RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
                 return;
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
-            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
-            if (animation_component != null)
-                animation_component.PlayerAnimation(AnimationName.RUN, true);
-            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
-            if (animator_component != null)
-                animator_component.SetParameter(AnimatorParameter.MOVING, true);
+            if (msg.m_simple_data != LocomotorComponent.StartMovingReason_Command || render_entity.GetComponent(PredictLogicComponent.ID) == null)
+            {
+                model_component.UpdateAngle();
+                AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+                if (animation_component != null)
+                    animation_component.PlayerAnimation(AnimationName.RUN, true);
+                AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+                if (animator_component != null)
+                    animator_component.SetParameter(AnimatorParameter.MOVING, true);
+            }
             m_render_world.RegisterMovingEntity(model_component);
         }
 
-        void ProcessRenderMessage_StopMoving(int entity_id)
+        void ProcessRenderMessage_StopMoving(SimpleRenderMessage msg)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+            ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
+            if (model_component == null)
+                return;
+            if (msg.m_simple_data != LocomotorComponent.StopMovingReason_Command || render_entity.GetComponent(PredictLogicComponent.ID) == null)
+            {
+                AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+                if (animation_component != null)
+                    animation_component.PlayerAnimation(AnimationName.IDLE, true);
+                AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+                if (animator_component != null)
+                    animator_component.SetParameter(AnimatorParameter.MOVING, false);
+            }
+            m_render_world.UnregisterMovingEntity(model_component);
+        }
+
+        void ProcessRenderMessage_ChangeMoving(int entity_id)
         {
             RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
             if (render_entity == null)
@@ -91,13 +118,8 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
-            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
-            if (animation_component != null)
-                animation_component.PlayerAnimation(AnimationName.IDLE, true);
-            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
-            if (animator_component != null)
-                animator_component.SetParameter(AnimatorParameter.MOVING, false);
-            m_render_world.UnregisterMovingEntity(model_component);
+            if (render_entity.GetComponent(PredictLogicComponent.ID) == null)
+                model_component.UpdateAngle();
         }
 
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)

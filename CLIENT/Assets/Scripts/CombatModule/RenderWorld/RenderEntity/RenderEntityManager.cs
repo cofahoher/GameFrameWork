@@ -25,6 +25,18 @@ namespace Combat
 
         protected override void AfterObjectCreated(RenderEntity entity)
         {
+            ObjectCreationContext context = entity.GetCreationContext();
+            if (!context.m_is_local || context.m_is_ai)
+                return;
+            if (entity.GetLogicEntity().GetComponent(LocomotorComponent.ID) != null)
+            {
+                Component component = entity.AddComponent(PredictLogicComponent.ID);
+                if (component != null)
+                {
+                    component.InitializeComponent();
+                    component.OnObjectCreated();
+                }
+            }
         }
 
         protected override void PreDestroyObject(RenderEntity entity)

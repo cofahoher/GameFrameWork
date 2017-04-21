@@ -24,8 +24,7 @@ namespace Combat
 
         public override int GetHashCode()
         {
-            //ZZWTODO 不可以做为键
-            return 0;
+            return (int)GetCRC();
         }
         public override bool Equals(object rhs)
         {
@@ -38,6 +37,13 @@ namespace Combat
         public override string ToString()
         {
             return "(" + x + ", " + z + ")";
+        }
+
+        public uint GetCRC(uint old_crc = 0)
+        {
+            old_crc = CRC.Calculate(x.RawValue, old_crc);
+            old_crc = CRC.Calculate(z.RawValue, old_crc);
+            return old_crc;
         }
 
         public static Vector2FP operator -(Vector2FP v2fp)

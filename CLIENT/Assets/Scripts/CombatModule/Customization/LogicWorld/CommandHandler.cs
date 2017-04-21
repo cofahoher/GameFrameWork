@@ -15,27 +15,32 @@ namespace Combat
         {
         }
 
-        public void Handle(Command command)
+        public bool Handle(Command command)
         {
             switch (command.Type)
             {
             case CommandType.EntityMove:
-                HandleEntityMove(command as EntityMoveCommand);
-                break;
+                return HandleEntityMove(command as EntityMoveCommand);
             default:
-                break;
+                return false;
             }
         }
 
-        void HandleEntityMove(EntityMoveCommand cmd)
+        bool HandleEntityMove(EntityMoveCommand cmd)
         {
             Entity entity = m_logic_world.GetEntityManager().GetObject(cmd.m_entity_id);
             if (entity == null)
-                return;
+                return false;
             LocomotorComponent locomotor_component = entity.GetComponent<LocomotorComponent>();
             if (locomotor_component == null)
-                return;
-            locomotor_component.MoveByDestination(cmd.m_destination);
+                return false;
+            if (cmd.m_move_type == EntityMoveCommand.DestinationType)
+                locomotor_component.MoveByDestination(cmd.m_vector, LocomotorComponent.StartMovingReason_Command);
+            else if (cmd.m_move_type == EntityMoveCommand.DirectionType)
+                locomotor_component.MoveByDirection(cmd.m_vector, LocomotorComponent.StartMovingReason_Command);
+            else if (cmd.m_move_type == EntityMoveCommand.StopMoving)
+                locomotor_component.StopMoving(LocomotorComponent.StopMovingReason_Command);
+            return true;
         }
     }
 }

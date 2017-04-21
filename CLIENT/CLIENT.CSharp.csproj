@@ -75,11 +75,11 @@
     <Reference Include="Pathfinding.ClipperLib">
       <HintPath>Assets\AstarPathfindingProject\Plugins\Clipper\Pathfinding.ClipperLib.dll</HintPath>
     </Reference>
-    <Reference Include="Pathfinding.Poly2Tri">
-      <HintPath>Assets\AstarPathfindingProject\Plugins\Poly2Tri\Pathfinding.Poly2Tri.dll</HintPath>
-    </Reference>
     <Reference Include="Pathfinding.Ionic.Zip.Reduced">
       <HintPath>Assets\AstarPathfindingProject\Plugins\DotNetZip\Pathfinding.Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
+    <Reference Include="Pathfinding.Poly2Tri">
+      <HintPath>Assets\AstarPathfindingProject\Plugins\Poly2Tri\Pathfinding.Poly2Tri.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -244,7 +244,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ManualConfigProvider.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectProtoData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectTypeData.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\WeaponData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\SkillData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\Damage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddStateEffectComponent.cs" />
@@ -282,6 +282,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\Token.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\ExpressionEngine\Tokenizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\GameResult.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\IRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\LogicWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Math\FixPoint.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Math\FixPointAtan2Table.cs" />
@@ -326,9 +327,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Signal\SignalListenerContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\BehaviorTreeSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\CreateObjectSkillComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\DirectDamageSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\EffectGeneratorSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\SkillDefinitionComponent.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\WeaponSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Skill.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillManager.cs" />
@@ -338,6 +339,7 @@
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimationComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimatorComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\ModelComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\PredictLogicComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntity.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntityComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntityManager.cs" />
@@ -402,6 +404,7 @@
     <None Include="Assets\Resources\Config\LevelConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />
+    <None Include="Assets\Resources\Config\SkillConfig.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

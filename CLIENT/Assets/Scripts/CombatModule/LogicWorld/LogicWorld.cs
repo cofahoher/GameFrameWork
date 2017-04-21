@@ -5,6 +5,7 @@ namespace Combat
     public class LogicWorld : GeneralComposableObject<LogicWorld, FixPoint>, ILogicWorld, IRenderMessageGenerator
     {
         protected IOutsideWorld m_outside_world;
+        protected IRenderWorld m_render_world;
         protected bool m_need_render_message = false;
         protected List<RenderMessage> m_render_messages;
 
@@ -49,6 +50,11 @@ namespace Combat
             m_target_gathering_manager = new TargetGatheringManager(this);
 
             m_command_handler = CreateCommandHandler();
+        }
+
+        public void SetIRenderWorld(IRenderWorld render_world)
+        {
+            m_render_world = render_world;
         }
 
         public virtual void Destruct()
@@ -169,7 +175,10 @@ namespace Combat
         {
             if (m_game_over)
                 return;
-            m_command_handler.Handle(command);
+            bool result = m_command_handler.Handle(command);
+            //ZZWTODO 也可以用RenderMessage
+            if (m_render_world != null && command.m_player_pstid == m_outside_world.GetLocalPlayerPstid())
+                m_render_world.OnLogicWorldHandleCommand(command, result);
         }
 
         public virtual void CopyFrom(ILogicWorld parallel_world)
@@ -203,12 +212,12 @@ namespace Combat
             m_render_messages.Add(render_message);
         }
 
-        public void AddSimpleRenderMessage(int type, int entity_id = -1)
+        public void AddSimpleRenderMessage(int type, int entity_id = -1, int simple_data = 0)
         {
             if (m_render_messages == null)
                 return;
             SimpleRenderMessage render_message = RenderMessage.Create<SimpleRenderMessage>();
-            render_message.Construct(type, entity_id);
+            render_message.Construct(type, entity_id, simple_data);
             m_render_messages.Add(render_message);
         }
 

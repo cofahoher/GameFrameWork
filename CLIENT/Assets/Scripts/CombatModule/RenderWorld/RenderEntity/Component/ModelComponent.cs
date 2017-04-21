@@ -7,14 +7,35 @@ namespace Combat
     {
         //配置数据
         string m_asset_name;
+        string m_bodyctrl_path;
         //运行数据
         GameObject m_unity_go;
+        Transform m_bodyctrl_tr;
         PositionComponent m_position_component;
+        Vector3 m_last_position = Vector3.zero;
+        PredictLogicComponent m_predict_component = null;
 
+        #region GETTER
         public GameObject GetUnityGameObject()
         {
             return m_unity_go;
         }
+
+        public Vector3 GetCurrentPosition()
+        {
+            return m_last_position;
+        }
+
+        public void SetPredictComponent(PredictLogicComponent predict_component)
+        {
+            m_predict_component = predict_component;
+        }
+
+        public void SetAngle(float angle)
+        {
+            m_bodyctrl_tr.localEulerAngles = new Vector3(0, angle, 0);
+        }
+        #endregion
 
         #region 初始化/销毁
         //public override void InitializeVariable(Dictionary<string, string> variables)
@@ -40,16 +61,21 @@ namespace Combat
             m_unity_go = UnityResourceManager.Instance.CreateGameObject(m_asset_name);
             if (m_unity_go == null)
                 return;
+            if (m_bodyctrl_path != null)
+                m_bodyctrl_tr = m_unity_go.transform.FindChild(m_bodyctrl_path);
+            else
+                m_bodyctrl_tr = m_unity_go.transform;
             Entity logic_entity = GetLogicEntity();
             m_position_component = logic_entity.GetComponent<PositionComponent>();
             if (m_position_component != null)
             {
-                m_unity_go.transform.position = RenderWorld.LogiocPosition2RenderPosition(m_position_component.CurrentPosition);
-                m_unity_go.transform.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
+                m_last_position = RenderWorld.Vector3FP_To_Vector3(m_position_component.CurrentPosition);
+                m_bodyctrl_tr.localPosition = m_last_position;
+                m_bodyctrl_tr.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
             }
-            UnityObjectBinding binding = m_unity_go.GetComponent<UnityObjectBinding>();
+            UnityObjectBinding binding = m_bodyctrl_tr.gameObject.GetComponent<UnityObjectBinding>();
             if (binding == null)
-                binding = m_unity_go.AddComponent<UnityObjectBinding>();
+                binding = m_bodyctrl_tr.gameObject.AddComponent<UnityObjectBinding>();
             binding.EntityID = logic_entity.ID;
         }
 
@@ -65,8 +91,15 @@ namespace Combat
 
         public void UpdatePosition()
         {
-            m_unity_go.transform.position = RenderWorld.LogiocPosition2RenderPosition(m_position_component.CurrentPosition);
-            m_unity_go.transform.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
+            m_last_position = RenderWorld.Vector3FP_To_Vector3(m_position_component.CurrentPosition);
+            if (m_predict_component != null)
+                m_predict_component.OnLogicUpdatePosition(m_last_position - m_bodyctrl_tr.localPosition);
+            m_bodyctrl_tr.localPosition = m_last_position;
+        }
+
+        public void UpdateAngle()
+        {
+            m_bodyctrl_tr.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
         }
     }
 }

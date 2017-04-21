@@ -4,7 +4,7 @@ namespace Combat
 {
     public interface ICommandHandler : IDestruct
     {
-        void Handle(Command command);
+        bool Handle(Command command);
     }
 
     public class DummyCommandHandler : ICommandHandler
@@ -16,8 +16,9 @@ namespace Combat
 #endif
         }
 
-        public void Handle(Command command)
+        public bool Handle(Command command)
         {
+            return false;
         }
 
         public void Destruct()

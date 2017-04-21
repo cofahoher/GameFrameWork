@@ -2,26 +2,27 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class WeaponSkillComponent : SkillComponent
+    public partial class DirectDamageSkillComponent : SkillComponent
     {
         #region 配置数据
-        //目标查找类型
-        int m_target_gathering_type = 0;
-        //目标查找参数
-        FixPoint m_target_gathering_param1;
-        FixPoint m_target_gathering_param2;
+        string m_damage_type_name;
+        Formula m_damage_amount_formula = RecyclableObject.Create<Formula>();
+        bool m_can_critical = false;
+        int m_combo_attack_cnt = 1;
+        FixPoint m_combo_interval = FixPoint.Zero;
         #endregion
 
         #region 运行数据
+        int m_damage_type_id = 0;
         WeaponInflictTask m_task;
         List<int> m_defender_ids = new List<int>();
-        SkillDefinitionComponent m_definition_cmp;
         #endregion
 
         #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
-            m_definition_cmp = ParentObject.GetComponent<SkillDefinitionComponent>();
+            if (m_damage_type_name != null)
+                m_damage_type_id = (int)CRC.Calculate(m_damage_type_name);
         }
 
         protected override void OnDestruct()
@@ -32,12 +33,10 @@ namespace Combat
                 m_task = null;
             }
             m_defender_ids.Clear();
-
-            m_definition_cmp = null;
         }
         #endregion
 
-        #region 技能的Activate流程
+        #region ISkillComponent
         public override void PostActivate(FixPoint start_time)
         {
             SaveDefenderIDs(GetOwnerSkill().GetTargets());
@@ -80,13 +79,13 @@ namespace Combat
         {
             Skill owner_skill = GetOwnerSkill();
             //判断是否需要重新查找目标
-            if(m_target_gathering_type != 0)
-            {
-                TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-                List<Target> targets = target_gathering_manager.BuildTargetList(m_target_gathering_type,
-                    m_target_gathering_param1, m_target_gathering_param2, owner_skill, GetOwnerEntity());
-                SaveDefenderIDs(targets);
-            }
+            //if(m_target_gathering_type != 0)
+            //{
+            //    TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
+            //    List<Target> targets = target_gathering_manager.BuildTargetList(m_target_gathering_type,
+            //        m_target_gathering_param1, m_target_gathering_param2, owner_skill, GetOwnerEntity());
+            //    SaveDefenderIDs(targets);
+            //}
 
             //对所有技能目标造成伤害，触发generator效果
             EntityManager entity_manager = GetLogicWorld().GetEntityManager();
@@ -131,12 +130,17 @@ namespace Combat
     //******************************************************************
     public class WeaponInflictTask : Task<LogicWorld>
     {
-        WeaponSkillComponent m_weapon_skill_component;
+        DirectDamageSkillComponent m_weapon_skill_component;
         Damage m_damage_info;
-        public WeaponInflictTask(WeaponSkillComponent weapon_skill_component, Damage damage_info)
+        public WeaponInflictTask(DirectDamageSkillComponent weapon_skill_component, Damage damage_info)
         {
             m_weapon_skill_component = weapon_skill_component;
             m_damage_info = damage_info;
+        }
+
+        public override void OnReset()
+        {
+            m_weapon_skill_component = null;
         }
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)

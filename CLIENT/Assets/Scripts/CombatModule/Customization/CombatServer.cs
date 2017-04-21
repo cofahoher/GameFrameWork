@@ -90,6 +90,11 @@ namespace Combat
             m_game_result = game_result;
             ProcessGameOver();
         }
+
+        public long GetLocalPlayerPstid()
+        {
+            return 0L;
+        }
         #endregion
 
         public void OnUpdate(int current_time_int)

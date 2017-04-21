@@ -101,6 +101,7 @@ namespace Combat
             m_logic_world.Initialize(this, true);
             m_render_world = m_combat_factory.CreateRenderWorld();
             m_render_world.Initialize(this, m_logic_world);
+            m_logic_world.SetIRenderWorld(m_render_world);
             m_sync_client = m_combat_factory.CreateSyncClient();
             m_sync_client.Init(m_logic_world);
 
@@ -182,6 +183,11 @@ namespace Combat
         {
             m_state = CombatClientState.GameOver;
             m_game_result = game_result;
+        }
+
+        public long GetLocalPlayerPstid()
+        {
+            return m_local_player_pstid;
         }
 
         public virtual void OnDisconnected()

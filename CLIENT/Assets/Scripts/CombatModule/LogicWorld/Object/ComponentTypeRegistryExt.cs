@@ -30,7 +30,7 @@ namespace Combat
             Register<CreateObjectSkillComponent>(false);
             Register<EffectGeneratorSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
-            Register<WeaponSkillComponent>(false);
+            Register<DirectDamageSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<DamageEffectComponent>(false);
@@ -40,6 +40,7 @@ namespace Combat
             Register<AnimationComponent>(true);
             Register<AnimatorComponent>(true);
             Register<ModelComponent>(true);
+            Register<PredictLogicComponent>(true);
 #endif
         }
     }
@@ -412,49 +413,39 @@ namespace Combat
     public partial class SkillDefinitionComponent
     {
         public const int ID = 1669330388;
-        public const int VID_ManaCost = -177021205;
-        public const int VID_CooldownTime = -766682502;
-        public const int VID_CastingTime = -1011172798;
-        public const int VID_ExpirationTime = -2084769206;
+        public const int VID_ManaCost = -865850683;
         public const int VID_StartsActive = -332320693;
         public const int VID_BlocksOtherSkillsWhenActive = -1537750290;
         public const int VID_BlocksMovementWhenActive = -27660750;
         public const int VID_DeactivateWhenMoving = 1315455694;
         public const int VID_CanActivateWhileMoving = 961060384;
         public const int VID_CanActivateWhenDisabled = 2062940555;
-        public const int VID_ExpectedTargetCount = 626351239;
-        public const int VID_AIExpectedTargetCount = -1116078248;
-        public const int VID_Priority = 1655102503;
-        public const int VID_PsDelay = -1651357205;
 
         static SkillDefinitionComponent()
         {
             ComponentTypeRegistry.RegisterVariable(VID_ManaCost, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_CooldownTime, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_CastingTime, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_ExpirationTime, ID);
             ComponentTypeRegistry.RegisterVariable(VID_StartsActive, ID);
             ComponentTypeRegistry.RegisterVariable(VID_BlocksOtherSkillsWhenActive, ID);
             ComponentTypeRegistry.RegisterVariable(VID_BlocksMovementWhenActive, ID);
             ComponentTypeRegistry.RegisterVariable(VID_DeactivateWhenMoving, ID);
             ComponentTypeRegistry.RegisterVariable(VID_CanActivateWhileMoving, ID);
             ComponentTypeRegistry.RegisterVariable(VID_CanActivateWhenDisabled, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_ExpectedTargetCount, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_AIExpectedTargetCount, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_Priority, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_PsDelay, ID);
         }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
-            if (variables.TryGetValue("mana_cost_formula", out value))
+            if (variables.TryGetValue("mana_type", out value))
+                m_mana_type_name = value;
+            if (variables.TryGetValue("mana_cost", out value))
                 m_mana_cost_formula.Compile(value);
-            if (variables.TryGetValue("cooldown_time_formula", out value))
+            if (variables.TryGetValue("cooldown_time", out value))
                 m_cooldown_time_formula.Compile(value);
-            if (variables.TryGetValue("casting_time_formula", out value))
+            if (variables.TryGetValue("casting_time", out value))
                 m_casting_time_formula.Compile(value);
-            if (variables.TryGetValue("expiration_time_formula", out value))
+            if (variables.TryGetValue("inflict_time", out value))
+                m_inflict_time_formula.Compile(value);
+            if (variables.TryGetValue("expiration_time", out value))
                 m_expiration_time_formula.Compile(value);
             if (variables.TryGetValue("starts_active", out value))
                 m_starts_active = bool.Parse(value);
@@ -468,26 +459,26 @@ namespace Combat
                 m_can_activate_while_moving = bool.Parse(value);
             if (variables.TryGetValue("can_activate_when_disabled", out value))
                 m_can_activate_when_disabled = bool.Parse(value);
-            if (variables.TryGetValue("expected_target_count", out value))
-                m_expected_target_count = int.Parse(value);
-            if (variables.TryGetValue("ai_expected_target_count", out value))
-                m_ai_expected_target_count = int.Parse(value);
             if (variables.TryGetValue("target_gathering_type", out value))
                 m_target_gathering_type = int.Parse(value);
             if (variables.TryGetValue("target_gathering_param1", out value))
                 m_target_gathering_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("target_gathering_param2", out value))
                 m_target_gathering_param2 = FixPoint.Parse(value);
-            if (variables.TryGetValue("priority", out value))
-                m_priority = int.Parse(value);
-            if (variables.TryGetValue("skill_desc", out value))
-                m_skill_desc = value;
-            if (variables.TryGetValue("animation_res", out value))
-                m_animation_res = value;
-            if (variables.TryGetValue("ps_res", out value))
-                m_ps_res = value;
-            if (variables.TryGetValue("ps_delay", out value))
-                m_ps_delay = FixPoint.Parse(value);
+            if (variables.TryGetValue("inflict_type", out value))
+                m_inflict_type = int.Parse(value);
+            if (variables.TryGetValue("inflict_missile", out value))
+                m_inflict_missile = value;
+            if (variables.TryGetValue("inflict_missile_speed", out value))
+                m_inflict_missile_speed = FixPoint.Parse(value);
+            if (variables.TryGetValue("impact_delay", out value))
+                m_impact_delay = FixPoint.Parse(value);
+            if (variables.TryGetValue("casting_animation", out value))
+                m_casting_animation = value;
+            if (variables.TryGetValue("main_animation", out value))
+                m_main_animation = value;
+            if (variables.TryGetValue("expiration_animation", out value))
+                m_expiration_animation = value;
         }
 
         public override bool GetVariable(int id, out FixPoint value)
@@ -496,15 +487,6 @@ namespace Combat
             {
             case VID_ManaCost:
                 value = m_mana_cost_formula.Evaluate(this);
-                return true;
-            case VID_CooldownTime:
-                value = m_cooldown_time_formula.Evaluate(this);
-                return true;
-            case VID_CastingTime:
-                value = m_casting_time_formula.Evaluate(this);
-                return true;
-            case VID_ExpirationTime:
-                value = m_expiration_time_formula.Evaluate(this);
                 return true;
             case VID_StartsActive:
                 value = (FixPoint)(m_starts_active);
@@ -523,18 +505,6 @@ namespace Combat
                 return true;
             case VID_CanActivateWhenDisabled:
                 value = (FixPoint)(m_can_activate_when_disabled);
-                return true;
-            case VID_ExpectedTargetCount:
-                value = (FixPoint)(m_expected_target_count);
-                return true;
-            case VID_AIExpectedTargetCount:
-                value = (FixPoint)(m_ai_expected_target_count);
-                return true;
-            case VID_Priority:
-                value = (FixPoint)(m_priority);
-                return true;
-            case VID_PsDelay:
-                value = m_ps_delay;
                 return true;
             default:
                 value = FixPoint.Zero;
@@ -564,18 +534,6 @@ namespace Combat
             case VID_CanActivateWhenDisabled:
                 m_can_activate_when_disabled = (bool)value;
                 return true;
-            case VID_ExpectedTargetCount:
-                m_expected_target_count = (int)value;
-                return true;
-            case VID_AIExpectedTargetCount:
-                m_ai_expected_target_count = (int)value;
-                return true;
-            case VID_Priority:
-                m_priority = (int)value;
-                return true;
-            case VID_PsDelay:
-                m_ps_delay = value;
-                return true;
             default:
                 return false;
             }
@@ -595,6 +553,11 @@ namespace Combat
         public FixPoint CastingTime
         {
             get { return m_casting_time_formula.Evaluate(this); }
+        }
+
+        public FixPoint InflictTime
+        {
+            get { return m_inflict_time_formula.Evaluate(this); }
         }
 
         public FixPoint ExpirationTime
@@ -632,16 +595,6 @@ namespace Combat
             get { return m_can_activate_when_disabled; }
         }
 
-        public int ExpectedTargetCount
-        {
-            get { return m_expected_target_count; }
-        }
-
-        public int AIExpectedTargetCount
-        {
-            get { return m_ai_expected_target_count; }
-        }
-
         public int TargetGatheringType
         {
             get { return m_target_gathering_type; }
@@ -657,31 +610,40 @@ namespace Combat
             get { return m_target_gathering_param2; }
         }
 
-        public int Priority
+        public int InflictType
         {
-            get { return m_priority; }
+            get { return m_inflict_type; }
         }
 
-        public FixPoint PsDelay
+        public FixPoint InflictMissileSpeed
         {
-            get { return m_ps_delay; }
+            get { return m_inflict_missile_speed; }
+        }
+
+        public FixPoint ImpactDelay
+        {
+            get { return m_impact_delay; }
         }
 #endregion
     }
 
-    public partial class WeaponSkillComponent
+    public partial class DirectDamageSkillComponent
     {
-        public const int ID = -1579537349;
+        public const int ID = 1225219141;
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
-            if (variables.TryGetValue("target_gathering_type", out value))
-                m_target_gathering_type = int.Parse(value);
-            if (variables.TryGetValue("target_gathering_param1", out value))
-                m_target_gathering_param1 = FixPoint.Parse(value);
-            if (variables.TryGetValue("target_gathering_param2", out value))
-                m_target_gathering_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("damage_type", out value))
+                m_damage_type_name = value;
+            if (variables.TryGetValue("damage_amount", out value))
+                m_damage_amount_formula.Compile(value);
+            if (variables.TryGetValue("can_critical", out value))
+                m_can_critical = bool.Parse(value);
+            if (variables.TryGetValue("combo_attack_cnt", out value))
+                m_combo_attack_cnt = int.Parse(value);
+            if (variables.TryGetValue("combo_interval", out value))
+                m_combo_interval = FixPoint.Parse(value);
         }
     }
 
@@ -725,7 +687,14 @@ namespace Combat
             string value;
             if (variables.TryGetValue("asset", out value))
                 m_asset_name = value;
+            if (variables.TryGetValue("bodyctrl_path", out value))
+                m_bodyctrl_path = value;
         }
+    }
+
+    public partial class PredictLogicComponent
+    {
+        public const int ID = -287824321;
     }
 #endif
 }

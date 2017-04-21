@@ -4,6 +4,11 @@ namespace Combat
 {
     public partial class LocomotorComponent : EntityComponent
     {
+        public const int StartMovingReason_Command = 1;
+        public const int StartMovingReason_Logic = 2;
+        public const int StopMovingReason_Command = 3;
+        public const int StopMovingReason_Logic = 4;
+
         enum MovingMode
         {
             Invalid = 0,
@@ -31,13 +36,17 @@ namespace Combat
         #region 初始化/销毁
         public override void OnDeletePending()
         {
-            StopMoving();
+            StopMoving(StopMovingReason_Logic);
         }
 
         protected override void OnDestruct()
         {
-            LogicTask.Recycle(m_task);
-            m_task = null;
+            if (m_task != null)
+            {
+                m_task.Cancel();
+                LogicTask.Recycle(m_task);
+                m_task = null;
+            }
         }
  
         protected override void PostInitializeComponent()
@@ -47,7 +56,7 @@ namespace Combat
         #endregion
 
         #region 接口操作
-        public void MoveByDirection(Vector3FP direction)
+        public void MoveByDirection(Vector3FP direction, int reason)
         {
             if (!IsEnable())
                 return;
@@ -55,10 +64,10 @@ namespace Combat
             m_direction = direction;
             m_direction.Normalize();
             m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
-            StartMoving();
+            StartMoving(reason);
         }
 
-        public void MoveByDestination(Vector3FP destination)
+        public void MoveByDestination(Vector3FP destination, int reason)
         {
             if (!IsEnable())
                 return;
@@ -68,21 +77,21 @@ namespace Combat
             m_destination = destination;
             m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
             m_remain_time = length / m_current_max_speed;
-            StartMoving();
+            StartMoving(reason);
         }
 
-        public void StopMoving()
+        public void StopMoving(int reason)
         {
             if (!m_is_moving)
                 return;
             m_task.Cancel();
             m_is_moving = false;
-            OnMovementStopped();
+            OnMovementStopped(reason);
         }
         #endregion
 
         #region 实现
-        void StartMoving()
+        void StartMoving(int reason)
         {
             if (m_task == null)
             {
@@ -95,20 +104,29 @@ namespace Combat
             if (!m_is_moving)
             {
                 m_is_moving = true;
-                OnMovementStarted();
+                OnMovementStarted(reason);
+            }
+            else
+            {
+                OnMovementChanged();
             }
         }
 
-        protected void OnMovementStarted()
+        protected void OnMovementStarted(int reason)
         {
             ParentObject.SendSignal(SignalType.StartMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID, reason);
         }
 
-        protected void OnMovementStopped()
+        protected void OnMovementStopped(int reason)
         {
             ParentObject.SendSignal(SignalType.StopMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID, reason);
+        }
+
+        protected void OnMovementChanged()
+        {
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.ChangeMoving, ParentObject.ID);
         }
 
         public void UpdatePosition(FixPoint delta_time)
@@ -118,13 +136,13 @@ namespace Combat
             {
                 m_remain_time -= delta_time;
                 if (m_remain_time <= FixPoint.Zero)
-                    StopMoving();
+                    StopMoving(StopMovingReason_Logic);
             }
         }
 
         protected override void OnDisable()
         {
-            StopMoving();
+            StopMoving(StopMovingReason_Logic);
         }
         #endregion
     }
@@ -136,6 +154,11 @@ namespace Combat
         public void Construct(LocomotorComponent locomotor_component)
         {
             m_locomotor_component = locomotor_component;
+        }
+
+        public override void OnReset()
+        {
+            m_locomotor_component = null;
         }
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)

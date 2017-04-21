@@ -58,11 +58,11 @@ namespace Combat
             m_render_messages.Add(render_message);
         }
 
-        public void AddSimpleRenderMessage(int type, int entity_id = -1)
+        public void AddSimpleRenderMessage(int type, int entity_id = -1, int simple_data = 0)
         {
             if (m_render_messages == null)
                 return;
-            SimpleRenderMessage render_message = SimpleRenderMessage.Create(type, entity_id);
+            SimpleRenderMessage render_message = SimpleRenderMessage.Create(type, entity_id, simple_data);
             m_render_messages.Add(render_message);
         }
 
@@ -78,7 +78,7 @@ namespace Combat
         }
 #endif
         #endregion
-        
+
         protected override void PreInitializeObject(ObjectCreationContext context)
         {
 #if ENTITY_RENDER_MESSAGE

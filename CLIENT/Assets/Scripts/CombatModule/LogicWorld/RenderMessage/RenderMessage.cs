@@ -10,9 +10,10 @@ namespace Combat
         public const int DestroyEntity = 2;             //SimpleRenderMessage
         public const int StartMoving = 3;               //SimpleRenderMessage
         public const int StopMoving = 4;                //SimpleRenderMessage
-        public const int ChangeHealth = 5;              //ChangeHealthRenderMessage
-        public const int Die = 6;                       //SimpleRenderMessage
-        public const int Hide = 7;                      //SimpleRenderMessage
+        public const int ChangeMoving = 5;              //SimpleRenderMessage
+        public const int ChangeHealth = 6;              //ChangeHealthRenderMessage
+        public const int Die = 7;                       //SimpleRenderMessage
+        public const int Hide = 8;                      //SimpleRenderMessage
     }
 
     public abstract class RenderMessage : IRecyclable, IDestruct
@@ -63,16 +64,20 @@ namespace Combat
 
     public class SimpleRenderMessage : RenderMessage
     {
-        public void Construct(int type, int entity_id)
+        public int m_simple_data = 0;
+
+        public void Construct(int type, int entity_id, int simple_data = 0)
         {
             m_type = type;
             m_entity_id = entity_id;
+            m_simple_data = simple_data;
         }
 
         public override void Reset()
         {
             m_entity_id = -1;
             m_type = RenderMessageType.Invalid;
+            m_simple_data = 0;
         }
     }
 }

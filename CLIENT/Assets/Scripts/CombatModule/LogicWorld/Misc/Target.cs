@@ -19,16 +19,16 @@ namespace Combat
             m_logic_world = logic_world;
         }
 
+        public void Destruct()
+        {
+            Reset();
+        }
+
         public void Reset()
         {
             m_logic_world = null;
             m_target_type = TargetType.InvalidType;
             m_object_id = -1;
-        }
-
-        public void Destruct()
-        {
-            Reset();
         }
 
         public bool IsPositionTarget()

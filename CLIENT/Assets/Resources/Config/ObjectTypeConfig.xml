@@ -17,7 +17,15 @@
 				<var key="max_health" value="1000"/>
 				<var key="current_health" value="900"/>
 			</Component>
+			<Component id="DeathComponent">
+				<var key="hide_delay" value="1"/>
+				<var key="delete_delay" value="2"/>
+			</Component>
 			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+			<Component id="LocomotorComponent">
+				<var key="max_speed" value="5.0"/>
 			</Component>
 		</ConfigItem>
 		<ConfigItem id="102" name="LegacyHero">
@@ -34,12 +42,17 @@
 			</Component>
 			<Component id="DamagableComponent">
 			</Component>
+			<Component id="DeathComponent">
+				<var key="hide_delay" value="1"/>
+				<var key="delete_delay" value="2"/>
+			</Component>
 			<Component id="SkillManagerComponent">
 			</Component>
 			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
 			<Component id="AnimationComponent">
-				<var key="animation_path" value="bodyctrl"/>
+				<var key="animation_path" value="bodyctrl/animationctrl"/>
 			</Component>
 		</ConfigItem>
 		<ConfigItem id="103" name="MecanimHero">
@@ -59,12 +72,17 @@
 			</Component>
 			<Component id="DamagableComponent">
 			</Component>
+			<Component id="DeathComponent">
+				<var key="hide_delay" value="1"/>
+				<var key="delete_delay" value="2"/>
+			</Component>
 			<Component id="SkillManagerComponent">
 			</Component>
 			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
 			<Component id="AnimatorComponent">
-				<var key="animator_path" value="bodyctrl"/>
+				<var key="animator_path" value="bodyctrl/animationctrl"/>
 			</Component>
 		</ConfigItem>
 	</ObjectTypeConfig>

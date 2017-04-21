@@ -9,6 +9,11 @@ namespace Combat
         FixPoint m_current_turn_time = FixPoint.Zero;
         TaskScheduler<LogicWorld> m_turn_scheduler;
 
+        public override void InitializeComponent()
+        {
+            m_turn_scheduler = new TaskScheduler<LogicWorld>(GetLogicWorld());
+        }
+
         public FixPoint CurrentTurnIndex
         {
             get { return m_current_turn_index; }            

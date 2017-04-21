@@ -12,5 +12,7 @@ namespace Combat
         void OnGameStart();
         //这个其实是逻辑世界往外通知的，不同的游戏可能会不一样吧
         void OnGameOver(GameResult game_result);
+        // 获取本地玩家
+        long GetLocalPlayerPstid();
     }
 }
