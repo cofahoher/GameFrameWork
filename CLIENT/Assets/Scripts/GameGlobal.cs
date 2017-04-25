@@ -38,6 +38,16 @@ public class GameGlobal : MonoBehaviour
             m_loadscene_callback(scene_build_index);
     }
 
+    public delegate void DrawGizmosCallback();
+    public DrawGizmosCallback m_draw_gizmos_callback = null;
+#if UNITY_EDITOR
+    void OnDrawGizmos()
+    {
+        if (m_draw_gizmos_callback != null)
+            m_draw_gizmos_callback();
+    }
+#endif
+
     #region 测试同步模型
     Combat.SyncTester m_sync_tester = null;
     Combat.CombatTester m_combat_tester = null;

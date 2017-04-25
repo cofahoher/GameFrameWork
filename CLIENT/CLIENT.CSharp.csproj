@@ -311,6 +311,8 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\ObjectCreationContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\ObjectManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Object\ObjectUtil.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\PathFinding\GridGraph.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\PathFinding\GridNode.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\FactionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerAIComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerTargetingComponent.cs" />

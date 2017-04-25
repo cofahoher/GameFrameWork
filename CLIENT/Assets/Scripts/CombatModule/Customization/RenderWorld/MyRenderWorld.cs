@@ -7,6 +7,9 @@ namespace Combat
     public class MyRenderWorld : RenderWorld
     {
         CameraController m_camera_controller;
+        bool m_draw_grid = true;
+        GridGraph m_grid_graph = null;
+        List<Vector3> m_current_path = new List<Vector3>();
 
         public MyRenderWorld()
         {
@@ -16,6 +19,15 @@ namespace Combat
         {
             base.Initialize(combat_client, logic_world);
             m_camera_controller = new CameraController(this);
+#if UNITY_EDITOR
+            MyLogicWorld my_logic_world = logic_world as MyLogicWorld;
+            if (m_draw_grid && my_logic_world != null)
+            {
+                m_grid_graph = my_logic_world.GetGridGraph();
+                InitializeDrawGrid();
+                GameGlobal.Instance.m_draw_gizmos_callback += DrawGridAndPath;
+            }
+#endif
         }
 
         public override void Destruct()
@@ -106,6 +118,21 @@ namespace Combat
                 //cmd.m_move_type = EntityMoveCommand.DestinationType;
                 //cmd.m_vector = Vector3_To_Vector3FP(hit.point);
                 //PushLocalCommand(cmd);
+                if (m_draw_grid && m_grid_graph != null)
+                {
+                    PositionComponent position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
+                    if (!m_grid_graph.FindPath(position_component.CurrentPosition, Vector3_To_Vector3FP(hit.point)))
+                        Debug.LogError("FindPath Failed!");
+                    else
+                    {
+                        List<Vector3FP> path = m_grid_graph.GetPath();
+                        m_current_path.Clear();
+                        for (int i = 0; i < path.Count; ++i)
+                        {
+                            m_current_path.Add(Vector3FP_To_Vector3(path[i]));
+                        }
+                    }
+                }
             }
             else
             {
@@ -115,12 +142,12 @@ namespace Combat
                 if (m_combat_client.LocalPlayerPstid == m_logic_world.GetPlayerManager().Objectid2Pstid(render_entity.GetOwnerPlayerID()))
                 {
                     m_current_operate_entityi_id = binding.EntityID;
-                    Debug.Log("RenderWorld.OnPick(), YOU CHOOSE YOUR ENTITY " + hit.transform.name);
+                    Debug.Log("RenderWorld.OnPick(), YOU CHOOSE YOUR ENTITY " + hit.transform.parent.name);
                 }
                 else
                 {
                     m_current_operate_entityi_id = -1;
-                    Debug.Log("RenderWorld.OnPick(), " + hit.transform.name + " IS NOT YOUR Entity");
+                    Debug.Log("RenderWorld.OnPick(), " + hit.transform.parent.name + " IS NOT YOUR Entity");
                 }
             }
         }
@@ -185,5 +212,55 @@ namespace Combat
             }
         }
         #endregion
+
+#if UNITY_EDITOR
+        List<Vector3> m_draw_nodes = new List<Vector3>();
+        Vector3 m_draw_size = new Vector3(0.3f, 0.1f, 0.3f);
+        readonly Color UNWALKABLE_COLOR = new Color(1f, 0, 0, 0.5f);
+        readonly Color WALKABLE_COLOR = new Color(0, 1f, 0, 0.5f);
+        readonly Color PATH_COLOR = new Color(0, 0, 1f, 1f);
+
+        void InitializeDrawGrid()
+        {
+            if (m_grid_graph == null)
+                return;
+            List<GridNode> logic_nodes = m_grid_graph.GetAllNodes();
+            GridNode node;
+            for (int i = 0; i < logic_nodes.Count; ++i)
+            {
+                node = logic_nodes[i];
+                Vector3 pos = Vector3FP_To_Vector3(m_grid_graph.Node2Position(node));
+                pos.y = 0.1f;
+                m_draw_nodes.Add(pos);
+            }
+            float grid_size = (float)m_grid_graph.GetGridSize() * 0.75f;
+            m_draw_size = new Vector3(grid_size, 0.1f, grid_size);
+        }
+
+        public void DrawGridAndPath()
+        {
+            if (m_grid_graph == null)
+                return;
+            List<GridNode> logic_nodes = m_grid_graph.GetAllNodes();
+            for (int i = 0; i < m_draw_nodes.Count; ++i)
+            {
+                if (logic_nodes[i].Walkable)
+                {
+                    Gizmos.color = WALKABLE_COLOR;
+                    Gizmos.DrawWireCube(m_draw_nodes[i], m_draw_size);
+                }
+                else
+                {
+                    Gizmos.color = UNWALKABLE_COLOR;
+                    Gizmos.DrawWireCube(m_draw_nodes[i], m_draw_size);
+                }
+            }
+            Gizmos.color = PATH_COLOR;
+            for (int i = 1; i < m_current_path.Count; ++i)
+            {
+                Gizmos.DrawLine(m_current_path[i], m_current_path[i-1]);
+            }
+        }
+#endif
     }
 }

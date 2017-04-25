@@ -19,6 +19,7 @@ namespace Combat
         FixPoint m_current_turn_index = FixPoint.Zero;
         FixPoint m_current_turn_time = FixPoint.Zero;
         TaskScheduler<LogicWorld> m_turn_scheduler;
+        GridGraph m_grid_graph = new GridGraph();
 
         public MyLogicWorld()
         {
@@ -28,6 +29,12 @@ namespace Combat
         {
             base.Initialize(outside_world, need_render_message);
             m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
+
+            FixPoint seeker_radius = FixPoint.One / FixPoint.FixPointDigit[4];
+            m_grid_graph.GenerateAsPlaneMap(new FixPoint(40), new FixPoint(30), FixPoint.One, seeker_radius, new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15)));
+            m_grid_graph.CoverArea(new Vector3FP(FixPoint.Zero, FixPoint.Half, FixPoint.FixPointDigit[5]), new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Half, FixPoint.Half));
+            m_grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Half, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Half, FixPoint.FixPointDigit[5]));
+            m_grid_graph.CoverArea(new Vector3FP(-FixPoint.FixPointDigit[7] - FixPoint.Half, FixPoint.Half, FixPoint.Two), new Vector3FP(FixPoint.Half, FixPoint.Half, FixPoint.FixPointDigit[7] + FixPoint.Half));
         }
 
         public override void Destruct()
@@ -54,6 +61,10 @@ namespace Combat
         public TaskScheduler<LogicWorld> GetTurnTaskScheduler()
         {
             return m_turn_scheduler;
+        }
+        public GridGraph GetGridGraph()
+        {
+            return m_grid_graph;
         }
         #endregion
 
