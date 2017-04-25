@@ -4,12 +4,38 @@ namespace Combat
 {
     public interface IGridGraph
     {
-        //纯粹为了标下哪些函数是public的
-        void GenerateAsPlaneMap(FixPoint max_size_x, FixPoint max_size_z, FixPoint grid_size, FixPoint seeker_radius, Vector3FP left_bottom_position);
+        /*
+         * 生成一张平面图：
+         * grid_size：格子边长
+         * max_size_x：平面地图X轴方向的总长度
+         * max_size_z：平面地图Z轴方向的总长度
+         * height：平面地图在Y方向的高度
+         * left_bottom_position：地图XZ坐标最小的点的位置
+         * seeker_radius：如果不想看到角色一部分钻进不可入的地方，设置为角色的边长
+         */
+        void GenerateAsPlaneMap(FixPoint grid_size, FixPoint max_size_x, FixPoint max_size_z, FixPoint height = default(FixPoint), Vector3FP left_bottom_position = new Vector3FP(), FixPoint seeker_radius = default(FixPoint));
+        /*
+         * 加入一块不可靠近的阻挡：
+         * center：中心
+         * extent：不可以范围的半边长
+         */
         void CoverArea(Vector3FP center, Vector3FP extent);
+        /*
+         * 取消一块不可靠近的阻挡：
+         * center：中心
+         * extent：不可以范围的半边长
+         */
         void UncoverArea(Vector3FP center, Vector3FP extent);
+        /*
+         * 寻路：
+         * start_pos：起点
+         * end_pos：终点
+         */
         bool FindPath(Vector3FP start_pos, Vector3FP end_pos);
-        //注意，不要直接保存这个List的引用，拷贝给自己的数据
+        /*
+         * 获得寻路结果：
+         * 注意，不要直接保存这个List的引用，拷贝给自己的数据
+         */
         List<Vector3FP> GetPath();
     }
 
@@ -448,7 +474,7 @@ namespace Combat
             }
         }
 
-        public void GenerateAsPlaneMap(FixPoint max_size_x, FixPoint max_size_z, FixPoint grid_size, FixPoint seeker_radius, Vector3FP left_bottom_position)
+        public void GenerateAsPlaneMap(FixPoint grid_size, FixPoint max_size_x, FixPoint max_size_z, FixPoint height, Vector3FP left_bottom_position, FixPoint seeker_radius)
         {
             m_seeker_radius = seeker_radius;
             m_left_bottom_position = left_bottom_position;
@@ -466,7 +492,7 @@ namespace Combat
             GridNode node = null;
             byte connection = 0xFF;
             for (index = 0; index < m_grid_x_count * m_grid_z_count; ++index)
-                m_nodes.Add(new GridNode(index % m_grid_x_count, index / m_grid_x_count, FixPoint.Zero, connection, 0, 0));
+                m_nodes.Add(new GridNode(index % m_grid_x_count, index / m_grid_x_count, height, connection, 0, 0));
             for (int x = 0; x < m_grid_x_count; ++x)
             {
                 //down

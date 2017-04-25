@@ -31,7 +31,7 @@ namespace Combat
             m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
 
             FixPoint seeker_radius = FixPoint.One / FixPoint.FixPointDigit[4];
-            m_grid_graph.GenerateAsPlaneMap(new FixPoint(40), new FixPoint(30), FixPoint.One, seeker_radius, new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15)));
+            m_grid_graph.GenerateAsPlaneMap(FixPoint.One, new FixPoint(40), new FixPoint(30), FixPoint.Zero, new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15)), seeker_radius);
             m_grid_graph.CoverArea(new Vector3FP(FixPoint.Zero, FixPoint.Half, FixPoint.FixPointDigit[5]), new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Half, FixPoint.Half));
             m_grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Half, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Half, FixPoint.FixPointDigit[5]));
             m_grid_graph.CoverArea(new Vector3FP(-FixPoint.FixPointDigit[7] - FixPoint.Half, FixPoint.Half, FixPoint.Two), new Vector3FP(FixPoint.Half, FixPoint.Half, FixPoint.FixPointDigit[7] + FixPoint.Half));
