@@ -106,7 +106,7 @@ namespace Combat
         public override void PushLocalCommand(Command command)
         {
             command.PlayerPstid = m_local_player_pstid;
-            command.SyncTurn = m_current_turn + 2;
+            command.SyncTurn = m_current_turn;
             if (m_command_synchronizer.AddCommand(command))
                 AddOutputCommand(command);
         }

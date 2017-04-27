@@ -7,7 +7,6 @@ namespace Combat
     public class MyRenderWorld : RenderWorld
     {
         CameraController m_camera_controller;
-        bool m_draw_grid = true;
         GridGraph m_grid_graph = null;
         List<Vector3> m_current_path = new List<Vector3>();
 
@@ -21,11 +20,14 @@ namespace Combat
             m_camera_controller = new CameraController(this);
 #if UNITY_EDITOR
             MyLogicWorld my_logic_world = logic_world as MyLogicWorld;
-            if (m_draw_grid && my_logic_world != null)
+            if (my_logic_world != null)
             {
                 m_grid_graph = my_logic_world.GetGridGraph();
-                InitializeDrawGrid();
-                GameGlobal.Instance.m_draw_gizmos_callback += DrawGridAndPath;
+                if (m_grid_graph != null)
+                {
+                    InitializeDrawGrid();
+                    GameGlobal.Instance.m_draw_gizmos_callback += DrawGridAndPath;
+                }
             }
 #endif
         }
@@ -118,11 +120,13 @@ namespace Combat
                 //cmd.m_move_type = EntityMoveCommand.DestinationType;
                 //cmd.m_vector = Vector3_To_Vector3FP(hit.point);
                 //PushLocalCommand(cmd);
-                if (m_draw_grid && m_grid_graph != null)
+                if (m_grid_graph != null)
                 {
                     PositionComponent position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
                     if (!m_grid_graph.FindPath(position_component.CurrentPosition, Vector3_To_Vector3FP(hit.point)))
+                    {
                         Debug.LogError("FindPath Failed!");
+                    }
                     else
                     {
                         List<Vector3FP> path = m_grid_graph.GetPath();
@@ -214,45 +218,102 @@ namespace Combat
         #endregion
 
 #if UNITY_EDITOR
-        List<Vector3> m_draw_nodes = new List<Vector3>();
-        Vector3 m_draw_size = new Vector3(0.3f, 0.1f, 0.3f);
+        Vector3[,] m_draw_nodes;
+        Vector3 m_draw_cube_size;
+        Vector3[] m_hexagon_vertex;
         readonly Color UNWALKABLE_COLOR = new Color(1f, 0, 0, 0.5f);
         readonly Color WALKABLE_COLOR = new Color(0, 1f, 0, 0.5f);
         readonly Color PATH_COLOR = new Color(0, 0, 1f, 1f);
 
         void InitializeDrawGrid()
         {
-            if (m_grid_graph == null)
-                return;
-            List<GridNode> logic_nodes = m_grid_graph.GetAllNodes();
+            int x_count = m_grid_graph.GetGridXCount();
+            int z_count = m_grid_graph.GetGridZCount();
+            m_draw_nodes = new Vector3[x_count, z_count];
+            GridNode[,] logic_nodes = m_grid_graph.GetAllNodes();
             GridNode node;
-            for (int i = 0; i < logic_nodes.Count; ++i)
+            for (int x = 0; x < x_count; ++x)
             {
-                node = logic_nodes[i];
-                Vector3 pos = Vector3FP_To_Vector3(m_grid_graph.Node2Position(node));
-                pos.y = 0.1f;
-                m_draw_nodes.Add(pos);
+                for (int z = 0; z < z_count; ++z)
+                {
+                    node = logic_nodes[x, z];
+                    if (node != null)
+                    {
+                        Vector3 pos = Vector3FP_To_Vector3(m_grid_graph.Node2Position(node));
+                        pos.y = 0.01f;
+                        m_draw_nodes[x, z] = pos;
+                    }
+                }
             }
-            float grid_size = (float)m_grid_graph.GetGridSize() * 0.75f;
-            m_draw_size = new Vector3(grid_size, 0.1f, grid_size);
+            if (m_grid_graph.GetGraphType() == GridGraph.HexagonNodeType)
+            {
+                float grid_draw_size = (float)m_grid_graph.GetGridSize() * 0.9f;
+                float half_sqrt_3 = Mathf.Sqrt(3.0f) / 2 * grid_draw_size;
+                m_hexagon_vertex = new Vector3[6];
+                m_hexagon_vertex[0].z = -grid_draw_size;
+                m_hexagon_vertex[1].x = half_sqrt_3;
+                m_hexagon_vertex[1].z = -grid_draw_size / 2;
+                m_hexagon_vertex[2].x = half_sqrt_3;
+                m_hexagon_vertex[2].z = grid_draw_size / 2;
+                m_hexagon_vertex[3].z = grid_draw_size;
+                m_hexagon_vertex[4].x = -half_sqrt_3;
+                m_hexagon_vertex[4].z = grid_draw_size / 2;
+                m_hexagon_vertex[5].x = -half_sqrt_3;
+                m_hexagon_vertex[5].z = -grid_draw_size / 2;
+                for (int i = 0; i < 6; ++i)
+                    m_hexagon_vertex[i].y = 0.01f;
+            }
+            else
+            {
+                float grid_draw_size = (float)m_grid_graph.GetGridSize() * 0.75f;
+                m_draw_cube_size = new Vector3(grid_draw_size, 0.01f, grid_draw_size);
+            }
         }
 
+        bool m_draw_grid = true;
         public void DrawGridAndPath()
         {
-            if (m_grid_graph == null)
+            if (!m_draw_grid)
                 return;
-            List<GridNode> logic_nodes = m_grid_graph.GetAllNodes();
-            for (int i = 0; i < m_draw_nodes.Count; ++i)
+            int x_count = m_grid_graph.GetGridXCount();
+            int z_count = m_grid_graph.GetGridZCount();
+            int pathid = m_grid_graph.GetPathID();
+            GridNode[,] logic_nodes = m_grid_graph.GetAllNodes();
+            GridNode node;
+            for (int x = 0; x < x_count; ++x)
             {
-                if (logic_nodes[i].Walkable)
+                for (int z = 0; z < z_count; ++z)
                 {
-                    Gizmos.color = WALKABLE_COLOR;
-                    Gizmos.DrawWireCube(m_draw_nodes[i], m_draw_size);
-                }
-                else
-                {
-                    Gizmos.color = UNWALKABLE_COLOR;
-                    Gizmos.DrawWireCube(m_draw_nodes[i], m_draw_size);
+                    node = logic_nodes[x, z];
+                    if (node == null)
+                        continue;
+                    if (node.Walkable)
+                    {
+                        if (node.m_path_id == pathid)
+                        {
+                            if (node.Closed)
+                                Gizmos.color = Color.grey;
+                            else
+                                Gizmos.color = Color.yellow;
+                        }
+                        else
+                        {
+                            Gizmos.color = Color.green;
+                        }
+                    }
+                    else
+                    {
+                        Gizmos.color = Color.red;
+                    }
+                    if (m_grid_graph.GetGraphType() == GridGraph.HexagonNodeType)
+                    {
+                        for (int i = 0; i < 6; ++i)
+                            Gizmos.DrawLine(m_draw_nodes[x, z] + m_hexagon_vertex[i], m_draw_nodes[x, z] + m_hexagon_vertex[(i + 1) % 6]);
+                    }
+                    else
+                    {
+                        Gizmos.DrawWireCube(m_draw_nodes[x, z], m_draw_cube_size);
+                    }
                 }
             }
             Gizmos.color = PATH_COLOR;

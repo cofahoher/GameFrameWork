@@ -98,6 +98,7 @@ namespace Combat
             obj_context.m_object_proto_id = 101002;
             obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-5), new FixPoint(0), new FixPoint(0), new FixPoint(90));
             obj_context.m_is_local = true;
+            obj_context.m_is_ai = true;
             world_context.m_entities.Add(obj_context);
 
             obj_context = new ObjectCreationContext();
