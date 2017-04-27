@@ -2,14 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public interface ISkillComponent
-    {
-        void Activate(FixPoint start_time);
-        void PostActivate(FixPoint start_time);
-        void Deactivate();
-    }
-
-    public abstract class SkillComponent : Component, ISkillComponent
+    public abstract class SkillComponent : Component
     {
         public Skill GetOwnerSkill()
         {
@@ -21,7 +14,6 @@ namespace Combat
             return ParentObject.ID;
         }
 
-        #region ISkillComponent
         public virtual void Activate(FixPoint start_time)
         {
         }
@@ -37,6 +29,5 @@ namespace Combat
         public virtual void Deactivate()
         {
         }
-        #endregion
     }
 }

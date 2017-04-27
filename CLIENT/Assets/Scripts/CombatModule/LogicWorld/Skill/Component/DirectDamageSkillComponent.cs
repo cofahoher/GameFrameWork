@@ -40,7 +40,7 @@ namespace Combat
         public override void PostActivate(FixPoint start_time)
         {
             SaveDefenderIDs(GetOwnerSkill().GetTargets());
-            Target skill_target = GetOwnerSkill().GetTarget();
+            Target skill_target = GetOwnerSkill().GetMajorTarget();
             FireWeapon(skill_target);
         }
 

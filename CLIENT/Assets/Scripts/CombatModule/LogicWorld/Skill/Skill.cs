@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public enum CheckSkillResult
+    public enum CastSkillResult
     {
         Success = 0,
-        CoolDown,
-        ManaNotEnough,
+        InCooldown,
+        NotEnoughMana,
         ObjectIsMoving,
         SkillDisabled,
     }
@@ -20,7 +20,7 @@ namespace Combat
         SkillCountdownTask m_task;
         List<Target> m_skill_targets = new List<Target>();
 
-        #region Getter
+        #region GETTER
         public SkillDefinitionComponent GetSkillDefinitionComponent()
         {
             return m_definition_component;
@@ -30,7 +30,7 @@ namespace Combat
         #region 初始化/销毁
         protected override void PreInitializeObject(ObjectCreationContext context)
         {
-            Entity ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_object_id);
+            Entity ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_owner_id);
             if(ownerEntity != null)
             {
                 m_owner_component = ownerEntity.GetComponent<SkillManagerComponent>();
@@ -45,7 +45,6 @@ namespace Combat
 
         protected override void OnDestruct()
         {
-            m_is_active = false;
             m_owner_component = null;
             m_definition_component = null;
             m_mana_component = null;
@@ -98,7 +97,7 @@ namespace Combat
             }
         }
 
-        public Target GetTarget()
+        public Target GetMajorTarget()
         {
             if (m_skill_targets.Count > 0)
                 return m_skill_targets[0];
@@ -121,39 +120,40 @@ namespace Combat
         #region 技能流程
         public bool CanActivate()
         {
-            return CheckActivate() == CheckSkillResult.Success;
+            return CheckActivate() == CastSkillResult.Success;
         }
 
-        public CheckSkillResult CheckActivate()
+        public CastSkillResult CheckActivate()
         {
             if (!IsReady())
-                return CheckSkillResult.CoolDown;
+                return CastSkillResult.InCooldown;
 
             if (!m_owner_component.CanActivateSkill())
             {
                 if (!m_definition_component.CanActivateWhenDisabled)
-                    return CheckSkillResult.SkillDisabled;
+                    return CastSkillResult.SkillDisabled;
             }
 
             FixPoint mana_cost = m_definition_component.ManaCost;
             if (mana_cost > FixPoint.Zero)
             {
                 if (m_mana_component.GetCurrentManaPoint(m_definition_component.ManaType) < mana_cost)
-                    return CheckSkillResult.ManaNotEnough;
+                    return CastSkillResult.NotEnoughMana;
             }
 
             if (!m_definition_component.CanActivateWhileMoving)
             {
-                LocomotorComponent locomotor_cmp = GetOwnerEntity().GetComponent<LocomotorComponent>(LocomotorComponent.ID);
+                LocomotorComponent locomotor_cmp = GetOwnerEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
                 if (locomotor_cmp != null && locomotor_cmp.IsMoving)
-                    return CheckSkillResult.ObjectIsMoving;
+                    return CastSkillResult.ObjectIsMoving;
             }
 
-            return CheckSkillResult.Success;
+            return CastSkillResult.Success;
         }
 
         public bool Activate(FixPoint start_time)
         {
+            Deactivate();
             SetSkillActive(true);
 
             var enumerator = m_components.GetEnumerator();
@@ -209,7 +209,6 @@ namespace Combat
                     cmp.Inflict(start_time);
             }
 
-
             if (m_definition_component.ExpirationTime > FixPoint.Zero)
                 m_definition_component.StartExpirationTimer(start_time);
             else
@@ -241,7 +240,7 @@ namespace Combat
 
         public void Interrupt()
         {
-            if(Deactivate())
+            if (Deactivate())
                 ScheduleTimers();
         }
 
@@ -285,7 +284,6 @@ namespace Combat
                 m_task.Construct(this);
             }
             task_scheduler.Schedule(m_task, GetCurrentTime(), time_remaining);
-
         }
 
         public void ServiceCountdownTimers(FixPoint current_time, FixPoint delta_time)

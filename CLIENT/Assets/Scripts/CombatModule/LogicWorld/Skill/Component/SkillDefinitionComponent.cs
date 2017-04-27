@@ -8,9 +8,9 @@ namespace Combat
         public const int InflictType_Immediately = 1;
         //播放朝向目标的特效，一定延迟后，对目标生效
         public const int InflictType_TargetOrientedFx = 2;
-        //发射朝向目标的必中飞行物，根据速度，一定延迟后，对目标生效
-        public const int InflictType_TargetTrackingMissile = 3;
-        //发射朝向指定位置的飞行物，根据速度，一定延迟后，对周围目标生效
+        //发射朝向目标的必中飞行物，根据速度，一定延迟后，对目标生效（可以实现为CreateObjectSkillComponent）
+        public const int InflictType_ObjectTrackingMissile = 3;
+        //发射朝向指定位置的飞行物，根据速度，一定延迟后，对周围目标生效（可以实现为CreateObjectSkillComponent）
         public const int InflictType_PositionTrackingMissile = 4;
         ////发射独立运行的Object，这种情况变成了CreateObjectSkillComponent，并且其配置是InflictType_Immediately，表示立即发射物体
         //public const int InflictType_CreateObject = -1;
@@ -25,7 +25,6 @@ namespace Combat
         Formula m_expiration_time_formula = RecyclableObject.Create<Formula>();
 
         bool m_starts_active = false;
-
         bool m_blocks_other_skills_when_active = false;
         bool m_blocks_movement_when_active = true;
         bool m_deactivate_when_moving = true;
@@ -80,6 +79,8 @@ namespace Combat
             m_cooldown_time_formula = null;
             RecyclableObject.Recycle(m_casting_time_formula);
             m_casting_time_formula = null;
+            RecyclableObject.Recycle(m_inflict_time_formula);
+            m_inflict_time_formula = null;
             RecyclableObject.Recycle(m_expiration_time_formula);
             m_expiration_time_formula = null;
         }
@@ -101,6 +102,11 @@ namespace Combat
         public bool IsTimerActive(int skill_timer_type)
         {
             return m_timers[skill_timer_type].Active;
+        }
+
+        public void StartTimer(int timer_type, FixPoint start_time)
+        {
+            m_timers[timer_type].Start(start_time, CooldownTime);
         }
 
         public void StartCooldownTimer(FixPoint start_time)
@@ -156,9 +162,6 @@ namespace Combat
         {
             return IsTimerActive(SkillTimer.ExpirationTimer);
         }
-        #endregion
-
-        #region ISkillComponent
         #endregion
     }
 }
