@@ -10,6 +10,7 @@ namespace Combat
         public const int StopMoving = 2;
         public const int TakeDamage = 3;
         public const int Die = 4;
+        public const int ChangeLevel = 5;
     }
 
     //public abstract class Signal

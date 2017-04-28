@@ -6,6 +6,7 @@ namespace Combat
     {
         AttributeData m_config;
         Formula m_formula;
+        bool m_is_level_based = false;
         List<int> m_static_dependent_attributes = new List<int>();
         List<int> m_referenced_attributes = new List<int>();
 
@@ -34,6 +35,11 @@ namespace Combat
             get { return m_config.m_attribute_name; }
         }
 
+        public bool LevelBased
+        {
+            get { return m_is_level_based; }
+        }
+
         public List<int> GetStaticDependentAttributes()
         {
             return m_static_dependent_attributes;
@@ -59,7 +65,11 @@ namespace Combat
             for (int i = 0; i < count; ++i)
             {
                 ExpressionVariable variable = variables[i];
-                if (variable.MaxIndex >= 2 && variable[variable.MaxIndex - 2] == ExpressionVariable.VID_Attribute || variable.MaxIndex == 1)
+                if (variable.MaxIndex == 1 && variable[0] == ExpressionVariable.VID_LevelTable)
+                {
+                    m_is_level_based = true;
+                }
+                else if (variable.MaxIndex >= 2 && variable[variable.MaxIndex - 2] == ExpressionVariable.VID_Attribute || variable.MaxIndex == 1)
                 {
                     int attribute_id = variable[variable.MaxIndex - 1];
                     if (AttributeSystem.IsAttributeID(attribute_id))

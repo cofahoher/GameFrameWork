@@ -27,6 +27,7 @@ namespace Combat
             Register<PositionComponent>(false);
             Register<SkillManagerComponent>(false);
             Register<StateComponent>(false);
+            Register<TargetingComponent>(false);
             Register<CreateObjectSkillComponent>(false);
             Register<EffectGeneratorSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
@@ -47,8 +48,8 @@ namespace Combat
 
     public partial class LevelComponent
     {
-        public const int ID = -1526547556;
-        public const int VID_CurrentLevel = -1695888365;
+        public const int ID = 1460936472;
+        public const int VID_CurrentLevel = -1466831087;
 
         static LevelComponent()
         {
@@ -59,7 +60,7 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("level", out value))
-                m_current_level = int.Parse(value);
+                CurrentLevel = int.Parse(value);
         }
 
         public override bool GetVariable(int id, out FixPoint value)
@@ -67,7 +68,7 @@ namespace Combat
             switch (id)
             {
             case VID_CurrentLevel:
-                value = (FixPoint)(m_current_level);
+                value = (FixPoint)(CurrentLevel);
                 return true;
             default:
                 value = FixPoint.Zero;
@@ -75,49 +76,57 @@ namespace Combat
             }
         }
 
-#region GETTER/SETTER
-        public int CurrentLevel
+        public override bool SetVariable(int id, FixPoint value)
         {
-            get { return m_current_level; }
+            switch (id)
+            {
+            case VID_CurrentLevel:
+                CurrentLevel = (int)value;
+                return true;
+            default:
+                return false;
+            }
         }
+
+#region GETTER/SETTER
 #endregion
     }
 
     public partial class TurnManagerComponent
     {
-        public const int ID = -971101728;
+        public const int ID = 522304681;
     }
 
     public partial class FactionComponent
     {
-        public const int ID = 1956626782;
+        public const int ID = -2067245938;
     }
 
     public partial class PlayerAIComponent
     {
-        public const int ID = 564472396;
+        public const int ID = -1685636568;
     }
 
     public partial class PlayerTargetingComponent
     {
-        public const int ID = 54498699;
+        public const int ID = -1756719123;
     }
 
     public partial class AIComponent
     {
-        public const int ID = 870870259;
+        public const int ID = 1842924899;
     }
 
     public partial class AttributeManagerComponent
     {
-        public const int ID = 794590895;
+        public const int ID = -1022416408;
     }
 
     public partial class DamagableComponent
     {
-        public const int ID = 1470729607;
-        public const int VID_MaxHealth = 1505485722;
-        public const int VID_CurrentHealth = -921437827;
+        public const int ID = -178669635;
+        public const int VID_MaxHealth = 1886202899;
+        public const int VID_CurrentHealth = -39273671;
 
         static DamagableComponent()
         {
@@ -175,12 +184,12 @@ namespace Combat
 
     public partial class DamageModificationComponent
     {
-        public const int ID = 588960288;
+        public const int ID = 1600517526;
     }
 
     public partial class DeathComponent
     {
-        public const int ID = -2008540504;
+        public const int ID = -453346718;
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
@@ -194,13 +203,13 @@ namespace Combat
 
     public partial class EffectManagerComponent
     {
-        public const int ID = -1307860976;
+        public const int ID = 1995518324;
     }
 
     public partial class LocomotorComponent
     {
-        public const int ID = 1531533156;
-        public const int VID_MaxSpeed = -1136656387;
+        public const int ID = 694646728;
+        public const int VID_MaxSpeed = -1745541986;
 
         static LocomotorComponent()
         {
@@ -249,19 +258,19 @@ namespace Combat
 
     public partial class ManaComponent
     {
-        public const int ID = 1470329370;
+        public const int ID = -1133849163;
     }
 
     public partial class PositionComponent
     {
-        public const int ID = -280295719;
-        public const int VID_X = -1931733373;
-        public const int VID_Y = -69523947;
-        public const int VID_Z = 1657960367;
-        public const int VID_CurrentAngle = 8471817;
-        public const int VID_ExtX = 159317834;
-        public const int VID_ExtY = 2121912284;
-        public const int VID_ExtZ = -412049818;
+        public const int ID = 1095243466;
+        public const int VID_X = -1505763071;
+        public const int VID_Y = -1088106432;
+        public const int VID_Z = -1811315837;
+        public const int VID_CurrentAngle = 1682267402;
+        public const int VID_ExtX = 1338674874;
+        public const int VID_ExtY = 1456586747;
+        public const int VID_ExtZ = 2113727544;
 
         static PositionComponent()
         {
@@ -392,38 +401,47 @@ namespace Combat
 
     public partial class SkillManagerComponent
     {
-        public const int ID = -632761300;
+        public const int ID = 2066148607;
     }
 
     public partial class StateComponent
     {
-        public const int ID = 391674091;
+        public const int ID = 11707299;
+    }
+
+    public partial class TargetingComponent
+    {
+        public const int ID = -775984024;
     }
 
     public partial class CreateObjectSkillComponent
     {
-        public const int ID = -1398796007;
+        public const int ID = 332789708;
     }
 
     public partial class EffectGeneratorSkillComponent
     {
-        public const int ID = -1137093856;
+        public const int ID = 1037752092;
     }
 
     public partial class SkillDefinitionComponent
     {
-        public const int ID = 1669330388;
-        public const int VID_ManaCost = -865850683;
-        public const int VID_StartsActive = -332320693;
-        public const int VID_BlocksOtherSkillsWhenActive = -1537750290;
-        public const int VID_BlocksMovementWhenActive = -27660750;
-        public const int VID_DeactivateWhenMoving = 1315455694;
-        public const int VID_CanActivateWhileMoving = 961060384;
-        public const int VID_CanActivateWhenDisabled = 2062940555;
+        public const int ID = -1434735094;
+        public const int VID_ManaCost = -840738116;
+        public const int VID_MinRange = -57630839;
+        public const int VID_MaxRange = 301168412;
+        public const int VID_StartsActive = -1080178819;
+        public const int VID_BlocksOtherSkillsWhenActive = 1224845959;
+        public const int VID_BlocksMovementWhenActive = 321038501;
+        public const int VID_DeactivateWhenMoving = 1559564677;
+        public const int VID_CanActivateWhileMoving = -366942315;
+        public const int VID_CanActivateWhenDisabled = -117959764;
 
         static SkillDefinitionComponent()
         {
             ComponentTypeRegistry.RegisterVariable(VID_ManaCost, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_MinRange, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_MaxRange, ID);
             ComponentTypeRegistry.RegisterVariable(VID_StartsActive, ID);
             ComponentTypeRegistry.RegisterVariable(VID_BlocksOtherSkillsWhenActive, ID);
             ComponentTypeRegistry.RegisterVariable(VID_BlocksMovementWhenActive, ID);
@@ -436,17 +454,21 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("mana_type", out value))
-                m_mana_type_name = value;
+                m_mana_type = value;
             if (variables.TryGetValue("mana_cost", out value))
-                m_mana_cost_formula.Compile(value);
+                m_mana_cost.Compile(value);
+            if (variables.TryGetValue("min_range", out value))
+                m_min_range.Compile(value);
+            if (variables.TryGetValue("max_range", out value))
+                m_max_range.Compile(value);
             if (variables.TryGetValue("cooldown_time", out value))
-                m_cooldown_time_formula.Compile(value);
+                m_cooldown_time.Compile(value);
             if (variables.TryGetValue("casting_time", out value))
-                m_casting_time_formula.Compile(value);
+                m_casting_time.Compile(value);
             if (variables.TryGetValue("inflict_time", out value))
-                m_inflict_time_formula.Compile(value);
+                m_inflict_time.Compile(value);
             if (variables.TryGetValue("expiration_time", out value))
-                m_expiration_time_formula.Compile(value);
+                m_expiration_time.Compile(value);
             if (variables.TryGetValue("starts_active", out value))
                 m_starts_active = bool.Parse(value);
             if (variables.TryGetValue("blocks_other_skills_when_active", out value))
@@ -460,7 +482,7 @@ namespace Combat
             if (variables.TryGetValue("can_activate_when_disabled", out value))
                 m_can_activate_when_disabled = bool.Parse(value);
             if (variables.TryGetValue("target_gathering_type", out value))
-                m_target_gathering_type = int.Parse(value);
+                m_target_gathering_type = value;
             if (variables.TryGetValue("target_gathering_param1", out value))
                 m_target_gathering_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("target_gathering_param2", out value))
@@ -486,7 +508,13 @@ namespace Combat
             switch (id)
             {
             case VID_ManaCost:
-                value = m_mana_cost_formula.Evaluate(this);
+                value = m_mana_cost.Evaluate(this);
+                return true;
+            case VID_MinRange:
+                value = m_min_range.Evaluate(this);
+                return true;
+            case VID_MaxRange:
+                value = m_max_range.Evaluate(this);
                 return true;
             case VID_StartsActive:
                 value = (FixPoint)(m_starts_active);
@@ -542,27 +570,37 @@ namespace Combat
 #region GETTER/SETTER
         public FixPoint ManaCost
         {
-            get { return m_mana_cost_formula.Evaluate(this); }
+            get { return m_mana_cost.Evaluate(this); }
+        }
+
+        public FixPoint MinRange
+        {
+            get { return m_min_range.Evaluate(this); }
+        }
+
+        public FixPoint MaxRange
+        {
+            get { return m_max_range.Evaluate(this); }
         }
 
         public FixPoint CooldownTime
         {
-            get { return m_cooldown_time_formula.Evaluate(this); }
+            get { return m_cooldown_time.Evaluate(this); }
         }
 
         public FixPoint CastingTime
         {
-            get { return m_casting_time_formula.Evaluate(this); }
+            get { return m_casting_time.Evaluate(this); }
         }
 
         public FixPoint InflictTime
         {
-            get { return m_inflict_time_formula.Evaluate(this); }
+            get { return m_inflict_time.Evaluate(this); }
         }
 
         public FixPoint ExpirationTime
         {
-            get { return m_expiration_time_formula.Evaluate(this); }
+            get { return m_expiration_time.Evaluate(this); }
         }
 
         public bool StartsActive
@@ -595,11 +633,6 @@ namespace Combat
             get { return m_can_activate_when_disabled; }
         }
 
-        public int TargetGatheringType
-        {
-            get { return m_target_gathering_type; }
-        }
-
         public FixPoint TargetGatheringParam1
         {
             get { return m_target_gathering_param1; }
@@ -629,7 +662,7 @@ namespace Combat
 
     public partial class DirectDamageSkillComponent
     {
-        public const int ID = 1225219141;
+        public const int ID = -360499912;
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
@@ -649,38 +682,38 @@ namespace Combat
 
     public partial class AddStateEffectComponent
     {
-        public const int ID = -1130149388;
+        public const int ID = 347312498;
     }
 
     public partial class ApplyGeneratorEffectComponent
     {
-        public const int ID = 48043748;
+        public const int ID = -943248477;
     }
 
     public partial class DamageEffectComponent
     {
-        public const int ID = 557364623;
+        public const int ID = 1635290451;
     }
 
     public partial class HealEffectComponent
     {
-        public const int ID = 2141629956;
+        public const int ID = -679969353;
     }
 
 #if COMBAT_CLIENT
     public partial class AnimationComponent
     {
-        public const int ID = -1519428271;
+        public const int ID = 60050710;
     }
 
     public partial class AnimatorComponent
     {
-        public const int ID = -317181815;
+        public const int ID = -1773924714;
     }
 
     public partial class ModelComponent
     {
-        public const int ID = -495890513;
+        public const int ID = -1332594716;
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
@@ -694,7 +727,7 @@ namespace Combat
 
     public partial class PredictLogicComponent
     {
-        public const int ID = -287824321;
+        public const int ID = 1521612208;
     }
 #endif
 }

@@ -15,14 +15,15 @@ namespace Combat
         ////发射独立运行的Object，这种情况变成了CreateObjectSkillComponent，并且其配置是InflictType_Immediately，表示立即发射物体
         //public const int InflictType_CreateObject = -1;
 
-        #region 配置数据
-        string m_mana_type_name = "mana";
-        Formula m_mana_cost_formula = RecyclableObject.Create<Formula>();
-
-        Formula m_cooldown_time_formula = RecyclableObject.Create<Formula>();
-        Formula m_casting_time_formula = RecyclableObject.Create<Formula>();
-        Formula m_inflict_time_formula = RecyclableObject.Create<Formula>();
-        Formula m_expiration_time_formula = RecyclableObject.Create<Formula>();
+        //配置数据
+        string m_mana_type = null;
+        Formula m_mana_cost = RecyclableObject.Create<Formula>();
+        Formula m_min_range = RecyclableObject.Create<Formula>();
+        Formula m_max_range = RecyclableObject.Create<Formula>();
+        Formula m_cooldown_time = RecyclableObject.Create<Formula>();
+        Formula m_casting_time = RecyclableObject.Create<Formula>();
+        Formula m_inflict_time = RecyclableObject.Create<Formula>();
+        Formula m_expiration_time = RecyclableObject.Create<Formula>();
 
         bool m_starts_active = false;
         bool m_blocks_other_skills_when_active = false;
@@ -31,7 +32,7 @@ namespace Combat
         bool m_can_activate_while_moving = true;
         bool m_can_activate_when_disabled = false;
 
-        int m_target_gathering_type = -1;
+        string m_target_gathering_type = null;
         FixPoint m_target_gathering_param1;
         FixPoint m_target_gathering_param2;
 
@@ -43,22 +44,37 @@ namespace Combat
         string m_casting_animation;
         string m_main_animation;
         string m_expiration_animation;
-        #endregion
 
-        #region 运行数据
+        //运行数据
         int m_mana_type_id = 0;
+        int m_target_gathering_type_id = 0;
         List<SkillTimer> m_timers = new List<SkillTimer>();
-        #endregion
 
+        #region GETTER
         public int ManaType
         {
             get { return m_mana_type_id; }
         }
 
+        public int TargetGatheringID
+        {
+            get { return m_target_gathering_type_id; }
+        }
+        #endregion
+
         #region 初始化/销毁
         public override void InitializeComponent()
         {
-            m_mana_type_id = (int)CRC.Calculate(m_mana_type_name);
+            if (m_mana_type == null)
+                m_mana_type_id = ManaComponent.DEFAULT_MANA_TYPE_ID;
+            else
+                m_mana_type_id = (int)CRC.Calculate(m_mana_type);
+
+            if (m_target_gathering_type == null)
+                m_target_gathering_type_id = TargetGatheringType.DefaultTarget;
+            else
+                m_target_gathering_type_id = (int)CRC.Calculate(m_target_gathering_type);
+
             m_timers.Clear();
             for (int i = 0; i < SkillTimer.TimerCount; ++i)
             {
@@ -73,16 +89,20 @@ namespace Combat
                 RecyclableObject.Recycle(m_timers[i]);
             m_timers.Clear();
 
-            RecyclableObject.Recycle(m_mana_cost_formula);
-            m_mana_cost_formula = null;
-            RecyclableObject.Recycle(m_cooldown_time_formula);
-            m_cooldown_time_formula = null;
-            RecyclableObject.Recycle(m_casting_time_formula);
-            m_casting_time_formula = null;
-            RecyclableObject.Recycle(m_inflict_time_formula);
-            m_inflict_time_formula = null;
-            RecyclableObject.Recycle(m_expiration_time_formula);
-            m_expiration_time_formula = null;
+            RecyclableObject.Recycle(m_mana_cost);
+            m_mana_cost = null;
+            RecyclableObject.Recycle(m_min_range);
+            m_min_range = null;
+            RecyclableObject.Recycle(m_max_range);
+            m_max_range = null;
+            RecyclableObject.Recycle(m_cooldown_time);
+            m_cooldown_time = null;
+            RecyclableObject.Recycle(m_casting_time);
+            m_casting_time = null;
+            RecyclableObject.Recycle(m_inflict_time);
+            m_inflict_time = null;
+            RecyclableObject.Recycle(m_expiration_time);
+            m_expiration_time = null;
         }
         #endregion
 
@@ -102,11 +122,6 @@ namespace Combat
         public bool IsTimerActive(int skill_timer_type)
         {
             return m_timers[skill_timer_type].Active;
-        }
-
-        public void StartTimer(int timer_type, FixPoint start_time)
-        {
-            m_timers[timer_type].Start(start_time, CooldownTime);
         }
 
         public void StartCooldownTimer(FixPoint start_time)

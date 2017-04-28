@@ -13,11 +13,11 @@ namespace Combat
 
     public class Skill : Object
     {
-        bool m_is_active = false;
         SkillManagerComponent m_owner_component;
         SkillDefinitionComponent m_definition_component;
         ManaComponent m_mana_component;
         SkillCountdownTask m_task;
+        bool m_is_active = false;
         List<Target> m_skill_targets = new List<Target>();
 
         #region GETTER
@@ -85,8 +85,7 @@ namespace Combat
         public void BuildSkillTargets()
         {
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            target_gathering_manager.BuildTargetList(m_definition_component.TargetGatheringType, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2,
-                this, GetOwnerEntity(), m_skill_targets);
+            target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.TargetGatheringID, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2, m_skill_targets);
         }
 
         public void AddTarget(Target target)

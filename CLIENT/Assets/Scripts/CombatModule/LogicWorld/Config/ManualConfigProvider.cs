@@ -381,49 +381,21 @@ namespace Combat
         {
             //普攻技能
             SkillData skill_data = new SkillData();
-            skill_data.m_name = "default_skill";
+            skill_data.m_name = "近战普通攻击";
 
             ComponentData cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["mana_cost_formula"] = "10";
-            cd.m_component_variables["cooldown_time_formula"] = "1";
-            cd.m_component_variables["expiration_time_formula"] = "1";
-            cd.m_component_variables["target_gathering_type"] = "AITarget";
-            cd.m_component_variables["inflict_delay"] = "0.5";
-            cd.m_component_variables["main_animation"] = "bodyctrl";
+            cd.m_component_variables["cooldown_time"] = "1";
+            cd.m_component_variables["inflict_time"] = "0.5";
+            cd.m_component_variables["target_gathering_type"] = "DefaultTarget";
+            cd.m_component_variables["main_animation"] = "attack";
             skill_data.m_components_data.Add(cd);
-
             //cd = new ComponentData();
             //cd.m_component_type_id = (int)CRC.Calculate("DirectDamageSkillComponent");
             //cd.m_component_variables = new Dictionary<string, string>();
             //skill_data.m_components_data.Add(cd);
-
             m_skill_data[1001] = skill_data;
-
-
-            //技能1
-            skill_data = new SkillData();
-            skill_data.m_name = "skill_name1";
-
-            cd = new ComponentData();
-            cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
-            cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["mana_cost_formula"] = "10";
-            cd.m_component_variables["cooldown_time_formula"] = "1";
-            cd.m_component_variables["expiration_time_formula"] = "1";
-            cd.m_component_variables["target_gathering_type"] = "AITarget";
-            cd.m_component_variables["inflict_delay"] = "0.5";
-            cd.m_component_variables["main_animation"] = "bodyctrl";
-            skill_data.m_components_data.Add(cd);
-
-            cd = new ComponentData();
-            cd.m_component_type_id = (int)CRC.Calculate("EffectGeneratorSkillComponent");
-            cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["effect_generator_id"] = "1";
-            skill_data.m_components_data.Add(cd);
-
-            m_skill_data[1002] = skill_data;
         }
         #endregion
     }

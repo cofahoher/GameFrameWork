@@ -185,14 +185,11 @@ namespace Combat
         protected override void ChangeArea(Vector3FP center, Vector3FP extent, sbyte fill_count)
         {
             Vector3FP downleft = center - extent;
+            downleft.x -= m_seeker_radius;
+            downleft.z -= m_seeker_radius;
             Vector3FP upright = center + extent;
-            if (m_seeker_radius > 0)
-            {
-                downleft.x -= m_seeker_radius;
-                downleft.z -= m_seeker_radius;
-                upright.x += m_seeker_radius - FixPoint.PrecisionFP;
-                upright.z += m_seeker_radius - FixPoint.PrecisionFP;
-            }
+            upright.x += m_seeker_radius - FixPoint.PrecisionFP;
+            upright.z += m_seeker_radius - FixPoint.PrecisionFP;
             GridNode min_node = Position2NearestNode(downleft);
             GridNode max_node = Position2NearestNode(upright);
             int minz = System.Math.Max(min_node.m_z - 1, 0);

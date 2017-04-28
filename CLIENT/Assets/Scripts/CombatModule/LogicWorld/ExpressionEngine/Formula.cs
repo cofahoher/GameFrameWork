@@ -59,5 +59,10 @@ namespace Combat
             else
                 return m_constant;
         }
+
+        public bool IsConst()
+        {
+            return m_program == null;
+        }
     }
 }

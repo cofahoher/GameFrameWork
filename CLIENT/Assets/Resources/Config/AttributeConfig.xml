@@ -1,8 +1,8 @@
 <ConfigSystem>
 	<AttributeConfig>
-		<ConfigItem name="TestAttribute1" formula="BaseValue"/>
+		<ConfigItem name="测试属性1" formula="BaseValue"/>
 		<ConfigItem name="TestAttribute2" formula="BaseValue + LevelTable.name3"/>
-		<ConfigItem name="TestAttribute3" formula="BaseValue + TestAttribute1.Value"/>
+		<ConfigItem name="TestAttribute3" formula="BaseValue + 测试属性1.Value"/>
 		<ConfigItem name="TestAttribute4" formula="(BaseValue + TestAttribute2.Value) * LevelTable.name1"/>
 		<ConfigItem name="TestAttribute5" formula="BaseValue + Max(TestAttribute3.Value, Entity.Attribute.TestAttribute4.Value)"/>
 		<ConfigItem name="TestAttribute6" formula="BaseValue * TestAttribute2.Value * TestAttribute5.Value"/>

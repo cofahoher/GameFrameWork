@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class AttributeManagerComponent : EntityComponent
+    public partial class AttributeManagerComponent : EntityComponent, ISignalListener
     {
+        SignalListenerContext m_listener_context;
         SortedDictionary<int, FixPoint> m_base_value = new SortedDictionary<int, FixPoint>();
         SortedDictionary<int, Attribute> m_attributes = new SortedDictionary<int, Attribute>();
 
@@ -46,12 +47,55 @@ namespace Combat
             m_attributes[id] = attribute;
         }
 
+        protected override void PostInitializeComponent()
+        {
+            if (m_attributes.Count > 0)
+            {
+                m_listener_context = SignalListenerContext.CreateForEntityComponent(GetLogicWorld().GenerateSignalListenerID(), ParentObject.ID, m_component_type_id);
+                ParentObject.AddListener(SignalType.ChangeLevel, m_listener_context);
+            }
+        }
+
         protected override void OnDestruct()
         {
+            if (m_listener_context != null)
+            {
+                ParentObject.RemoveListener(SignalType.ChangeLevel, m_listener_context.ID);
+                SignalListenerContext.Recycle(m_listener_context);
+                m_listener_context = null;
+            }
+
             var enumerator = m_attributes.GetEnumerator();
             while (enumerator.MoveNext())
                 RecyclableObject.Recycle(enumerator.Current.Value);
             m_attributes.Clear();
+        }
+        #endregion
+
+        #region ISignalListener
+        public void ReceiveSignal(ISignalGenerator generator, int signal_type, System.Object signal = null)
+        {
+            switch (signal_type)
+            {
+            case SignalType.ChangeLevel:
+                OnChangeLevel();
+                break;
+            default:
+                break;
+            }
+        }
+
+        private void OnChangeLevel()
+        {
+            var enumerator = m_attributes.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                enumerator.Current.Value.OnLevelChanged();
+            }
+        }
+
+        public void OnGeneratorDestroyed(ISignalGenerator generator)
+        {
         }
         #endregion
 

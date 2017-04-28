@@ -5,7 +5,7 @@
 				<var key="asset" value="Objects/3D/zzw_cube"/>
 			</Component>
 		</ConfigItem>
-		<ConfigItem id="101002" name="Cube">
+		<ConfigItem id="101002" name="Sphere">
 			<Component>
 				<var key="asset" value="Objects/3D/zzw_sphere"/>
 			</Component>
@@ -20,7 +20,7 @@
 				<var key="asset" value="Objects/3D/zzw_ssx_mecanim"/>
 			</Component>
 			<Attributes>
-				<var key="TestAttribute1" value="1"/>
+				<var key="测试属性1" value="1"/>
 				<var key="TestAttribute2" value="2"/>
 				<var key="TestAttribute3" value="3"/>
 				<var key="TestAttribute4" value="4"/>

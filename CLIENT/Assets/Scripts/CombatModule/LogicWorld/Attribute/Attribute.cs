@@ -55,6 +55,10 @@ namespace Combat
         {
             get { return m_value; }
         }
+        public bool LevelBased
+        {
+            get { return m_definition.LevelBased; }
+        }
         #endregion
 
         #region DynamicDependent
@@ -105,6 +109,12 @@ namespace Combat
         #endregion
 
         #region Update
+        public void OnLevelChanged()
+        {
+            if (m_definition.LevelBased)
+                MarkDirty();
+        }
+
         void MarkDirty()
         {
             MarkDirtyStatic(m_owner_component, m_definition.ID);

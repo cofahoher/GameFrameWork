@@ -38,51 +38,93 @@ namespace Combat
 	        0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF,
 	        0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
         };
-
-        public static uint Calculate(string data, uint old_crc = 0)
+        
+        public static uint Calculate(byte data, uint crc = 0)
         {
-            uint crc = old_crc ^ 0xFFFFFFFF;
+            return CRCTABLE[(crc ^ data) & 0xFF] ^ (crc >> 8);
+        }
+
+        public static uint Calculate(sbyte data, uint crc = 0)
+        {
+            return Calculate((byte)data, crc);
+        }
+
+        public static uint Calculate(bool data, uint cec = 0)
+        {
+            return Calculate(data ? (byte)1 : (byte)0, cec);
+        }
+
+        public static uint Calculate(short data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(ushort data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(int data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 16) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 24) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(uint data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 16) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 24) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(long data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 16) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 24) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 32) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 40) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 48) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 56) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(ulong data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 16) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 24) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 32) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 40) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 48) & 0xFF), crc);
+            crc = Calculate((byte)((data >> 56) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(char data, uint crc = 0)
+        {
+            crc = Calculate((byte)(data & 0xFF), crc);
+            crc = Calculate((byte)((data >> 8) & 0xFF), crc);
+            return crc;
+        }
+
+        public static uint Calculate(string data, uint crc = 0)
+        {
+            crc = crc ^ 0xFFFFFFFF;
             for (int i = 0; i < data.Length; ++i)
                 crc = Calculate(data[i], crc);
             crc = crc ^ 0xFFFFFFFF;
-            return crc;
-        }
-
-        public static uint Calculate(char data, uint old_crc = 0)
-        {
-            uint index = (old_crc ^ data) & 0xFF;
-            uint crc = CRCTABLE[index];
-            crc ^= old_crc >> 8;
-	        return crc;
-        }
-
-        public static uint Calculate(short data, uint old_crc = 0)
-        {
-            uint crc = Calculate((char)(data & 0xFF), old_crc);
-            crc = Calculate((char)((data >> 8) & 0xFF), crc);
-            crc ^= old_crc >> 8;
-            return crc;
-        }
-
-        public static uint Calculate(int data, uint old_crc = 0)
-        {
-            uint crc = Calculate((char)(data & 0xFF), old_crc);
-            crc = Calculate((char)((data >> 8) & 0xFF), crc);
-            crc = Calculate((char)((data >> 16) & 0xFF), crc);
-            crc = Calculate((char)((data >> 24) & 0xFF), crc);
-            return crc;
-        }
-
-        public static uint Calculate(long data, uint old_crc = 0)
-        {
-            uint crc = Calculate((char)(data & 0xFF), old_crc);
-            crc = Calculate((char)((data >> 8) & 0xFF), crc);
-            crc = Calculate((char)((data >> 16) & 0xFF), crc);
-            crc = Calculate((char)((data >> 24) & 0xFF), crc);
-            crc = Calculate((char)((data >> 32) & 0xFF), crc);
-            crc = Calculate((char)((data >> 40) & 0xFF), crc);
-            crc = Calculate((char)((data >> 48) & 0xFF), crc);
-            crc = Calculate((char)((data >> 56) & 0xFF), crc);
             return crc;
         }
     }

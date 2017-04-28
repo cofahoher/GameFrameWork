@@ -101,7 +101,7 @@ namespace Combat
 
             m_current_health += delta_health;
 
-#if RENDER_MESSAGE
+#if COMBAT_CLIENT
             ChangeHealthRenderMessage msg = RenderMessage.Create<ChangeHealthRenderMessage>();
             msg.Construct(ParentObject.ID, delta_health, m_current_health);
             GetLogicWorld().AddRenderMessage(msg);

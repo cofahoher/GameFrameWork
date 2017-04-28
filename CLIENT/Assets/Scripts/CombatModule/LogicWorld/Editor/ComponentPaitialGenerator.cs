@@ -45,7 +45,7 @@ namespace Combat
 
             #region Object
             REGISTER_COMPONENT<LevelComponent>()
-                .REGISTER_VARIABLE<int>("level", "VID_CurrentLevel", "m_current_level", Flag_Variable_Get_Attribute_Get);
+                .REGISTER_VARIABLE<int>("level", "VID_CurrentLevel", "CurrentLevel", Flag_Variable_GetSet);
             REGISTER_COMPONENT<TurnManagerComponent>();
             #endregion
 
@@ -80,25 +80,28 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<SkillManagerComponent>();
             REGISTER_COMPONENT<StateComponent>();
+            REGISTER_COMPONENT<TargetingComponent>();
             #endregion
 
             #region Skill
             REGISTER_COMPONENT<CreateObjectSkillComponent>();
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>();
             REGISTER_COMPONENT<SkillDefinitionComponent>()
-                .REGISTER_VARIABLE<string>("mana_type", null, "m_mana_type_name")
-                .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost_formula")
-                .REGISTER_VARIABLE<Formula>("cooldown_time", "VID_CooldownTime", "m_cooldown_time_formula", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<Formula>("casting_time", "VID_CastingTime", "m_casting_time_formula", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<Formula>("inflict_time", "VID_InflictTime", "m_inflict_time_formula", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<Formula>("expiration_time", "VID_ExpirationTime", "m_expiration_time_formula", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<string>("mana_type", null, "m_mana_type")
+                .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost")
+                .REGISTER_VARIABLE<Formula>("min_range", "VID_MinRange", "m_min_range")
+                .REGISTER_VARIABLE<Formula>("max_range", "VID_MaxRange", "m_max_range")
+                .REGISTER_VARIABLE<Formula>("cooldown_time", "VID_CooldownTime", "m_cooldown_time", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("casting_time", "VID_CastingTime", "m_casting_time", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("inflict_time", "VID_InflictTime", "m_inflict_time", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("expiration_time", "VID_ExpirationTime", "m_expiration_time", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("starts_active", "VID_StartsActive", "m_starts_active")
                 .REGISTER_VARIABLE<bool>("blocks_other_skills_when_active", "VID_BlocksOtherSkillsWhenActive", "m_blocks_other_skills_when_active")
                 .REGISTER_VARIABLE<bool>("blocks_movement_when_active", "VID_BlocksMovementWhenActive", "m_blocks_movement_when_active")
                 .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving")
                 .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving")
                 .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled")
-                .REGISTER_VARIABLE<int>("target_gathering_type", "VID_TargetGatheringType", "m_target_gathering_type", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<string>("target_gathering_type", null, "m_target_gathering_type")
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<int>("inflict_type", "VID_InflictType", "m_inflict_type", Flag_Attribute_Get)

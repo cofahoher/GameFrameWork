@@ -68,7 +68,7 @@ namespace Combat
             }
         }
 
-        private void OnMovementStart()
+        void OnMovementStart()
         {
             SkillManager skill_manager = GetLogicWorld().GetSkillManager();
             var enumerator = m_active_skill_ids.GetEnumerator();

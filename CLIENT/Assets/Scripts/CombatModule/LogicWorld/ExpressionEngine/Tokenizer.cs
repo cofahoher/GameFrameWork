@@ -39,7 +39,7 @@ namespace Combat
         static public char GetCode(char ch)
         {
             if (ch > 127)
-                return Error;
+                return Letter;
             else
                 return CodeMap[ch];
         }

@@ -36,7 +36,6 @@ namespace Combat
         }
         #endregion
 
-        #region ISkillComponent
         public override void PostActivate(FixPoint start_time)
         {
             SaveDefenderIDs(GetOwnerSkill().GetTargets());
@@ -63,7 +62,6 @@ namespace Combat
             //skill target可能是位置目标，可能是entity目标
             return FixPoint.Zero;
         }
-        #endregion
 
         private void ScheduleInflict(Damage damage_info, FixPoint inflict_delay_time)
         {
