@@ -7,6 +7,9 @@
 				<var key="target_gathering_type" value="DefaultTarget"/>
 				<var key="main_animation" value="attack"/>
 			</Component>
+			<Component id="DirectDamageSkillComponent">
+				<var key="damage_amount" value="100"/>
+			</Component>
 		</ConfigItem>
 	</SkillConfig>
 </ConfigSystem>

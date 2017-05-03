@@ -10,6 +10,6 @@ namespace Combat
         ObjectTypeData GetObjectTypeData(int id);
         ObjectProtoData GetObjectProtoData(int id);
         AttributeData GetAttributeData(int id);
-        SkillData GetSkillData(int id);
+        ObjectTypeData GetSkillData(int id);
     }
 }

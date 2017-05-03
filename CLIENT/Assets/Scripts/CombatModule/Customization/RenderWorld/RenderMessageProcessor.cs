@@ -32,8 +32,8 @@ namespace Combat
             case RenderMessageType.StopMoving:
                 ProcessRenderMessage_StopMoving(msg as SimpleRenderMessage);
                 break;
-            case RenderMessageType.ChangeMoving:
-                ProcessRenderMessage_ChangeMoving(msg.EntityID);
+            case RenderMessageType.ChangeDirection:
+                ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
                 break;
             case RenderMessageType.CreateEntity:
                 ProcessRenderMessage_CreateEntity(msg.EntityID);
@@ -49,6 +49,9 @@ namespace Combat
                 break;
             case RenderMessageType.Hide:
                 ProcessRenderMessage_Hide(msg.EntityID);
+                break;
+            case RenderMessageType.PlayAnimation:
+                ProcessRenderMessage_PlayAnimation(msg as PlayAnimationRenderMessage);
                 break;
             default:
                 break;
@@ -77,7 +80,8 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
-            if (msg.m_simple_data != LocomotorComponent.StartMovingReason_Command || render_entity.GetComponent(PredictLogicComponent.ID) == null)
+            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
+            if (predic_component == null || !predic_component.HasMovementPredict)
             {
                 model_component.UpdateAngle();
                 AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
@@ -98,7 +102,8 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
-            if (msg.m_simple_data != LocomotorComponent.StopMovingReason_Command || render_entity.GetComponent(PredictLogicComponent.ID) == null)
+            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
+            if (predic_component == null || !predic_component.HasMovementPredict)
             {
                 AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
                 if (animation_component != null)
@@ -110,16 +115,18 @@ namespace Combat
             m_render_world.UnregisterMovingEntity(model_component);
         }
 
-        void ProcessRenderMessage_ChangeMoving(int entity_id)
+        void ProcessRenderMessage_ChangeDirection(ChangeDirectionRenderMessage msg)
         {
-            RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
+                return;
+            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
+            if (predic_component != null && predic_component.HasMovementPredict)
                 return;
             ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
             if (model_component == null)
                 return;
-            if (render_entity.GetComponent(PredictLogicComponent.ID) == null)
-                model_component.UpdateAngle();
+            model_component.UpdateAngle();
         }
 
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)
@@ -144,6 +151,25 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
             if (render_entity == null)
                 return;
+        }
+
+        void ProcessRenderMessage_PlayAnimation(PlayAnimationRenderMessage msg)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            if (animation_component == null)
+                return;
+            if (msg.m_animation_name_2 == null)
+            {
+                animation_component.PlayerAnimation(msg.m_animation_name, msg.m_loop);
+            }
+            else
+            {
+                animation_component.PlayerAnimation(msg.m_animation_name, false);
+                animation_component.QueueAnimation(msg.m_animation_name_2, msg.m_loop);
+            }
         }
     }
 }

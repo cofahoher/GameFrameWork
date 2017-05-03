@@ -2,41 +2,39 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class LocomotorComponent : EntityComponent
+    public partial class LocomotorComponent : EntityComponent, IMovementCallback
     {
-        public const int StartMovingReason_Command = 1;
-        public const int StartMovingReason_Logic = 2;
-        public const int StopMovingReason_Command = 3;
-        public const int StopMovingReason_Logic = 4;
+        readonly FixPoint PERIOD = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
 
-        enum MovingMode
-        {
-            Invalid = 0,
-            ByDirection = 1,
-            ByDestination = 2,
-        }
         //需要备份的初始数据
         //运行数据
         FixPoint m_current_max_speed = FixPoint.Zero;
-        PositionComponent m_position_component;
-        MovingMode m_mode = MovingMode.Invalid;
+        IMovementProvider m_movement_provider = null;
         bool m_is_moving = false;
-        Vector3FP m_direction;
-        Vector3FP m_destination;
         LocomoterTask m_task;
-        FixPoint m_remain_time = FixPoint.Zero;
 
         #region GETTER
         public bool IsMoving
         {
             get { return m_is_moving; }
         }
+
+        public FixPoint MaxSpeed
+        {
+            get { return m_current_max_speed; }
+            set
+            {
+                m_current_max_speed = value;
+                if (m_movement_provider != null)
+                    m_movement_provider.SetMaxSpeed(m_current_max_speed);
+            }
+        }
         #endregion
 
         #region 初始化/销毁
         public override void OnDeletePending()
         {
-            StopMoving(StopMovingReason_Logic);
+            StopMoving();
         }
 
         protected override void OnDestruct()
@@ -48,50 +46,75 @@ namespace Combat
                 m_task = null;
             }
         }
- 
-        protected override void PostInitializeComponent()
+
+        void ClearMovementProvider()
         {
-            m_position_component = ParentObject.GetComponent<PositionComponent>();
+            if (m_movement_provider != null)
+            {
+                RecyclableObject.Recycle(m_movement_provider);
+                m_movement_provider = null;
+            }
         }
         #endregion
 
         #region 接口操作
-        public void MoveByDirection(Vector3FP direction, int reason)
+        public bool MoveByDirection(Vector3FP direction)
         {
             if (!IsEnable())
-                return;
-            m_mode = MovingMode.ByDirection;
-            m_direction = direction;
-            m_direction.Normalize();
-            m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
-            StartMoving(reason);
+                return false;
+            if (m_movement_provider as MovementByDirection == null)
+            {
+                ClearMovementProvider();
+                m_movement_provider = RecyclableObject.Create<MovementByDirection>();
+                m_movement_provider.SetCallback(this);
+                m_movement_provider.SetMaxSpeed(m_current_max_speed);
+            }
+            m_movement_provider.MoveByDirection(direction);
+            StartMoving();
+            return true;
         }
 
-        public void MoveByDestination(Vector3FP destination, int reason)
+        public bool MoveAlongPath(List<Vector3FP> path)
         {
+            //不可以保存path
             if (!IsEnable())
-                return;
-            m_mode = MovingMode.ByDestination;
-            m_direction = destination - m_position_component.CurrentPosition;
-            FixPoint length = m_direction.Normalize();
-            m_destination = destination;
-            m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
-            m_remain_time = length / m_current_max_speed;
-            StartMoving(reason);
+                return false;
+            if (m_movement_provider as MovementAlongPath == null)
+            {
+                ClearMovementProvider();
+                m_movement_provider = RecyclableObject.Create<MovementAlongPath>();
+                m_movement_provider.SetCallback(this);
+                m_movement_provider.SetMaxSpeed(m_current_max_speed);
+            }
+            m_movement_provider.MoveAlongPath(path);
+            StartMoving();
+            return true;
         }
 
-        public void StopMoving(int reason)
+        public void StopMoving()
         {
             if (!m_is_moving)
                 return;
             m_task.Cancel();
             m_is_moving = false;
-            OnMovementStopped(reason);
+            OnMovementStopped();
+        }
+        #endregion
+
+        #region IMovementCallback
+        public ILogicOwnerInfo GetOwnerInfo()
+        {
+            return this;
+        }
+
+        public void MovementFinished()
+        {
+            StopMoving();
         }
         #endregion
 
         #region 实现
-        void StartMoving(int reason)
+        void StartMoving()
         {
             if (m_task == null)
             {
@@ -99,50 +122,34 @@ namespace Combat
                 m_task.Construct(this);
             }
             var schedeler = GetLogicWorld().GetTaskScheduler();
-            FixPoint period = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
-            schedeler.Schedule(m_task, GetCurrentTime(), period, period);
+            schedeler.Schedule(m_task, GetCurrentTime(), PERIOD, PERIOD);
             if (!m_is_moving)
             {
                 m_is_moving = true;
-                OnMovementStarted(reason);
-            }
-            else
-            {
-                OnMovementChanged();
+                OnMovementStarted();
             }
         }
 
-        protected void OnMovementStarted(int reason)
+        protected void OnMovementStarted()
         {
             ParentObject.SendSignal(SignalType.StartMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID, reason);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
         }
 
-        protected void OnMovementStopped(int reason)
+        protected void OnMovementStopped()
         {
             ParentObject.SendSignal(SignalType.StopMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID, reason);
-        }
-
-        protected void OnMovementChanged()
-        {
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.ChangeMoving, ParentObject.ID);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID);
         }
 
         public void UpdatePosition(FixPoint delta_time)
         {
-            m_position_component.CurrentPosition += m_direction * m_current_max_speed * delta_time;
-            if (m_mode == MovingMode.ByDestination)
-            {
-                m_remain_time -= delta_time;
-                if (m_remain_time <= FixPoint.Zero)
-                    StopMoving(StopMovingReason_Logic);
-            }
+            m_movement_provider.Update(delta_time);
         }
 
         protected override void OnDisable()
         {
-            StopMoving(StopMovingReason_Logic);
+            StopMoving();
         }
         #endregion
     }

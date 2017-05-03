@@ -24,13 +24,12 @@
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
-			<Component id="LocomotorComponent">
-				<var key="max_speed" value="5.0"/>
-			</Component>
 		</ConfigItem>
 		<ConfigItem id="102" name="LegacyHero">
-			<Component id="AttributeManagerComponent">
+			<Component id="LevelComponent">
+				<var key="level" value="1"/>
 			</Component>
+			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
 				<var key="ext_x" value="0.5"/>
 				<var key="ext_y" value="0.5"/>
@@ -40,14 +39,14 @@
 			<Component id="LocomotorComponent">
 				<var key="max_speed" value="5.0"/>
 			</Component>
-			<Component id="DamagableComponent">
-			</Component>
+			<Component id="PathFindingComponent"/>
+			<Component id="DamagableComponent"/>
 			<Component id="DeathComponent">
 				<var key="hide_delay" value="1"/>
 				<var key="delete_delay" value="2"/>
 			</Component>
-			<Component id="SkillManagerComponent">
-			</Component>
+			<Component id="SkillManagerComponent"/>
+			<Component id="TargetingComponent"/>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
@@ -59,8 +58,7 @@
 			<Component id="LevelComponent">
 				<var key="level" value="1"/>
 			</Component>
-			<Component id="AttributeManagerComponent">
-			</Component>
+			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
 				<var key="ext_x" value="0.5"/>
 				<var key="ext_y" value="0.5"/>
@@ -70,14 +68,14 @@
 			<Component id="LocomotorComponent">
 				<var key="max_speed" value="5.0"/>
 			</Component>
-			<Component id="DamagableComponent">
-			</Component>
+			<Component id="PathFindingComponent"/>
+			<Component id="DamagableComponent"/>
 			<Component id="DeathComponent">
 				<var key="hide_delay" value="1"/>
 				<var key="delete_delay" value="2"/>
 			</Component>
-			<Component id="SkillManagerComponent">
-			</Component>
+			<Component id="SkillManagerComponent"/>
+			<Component id="TargetingComponent"/>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>

@@ -4,45 +4,52 @@ namespace Combat
 {
     public partial class SkillManagerComponent : EntityComponent, ISignalListener
     {
+        public const int DEFAULT_SKILL_INDEX = 0;
         LocomotorComponent m_locomotor_cmp;
         SignalListenerContext m_listener_context;
-        int m_default_skill_cfgid = 0;
+        SortedDictionary<int, int> m_index2id = new SortedDictionary<int, int>();
         int m_default_skill_id = 0;
-        SortedDictionary<int, int> m_skill_cfgid2id = new SortedDictionary<int, int>();  //ZZWTODO CRCID?
         int m_move_block_count = 0;
         int m_active_block_count = 0;
         List<int> m_active_skill_ids = new List<int>();
 
         #region 初始化/销毁
-        public void AddSkill(int cfgid, bool default_skill = false)
+        public void AddSkill(int index, int skill_cfgid)
         {
-            if (default_skill)
-                m_default_skill_cfgid = cfgid;
-            m_skill_cfgid2id[cfgid] = -1;
+            if (index == DEFAULT_SKILL_INDEX)
+                m_default_skill_id = skill_cfgid;
+            m_index2id[index] = skill_cfgid;
         }
 
         protected override void PostInitializeComponent()
         {
-            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
-            var enumerator = m_skill_cfgid2id.GetEnumerator();
+            LogicWorld logic_world = GetLogicWorld();
+            SkillManager skill_manager = logic_world.GetSkillManager();
+            IConfigProvider config = logic_world.GetConfigProvider();
+            var enumerator = m_index2id.GetEnumerator();
             while(enumerator.MoveNext())
             {
-                int skill_cfgid = enumerator.Current.Key;
-                //ZZWTODO 技能配置
-                ObjectTypeData type_data = null;
+                int skill_index = enumerator.Current.Key;
+                int skill_cfgid = enumerator.Current.Value;
+                ObjectTypeData skill_data = config.GetSkillData(skill_cfgid);
+                if (skill_data == null)
+                {
+                    m_index2id[skill_index] = -1;
+                    continue;
+                }
                 ObjectCreationContext object_context = new ObjectCreationContext();
-                object_context.m_logic_world = GetLogicWorld();
                 object_context.m_object_type_id = skill_cfgid;
-                object_context.m_type_data = type_data;
+                object_context.m_type_data = skill_data;
+                object_context.m_logic_world = logic_world;
                 object_context.m_owner_id = ParentObject.ID;
                 Skill skill = skill_manager.CreateObject(object_context);
-                m_skill_cfgid2id[skill_cfgid] = skill.ID;
-                if (skill_cfgid == m_default_skill_cfgid)
+                m_index2id[skill_index] = skill.ID;
+                if (skill_index == DEFAULT_SKILL_INDEX)
                     m_default_skill_id = skill.ID;
             }
 
             m_locomotor_cmp = ParentObject.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
-            m_listener_context = SignalListenerContext.CreateForEntityComponent(GetLogicWorld().GenerateSignalListenerID(), ParentObject.ID, m_component_type_id);
+            m_listener_context = SignalListenerContext.CreateForEntityComponent(logic_world.GenerateSignalListenerID(), ParentObject.ID, m_component_type_id);
             ParentObject.AddListener(SignalType.StartMoving, m_listener_context);
         }
 
@@ -52,6 +59,14 @@ namespace Combat
             ParentObject.RemoveListener(SignalType.StartMoving, m_listener_context.ID);
             SignalListenerContext.Recycle(m_listener_context);
             m_listener_context = null;
+
+            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+            var enumerator = m_index2id.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                int skill_id = enumerator.Current.Value;
+                skill_manager.DestroyObject(skill_id);
+            }
         }
         #endregion
 
@@ -94,10 +109,10 @@ namespace Combat
             return GetLogicWorld().GetSkillManager().GetObject(m_default_skill_id);
         }
 
-        public Skill GetSkill(int skill_cfgid)
+        public Skill GetSkill(int index)
         {
             int skill_id;
-            if (m_skill_cfgid2id.TryGetValue(skill_cfgid, out skill_id))
+            if (m_index2id.TryGetValue(index, out skill_id))
                 return GetLogicWorld().GetSkillManager().GetObject(skill_id);
             else
                 return null;

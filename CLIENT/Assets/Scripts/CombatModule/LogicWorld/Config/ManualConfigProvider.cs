@@ -9,7 +9,7 @@ namespace Combat
         Dictionary<int, ObjectTypeData> m_object_type_data = new Dictionary<int, ObjectTypeData>();
         Dictionary<int, ObjectProtoData> m_object_proto_data = new Dictionary<int, ObjectProtoData>();
         Dictionary<int, AttributeData> m_attribute_data = new Dictionary<int, AttributeData>();
-        Dictionary<int, SkillData> m_skill_data = new Dictionary<int, SkillData>();
+        Dictionary<int, ObjectTypeData> m_skill_data = new Dictionary<int, ObjectTypeData>();
 
         private ManualConfigProvider()
         {
@@ -72,9 +72,9 @@ namespace Combat
             return attribute_data;
         }
 
-        public SkillData GetSkillData(int id)
+        public ObjectTypeData GetSkillData(int id)
         {
-            SkillData skill_data = null;
+            ObjectTypeData skill_data = null;
             if (!m_skill_data.TryGetValue(id, out skill_data))
                 return null;
             return skill_data;
@@ -186,6 +186,12 @@ namespace Combat
             type_data.m_name = "LegacyHero";
 
             cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("LevelComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["level"] = "1";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("AttributeManagerComponent");
             type_data.m_components_data.Add(cd);
 
@@ -205,6 +211,10 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("PathFindingComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DamagableComponent");
             type_data.m_components_data.Add(cd);
 
@@ -217,6 +227,10 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("SkillManagerComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("TargetingComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
@@ -263,6 +277,10 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("PathFindingComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("DamagableComponent");
             type_data.m_components_data.Add(cd);
 
@@ -275,6 +293,10 @@ namespace Combat
 
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("SkillManagerComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("TargetingComponent");
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
@@ -307,18 +329,22 @@ namespace Combat
             proto_data = new ObjectProtoData();
             proto_data.m_name = "ssx_legacy";
             proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_legacy";
-            m_object_proto_data[102001] = proto_data;
-
-            proto_data = new ObjectProtoData();
-            proto_data.m_name = "ssx_mecanim";
-            proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_mecanim";
-            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute1")] = new FixPoint(1);
+            proto_data.m_attributes[(int)CRC.Calculate("测试属性1")] = new FixPoint(1);
             proto_data.m_attributes[(int)CRC.Calculate("TestAttribute2")] = new FixPoint(2);
             proto_data.m_attributes[(int)CRC.Calculate("TestAttribute3")] = new FixPoint(3);
             proto_data.m_attributes[(int)CRC.Calculate("TestAttribute4")] = new FixPoint(4);
             proto_data.m_attributes[(int)CRC.Calculate("TestAttribute5")] = new FixPoint(5);
             proto_data.m_attributes[(int)CRC.Calculate("TestAttribute6")] = new FixPoint(6);
             proto_data.m_attributes[(int)CRC.Calculate("MaxHealth")] = new FixPoint(1000);
+            proto_data.m_skills[0] = 1001;
+            proto_data.m_skills[1] = 1002;
+            proto_data.m_skills[2] = 1003;
+            proto_data.m_skills[3] = 1004;
+            m_object_proto_data[102001] = proto_data;
+
+            proto_data = new ObjectProtoData();
+            proto_data.m_name = "ssx_mecanim";
+            proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_mecanim";
             m_object_proto_data[103001] = proto_data;
         }
 
@@ -335,7 +361,7 @@ namespace Combat
             m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
 
             attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "TestAttribute1";
+            attribute_data.m_attribute_name = "测试属性1";
             attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
             attribute_data.m_formula = "BaseValue";
             AttributeSystem.RegisterAttribute(attribute_data);
@@ -380,7 +406,7 @@ namespace Combat
         void InitSkillData()
         {
             //普攻技能
-            SkillData skill_data = new SkillData();
+            ObjectTypeData skill_data = new ObjectTypeData();
             skill_data.m_name = "近战普通攻击";
 
             ComponentData cd = new ComponentData();
@@ -391,10 +417,13 @@ namespace Combat
             cd.m_component_variables["target_gathering_type"] = "DefaultTarget";
             cd.m_component_variables["main_animation"] = "attack";
             skill_data.m_components_data.Add(cd);
-            //cd = new ComponentData();
-            //cd.m_component_type_id = (int)CRC.Calculate("DirectDamageSkillComponent");
-            //cd.m_component_variables = new Dictionary<string, string>();
-            //skill_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("DirectDamageSkillComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["damage_amount"] = "100";
+            skill_data.m_components_data.Add(cd);
+
             m_skill_data[1001] = skill_data;
         }
         #endregion

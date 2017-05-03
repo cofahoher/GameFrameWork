@@ -19,15 +19,11 @@ namespace Combat
             base.Initialize(combat_client, logic_world);
             m_camera_controller = new CameraController(this);
 #if UNITY_EDITOR
-            MyLogicWorld my_logic_world = logic_world as MyLogicWorld;
-            if (my_logic_world != null)
+            m_grid_graph = GetLogicWorld().GetGridGraph();
+            if (m_grid_graph != null)
             {
-                m_grid_graph = my_logic_world.GetGridGraph();
-                if (m_grid_graph != null)
-                {
-                    InitializeDrawGrid();
-                    GameGlobal.Instance.m_draw_gizmos_callback += DrawGridAndPath;
-                }
+                InitializeDrawGrid();
+                GameGlobal.Instance.m_draw_gizmos_callback += DrawGridAndPath;
             }
 #endif
         }
@@ -115,11 +111,9 @@ namespace Combat
                 LocomotorComponent locomotor_component = render_entity.GetLogicEntity().GetComponent<LocomotorComponent>();
                 if (locomotor_component == null || !locomotor_component.IsEnable())
                     return;
-                //EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
-                //cmd.m_entity_id = m_current_operate_entityi_id;
-                //cmd.m_move_type = EntityMoveCommand.DestinationType;
-                //cmd.m_vector = Vector3_To_Vector3FP(hit.point);
-                //PushLocalCommand(cmd);
+                EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
+                cmd.ConstructAsDestination(m_current_operate_entityi_id, Vector3_To_Vector3FP(hit.point));
+                PushLocalCommand(cmd);
                 if (m_grid_graph != null)
                 {
                     PositionComponent position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
@@ -150,8 +144,12 @@ namespace Combat
                 }
                 else
                 {
-                    m_current_operate_entityi_id = -1;
-                    Debug.Log("RenderWorld.OnPick(), " + hit.transform.parent.name + " IS NOT YOUR Entity");
+                    Debug.Log("RenderWorld.OnPick(), YOU CHOOSE AN ENEMY " + hit.transform.parent.name);
+                    if (m_current_operate_entityi_id < 0)
+                        return;
+                    EntityTargetCommand cmd = Command.Create<EntityTargetCommand>();
+                    cmd.Construct(m_current_operate_entityi_id, render_entity.ID);
+                    PushLocalCommand(cmd);
                 }
             }
         }
@@ -189,8 +187,7 @@ namespace Combat
             if (m_wsad_state == 0)
             {
                 EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
-                cmd.m_entity_id = m_current_operate_entityi_id;
-                cmd.m_move_type = EntityMoveCommand.StopMoving;
+                cmd.ConstructAsStopMove(m_current_operate_entityi_id);
                 PushLocalCommand(cmd);
             }
             else
@@ -209,9 +206,7 @@ namespace Combat
                     m_direction.x += FixPoint.One;
                 m_direction.Normalize();
                 EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
-                cmd.m_entity_id = m_current_operate_entityi_id;
-                cmd.m_move_type = EntityMoveCommand.DirectionType;
-                cmd.m_vector = m_direction;
+                cmd.ConstructAsDirection(m_current_operate_entityi_id, m_direction);
                 PushLocalCommand(cmd);
             }
         }
@@ -270,7 +265,7 @@ namespace Combat
             }
         }
 
-        bool m_draw_grid = true;
+        bool m_draw_grid = false;
         public void DrawGridAndPath()
         {
             if (!m_draw_grid)

@@ -85,6 +85,14 @@ namespace Combat
         public void SetAngle(FixPoint new_angle)
         {
             m_current_angle = new_angle;
+            ChangeDirectionRenderMessage msg = RenderMessage.Create<ChangeDirectionRenderMessage>();
+            msg.Construct(ParentObject.ID, m_current_angle);
+            GetLogicWorld().AddRenderMessage(msg);
+        }
+
+        public void SetAngle(Vector3FP direction)
+        {
+            SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-direction.z, direction.x)));
         }
         #endregion
     }

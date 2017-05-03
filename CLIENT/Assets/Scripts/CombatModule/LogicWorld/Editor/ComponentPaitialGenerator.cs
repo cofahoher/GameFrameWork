@@ -67,8 +67,10 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("delete_delay", null, "m_delete_delay");
             REGISTER_COMPONENT<EffectManagerComponent>();
             REGISTER_COMPONENT<LocomotorComponent>()
-                .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "m_current_max_speed");
+                .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "MaxSpeed", Flag_Variable_GetSet);
             REGISTER_COMPONENT<ManaComponent>();
+            REGISTER_COMPONENT<PathFindingComponent>()
+                .REGISTER_VARIABLE<FixPoint>("tolerance", null, "m_tolerance");
             REGISTER_COMPONENT<PositionComponent>()
                 .REGISTER_VARIABLE<FixPoint>("x", "VID_X", "m_current_position.x")
                 .REGISTER_VARIABLE<FixPoint>("y", "VID_Y", "m_current_position.y")
@@ -87,7 +89,7 @@ namespace Combat
             REGISTER_COMPONENT<CreateObjectSkillComponent>();
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>();
             REGISTER_COMPONENT<SkillDefinitionComponent>()
-                .REGISTER_VARIABLE<string>("mana_type", null, "m_mana_type")
+                .REGISTER_VARIABLE_CRC<int>("mana_type", "VID_ManaType", "m_mana_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost")
                 .REGISTER_VARIABLE<Formula>("min_range", "VID_MinRange", "m_min_range")
                 .REGISTER_VARIABLE<Formula>("max_range", "VID_MaxRange", "m_max_range")
@@ -101,7 +103,7 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving")
                 .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving")
                 .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled")
-                .REGISTER_VARIABLE<string>("target_gathering_type", null, "m_target_gathering_type")
+                .REGISTER_VARIABLE_CRC<int>("target_gathering_type", "VID_TargetGatheringID", "m_target_gathering_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<int>("inflict_type", "VID_InflictType", "m_inflict_type", Flag_Attribute_Get)
@@ -112,8 +114,8 @@ namespace Combat
                 .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
                 .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation");
             REGISTER_COMPONENT<DirectDamageSkillComponent>()
-                .REGISTER_VARIABLE<string>("damage_type", null, "m_damage_type_name")
-                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount_formula")
+                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
+                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
                 .REGISTER_VARIABLE<bool>("can_critical", null, "m_can_critical")
                 .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
                 .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
@@ -194,6 +196,10 @@ namespace Combat
             {
                 return m_type_name != "string";
             }
+            public bool Transform2Crc()
+            {
+                return (m_flag & TRANSFORM2CRCID) != 0;
+            }
         }
 
         class EditorComponent
@@ -219,23 +225,23 @@ namespace Combat
             }
             public EditorComponent REGISTER_VARIABLE<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_Get)
             {
-                //RegisterVariableInternal<T>(config_name, code_name, code_fragment, Flag_Variable_GetSet_Attribute_Get);
-                EditorVariable variable = new EditorVariable();
-                System.Type type = typeof(T);
-                if (!m_real_type.TryGetValue(type, out variable.m_type_name))
-                    variable.m_type_name = type.Name;
-                variable.m_config_name = config_name;
-                variable.m_code_name = code_name;
-                variable.m_code_fragment = code_fragment;
-                variable.m_flag = flag;
-                m_variables.Add(variable);
+                RegisterVariableInternal<T>(config_name, code_name, code_fragment, flag);
+                //EditorVariable variable = new EditorVariable();
+                //System.Type type = typeof(T);
+                //if (!m_real_type.TryGetValue(type, out variable.m_type_name))
+                //    variable.m_type_name = type.Name;
+                //variable.m_config_name = config_name;
+                //variable.m_code_name = code_name;
+                //variable.m_code_fragment = code_fragment;
+                //variable.m_flag = flag;
+                //m_variables.Add(variable);
                 return this;
             }
             public EditorComponent REGISTER_VARIABLE_CRC<T>(string config_name, string code_name, string code_fragment = null, int flag = Flag_Variable_GetSet_Attribute_Get)
             {
-                EditorVariable variable = RegisterVariableInternal<T>(config_name, code_name, code_fragment, Flag_Variable_GetSet_Attribute_Get);
-                if (variable.m_type_name == "string")
-                    variable.m_flag |= TRANSFORM2CRCID;
+                EditorVariable variable = RegisterVariableInternal<T>(config_name, code_name, code_fragment, flag);
+                variable.m_flag |= TRANSFORM2CRCID;
+                variable.m_type_name = "int";
                 return this;
             }
             EditorVariable RegisterVariableInternal<T>(string config_name, string code_name, string code_fragment, int flag)
@@ -299,7 +305,7 @@ namespace Combat
             }
 
             m_logic = false;
-            writer.Write("\r\n\r\n#if COMBAT_CLIENT");
+            writer.Write("\r\n"); //writer.Write("\r\n\r\n#if COMBAT_CLIENT");
             count = m_render_componnets.Count;
             for (int i = 0; i < count; ++i)
             {
@@ -309,11 +315,11 @@ namespace Combat
                     writer.Write("\r\n");
                 GenerateOneComponent(writer, m_render_componnets[i]);
             }
-            writer.Write("\r\n#endif\r\n");
+            //writer.Write("\r\n#endif");
 
             m_logic_componnets.Clear();
             m_render_componnets.Clear();
-            writer.Write("}");
+            writer.Write("\r\n}");
             writer.Flush();
             writer.Close();
             writer = null;
@@ -353,25 +359,25 @@ namespace Combat
             writer.Write("\r\n#endif\r\n        }");
         }
 
-        static void Generate_ActivateAllRegisteredComponents(StreamWriter writer)
-        {
-            writer.Write("\r\n        static public void ActivateAllRegisteredComponents()\r\n        {");
-            writer.Write("\r\n            int id = 0;");
-            for (int i = 0; i < m_logic_componnets.Count; ++i)
-            {
-                writer.Write("\r\n            id = ");
-                writer.Write(m_logic_componnets[i].m_name);
-                writer.Write(".ID;");
-            }
-            writer.Write("\r\n#if COMBAT_CLIENT");
-            for (int i = 0; i < m_render_componnets.Count; ++i)
-            {
-                writer.Write("\r\n            id = ");
-                writer.Write(m_logic_componnets[i].m_name);
-                writer.Write(".ID;");
-            }
-            writer.Write("\r\n#endif\r\n        }");
-        }
+        //static void Generate_ActivateAllRegisteredComponents(StreamWriter writer)
+        //{
+        //    writer.Write("\r\n        static public void ActivateAllRegisteredComponents()\r\n        {");
+        //    writer.Write("\r\n            int id = 0;");
+        //    for (int i = 0; i < m_logic_componnets.Count; ++i)
+        //    {
+        //        writer.Write("\r\n            id = ");
+        //        writer.Write(m_logic_componnets[i].m_name);
+        //        writer.Write(".ID;");
+        //    }
+        //    writer.Write("\r\n#if COMBAT_CLIENT");
+        //    for (int i = 0; i < m_render_componnets.Count; ++i)
+        //    {
+        //        writer.Write("\r\n            id = ");
+        //        writer.Write(m_logic_componnets[i].m_name);
+        //        writer.Write(".ID;");
+        //    }
+        //    writer.Write("\r\n#endif\r\n        }");
+        //}
 
         static void GenerateOneComponent(StreamWriter writer, EditorComponent component)
         {
@@ -401,6 +407,10 @@ namespace Combat
                 writer.Write(";");
             }
 
+            bool generate = code_variable_count > 0 || component.Need_InitializeVariable();
+            if (m_logic == false && generate)
+                writer.Write("\r\n\r\n#if COMBAT_CLIENT");
+
             if (code_variable_count > 0)
                 Generate_StaticConstructor(writer, component);
             if (component.Need_InitializeVariable())
@@ -411,6 +421,9 @@ namespace Combat
                 Generate_SetVariable(writer, component);
             if (code_variable_count > 0 && component.Need_CSharpAttribute())
                 Generate_CSharpAttribute(writer, component);
+
+            if (m_logic == false && generate)
+                writer.Write("\r\n#endif");
         }
 
         static void Generate_StaticConstructor(StreamWriter writer, EditorComponent component)
@@ -467,6 +480,29 @@ namespace Combat
                 if (variable.IsFormula())
                 {
                     writer.Write(".Compile(value);");
+                }
+                //else if (variable.NeedParse())
+                //{
+                //    if (variable.Transform2Crc())
+                //        writer.Write(" = (int)CRC.Calculate(");
+                //    else
+                //        writer.Write(" = ");
+                //    writer.Write(variable.m_type_name);
+                //    if (variable.Transform2Crc())
+                //        writer.Write(".Parse(value));");
+                //    else
+                //        writer.Write(".Parse(value);");
+                //}
+                //else
+                //{
+                //    if (variable.Transform2Crc())
+                //        writer.Write(" = (int)CRC.Calculate(value);");
+                //    else
+                //        writer.Write(" = value;");
+                //}
+                else if (variable.Transform2Crc())
+                {
+                    writer.Write(" = (int)CRC.Calculate(value);");
                 }
                 else if (variable.NeedParse())
                 {
@@ -611,6 +647,18 @@ namespace Combat
 
         static void Generate_CSharpAttribute(StreamWriter writer, EditorComponent component)
         {
+            bool need = false;
+            for (int i = 0; i < component.m_variables.Count; ++i)
+            {
+                EditorVariable variable = component.m_variables[i];
+                if (variable.m_code_fragment == null || variable.m_code_name == null || (!variable.CanAttributeGet() && !variable.CanAttributeSet()))
+                    continue;
+                need = true;
+                break;
+            }
+            if (!need)
+                return;
+
             writer.Write("\r\n\r\n#region GETTER/SETTER");
             //        public FixPoint X
             //        {
