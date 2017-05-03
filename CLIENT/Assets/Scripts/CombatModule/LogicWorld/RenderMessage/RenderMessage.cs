@@ -8,12 +8,6 @@ namespace Combat
         public const int Invalid = 0;
         public const int CreateEntity = 1;              //SimpleRenderMessage
         public const int DestroyEntity = 2;             //SimpleRenderMessage
-        public const int StartMoving = 3;               //SimpleRenderMessage
-        public const int StopMoving = 4;                //SimpleRenderMessage
-        public const int ChangeMoving = 5;              //SimpleRenderMessage
-        public const int ChangeHealth = 6;              //ChangeHealthRenderMessage
-        public const int Die = 7;                       //SimpleRenderMessage
-        public const int Hide = 8;                      //SimpleRenderMessage
     }
 
     public abstract class RenderMessage : IRecyclable, IDestruct

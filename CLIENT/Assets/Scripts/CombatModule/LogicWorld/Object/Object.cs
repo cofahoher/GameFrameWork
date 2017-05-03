@@ -134,15 +134,30 @@ namespace Combat
             for (int i = 0; i < components_data.Count; ++i)
                 AddComponent(components_data[i]);
 
-            var attributes = context.m_proto_data == null ? null : context.m_proto_data.m_attributes;
-            if (attributes != null && attributes.Count > 0)
+            if (context.m_proto_data != null)
             {
-                AttributeManagerComponent cmp = GetComponent<AttributeManagerComponent>(AttributeManagerComponent.ID);
-                if (cmp != null)
+                var attributes = context.m_proto_data.m_attributes;
+                if (attributes != null && attributes.Count > 0)
                 {
-                    var enumerator = attributes.GetEnumerator();
-                    while (enumerator.MoveNext())
-                        cmp.SetAttributeBaseValue(enumerator.Current.Key, enumerator.Current.Value);
+                    AttributeManagerComponent cmp = GetComponent<AttributeManagerComponent>(AttributeManagerComponent.ID);
+                    if (cmp != null)
+                    {
+                        var enumerator = attributes.GetEnumerator();
+                        while (enumerator.MoveNext())
+                            cmp.SetAttributeBaseValue(enumerator.Current.Key, enumerator.Current.Value);
+                    }
+                }
+
+                var skills = context.m_proto_data.m_skills;
+                if (skills != null && skills.Count > 0)
+                {
+                    SkillManagerComponent cmp = GetComponent(SkillManagerComponent.ID) as SkillManagerComponent;
+                    if (cmp != null)
+                    {
+                        var enumerator = skills.GetEnumerator();
+                        while (enumerator.MoveNext())
+                            cmp.AddSkill(enumerator.Current.Key, enumerator.Current.Value);
+                    }
                 }
             }
 

@@ -25,6 +25,7 @@ namespace Combat
         protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
         protected TargetGatheringManager m_target_gathering_manager;
+        protected GridGraph m_grid_graph;
 
         public LogicWorld()
         {
@@ -105,6 +106,10 @@ namespace Combat
         {
             get { return m_current_frame; }
         }
+        public FixPoint GetCurrentTime()
+        {
+            return m_current_time;
+        }
         public IConfigProvider GetConfigProvider()
         {
             return m_outside_world.GetConfigProvider();
@@ -141,10 +146,13 @@ namespace Combat
         {
             return m_faction_manager;
         }
-
         public TargetGatheringManager GetTargetGatheringManager()
         {
             return m_target_gathering_manager;
+        }
+        public GridGraph GetGridGraph()
+        {
+            return m_grid_graph;
         }
         #endregion
 
@@ -243,7 +251,7 @@ namespace Combat
         {
             m_random_generator.ResetSeed(world_context.m_world_seed);
             m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
-            IConfigProvider config = m_outside_world.GetConfigProvider();
+            IConfigProvider config = GetConfigProvider();
             for (int i = 0; i < world_context.m_players.Count; ++i)
             {
                 ObjectCreationContext context = world_context.m_players[i];

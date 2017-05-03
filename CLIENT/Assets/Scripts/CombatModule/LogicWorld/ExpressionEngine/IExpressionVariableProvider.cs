@@ -7,10 +7,13 @@ namespace Combat
         public static readonly int VID_Object = (int)CRC.Calculate("Object");
         public static readonly int VID_Entity = (int)CRC.Calculate("Entity");
         public static readonly int VID_Player = (int)CRC.Calculate("Player");
+        public static readonly int VID_Target = (int)CRC.Calculate("Target");
+        public static readonly int VID_Attacker = (int)CRC.Calculate("Attacker");
+        public static readonly int VID_Defender = (int)CRC.Calculate("Defender");
+        public static readonly int VID_LevelTable = (int)CRC.Calculate("LevelTable");
         public static readonly int VID_Attribute = (int)CRC.Calculate("Attribute");
         public static readonly int VID_Value = (int)CRC.Calculate("Value");
         public static readonly int VID_BaseValue = (int)CRC.Calculate("BaseValue");
-        public static readonly int VID_LevelTable = (int)CRC.Calculate("LevelTable");
         /*
          * 在各种上下文（指IExpressionVariableProvider实现者），都可以这样写公式的一部分
          * max_speed

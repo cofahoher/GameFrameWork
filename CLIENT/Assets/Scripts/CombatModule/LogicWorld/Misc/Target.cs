@@ -5,14 +5,16 @@ namespace Combat
     public enum TargetType
     {
         InvalidType = 0,
-        PositionType,
         EntityType,
+        PositionType,
     }
+
     public class Target : IRecyclable, IDestruct
     {
         LogicWorld m_logic_world;
         TargetType m_target_type = TargetType.InvalidType;
         int m_object_id = -1;
+        Vector3FP m_position;
 
         public void Construct(LogicWorld logic_world)
         {
@@ -42,9 +44,16 @@ namespace Combat
         }
 
         #region Setter
-        public void SetPositionTarget(Vector3FP pos)
+        public void SetPositionTarget(Vector3FP position)
         {
             m_target_type = TargetType.PositionType;
+            m_position = position;
+        }
+
+        public void SetEntityTarget(Entity entity)
+        {
+            m_target_type = TargetType.EntityType;
+            m_object_id = entity.ID;
         }
 
         public void SetEntityTarget(int entity_id)

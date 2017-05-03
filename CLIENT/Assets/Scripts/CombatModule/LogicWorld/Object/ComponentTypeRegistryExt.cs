@@ -24,6 +24,7 @@ namespace Combat
             Register<EffectManagerComponent>(false);
             Register<LocomotorComponent>(false);
             Register<ManaComponent>(false);
+            Register<PathFindingComponent>(false);
             Register<PositionComponent>(false);
             Register<SkillManagerComponent>(false);
             Register<StateComponent>(false);
@@ -87,9 +88,6 @@ namespace Combat
                 return false;
             }
         }
-
-#region GETTER/SETTER
-#endregion
     }
 
     public partial class TurnManagerComponent
@@ -220,7 +218,7 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("max_speed", out value))
-                m_current_max_speed = FixPoint.Parse(value);
+                MaxSpeed = FixPoint.Parse(value);
         }
 
         public override bool GetVariable(int id, out FixPoint value)
@@ -228,7 +226,7 @@ namespace Combat
             switch (id)
             {
             case VID_MaxSpeed:
-                value = m_current_max_speed;
+                value = MaxSpeed;
                 return true;
             default:
                 value = FixPoint.Zero;
@@ -241,24 +239,29 @@ namespace Combat
             switch (id)
             {
             case VID_MaxSpeed:
-                m_current_max_speed = value;
+                MaxSpeed = value;
                 return true;
             default:
                 return false;
             }
         }
-
-#region GETTER/SETTER
-        public FixPoint MaxSpeed
-        {
-            get { return m_current_max_speed; }
-        }
-#endregion
     }
 
     public partial class ManaComponent
     {
         public const int ID = -1133849163;
+    }
+
+    public partial class PathFindingComponent
+    {
+        public const int ID = -975410129;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("tolerance", out value))
+                m_tolerance = FixPoint.Parse(value);
+        }
     }
 
     public partial class PositionComponent
@@ -454,7 +457,7 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("mana_type", out value))
-                m_mana_type = value;
+                m_mana_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("mana_cost", out value))
                 m_mana_cost.Compile(value);
             if (variables.TryGetValue("min_range", out value))
@@ -482,7 +485,7 @@ namespace Combat
             if (variables.TryGetValue("can_activate_when_disabled", out value))
                 m_can_activate_when_disabled = bool.Parse(value);
             if (variables.TryGetValue("target_gathering_type", out value))
-                m_target_gathering_type = value;
+                m_target_gathering_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("target_gathering_param1", out value))
                 m_target_gathering_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("target_gathering_param2", out value))
@@ -568,6 +571,11 @@ namespace Combat
         }
 
 #region GETTER/SETTER
+        public int ManaType
+        {
+            get { return m_mana_type; }
+        }
+
         public FixPoint ManaCost
         {
             get { return m_mana_cost.Evaluate(this); }
@@ -633,6 +641,11 @@ namespace Combat
             get { return m_can_activate_when_disabled; }
         }
 
+        public int TargetGatheringID
+        {
+            get { return m_target_gathering_type; }
+        }
+
         public FixPoint TargetGatheringParam1
         {
             get { return m_target_gathering_param1; }
@@ -668,9 +681,9 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("damage_type", out value))
-                m_damage_type_name = value;
+                m_damage_type_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("damage_amount", out value))
-                m_damage_amount_formula.Compile(value);
+                m_damage_amount.Compile(value);
             if (variables.TryGetValue("can_critical", out value))
                 m_can_critical = bool.Parse(value);
             if (variables.TryGetValue("combo_attack_cnt", out value))
@@ -700,7 +713,6 @@ namespace Combat
         public const int ID = -679969353;
     }
 
-#if COMBAT_CLIENT
     public partial class AnimationComponent
     {
         public const int ID = 60050710;
@@ -715,6 +727,8 @@ namespace Combat
     {
         public const int ID = -1332594716;
 
+#if COMBAT_CLIENT
+
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
@@ -723,11 +737,11 @@ namespace Combat
             if (variables.TryGetValue("bodyctrl_path", out value))
                 m_bodyctrl_path = value;
         }
+#endif
     }
 
     public partial class PredictLogicComponent
     {
         public const int ID = 1521612208;
     }
-#endif
 }

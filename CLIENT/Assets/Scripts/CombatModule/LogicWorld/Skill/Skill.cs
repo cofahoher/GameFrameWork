@@ -9,13 +9,15 @@ namespace Combat
         NotEnoughMana,
         ObjectIsMoving,
         SkillDisabled,
+        TargetTooNear,
+        TargetTooFar,
     }
 
     public class Skill : Object
     {
         SkillManagerComponent m_owner_component;
-        SkillDefinitionComponent m_definition_component;
         ManaComponent m_mana_component;
+        SkillDefinitionComponent m_definition_component;
         SkillCountdownTask m_task;
         bool m_is_active = false;
         List<Target> m_skill_targets = new List<Target>();
@@ -40,20 +42,22 @@ namespace Combat
 
         protected override void PostInitializeObject(ObjectCreationContext context)
         {
-            m_definition_component = this.GetComponent<SkillDefinitionComponent>();
+            m_definition_component = GetComponent<SkillDefinitionComponent>();
         }
 
         protected override void OnDestruct()
         {
             m_owner_component = null;
-            m_definition_component = null;
             m_mana_component = null;
+            m_definition_component = null;
             if (m_task != null)
             {
                 m_task.Cancel();
                 LogicTask.Recycle(m_task);
                 m_task = null;
             }
+            if (m_is_active)
+                Deactivate();
             ClearTargets();
         }
         #endregion
@@ -84,6 +88,7 @@ namespace Combat
         #region 技能目标
         public void BuildSkillTargets()
         {
+            ClearTargets();
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
             target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.TargetGatheringID, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2, m_skill_targets);
         }
@@ -150,6 +155,33 @@ namespace Combat
             return CastSkillResult.Success;
         }
 
+        public CastSkillResult CheckTargetRange(Entity entity)
+        {
+            FixPoint min_range = m_definition_component.MinRange;
+            FixPoint max_range = m_definition_component.MaxRange;
+            if (min_range <= FixPoint.Zero && max_range <= FixPoint.Zero)
+                return CastSkillResult.Success;
+            PositionComponent target_position_cmp = entity.GetComponent(PositionComponent.ID) as PositionComponent;
+            PositionComponent source_position_cmp = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+            FixPoint distance = source_position_cmp.CurrentPosition.FastDistance(target_position_cmp.CurrentPosition);
+            if (min_range > 0 && distance < min_range)
+                return CastSkillResult.TargetTooNear;
+            if (max_range > 0 && distance > max_range)
+                return CastSkillResult.TargetTooFar;
+            return CastSkillResult.Success;
+        }
+
+        bool CheckTargetRange()
+        {
+            Target target = GetMajorTarget();
+            if (target == null)
+                return false;
+            Entity entity = target.GetEntity();
+            if (entity == null)
+                return false;
+            return CheckTargetRange(entity) == CastSkillResult.Success;
+        }
+
         public bool Activate(FixPoint start_time)
         {
             Deactivate();
@@ -170,15 +202,36 @@ namespace Combat
                 PostActivate(start_time);
 
             ScheduleTimers();
+
+#if COMBAT_CLIENT
+            if (m_definition_component.m_casting_animation != null)
+            {
+                PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+                msg.Construct(GetOwnerEntityID(), m_definition_component.m_casting_animation, null, true);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
             return true;
         }
 
         public bool PostActivate(FixPoint start_time)
         {
+            BuildSkillTargets();
+
+            if (!CheckTargetRange())
+            {
+                Deactivate();
+                return false;
+            }
+
             FixPoint mana_cost = m_definition_component.ManaCost;
             if (mana_cost > FixPoint.Zero)
             {
-                m_mana_component.ChangeMana(m_definition_component.ManaType, -mana_cost);
+                if (!m_mana_component.ChangeMana(m_definition_component.ManaType, -mana_cost))
+                {
+                    Deactivate();
+                    return false;
+                }
             }
 
             var enumerator = m_components.GetEnumerator();
@@ -195,6 +248,18 @@ namespace Combat
                 m_definition_component.StartInflictingTimer(start_time);
             else
                 Inflict(start_time);
+
+#if COMBAT_CLIENT
+            if (m_definition_component.m_main_animation != null)
+            {
+                PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+                if (m_definition_component.m_expiration_animation == null)
+                    msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation);
+                else
+                    msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation, m_definition_component.m_expiration_animation, true);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
             return true;
         }
 
@@ -233,7 +298,6 @@ namespace Combat
             }
 
             SetSkillActive(false);
-            ClearTargets();
             return true;
         }
 

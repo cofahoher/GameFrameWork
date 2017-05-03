@@ -180,6 +180,11 @@ namespace Combat
             return FixPoint.FastDistance(FixPoint.FastDistance(v3fp.x - x, v3fp.y - y), v3fp.z - z);
         }
 
+        public FixPoint FastDistance(Vector3FP v3fp)
+        {
+            return FixPoint.FastDistance(FixPoint.FastDistance(v3fp.x - x, v3fp.y - y), v3fp.z - z);
+        }
+
         public void MakeZero()
         {
             x = y = z = FixPoint.Zero;

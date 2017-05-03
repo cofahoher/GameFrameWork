@@ -178,7 +178,7 @@ namespace Combat
             PredictLogicComponent predict_logic_component = render_entity.GetComponent<PredictLogicComponent>(PredictLogicComponent.ID);
             if (predict_logic_component == null)
                 return;
-            predict_logic_component.ConfirmCommand(cmd);
+            predict_logic_component.ConfirmCommand(cmd, result);
         }
         #endregion
 
