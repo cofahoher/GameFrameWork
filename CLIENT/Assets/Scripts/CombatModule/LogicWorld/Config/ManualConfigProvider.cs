@@ -146,17 +146,23 @@ namespace Combat
             type_data.m_name = "LocalPlayer";
             m_object_type_data[3] = type_data;
 
-            //障碍物
+            //可破坏的障碍物
             type_data = new ObjectTypeData();
-            type_data.m_name = "Obstruct";
+            type_data.m_name = "DamagableObstruct";
 
             ComponentData cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["radius"] = "0.5";
+            cd.m_component_variables["visible"] = "True";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("ObstacleComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
             cd.m_component_variables["ext_x"] = "0.5";
             cd.m_component_variables["ext_y"] = "0.5";
             cd.m_component_variables["ext_z"] = "0.5";
-            cd.m_component_variables["visible"] = "True";
             type_data.m_components_data.Add(cd);
 
             cd = new ComponentData();
@@ -198,9 +204,7 @@ namespace Combat
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["ext_x"] = "0.5";
-            cd.m_component_variables["ext_y"] = "0.5";
-            cd.m_component_variables["ext_z"] = "0.5";
+            cd.m_component_variables["radius"] = "0.5";
             cd.m_component_variables["visible"] = "True";
             type_data.m_components_data.Add(cd);
 
@@ -264,9 +268,7 @@ namespace Combat
             cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["ext_x"] = "0.5";
-            cd.m_component_variables["ext_y"] = "0.5";
-            cd.m_component_variables["ext_z"] = "0.5";
+            cd.m_component_variables["radius"] = "0.5";
             cd.m_component_variables["visible"] = "True";
             type_data.m_components_data.Add(cd);
 
@@ -312,6 +314,56 @@ namespace Combat
             type_data.m_components_data.Add(cd);
 
             m_object_type_data[103] = type_data;
+
+            //不可破坏的障碍物
+            type_data = new ObjectTypeData();
+            type_data.m_name = "UndamagableObstruct";
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["radius"] = "0.5";
+            cd.m_component_variables["visible"] = "True";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("ObstacleComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["ext_x"] = "0.5";
+            cd.m_component_variables["ext_y"] = "0.5";
+            cd.m_component_variables["ext_z"] = "0.5";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["bodyctrl_path"] = "bodyctrl";
+            type_data.m_components_data.Add(cd);
+
+            m_object_type_data[201] = type_data;
+
+            //发射物
+            type_data = new ObjectTypeData();
+            type_data.m_name = "Missile";
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["radius"] = "0";
+            cd.m_component_variables["visible"] = "True";
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("ProjectileComponent");
+            type_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("ModelComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["bodyctrl_path"] = "bodyctrl";
+            type_data.m_components_data.Add(cd);
+
+            m_object_type_data[301] = type_data;
         }
 
         void InitObjectProtoData()
@@ -337,15 +389,18 @@ namespace Combat
             proto_data.m_attributes[(int)CRC.Calculate("TestAttribute6")] = new FixPoint(6);
             proto_data.m_attributes[(int)CRC.Calculate("MaxHealth")] = new FixPoint(1000);
             proto_data.m_skills[0] = 1001;
-            proto_data.m_skills[1] = 1002;
-            proto_data.m_skills[2] = 1003;
-            proto_data.m_skills[3] = 1004;
             m_object_proto_data[102001] = proto_data;
 
             proto_data = new ObjectProtoData();
             proto_data.m_name = "ssx_mecanim";
             proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_mecanim";
+            proto_data.m_skills[0] = 1002;
             m_object_proto_data[103001] = proto_data;
+
+            proto_data = new ObjectProtoData();
+            proto_data.m_name = "missile_entity";
+            proto_data.m_component_variables["asset"] = "Objects/3D/zzw_missile_entity";
+            m_object_proto_data[301001] = proto_data;
         }
 
         void InitAttributeData()
@@ -412,7 +467,7 @@ namespace Combat
             ComponentData cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
-            cd.m_component_variables["max_range"] = "2";
+            cd.m_component_variables["max_range"] = "1";
             cd.m_component_variables["cooldown_time"] = "1";
             cd.m_component_variables["inflict_time"] = "0.5";
             cd.m_component_variables["target_gathering_type"] = "DefaultTarget";
@@ -426,6 +481,32 @@ namespace Combat
             skill_data.m_components_data.Add(cd);
 
             m_skill_data[1001] = skill_data;
+
+            //弹道发射物
+            skill_data = new ObjectTypeData();
+            skill_data.m_name = "弹道发射物";
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["cooldown_time"] = "1";
+            cd.m_component_variables["inflict_time"] = "0.5";
+            cd.m_component_variables["target_gathering_type"] = "DefaultTarget";
+            cd.m_component_variables["main_animation"] = "attack";
+            skill_data.m_components_data.Add(cd);
+
+            cd = new ComponentData();
+            cd.m_component_type_id = (int)CRC.Calculate("CreateObjectSkillComponent");
+            cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["object_type_id"] = "301";
+            cd.m_component_variables["object_proto_id"] = "301001";
+            cd.m_component_variables["offset_x"] = "0";
+            cd.m_component_variables["offset_y"] = "1";
+            cd.m_component_variables["offset_z"] = "1";
+            cd.m_component_variables["speed"] = "15";
+            skill_data.m_components_data.Add(cd);
+
+            m_skill_data[1002] = skill_data;
         }
         #endregion
     }

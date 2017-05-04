@@ -39,7 +39,7 @@
 			</Skills>
 		</ConfigItem>
 		
-		<ConfigItem id="301001" name="Cube">
+		<ConfigItem id="301001" name="missile_entity">
 			<Component>
 				<var key="asset" value="Objects/3D/zzw_missile_entity"/>
 			</Component>
