@@ -163,7 +163,7 @@ namespace Combat
                 return CastSkillResult.Success;
             PositionComponent target_position_cmp = entity.GetComponent(PositionComponent.ID) as PositionComponent;
             PositionComponent source_position_cmp = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
-            FixPoint distance = source_position_cmp.CurrentPosition.FastDistance(target_position_cmp.CurrentPosition);
+            FixPoint distance = source_position_cmp.CurrentPosition.FastDistance(target_position_cmp.CurrentPosition) - target_position_cmp.Radius - source_position_cmp.Radius;  //ZZWTODO 多处距离计算
             if (min_range > 0 && distance < min_range)
                 return CastSkillResult.TargetTooNear;
             if (max_range > 0 && distance > max_range)

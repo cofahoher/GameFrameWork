@@ -6,12 +6,16 @@
 		</ConfigItem>
 		<ConfigItem id="3" name="LocalPlayer">
 		</ConfigItem>
-		<ConfigItem id="101" name="Obstruct">
+		
+		<ConfigItem id="101" name="DamagableObstruct">
 			<Component id="PositionComponent">
+				<var key="radius" value="0.5"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="ObstacleComponent">
 				<var key="ext_x" value="0.5"/>
 				<var key="ext_y" value="0.5"/>
 				<var key="ext_z" value="0.5"/>
-				<var key="visible" value="True"/>
 			</Component>
 			<Component id="DamagableComponent">
 				<var key="max_health" value="1000"/>
@@ -25,15 +29,14 @@
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
 		</ConfigItem>
+		
 		<ConfigItem id="102" name="LegacyHero">
 			<Component id="LevelComponent">
 				<var key="level" value="1"/>
 			</Component>
 			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
-				<var key="ext_x" value="0.5"/>
-				<var key="ext_y" value="0.5"/>
-				<var key="ext_z" value="0.5"/>
+				<var key="radius" value="0.5"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="LocomotorComponent">
@@ -54,15 +57,14 @@
 				<var key="animation_path" value="bodyctrl/animationctrl"/>
 			</Component>
 		</ConfigItem>
+		
 		<ConfigItem id="103" name="MecanimHero">
 			<Component id="LevelComponent">
 				<var key="level" value="1"/>
 			</Component>
 			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
-				<var key="ext_x" value="0.5"/>
-				<var key="ext_y" value="0.5"/>
-				<var key="ext_z" value="0.5"/>
+				<var key="radius" value="0.5"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="LocomotorComponent">
@@ -81,6 +83,33 @@
 			</Component>
 			<Component id="AnimatorComponent">
 				<var key="animator_path" value="bodyctrl/animationctrl"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="201" name="UndamagableObstruct">
+			<Component id="PositionComponent">
+				<var key="radius" value="0.5"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="ObstacleComponent">
+				<var key="ext_x" value="0.5"/>
+				<var key="ext_y" value="0.5"/>
+				<var key="ext_z" value="0.5"/>
+			</Component>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="301" name="Missile">
+			<Component id="PositionComponent">
+				<var key="radius" value="0"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="ProjectileComponent">
+			</Component>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
 		</ConfigItem>
 	</ObjectTypeConfig>

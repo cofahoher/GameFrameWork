@@ -2,4 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
+    public partial class BehaviorTreeSkillComponent : SkillComponent
+    {
+    }
 }

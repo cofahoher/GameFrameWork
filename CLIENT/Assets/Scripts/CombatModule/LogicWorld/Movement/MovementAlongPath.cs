@@ -15,6 +15,9 @@ namespace Combat
         Vector3FP m_direction;
         FixPoint m_remain_time;
 
+        PositionComponent m_target;
+        FixPoint m_range;
+
         public void Reset()
         {
             m_callback = null;
@@ -39,6 +42,7 @@ namespace Combat
 
         public void MoveAlongPath(List<Vector3FP> path)
         {
+            m_target = null;
             //不可以保存path
             m_path.Clear();
             for (int i = 0; i < path.Count; ++i)
@@ -69,6 +73,12 @@ namespace Combat
                 m_remain_time -= delta_time;
                 m_position_component.CurrentPosition = new_position;
             }
+            if (m_target != null)
+            {
+                FixPoint distance = m_position_component.CurrentPosition.FastDistance(m_target.CurrentPosition) - m_position_component.Radius - m_target.Radius;  //ZZWTODO 多处距离计算
+                if (distance < m_range)
+                    m_callback.MovementFinished();
+            }
         }
 
         void AdvanceWayPoint()
@@ -84,6 +94,12 @@ namespace Combat
             FixPoint distance = m_direction.Normalize();
             m_remain_time = distance / m_max_speed;
             m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
+        }
+
+        public void FinishMovementWhenTargetInRange(PositionComponent target, FixPoint range)
+        {
+            m_target = target;
+            m_range = range;
         }
     }
 }

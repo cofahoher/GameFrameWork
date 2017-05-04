@@ -54,9 +54,10 @@ namespace Combat
             string asset;
             if (dic.TryGetValue("asset", out asset))
                 m_asset_name = asset;
+            CreateModel();
         }
 
-        protected override void PostInitializeComponent()
+        void CreateModel()
         {
             m_unity_go = UnityResourceManager.Instance.CreateGameObject(m_asset_name);
             if (m_unity_go == null)

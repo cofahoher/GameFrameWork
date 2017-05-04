@@ -69,24 +69,39 @@ namespace Combat
             REGISTER_COMPONENT<LocomotorComponent>()
                 .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "MaxSpeed", Flag_Variable_GetSet);
             REGISTER_COMPONENT<ManaComponent>();
-            REGISTER_COMPONENT<PathFindingComponent>()
-                .REGISTER_VARIABLE<FixPoint>("tolerance", null, "m_tolerance");
+            REGISTER_COMPONENT<ObstacleComponent>()
+                .REGISTER_VARIABLE<FixPoint>("ext_x", null, "m_extents.x")
+                .REGISTER_VARIABLE<FixPoint>("ext_y", null, "m_extents.y")
+                .REGISTER_VARIABLE<FixPoint>("ext_z", null, "m_extents.z");
+            REGISTER_COMPONENT<PathFindingComponent>();
             REGISTER_COMPONENT<PositionComponent>()
                 .REGISTER_VARIABLE<FixPoint>("x", "VID_X", "m_current_position.x")
                 .REGISTER_VARIABLE<FixPoint>("y", "VID_Y", "m_current_position.y")
                 .REGISTER_VARIABLE<FixPoint>("z", "VID_Z", "m_current_position.z")
-                .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle")
-                .REGISTER_VARIABLE<FixPoint>("ext_x", "VID_ExtX", "m_extents.x", Flag_Variable_Get_Attribute_Get)
-                .REGISTER_VARIABLE<FixPoint>("ext_y", "VID_ExtY", "m_extents.y", Flag_Variable_Get_Attribute_Get)
-                .REGISTER_VARIABLE<FixPoint>("ext_z", "VID_ExtZ", "m_extents.z", Flag_Variable_Get_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("radius", "VID_Radius", "m_radius")
+                .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle", Flag_Variable_GetSet)
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
+            REGISTER_COMPONENT<ProjectileComponent>();
             REGISTER_COMPONENT<SkillManagerComponent>();
             REGISTER_COMPONENT<StateComponent>();
             REGISTER_COMPONENT<TargetingComponent>();
             #endregion
 
             #region Skill
-            REGISTER_COMPONENT<CreateObjectSkillComponent>();
+            REGISTER_COMPONENT<BehaviorTreeSkillComponent>();
+            REGISTER_COMPONENT<CreateObjectSkillComponent>()
+                .REGISTER_VARIABLE<int>("object_type_id", null, "m_object_type_id")
+                .REGISTER_VARIABLE<int>("object_proto_id", null, "m_object_proto_id")
+                .REGISTER_VARIABLE<FixPoint>("offset_x", null, "m_offset.x")
+                .REGISTER_VARIABLE<FixPoint>("offset_y", null, "m_offset.y")
+                .REGISTER_VARIABLE<FixPoint>("offset_z", null, "m_offset.z")
+                .REGISTER_VARIABLE<FixPoint>("speed", null, "m_speed");
+            REGISTER_COMPONENT<DirectDamageSkillComponent>()
+                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
+                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
+                .REGISTER_VARIABLE<bool>("can_critical", null, "m_can_critical")
+                .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
+                .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>();
             REGISTER_COMPONENT<SkillDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("mana_type", "VID_ManaType", "m_mana_type", Flag_Attribute_Get)
@@ -113,12 +128,6 @@ namespace Combat
                 .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
                 .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
                 .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation");
-            REGISTER_COMPONENT<DirectDamageSkillComponent>()
-                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
-                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
-                .REGISTER_VARIABLE<bool>("can_critical", null, "m_can_critical")
-                .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
-                .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             #endregion
 
             #region Effect

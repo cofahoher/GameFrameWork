@@ -5,10 +5,10 @@ namespace Combat
 {
     public class SkillTimer : IRecyclable, IDestruct
     {
-        public const int CooldownTimer = 1;
-        public const int CastingTimer = 2;
-        public const int InflictingTimer = 3;
-        public const int ExpirationTimer = 4;
+        public const int CooldownTimer = 0;
+        public const int CastingTimer = 1;
+        public const int InflictingTimer = 2;
+        public const int ExpirationTimer = 3;
         public const int TimerCount = 4;
 
         FixPoint m_strat_time = FixPoint.Zero;

@@ -9,6 +9,7 @@ namespace Combat
         void MoveByDirection(Vector3FP direction);
         void MoveAlongPath(List<Vector3FP> path);
         void Update(FixPoint delta_time);
+        void FinishMovementWhenTargetInRange(PositionComponent target, FixPoint range);
     }
 
     public interface IMovementCallback

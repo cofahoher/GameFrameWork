@@ -2,6 +2,7 @@
 	<SkillConfig>
 		<ConfigItem id="1001" name="近战普通攻击">
 			<Component id="SkillDefinitionComponent">
+				<var key="max_range" value="1"/>
 				<var key="cooldown_time" value="1"/>
 				<var key="inflict_time" value="0.5"/>
 				<var key="target_gathering_type" value="DefaultTarget"/>
@@ -9,6 +10,23 @@
 			</Component>
 			<Component id="DirectDamageSkillComponent">
 				<var key="damage_amount" value="100"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="1002" name="弹道发射物">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="1"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="CreateObjectSkillComponent">
+				<var key="object_type_id" value="301"/>
+				<var key="object_proto_id" value="301001"/>
+				<var key="offset_x" value="0"/>
+				<var key="offset_y" value="1"/>
+				<var key="offset_z" value="1"/>
+				<var key="speed" value="15"/>
 			</Component>
 		</ConfigItem>
 	</SkillConfig>

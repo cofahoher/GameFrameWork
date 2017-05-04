@@ -4,7 +4,7 @@ namespace Combat
 {
     public partial class LocomotorComponent : EntityComponent, IMovementCallback
     {
-        readonly FixPoint PERIOD = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
+        static readonly FixPoint PERIOD = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
 
         //需要备份的初始数据
         //运行数据
@@ -28,6 +28,11 @@ namespace Combat
                 if (m_movement_provider != null)
                     m_movement_provider.SetMaxSpeed(m_current_max_speed);
             }
+        }
+
+        public IMovementProvider GetMovementProvider()
+        {
+            return m_movement_provider;
         }
         #endregion
 

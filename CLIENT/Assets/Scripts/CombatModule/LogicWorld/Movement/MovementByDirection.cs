@@ -49,5 +49,7 @@ namespace Combat
             }
             m_position_component.CurrentPosition = new_position;
         }
+
+        public void FinishMovementWhenTargetInRange(PositionComponent target, FixPoint range) { }
     }
 }

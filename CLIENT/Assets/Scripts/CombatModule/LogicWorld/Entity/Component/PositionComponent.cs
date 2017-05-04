@@ -30,8 +30,8 @@ namespace Combat
         BirthPositionInfo m_birth_info = new BirthPositionInfo(FixPoint.Zero, FixPoint.Zero, FixPoint.Zero, FixPoint.Zero);
         //运行数据
         Vector3FP m_current_position;
-        FixPoint m_current_angle;
-        Vector3FP m_extents = new Vector3FP();
+        FixPoint m_current_angle;  //绕Z轴的转角，注意Unity是左手系
+        FixPoint m_radius = FixPoint.Zero;
         bool m_visible = true;
 
         #region GETTER
@@ -40,9 +40,20 @@ namespace Combat
             get { return m_current_position; }
             set { m_current_position = value; }
         }
-        public Vector3FP Extents
+
+        public FixPoint CurrentAngle
         {
-            get { return m_extents; }
+            get { return m_current_angle; }
+            set { SetAngle(value); }
+        }
+
+        public Vector2FP Facing
+        {
+            get
+            {
+                FixPoint radian = FixPoint.Degree2Radian(-m_current_angle);
+                return new Vector2FP(FixPoint.Cos(radian), FixPoint.Sin(radian));
+            }
         }
         #endregion
 

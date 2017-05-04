@@ -8,7 +8,7 @@ namespace Combat
         public int m_object_proxy_id = -1;
         public int m_object_type_id = -1;
         public int m_object_proto_id = -1;
-        public BirthPositionInfo m_birth_info = null;
+        public BirthPositionInfo m_birth_info = null;  //ZZWTODO 要改，不知道怎么改？融入m_custom_data的一部分？
         public string m_name;
         public System.Object m_custom_data = null;
         //实际配置

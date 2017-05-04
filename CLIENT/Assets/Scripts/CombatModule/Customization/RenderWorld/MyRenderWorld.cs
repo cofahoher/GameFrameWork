@@ -114,7 +114,8 @@ namespace Combat
                 EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
                 cmd.ConstructAsDestination(m_current_operate_entityi_id, Vector3_To_Vector3FP(hit.point));
                 PushLocalCommand(cmd);
-                if (m_grid_graph != null)
+#if UNITY_EDITOR
+                if (m_draw_grid && m_grid_graph != null)
                 {
                     PositionComponent position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
                     if (!m_grid_graph.FindPath(position_component.CurrentPosition, Vector3_To_Vector3FP(hit.point)))
@@ -131,6 +132,7 @@ namespace Combat
                         }
                     }
                 }
+#endif
             }
             else
             {
@@ -150,6 +152,27 @@ namespace Combat
                     EntityTargetCommand cmd = Command.Create<EntityTargetCommand>();
                     cmd.Construct(m_current_operate_entityi_id, render_entity.ID);
                     PushLocalCommand(cmd);
+#if UNITY_EDITOR
+                    if (m_draw_grid && m_grid_graph != null)
+                    {
+                        RenderEntity self_entity = m_render_entity_manager.GetObject(m_current_operate_entityi_id);
+                        PositionComponent self_position_component = self_entity.GetLogicEntity().GetComponent<PositionComponent>();
+                        PositionComponent target_position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
+                        if (!m_grid_graph.FindPath(self_position_component.CurrentPosition, target_position_component.CurrentPosition))
+                        {
+                            Debug.LogError("FindPath Failed!");
+                        }
+                        else
+                        {
+                            List<Vector3FP> path = m_grid_graph.GetPath();
+                            m_current_path.Clear();
+                            for (int i = 0; i < path.Count; ++i)
+                            {
+                                m_current_path.Add(Vector3FP_To_Vector3(path[i]));
+                            }
+                        }
+                    }
+#endif
                 }
             }
         }
@@ -265,7 +288,7 @@ namespace Combat
             }
         }
 
-        bool m_draw_grid = false;
+        bool m_draw_grid = true;
         public void DrawGridAndPath()
         {
             if (!m_draw_grid)

@@ -412,6 +412,7 @@ namespace Combat
             ComponentData cd = new ComponentData();
             cd.m_component_type_id = (int)CRC.Calculate("SkillDefinitionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
+            cd.m_component_variables["max_range"] = "2";
             cd.m_component_variables["cooldown_time"] = "1";
             cd.m_component_variables["inflict_time"] = "0.5";
             cd.m_component_variables["target_gathering_type"] = "DefaultTarget";

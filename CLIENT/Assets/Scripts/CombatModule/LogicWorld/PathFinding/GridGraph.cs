@@ -199,10 +199,13 @@ namespace Combat
                     GridNode neighbour = GetNeighbourNode(current_node, i);
                     if (neighbour == null)
                         continue;
+                    int neighbour_cost = NEIGHBOUR_COST[i];
                     if (neighbour.m_path_id != m_path_id)
                     {
                         neighbour.m_path_id = m_path_id;
-                        neighbour.m_g = 0;
+                        neighbour.m_g = current_node.m_g + neighbour_cost;
+                        if (!neighbour.Walkable)
+                            neighbour.m_g += 1000;
                         neighbour.m_h = CalculateHCost(current_node, end_node);
                         m_open_set.Enqueue(neighbour);
                     }

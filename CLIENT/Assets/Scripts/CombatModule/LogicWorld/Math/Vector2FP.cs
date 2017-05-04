@@ -164,7 +164,7 @@ namespace Combat
 
         public Vector2FP Perpendicular()
         {
-            return new Vector2FP(-z, x);
+            return new Vector2FP(z, -x);
         }
         public void Perpendicular(ref Vector2FP v2fp)
         {

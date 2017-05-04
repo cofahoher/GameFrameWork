@@ -36,6 +36,9 @@ namespace Combat
             LocomotorComponent locomotor_component = entity.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
             if (locomotor_component == null)
                 return false;
+            TargetingComponent targeting_component = entity.GetComponent(TargetingComponent.ID) as TargetingComponent;
+            if (targeting_component != null)
+                targeting_component.StopTargeting();
             if (cmd.m_move_type == EntityMoveCommand.DestinationType)
             {
                 PathFindingComponent pathfinding_component = entity.GetComponent(PathFindingComponent.ID) as PathFindingComponent;

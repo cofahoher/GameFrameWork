@@ -22,8 +22,9 @@ namespace Combat
             m_camera_cmp = camera_go.GetComponent<Camera>();
             m_camera_tf = camera_go.transform;
 
-            m_camera_tf.position = new Vector3(0, 10, -25);
-            m_camera_tf.LookAt(Vector3.zero);
+            m_camera_tf.position = new Vector3(0, 25, -25);
+            m_camera_tf.localEulerAngles = new Vector3(50, 0, 0);
+            //m_camera_tf.LookAt(Vector3.zero);
         }
     }
 }

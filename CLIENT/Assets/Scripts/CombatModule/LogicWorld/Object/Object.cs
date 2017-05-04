@@ -24,7 +24,6 @@ namespace Combat
 
         public void Destruct()
         {
-            OnDestruct();
             NotifyGeneratorDestroyAndRemoveAllListeners();
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
@@ -33,6 +32,7 @@ namespace Combat
                 component.Destruct();
             }
             m_components.Clear();
+            OnDestruct();
         }
 
         protected virtual void OnDestruct()
@@ -44,14 +44,22 @@ namespace Combat
         {
             return m_context;
         }
+
         public int ID
         {
             get { return m_context.m_object_id; }
         }
+
         public string Name
         {
             get { return m_context.m_name; }
         }
+
+        public bool IsLocal
+        {
+            get { return m_context.m_is_local; }
+        }
+
         public bool DeletePending
         {
             get { return m_is_delete_pending; }

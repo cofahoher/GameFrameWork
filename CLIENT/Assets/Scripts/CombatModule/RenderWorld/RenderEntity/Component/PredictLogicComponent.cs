@@ -47,8 +47,9 @@ namespace Combat
         #region GETTER
         public bool HasMovementPredict
         {
-            get { return m_copy_state != DoCopy; }
+            get { return m_copy_state != DoCopy && m_movement_predicts.Count > 0; }
         }
+
         public LocomotorComponent GetLocomotorComponent()
         {
             return m_locomotor_component;
@@ -81,7 +82,7 @@ namespace Combat
 
         public void OnLogicUpdatePosition(Vector3 offset)
         {
-            if (m_copy_state == DoCopy)
+            if (m_copy_state == DoCopy || m_movement_predicts.Count == 0)
             {
                 Interpolate();
                 return;

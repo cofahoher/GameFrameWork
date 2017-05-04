@@ -4,7 +4,9 @@ namespace Combat
 {
     public partial class TargetingComponent : EntityComponent, ISignalListener
     {
-        readonly FixPoint TARGETING_UPDATE_MIN_FREQUENCY = FixPoint.One;
+        static readonly FixPoint TARGETING_UPDATE_MIN_FREQUENCY = FixPoint.Two / FixPoint.Ten;
+        static readonly FixPoint TARGETING_UPDATE_MAX_FREQUENCY = FixPoint.Two;
+
         SignalListenerContext m_listener_context;
         Entity m_current_target;
         UpdateTargetingTask m_task;
@@ -74,6 +76,8 @@ namespace Combat
         {
             if (m_current_target != null && target.ID == m_current_target.ID)
                 return;
+            if (ObjectUtil.IsDead(target))
+                return;
             StopTargeting();
             m_current_target = target;
             target.AddListener(SignalType.Die, m_listener_context);
@@ -86,6 +90,7 @@ namespace Combat
                 return;
             m_current_target.RemoveListener(SignalType.Die, m_listener_context.ID);
             m_current_target = null;
+            m_task.Cancel();
         }
 
         public void ScheduleTargeting(FixPoint delay)
@@ -108,33 +113,56 @@ namespace Combat
             Skill skill = skill_cmp.GetDefaultSkill();
             if (skill == null)
                 return;
+
             if (!skill.IsReady() && locomotor_cmp != null && locomotor_cmp.IsMoving)
             {
                 FixPoint delay = skill.GetNextReadyTime();
                 if (delay == FixPoint.Zero)
                     delay = FixPoint.PrecisionFP;
                 ScheduleTargeting(delay);
+                return;
             }
 
             bool move_required = false;
             FixPoint max_range = skill.GetSkillDefinitionComponent().MaxRange;
-            if (max_range >0)
+            PositionComponent target_position_cmp = m_current_target.GetComponent(PositionComponent.ID) as PositionComponent;
+            Vector3FP direction = target_position_cmp.CurrentPosition - position_cmp.CurrentPosition;
+            if (max_range > 0)
             {
-                PositionComponent target_position_cmp = m_current_target.GetComponent(PositionComponent.ID) as PositionComponent;
-                FixPoint distance = position_cmp.CurrentPosition.FastDistance(target_position_cmp.CurrentPosition);
+                FixPoint distance = direction.FastLength() - target_position_cmp.Radius - position_cmp.Radius;  //ZZWTODO 多处距离计算
                 if (distance > max_range)
                 {
                     move_required = true;
-                    if (locomotor_cmp == null || !locomotor_cmp.IsEnable())
+                    if (locomotor_cmp == null)
                     {
                         //ZZWTODO
+                        ScheduleTargeting(TARGETING_UPDATE_MAX_FREQUENCY);
+                    }
+                    else if (!locomotor_cmp.IsEnable())
+                    {
                         ScheduleTargeting(TARGETING_UPDATE_MIN_FREQUENCY);
                     }
                     else
                     {
-                        FixPoint delay = distance / locomotor_cmp.MaxSpeed / FixPoint.Two;
-                        if (delay < TARGETING_UPDATE_MIN_FREQUENCY)
+                        FixPoint delay = (distance - max_range) / locomotor_cmp.MaxSpeed;
+                        if (delay > TARGETING_UPDATE_MAX_FREQUENCY)
+                            delay = TARGETING_UPDATE_MAX_FREQUENCY;
+                        else if (delay < TARGETING_UPDATE_MIN_FREQUENCY)
                             delay = TARGETING_UPDATE_MIN_FREQUENCY;
+                        PathFindingComponent pathfinding_component = ParentObject.GetComponent(PathFindingComponent.ID) as PathFindingComponent;
+                        if (pathfinding_component != null)
+                        {
+                            if (pathfinding_component.FindPath(target_position_cmp.CurrentPosition))
+                                locomotor_cmp.GetMovementProvider().FinishMovementWhenTargetInRange(target_position_cmp, max_range);
+                        }
+                        else
+                        {
+                            List<Vector3FP> path = new List<Vector3FP>();
+                            path.Add(position_cmp.CurrentPosition);
+                            path.Add(target_position_cmp.CurrentPosition);
+                            locomotor_cmp.MoveAlongPath(path);
+                            locomotor_cmp.GetMovementProvider().FinishMovementWhenTargetInRange(target_position_cmp, max_range);
+                        }
                         ScheduleTargeting(delay);
                     }
                 }
@@ -143,9 +171,19 @@ namespace Combat
             {
                 if (skill.CheckActivate() == CastSkillResult.Success)
                 {
+                    position_cmp.SetAngle(direction);
+                    skill.Activate(GetCurrentTime());
+                    FixPoint delay = skill.GetSkillDefinitionComponent().CooldownTime + FixPoint.PrecisionFP;
+                    if (delay > TARGETING_UPDATE_MAX_FREQUENCY)
+                        delay = TARGETING_UPDATE_MAX_FREQUENCY;
+                    ScheduleTargeting(delay);
                 }
                 else
                 {
+                    FixPoint delay = skill.GetNextReadyTime();
+                    if (delay < TARGETING_UPDATE_MIN_FREQUENCY)
+                        delay = TARGETING_UPDATE_MIN_FREQUENCY;
+                    ScheduleTargeting(delay);
                 }
             }
         }

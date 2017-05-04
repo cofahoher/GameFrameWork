@@ -17,7 +17,8 @@ namespace Combat
         protected override void AfterObjectCreated(Entity entity)
         {
             Player player = entity.GetOwnerPlayer();
-            player.AddEntity(entity);
+            if (player != null)
+                player.AddEntity(entity);
             PositionComponent position_component = entity.GetComponent<PositionComponent>();
             if (position_component != null && position_component.Visible)
                 m_logic_world.AddSimpleRenderMessage(RenderMessageType.CreateEntity, entity.ID);

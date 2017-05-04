@@ -24,15 +24,18 @@ namespace Combat
             Register<EffectManagerComponent>(false);
             Register<LocomotorComponent>(false);
             Register<ManaComponent>(false);
+            Register<ObstacleComponent>(false);
             Register<PathFindingComponent>(false);
             Register<PositionComponent>(false);
+            Register<ProjectileComponent>(false);
             Register<SkillManagerComponent>(false);
             Register<StateComponent>(false);
             Register<TargetingComponent>(false);
+            Register<BehaviorTreeSkillComponent>(false);
             Register<CreateObjectSkillComponent>(false);
+            Register<DirectDamageSkillComponent>(false);
             Register<EffectGeneratorSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
-            Register<DirectDamageSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<DamageEffectComponent>(false);
@@ -252,16 +255,25 @@ namespace Combat
         public const int ID = -1133849163;
     }
 
-    public partial class PathFindingComponent
+    public partial class ObstacleComponent
     {
-        public const int ID = -975410129;
+        public const int ID = 1898152231;
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
-            if (variables.TryGetValue("tolerance", out value))
-                m_tolerance = FixPoint.Parse(value);
+            if (variables.TryGetValue("ext_x", out value))
+                m_extents.x = FixPoint.Parse(value);
+            if (variables.TryGetValue("ext_y", out value))
+                m_extents.y = FixPoint.Parse(value);
+            if (variables.TryGetValue("ext_z", out value))
+                m_extents.z = FixPoint.Parse(value);
         }
+    }
+
+    public partial class PathFindingComponent
+    {
+        public const int ID = -975410129;
     }
 
     public partial class PositionComponent
@@ -270,20 +282,16 @@ namespace Combat
         public const int VID_X = -1505763071;
         public const int VID_Y = -1088106432;
         public const int VID_Z = -1811315837;
+        public const int VID_Radius = -1373094910;
         public const int VID_CurrentAngle = 1682267402;
-        public const int VID_ExtX = 1338674874;
-        public const int VID_ExtY = 1456586747;
-        public const int VID_ExtZ = 2113727544;
 
         static PositionComponent()
         {
             ComponentTypeRegistry.RegisterVariable(VID_X, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Y, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Z, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_Radius, ID);
             ComponentTypeRegistry.RegisterVariable(VID_CurrentAngle, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_ExtX, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_ExtY, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_ExtZ, ID);
         }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
@@ -295,14 +303,10 @@ namespace Combat
                 m_current_position.y = FixPoint.Parse(value);
             if (variables.TryGetValue("z", out value))
                 m_current_position.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("radius", out value))
+                m_radius = FixPoint.Parse(value);
             if (variables.TryGetValue("angle", out value))
                 m_current_angle = FixPoint.Parse(value);
-            if (variables.TryGetValue("ext_x", out value))
-                m_extents.x = FixPoint.Parse(value);
-            if (variables.TryGetValue("ext_y", out value))
-                m_extents.y = FixPoint.Parse(value);
-            if (variables.TryGetValue("ext_z", out value))
-                m_extents.z = FixPoint.Parse(value);
             if (variables.TryGetValue("visible", out value))
                 m_visible = bool.Parse(value);
         }
@@ -320,17 +324,11 @@ namespace Combat
             case VID_Z:
                 value = m_current_position.z;
                 return true;
+            case VID_Radius:
+                value = m_radius;
+                return true;
             case VID_CurrentAngle:
                 value = m_current_angle;
-                return true;
-            case VID_ExtX:
-                value = m_extents.x;
-                return true;
-            case VID_ExtY:
-                value = m_extents.y;
-                return true;
-            case VID_ExtZ:
-                value = m_extents.z;
                 return true;
             default:
                 value = FixPoint.Zero;
@@ -350,6 +348,9 @@ namespace Combat
                 return true;
             case VID_Z:
                 m_current_position.z = value;
+                return true;
+            case VID_Radius:
+                m_radius = value;
                 return true;
             case VID_CurrentAngle:
                 m_current_angle = value;
@@ -375,24 +376,9 @@ namespace Combat
             get { return m_current_position.z; }
         }
 
-        public FixPoint CurrentAngle
+        public FixPoint Radius
         {
-            get { return m_current_angle; }
-        }
-
-        public FixPoint ExtX
-        {
-            get { return m_extents.x; }
-        }
-
-        public FixPoint ExtY
-        {
-            get { return m_extents.y; }
-        }
-
-        public FixPoint ExtZ
-        {
-            get { return m_extents.z; }
+            get { return m_radius; }
         }
 
         public bool Visible
@@ -400,6 +386,11 @@ namespace Combat
             get { return m_visible; }
         }
 #endregion
+    }
+
+    public partial class ProjectileComponent
+    {
+        public const int ID = -1092026181;
     }
 
     public partial class SkillManagerComponent
@@ -417,9 +408,51 @@ namespace Combat
         public const int ID = -775984024;
     }
 
+    public partial class BehaviorTreeSkillComponent
+    {
+        public const int ID = 777250943;
+    }
+
     public partial class CreateObjectSkillComponent
     {
         public const int ID = 332789708;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("object_type_id", out value))
+                m_object_type_id = int.Parse(value);
+            if (variables.TryGetValue("object_proto_id", out value))
+                m_object_proto_id = int.Parse(value);
+            if (variables.TryGetValue("offset_x", out value))
+                m_offset.x = FixPoint.Parse(value);
+            if (variables.TryGetValue("offset_y", out value))
+                m_offset.y = FixPoint.Parse(value);
+            if (variables.TryGetValue("offset_z", out value))
+                m_offset.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("speed", out value))
+                m_speed = FixPoint.Parse(value);
+        }
+    }
+
+    public partial class DirectDamageSkillComponent
+    {
+        public const int ID = -360499912;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("damage_type", out value))
+                m_damage_type_id = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("damage_amount", out value))
+                m_damage_amount.Compile(value);
+            if (variables.TryGetValue("can_critical", out value))
+                m_can_critical = bool.Parse(value);
+            if (variables.TryGetValue("combo_attack_cnt", out value))
+                m_combo_attack_cnt = int.Parse(value);
+            if (variables.TryGetValue("combo_interval", out value))
+                m_combo_interval = FixPoint.Parse(value);
+        }
     }
 
     public partial class EffectGeneratorSkillComponent
@@ -671,26 +704,6 @@ namespace Combat
             get { return m_impact_delay; }
         }
 #endregion
-    }
-
-    public partial class DirectDamageSkillComponent
-    {
-        public const int ID = -360499912;
-
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            string value;
-            if (variables.TryGetValue("damage_type", out value))
-                m_damage_type_id = (int)CRC.Calculate(value);
-            if (variables.TryGetValue("damage_amount", out value))
-                m_damage_amount.Compile(value);
-            if (variables.TryGetValue("can_critical", out value))
-                m_can_critical = bool.Parse(value);
-            if (variables.TryGetValue("combo_attack_cnt", out value))
-                m_combo_attack_cnt = int.Parse(value);
-            if (variables.TryGetValue("combo_interval", out value))
-                m_combo_interval = FixPoint.Parse(value);
-        }
     }
 
     public partial class AddStateEffectComponent

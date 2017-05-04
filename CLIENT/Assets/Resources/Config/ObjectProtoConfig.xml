@@ -5,11 +5,13 @@
 				<var key="asset" value="Objects/3D/zzw_cube"/>
 			</Component>
 		</ConfigItem>
+		
 		<ConfigItem id="101002" name="Sphere">
 			<Component>
 				<var key="asset" value="Objects/3D/zzw_sphere"/>
 			</Component>
 		</ConfigItem>
+		
 		<ConfigItem id="102001" name="ssx_legacy">
 			<Component>
 				<var key="asset" value="Objects/3D/zzw_ssx_legacy"/>
@@ -25,14 +27,21 @@
 			</Attributes>
 			<Skills>
 				<var index="0" id="1001"/>
-				<var index="1" id="1002"/>
-				<var index="2" id="1003"/>
-				<var index="3" id="1004"/>
 			</Skills>
 		</ConfigItem>
+		
 		<ConfigItem id="103001" name="ssx_mecanim">
 			<Component>
 				<var key="asset" value="Objects/3D/zzw_ssx_mecanim"/>
+			</Component>
+			<Skills>
+				<var index="0" id="1002"/>
+			</Skills>
+		</ConfigItem>
+		
+		<ConfigItem id="301001" name="Cube">
+			<Component>
+				<var key="asset" value="Objects/3D/zzw_missile_entity"/>
 			</Component>
 		</ConfigItem>
 	</ObjectProtoConfig>

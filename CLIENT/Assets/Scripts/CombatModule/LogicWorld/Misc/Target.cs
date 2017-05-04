@@ -67,8 +67,9 @@ namespace Combat
         public Entity GetEntity()
         {
             if (m_target_type == TargetType.EntityType)
-                m_logic_world.GetEntityManager().GetObject(m_object_id);
-            return null;
+                return m_logic_world.GetEntityManager().GetObject(m_object_id);
+            else
+                return null;
         }
         public int GetEntityID()
         {
