@@ -72,6 +72,7 @@ namespace Combat
 
         public List<int> CollectEntity_Point(Vector3FP position, int exclude_id)
         {
+            m_collection.Clear();
             FixPoint position_x = position.x - m_left_bottom_position.x;
             FixPoint position_z = position.z - m_left_bottom_position.z;
             int min_x = (int)((position_x - TOLERANCE) / CELL_SIZE);
@@ -90,7 +91,7 @@ namespace Combat
             PositionComponent cmp;
             for (int x = min_x; x <= max_x; ++x)
             {
-                for (int z = min_z; z < max_z; ++z)
+                for (int z = min_z; z <= max_z; ++z)
                 {
                     cell = m_cells[x, z];
                     for (int i = 0; i < cell.m_entities.Count; ++i)

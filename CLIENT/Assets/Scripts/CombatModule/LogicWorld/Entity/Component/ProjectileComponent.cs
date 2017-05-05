@@ -135,7 +135,7 @@ namespace Combat
             if (m_lock)
                 return;
             m_lock = true;
-            FixPoint max_time = FixPoint.One / FixPoint.Two;
+            FixPoint max_time = FixPoint.One / speed;
             if (m_remain_time > max_time)
                 m_remain_time = max_time;
         }

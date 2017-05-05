@@ -229,11 +229,12 @@
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\RenderMessageProcessor.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Empty.cs" />
     <Compile Include="Assets\Scripts\CombatModule\GeneralComposableObject.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\BehaviorTree\BehaviorTree.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\AI.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\Attribute.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeSystem.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTree.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\AttributeData.cs" />
@@ -346,6 +347,10 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillTimer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\TargetGatheringManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\CellSpaceManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\ISpaceManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\RegionCallbak.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\RegionCallbakManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\WorldCreationContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimationComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimatorComponent.cs" />
