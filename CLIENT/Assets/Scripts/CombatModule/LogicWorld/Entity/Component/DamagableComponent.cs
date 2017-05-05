@@ -112,6 +112,8 @@ namespace Combat
                 DeathComponent death_component = ParentObject.GetComponent<DeathComponent>(DeathComponent.ID);
                 if (death_component != null)
                     death_component.KillOwner();
+                else
+                    EntityUtil.KillEntity(ParentObject as Entity);
                 ParentObject.SendSignal(SignalType.Die);
             }
         }

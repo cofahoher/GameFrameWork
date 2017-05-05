@@ -33,10 +33,14 @@ namespace Combat
             //m_grid_graph = new HexagonGridGraph();
             FixPoint grid_size = FixPoint.One;
             FixPoint seeker_radius = FixPoint.One / FixPoint.FixPointDigit[4];
-            m_grid_graph.GenerateAsPlaneMap(grid_size, new FixPoint(40), new FixPoint(30), FixPoint.Zero, new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15)), seeker_radius);
+            FixPoint x_size = new FixPoint(40);
+            FixPoint z_size = new FixPoint(30);
+            Vector3FP left_bottom_position = new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15));
+            m_grid_graph.GenerateAsPlaneMap(grid_size, x_size, z_size, FixPoint.Zero, left_bottom_position, seeker_radius);
             m_grid_graph.CoverArea(new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.FixPointDigit[5]), new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Half));
             m_grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[5]));
             m_grid_graph.CoverArea(new Vector3FP(-FixPoint.FixPointDigit[7] - FixPoint.Half, FixPoint.Zero, FixPoint.Two), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[7] + FixPoint.Half));
+            m_space_manager = new CellSpaceManager(this, x_size, z_size, left_bottom_position);
         }
 
         public override void Destruct()

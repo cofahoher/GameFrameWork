@@ -4,6 +4,8 @@ namespace Combat
 {
     public abstract class Component : ILogicOwnerInfo, IDestruct, IExpressionVariableProvider
     {
+        static public readonly FixPoint LOGIC_UPDATE_INTERVAL = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
+
         protected Object m_parent_object;
         protected int m_component_type_id = -1;
         protected int m_disable_count = 0;

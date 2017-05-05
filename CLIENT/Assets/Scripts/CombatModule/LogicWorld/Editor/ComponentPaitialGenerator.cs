@@ -80,6 +80,7 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("z", "VID_Z", "m_current_position.z")
                 .REGISTER_VARIABLE<FixPoint>("radius", "VID_Radius", "m_radius")
                 .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle", Flag_Variable_GetSet)
+                .REGISTER_VARIABLE<bool>("collision_sender", null, "m_collision_sender")
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<ProjectileComponent>();
             REGISTER_COMPONENT<SkillManagerComponent>();
@@ -95,6 +96,7 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("offset_x", null, "m_offset.x")
                 .REGISTER_VARIABLE<FixPoint>("offset_y", null, "m_offset.y")
                 .REGISTER_VARIABLE<FixPoint>("offset_z", null, "m_offset.z")
+                .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime")
                 .REGISTER_VARIABLE<FixPoint>("speed", null, "m_speed");
             REGISTER_COMPONENT<DirectDamageSkillComponent>()
                 .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")

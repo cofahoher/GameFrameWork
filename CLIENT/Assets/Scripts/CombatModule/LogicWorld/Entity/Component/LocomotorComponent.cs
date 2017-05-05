@@ -4,8 +4,6 @@ namespace Combat
 {
     public partial class LocomotorComponent : EntityComponent, IMovementCallback
     {
-        static readonly FixPoint PERIOD = new FixPoint(SyncParam.FRAME_TIME) / FixPoint.Thousand;
-
         //需要备份的初始数据
         //运行数据
         FixPoint m_current_max_speed = FixPoint.Zero;
@@ -127,7 +125,7 @@ namespace Combat
                 m_task.Construct(this);
             }
             var schedeler = GetLogicWorld().GetTaskScheduler();
-            schedeler.Schedule(m_task, GetCurrentTime(), PERIOD, PERIOD);
+            schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
             if (!m_is_moving)
             {
                 m_is_moving = true;

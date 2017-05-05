@@ -23,6 +23,13 @@ namespace Combat
             z = rhs.z;
         }
 
+        public Vector3FP(Vector2FP v2)
+        {
+            x = v2.x;
+            y = FixPoint.Zero;
+            z = v2.z;
+        }
+
         public static Vector3FP CreateXY(FixPoint term_x, FixPoint term_y)
         {
             return new Vector3FP(term_x, term_y, FixPoint.Zero);

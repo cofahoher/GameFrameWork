@@ -25,6 +25,7 @@ namespace Combat
         protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
         protected TargetGatheringManager m_target_gathering_manager;
+        protected ISpaceManager m_space_manager;
         protected GridGraph m_grid_graph;
 
         public LogicWorld()
@@ -82,6 +83,17 @@ namespace Combat
             m_faction_manager = null;
             m_target_gathering_manager.Destruct();
             m_target_gathering_manager = null;
+
+            if (m_space_manager != null)
+            {
+                m_space_manager.Destruct();
+                m_space_manager = null;
+            }
+            if (m_grid_graph != null)
+            {
+                m_grid_graph.Destruct();
+                m_grid_graph = null;
+            }
 
             m_command_handler.Destruct();
             m_command_handler = null;
@@ -153,6 +165,10 @@ namespace Combat
         public GridGraph GetGridGraph()
         {
             return m_grid_graph;
+        }
+        public ISpaceManager GetSpaceManager()
+        {
+            return m_space_manager;
         }
         #endregion
 

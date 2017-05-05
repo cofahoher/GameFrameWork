@@ -32,19 +32,29 @@ namespace Combat
         Vector3FP m_current_position;
         FixPoint m_current_angle;  //绕Z轴的转角，注意Unity是左手系
         FixPoint m_radius = FixPoint.Zero;
+        bool m_collision_sender = true;
         bool m_visible = true;
+        ISpaceManager m_space_manager = null;
 
         #region GETTER
         public Vector3FP CurrentPosition
         {
             get { return m_current_position; }
-            set { m_current_position = value; }
+            set
+            {
+                if (m_space_manager != null)
+                    m_space_manager.UpdateEntity(this, value);
+                m_current_position = value;
+            }
         }
 
         public FixPoint CurrentAngle
         {
             get { return m_current_angle; }
-            set { SetAngle(value); }
+            set
+            {
+                SetAngle(value);
+            }
         }
 
         public Vector2FP Facing
@@ -72,15 +82,27 @@ namespace Combat
                 m_birth_info.m_birth_position = m_current_position;
                 m_birth_info.m_birth_angle = m_current_angle;
             }
+            if (m_collision_sender)
+            {
+                m_space_manager = GetLogicWorld().GetSpaceManager();
+                if (m_space_manager != null)
+                    m_space_manager.AddEntiy(this);
+            }
+        }
+
+        public override void OnDeletePending()
+        {
+            if (m_space_manager != null)
+                m_space_manager.RemoveEntity(this);
+        }
+
+        protected override void OnDestruct()
+        {
+            m_space_manager = null;
         }
         #endregion
 
         #region SETTER
-        public void SetPosition(Vector3FP new_position)
-        {
-            m_current_position = new_position;
-        }
-
         public void SetPositionXZ(FixPoint x, FixPoint z)
         {
             m_current_position.x = x;

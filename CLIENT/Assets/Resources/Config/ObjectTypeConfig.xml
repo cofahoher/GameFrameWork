@@ -89,6 +89,7 @@
 		<ConfigItem id="201" name="UndamagableObstruct">
 			<Component id="PositionComponent">
 				<var key="radius" value="0.5"/>
+				<var key="collision_sender" value="False"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="ObstacleComponent">
@@ -104,6 +105,7 @@
 		<ConfigItem id="301" name="Missile">
 			<Component id="PositionComponent">
 				<var key="radius" value="0"/>
+				<var key="collision_sender" value="False"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="ProjectileComponent">

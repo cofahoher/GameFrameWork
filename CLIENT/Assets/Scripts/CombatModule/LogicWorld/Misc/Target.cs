@@ -80,7 +80,18 @@ namespace Combat
 
         public Vector3FP GetPosition()
         {
-            return Vector3FP.Zero;
+            if (m_target_type == TargetType.EntityType)
+            {
+                Entity entity = m_logic_world.GetEntityManager().GetObject(m_object_id);
+                if (entity == null)
+                    return new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.Zero);
+                else
+                    return entity.GetComponent<PositionComponent>().CurrentPosition;
+            }
+            else
+            {
+                return m_position;
+            }
         }
         #endregion
     }

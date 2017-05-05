@@ -13,10 +13,17 @@ namespace Combat
             x = term_x;
             z = term_y;
         }
-        public Vector2FP(ref Vector2FP rhs)
+
+        public Vector2FP(Vector2FP rhs)
         {
             x = rhs.x;
             z = rhs.z;
+        }
+
+        public Vector2FP(Vector3FP v3)
+        {
+            x = v3.x;
+            z = v3.z;
         }
 
         public static readonly Vector2FP Zero = new Vector2FP(FixPoint.Zero, FixPoint.Zero);

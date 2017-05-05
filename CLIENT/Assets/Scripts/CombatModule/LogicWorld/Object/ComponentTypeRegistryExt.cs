@@ -307,6 +307,8 @@ namespace Combat
                 m_radius = FixPoint.Parse(value);
             if (variables.TryGetValue("angle", out value))
                 m_current_angle = FixPoint.Parse(value);
+            if (variables.TryGetValue("collision_sender", out value))
+                m_collision_sender = bool.Parse(value);
             if (variables.TryGetValue("visible", out value))
                 m_visible = bool.Parse(value);
         }
@@ -430,6 +432,8 @@ namespace Combat
                 m_offset.y = FixPoint.Parse(value);
             if (variables.TryGetValue("offset_z", out value))
                 m_offset.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("lifetime", out value))
+                m_lifetime = FixPoint.Parse(value);
             if (variables.TryGetValue("speed", out value))
                 m_speed = FixPoint.Parse(value);
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public interface IGridGraph
+    public interface IGridGraph : IDestruct
     {
         /*
          * 从二进制文件生成，尚未支持
@@ -84,6 +84,10 @@ namespace Combat
         protected Heap<GridNode> m_open_set = new Heap<GridNode>(Heap<GridNode>.CheckPriorityMethod.CPM_LESS);
         protected List<GridNode> m_node_path = new List<GridNode>();
         protected List<Vector3FP> m_position_path = new List<Vector3FP>();
+
+        public void Destruct()
+        {
+        }
 
         #region 测试用
         public GridNode[,] GetAllNodes()
