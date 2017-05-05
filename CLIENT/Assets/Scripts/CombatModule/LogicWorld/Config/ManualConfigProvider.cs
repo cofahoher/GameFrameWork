@@ -323,6 +323,7 @@ namespace Combat
             cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
             cd.m_component_variables["radius"] = "0.5";
+            cd.m_component_variables["collision_sende"] = "False";
             cd.m_component_variables["visible"] = "True";
             type_data.m_components_data.Add(cd);
 
@@ -350,6 +351,7 @@ namespace Combat
             cd.m_component_type_id = (int)CRC.Calculate("PositionComponent");
             cd.m_component_variables = new Dictionary<string, string>();
             cd.m_component_variables["radius"] = "0";
+            cd.m_component_variables["collision_sende"] = "False";
             cd.m_component_variables["visible"] = "True";
             type_data.m_components_data.Add(cd);
 
