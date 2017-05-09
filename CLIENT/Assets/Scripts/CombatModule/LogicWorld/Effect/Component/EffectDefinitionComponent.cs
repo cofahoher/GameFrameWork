@@ -18,6 +18,7 @@ namespace Combat
         EffectExpireTask m_task;
 
         #region GETTER
+
         public int OriginalEntityID
         {
             get { return m_original_entity_id; }

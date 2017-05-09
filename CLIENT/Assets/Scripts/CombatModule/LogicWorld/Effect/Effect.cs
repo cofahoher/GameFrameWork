@@ -5,11 +5,17 @@ namespace Combat
     public class Effect : Object
     {
         EffectDefinitionComponent m_definition_component;
+        bool m_is_applied = false;
 
         #region GETTER
         public EffectDefinitionComponent GetDefinitionComponent()
         {
             return m_definition_component;
+        }
+
+        public bool Applied
+        {
+            get { return m_is_applied; }
         }
         #endregion
 
@@ -50,6 +56,9 @@ namespace Combat
 
         public void Apply()
         {
+            if (m_is_applied)
+                return;
+            m_is_applied = true;
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -61,6 +70,9 @@ namespace Combat
 
         public void Unapply()
         {
+            if (!m_is_applied)
+                return;
+            m_is_applied = false;
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {
