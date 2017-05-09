@@ -114,5 +114,9 @@ namespace Combat
         public override void PushServerCommand(Command command)
         {
         }
+        public override void ClearOutputCommand()
+        {
+            m_output_commands.Clear();
+        }
     }
 }

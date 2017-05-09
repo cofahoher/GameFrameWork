@@ -8,6 +8,7 @@ namespace Combat
         void RemovePlayer(long player_pstid);
         bool AddCommand(Command command);
         List<Command> GetCommands(int syncturn);
+        void ClearCommands(int syncturn);
         int GetReadyTurn();
     }
 
@@ -44,6 +45,16 @@ namespace Combat
             List<Command> commands;
             m_syncturn2commands.TryGetValue(syncturn, out commands);
             return commands;
+        }
+        public void ClearCommands(int syncturn)
+        {
+            List<Command> commands;
+            m_syncturn2commands.TryGetValue(syncturn, out commands);
+            if (commands == null)
+                return;
+            for (int i = 0; i < commands.Count; ++i)
+                Command.Recycle(commands[i]);
+            m_syncturn2commands.Remove(syncturn);
         }
         public virtual int GetReadyTurn()
         {

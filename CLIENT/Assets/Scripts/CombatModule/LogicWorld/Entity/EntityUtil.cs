@@ -20,5 +20,25 @@ namespace Combat
                 schedeler.Schedule(delete_task, entity.GetCurrentTime(), FixPoint.PrecisionFP);
             }
         }
+
+        public static EffectGeneratorRegistry GetEffectGeneratorRegistry(Entity entity)
+        {
+            if (entity == null)
+                return null;
+            EffectManagerComponent cmp = entity.GetComponent(EffectManagerComponent.ID) as EffectManagerComponent;
+            if (cmp == null)
+                return null;
+            return cmp.GetEffectGeneratorRegistry();
+        }
+
+        public static EffectRegistry GetEffectRegistry(Entity entity)
+        {
+            if (entity == null)
+                return null;
+            EffectManagerComponent cmp = entity.GetComponent(EffectManagerComponent.ID) as EffectManagerComponent;
+            if (cmp == null)
+                return null;
+            return cmp.GetEffectRegistry();
+        }
     }
 }

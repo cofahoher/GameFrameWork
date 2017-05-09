@@ -53,8 +53,10 @@ namespace Combat
         {
             return m_output_commands;
         }
-        public void ClearOutputCommand()
+        public virtual void ClearOutputCommand()
         {
+            for (int i = 0; i < m_output_commands.Count; ++i)
+                Command.Recycle(m_output_commands[i]);
             m_output_commands.Clear();
         }
     }

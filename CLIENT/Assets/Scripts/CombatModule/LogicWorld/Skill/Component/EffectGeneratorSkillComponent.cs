@@ -4,17 +4,15 @@ namespace Combat
 {
     public partial class EffectGeneratorSkillComponent : SkillComponent
     {
-        #region 配置数据
-        #endregion
+        //配置数据
+        int m_generator_cfgid = 0;
 
-        #region 运行数据
+        //运行数据
         EffectGenerator m_generator;
-        #endregion
 
         #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
-
         }
 
         protected override void OnDestruct()
@@ -24,10 +22,8 @@ namespace Combat
         }
         #endregion
 
-        #region 技能的Activate流程
         public override void PostActivate(FixPoint start_time)
         {
         }
-        #endregion
     }
 }

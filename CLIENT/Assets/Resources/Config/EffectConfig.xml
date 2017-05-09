@@ -1,0 +1,13 @@
+<ConfigSystem>
+	<EffectConfig>
+		<ConfigItem id="1" name="Effect1">
+			<Component id="EffectDefinitionComponent">
+				<var key="category" value="Common"/>
+				<var key="conflict_id" value="1"/>
+			</Component>
+			<Component id="DamageEffectComponent">
+				<var key="damage_amount" value="100"/>
+			</Component>
+		</ConfigItem>
+	</EffectConfig>
+</ConfigSystem>

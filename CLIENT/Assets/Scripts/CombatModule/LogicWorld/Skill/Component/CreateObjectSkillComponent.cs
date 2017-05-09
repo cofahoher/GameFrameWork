@@ -4,13 +4,22 @@ namespace Combat
 {
     public partial class CreateObjectSkillComponent : SkillComponent
     {
-        int m_object_type_id = -1;
-        int m_object_proto_id = -1;
+        //配置数据
+        int m_object_type_id = 0;
+        int m_object_proto_id = 0;
+        int m_generator_cfgid = 0;
         Vector3FP m_offset;
-        FixPoint m_speed;
-        FixPoint m_lifetime = FixPoint.Ten;
+
+        //运行数据
+        int m_generator_id = 0;
 
         #region 初始化/销毁
+        public override void InitializeComponent()
+        {
+            EffectGenerator generator = GetLogicWorld().GetEffectManager().CreateGenerator(m_generator_cfgid, GetOwnerEntity());
+            if (generator != null)
+                m_generator_id = generator.ID;
+        }
         #endregion
 
         public override void Inflict(FixPoint start_time)
@@ -75,9 +84,8 @@ namespace Combat
                     param.m_target_entity_id = 0;
                 else
                     param.m_target_entity_id = target.GetEntityID();
-                param.m_speed = m_speed;
-                param.m_lifetime = m_lifetime;
                 param.m_facing = facing;
+                param.m_generator_id = m_generator_id;
                 projectile_component.InitParam(param);
             }
         }

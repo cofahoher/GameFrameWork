@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ObjectCreationContext
+    public class ObjectCreationContext : IDestruct
     {
         //配置数据
         public int m_object_proxy_id = -1;
@@ -20,6 +20,15 @@ namespace Combat
         public int m_owner_id = -1;
         public bool m_is_ai = false;
         public bool m_is_local = false;
+        public FixPoint m_creation_time = FixPoint.Zero;
+
+        public void Destruct()
+        {
+            m_custom_data = null;
+            m_type_data = null;
+            m_proto_data = null;
+            m_logic_world = null;
+        }
 
         public int SetProxyIDFromPstid(long pstid)
         {

@@ -92,7 +92,7 @@ namespace Combat
                 Skill skill = skill_manager.GetObject(enumerator.Current);
                 if(skill != null)
                 {
-                    SkillDefinitionComponent def_cmp = skill.GetSkillDefinitionComponent();
+                    SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
                     if (def_cmp.DeactivateWhenMoving)
                         skill.Interrupt();
                 }
@@ -127,7 +127,7 @@ namespace Combat
 
         public void OnSkillActivated(Skill skill)
         {
-            SkillDefinitionComponent def_cmp = skill.GetSkillDefinitionComponent();
+            SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
             if(def_cmp.BlocksMovementWhenActive)
             {
                 ++m_move_block_count;
@@ -144,7 +144,7 @@ namespace Combat
 
         public void OnSkillDeactivated(Skill skill)
         {
-            SkillDefinitionComponent def_cmp = skill.GetSkillDefinitionComponent();
+            SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
             if (def_cmp.BlocksMovementWhenActive)
             {
                 --m_move_block_count;

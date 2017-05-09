@@ -66,6 +66,10 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("hide_delay", null, "m_hide_delay")
                 .REGISTER_VARIABLE<FixPoint>("delete_delay", null, "m_delete_delay");
             REGISTER_COMPONENT<EffectManagerComponent>();
+            REGISTER_COMPONENT<EntityDefinitionComponent>()
+                .REGISTER_VARIABLE_CRC<int>("category1", "VID_Category1", "m_category_1", Flag_Attribute_Get)
+                .REGISTER_VARIABLE_CRC<int>("category2", "VID_Category2", "m_category_2", Flag_Attribute_Get)
+                .REGISTER_VARIABLE_CRC<int>("category3", "VID_Category3", "m_category_3", Flag_Attribute_Get);
             REGISTER_COMPONENT<LocomotorComponent>()
                 .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "MaxSpeed", Flag_Variable_GetSet);
             REGISTER_COMPONENT<ManaComponent>();
@@ -82,7 +86,9 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle", Flag_Variable_GetSet)
                 .REGISTER_VARIABLE<bool>("collision_sender", null, "m_collision_sender")
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
-            REGISTER_COMPONENT<ProjectileComponent>();
+            REGISTER_COMPONENT<ProjectileComponent>()
+                .REGISTER_VARIABLE<FixPoint>("speed", null, "m_speed")
+                .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime");
             REGISTER_COMPONENT<SkillManagerComponent>();
             REGISTER_COMPONENT<StateComponent>();
             REGISTER_COMPONENT<TargetingComponent>();
@@ -93,18 +99,18 @@ namespace Combat
             REGISTER_COMPONENT<CreateObjectSkillComponent>()
                 .REGISTER_VARIABLE<int>("object_type_id", null, "m_object_type_id")
                 .REGISTER_VARIABLE<int>("object_proto_id", null, "m_object_proto_id")
+                .REGISTER_VARIABLE<int>("generator_id", null, "m_generator_cfgid")
                 .REGISTER_VARIABLE<FixPoint>("offset_x", null, "m_offset.x")
                 .REGISTER_VARIABLE<FixPoint>("offset_y", null, "m_offset.y")
-                .REGISTER_VARIABLE<FixPoint>("offset_z", null, "m_offset.z")
-                .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime")
-                .REGISTER_VARIABLE<FixPoint>("speed", null, "m_speed");
+                .REGISTER_VARIABLE<FixPoint>("offset_z", null, "m_offset.z");
             REGISTER_COMPONENT<DirectDamageSkillComponent>()
                 .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
                 .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
                 .REGISTER_VARIABLE<bool>("can_critical", null, "m_can_critical")
                 .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
                 .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
-            REGISTER_COMPONENT<EffectGeneratorSkillComponent>();
+            REGISTER_COMPONENT<EffectGeneratorSkillComponent>()
+                .REGISTER_VARIABLE<int>("generator_id", null, "m_generator_cfgid");
             REGISTER_COMPONENT<SkillDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("mana_type", "VID_ManaType", "m_mana_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost")
@@ -135,7 +141,13 @@ namespace Combat
             #region Effect
             REGISTER_COMPONENT<AddStateEffectComponent>();
             REGISTER_COMPONENT<ApplyGeneratorEffectComponent>();
-            REGISTER_COMPONENT<DamageEffectComponent>();
+            REGISTER_COMPONENT<DamageEffectComponent>()
+                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
+                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount");
+            REGISTER_COMPONENT<EffectDefinitionComponent>()
+                .REGISTER_VARIABLE_CRC<int>("category", "VID_Category", "m_category", Flag_Attribute_Get)
+                .REGISTER_VARIABLE_CRC<int>("conflict_id", "VID_ConflictID", "m_conflict_id", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration");
             REGISTER_COMPONENT<HealEffectComponent>();
             #endregion
         }
@@ -178,6 +190,10 @@ namespace Combat
             public bool NeedDeclareVariable()
             {
                 return (m_flag & (VARIABLE_GET | VARIABLE_SET)) != 0;
+            }
+            public bool NeedCSAttribute()
+            {
+                return (m_flag & (CS_ATTRIBUTE_GET | CS_ATTRIBUTE_SET)) != 0;
             }
             public bool CanVariableGet()
             {
@@ -405,17 +421,25 @@ namespace Combat
         static void GenerateVariableRelatedCode(StreamWriter writer, EditorComponent component)
         {
             int code_variable_count = 0;
+            int attribute_count = 0;
             for (int i = 0; i < component.m_variables.Count; ++i)
             {
                 EditorVariable variable = component.m_variables[i];
-                if (variable.m_code_name == null || !variable.NeedDeclareVariable())
+                if (variable.m_code_name == null)
                     continue;
-                ++code_variable_count;
-                writer.Write("\r\n        public const int ");
-                writer.Write(variable.m_code_name);
-                writer.Write(" = ");
-                writer.Write(((int)CRC.Calculate(variable.m_config_name)).ToString());
-                writer.Write(";");
+                if (variable.NeedDeclareVariable())
+                {
+                    ++code_variable_count;
+                    writer.Write("\r\n        public const int ");
+                    writer.Write(variable.m_code_name);
+                    writer.Write(" = ");
+                    writer.Write(((int)CRC.Calculate(variable.m_config_name)).ToString());
+                    writer.Write(";");
+                }
+                if (variable.NeedCSAttribute())
+                {
+                    ++attribute_count;
+                }
             }
 
             bool generate = code_variable_count > 0 || component.Need_InitializeVariable();
@@ -430,7 +454,7 @@ namespace Combat
                 Generate_GetVariable(writer, component);
             if (code_variable_count > 0 && component.Need_SetVariable())
                 Generate_SetVariable(writer, component);
-            if (code_variable_count > 0 && component.Need_CSharpAttribute())
+            if (attribute_count > 0 && component.Need_CSharpAttribute())
                 Generate_CSharpAttribute(writer, component);
 
             if (m_logic == false && generate)

@@ -68,6 +68,7 @@ namespace Combat
                 context.m_object_id = id;
             }
             TObject obj = CreateObjectInstance();
+            context.m_creation_time = m_logic_world.GetCurrentTime();
             m_objects[context.m_object_id] = obj;
             if (context.m_name != null && context.m_name.Length > 0)
                 m_named_objects[context.m_name] = obj;

@@ -23,7 +23,7 @@ namespace Combat
         List<Target> m_skill_targets = new List<Target>();
 
         #region GETTER
-        public SkillDefinitionComponent GetSkillDefinitionComponent()
+        public SkillDefinitionComponent GetDefinitionComponent()
         {
             return m_definition_component;
         }
@@ -113,7 +113,7 @@ namespace Combat
             return m_skill_targets;
         }
 
-        private void ClearTargets()
+        void ClearTargets()
         {
             for (int i = 0; i < m_skill_targets.Count; ++i)
                 RecyclableObject.Recycle(m_skill_targets[i]);

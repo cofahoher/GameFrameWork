@@ -28,7 +28,7 @@ namespace Combat
         }
         public override int GetOwnerPlayerID()
         {
-            return m_context.m_owner_id;;
+            return m_context.m_owner_id;
         }
         public override Player GetOwnerPlayer()
         {

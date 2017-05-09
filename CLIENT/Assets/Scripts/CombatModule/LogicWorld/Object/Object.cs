@@ -18,10 +18,6 @@ namespace Combat
         protected SortedDictionary<int, Component> m_components = new SortedDictionary<int, Component>();
         protected bool m_is_delete_pending = false;
 
-        public Object()
-        {
-        }
-
         public void Destruct()
         {
             NotifyGeneratorDestroyAndRemoveAllListeners();
@@ -33,6 +29,7 @@ namespace Combat
             }
             m_components.Clear();
             OnDestruct();
+            m_context.Destruct();
         }
 
         protected virtual void OnDestruct()
@@ -53,6 +50,11 @@ namespace Combat
         public string Name
         {
             get { return m_context.m_name; }
+        }
+
+        public FixPoint CreationTime
+        {
+            get { return m_context.m_creation_time; }
         }
 
         public bool IsLocal

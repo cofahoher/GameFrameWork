@@ -1,0 +1,7 @@
+<ConfigSystem>
+	<EffectGeneratorConfig>
+		<ConfigItem id="1" name="测试Generator1" deactivate_entry_when_deactive="False" remove_by_self="False">
+			<Entry target_gathering_type="DefaultTarget" effect_id="1"/>
+		</ConfigItem>
+	</EffectGeneratorConfig>
+</ConfigSystem>

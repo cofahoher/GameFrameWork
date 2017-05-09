@@ -124,7 +124,7 @@ namespace Combat
             }
 
             bool move_required = false;
-            FixPoint max_range = skill.GetSkillDefinitionComponent().MaxRange;
+            FixPoint max_range = skill.GetDefinitionComponent().MaxRange;
             PositionComponent target_position_cmp = m_current_target.GetComponent(PositionComponent.ID) as PositionComponent;
             Vector3FP direction = target_position_cmp.CurrentPosition - position_cmp.CurrentPosition;
             if (max_range > 0)
@@ -173,7 +173,7 @@ namespace Combat
                 {
                     position_cmp.SetAngle(direction);
                     skill.Activate(GetCurrentTime());
-                    FixPoint delay = skill.GetSkillDefinitionComponent().CooldownTime + FixPoint.PrecisionFP;
+                    FixPoint delay = skill.GetDefinitionComponent().CooldownTime + FixPoint.PrecisionFP;
                     if (delay > TARGETING_UPDATE_MAX_FREQUENCY)
                         delay = TARGETING_UPDATE_MAX_FREQUENCY;
                     ScheduleTargeting(delay);

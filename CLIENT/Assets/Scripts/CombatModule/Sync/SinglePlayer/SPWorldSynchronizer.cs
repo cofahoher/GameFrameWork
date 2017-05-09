@@ -48,6 +48,7 @@ namespace Combat
                     {
                         for (int j = 0; j < commands.Count; ++j)
                             m_logic_world.HandleCommand(commands[j]);
+                        m_command_synchronizer.ClearCommands(m_synchronized_turn);
                     }
                     if (m_game_over)
                         break;
@@ -117,6 +118,7 @@ namespace Combat
                     {
                         for (int j = 0; j < commands.Count; ++j)
                             m_logic_world.HandleCommand(commands[j]);
+                        m_command_synchronizer.ClearCommands(m_synchronized_turn);
                     }
                 }
                 m_forward_start_time += SyncParam.FRAME_TIME;
@@ -172,6 +174,7 @@ namespace Combat
                 {
                     for (int j = 0; j < commands.Count; ++j)
                         m_logic_world.HandleCommand(commands[j]);
+                    m_command_synchronizer.ClearCommands(m_synchronized_turn);
                 }
             }
             return true;

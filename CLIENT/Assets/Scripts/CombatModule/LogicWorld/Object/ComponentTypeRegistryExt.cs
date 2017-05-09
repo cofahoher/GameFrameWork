@@ -22,6 +22,7 @@ namespace Combat
             Register<DamageModificationComponent>(false);
             Register<DeathComponent>(false);
             Register<EffectManagerComponent>(false);
+            Register<EntityDefinitionComponent>(false);
             Register<LocomotorComponent>(false);
             Register<ManaComponent>(false);
             Register<ObstacleComponent>(false);
@@ -39,6 +40,7 @@ namespace Combat
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<DamageEffectComponent>(false);
+            Register<EffectDefinitionComponent>(false);
             Register<HealEffectComponent>(false);
 
 #if COMBAT_CLIENT
@@ -205,6 +207,39 @@ namespace Combat
     public partial class EffectManagerComponent
     {
         public const int ID = 1995518324;
+    }
+
+    public partial class EntityDefinitionComponent
+    {
+        public const int ID = -1587766303;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("category1", out value))
+                m_category_1 = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("category2", out value))
+                m_category_2 = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("category3", out value))
+                m_category_3 = (int)CRC.Calculate(value);
+        }
+
+#region GETTER/SETTER
+        public int Category1
+        {
+            get { return m_category_1; }
+        }
+
+        public int Category2
+        {
+            get { return m_category_2; }
+        }
+
+        public int Category3
+        {
+            get { return m_category_3; }
+        }
+#endregion
     }
 
     public partial class LocomotorComponent
@@ -393,6 +428,15 @@ namespace Combat
     public partial class ProjectileComponent
     {
         public const int ID = -1092026181;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("speed", out value))
+                m_speed = FixPoint.Parse(value);
+            if (variables.TryGetValue("lifetime", out value))
+                m_lifetime = FixPoint.Parse(value);
+        }
     }
 
     public partial class SkillManagerComponent
@@ -426,16 +470,14 @@ namespace Combat
                 m_object_type_id = int.Parse(value);
             if (variables.TryGetValue("object_proto_id", out value))
                 m_object_proto_id = int.Parse(value);
+            if (variables.TryGetValue("generator_id", out value))
+                m_generator_cfgid = int.Parse(value);
             if (variables.TryGetValue("offset_x", out value))
                 m_offset.x = FixPoint.Parse(value);
             if (variables.TryGetValue("offset_y", out value))
                 m_offset.y = FixPoint.Parse(value);
             if (variables.TryGetValue("offset_z", out value))
                 m_offset.z = FixPoint.Parse(value);
-            if (variables.TryGetValue("lifetime", out value))
-                m_lifetime = FixPoint.Parse(value);
-            if (variables.TryGetValue("speed", out value))
-                m_speed = FixPoint.Parse(value);
         }
     }
 
@@ -462,6 +504,13 @@ namespace Combat
     public partial class EffectGeneratorSkillComponent
     {
         public const int ID = 1037752092;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("generator_id", out value))
+                m_generator_cfgid = int.Parse(value);
+        }
     }
 
     public partial class SkillDefinitionComponent
@@ -723,6 +772,67 @@ namespace Combat
     public partial class DamageEffectComponent
     {
         public const int ID = 1635290451;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("damage_type", out value))
+                m_damage_type_id = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("damage_amount", out value))
+                m_damage_amount.Compile(value);
+        }
+    }
+
+    public partial class EffectDefinitionComponent
+    {
+        public const int ID = 473097098;
+        public const int VID_Duration = 109660124;
+
+        static EffectDefinitionComponent()
+        {
+            ComponentTypeRegistry.RegisterVariable(VID_Duration, ID);
+        }
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("category", out value))
+                m_category = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("conflict_id", out value))
+                m_conflict_id = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("duration", out value))
+                m_duration.Compile(value);
+        }
+
+        public override bool GetVariable(int id, out FixPoint value)
+        {
+            switch (id)
+            {
+            case VID_Duration:
+                value = m_duration.Evaluate(this);
+                return true;
+            default:
+                value = FixPoint.Zero;
+                return false;
+            }
+        }
+
+#region GETTER/SETTER
+        public int Category
+        {
+            get { return m_category; }
+        }
+
+        public int ConflictID
+        {
+            get { return m_conflict_id; }
+        }
+
+        public FixPoint Duration
+        {
+            get { return m_duration.Evaluate(this); }
+        }
+#endregion
     }
 
     public partial class HealEffectComponent

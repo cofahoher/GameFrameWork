@@ -4,14 +4,16 @@ namespace Combat
 {
     public class ProjectileParameters : IRecyclable, IDestruct
     {
-        public int m_source_entity_id;
-        public int m_target_entity_id;
-        public FixPoint m_speed;
-        public FixPoint m_lifetime;
+        public int m_source_entity_id = 0;
+        public int m_target_entity_id = 0;
         public Vector3FP m_facing;
+        public int m_generator_id = 0;
 
         public void Reset()
         {
+            m_source_entity_id = 0;
+            m_target_entity_id = 0;
+            m_generator_id = 0;
         }
 
         public void Destruct()
@@ -21,21 +23,26 @@ namespace Combat
 
     public partial class ProjectileComponent : EntityComponent
     {
+        FixPoint m_speed;
+        FixPoint m_lifetime = FixPoint.Ten;
+
         ProjectileParameters m_param;
         UpdateProjectileTask m_task;
 
         #region 初始化/销毁
-        public void InitParam(ProjectileParameters param)
+        public override void InitializeComponent()
         {
-            m_param = param;
-
-            if (m_task == null)
-                m_task = LogicTask.Create<UpdateProjectileTask>();
-            m_task.Construct(this, m_param.m_lifetime);
-            var schedeler = GetLogicWorld().GetTaskScheduler();
-            schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
-
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
+            ObjectProtoData proto_data = ParentObject.GetCreationContext().m_proto_data;
+            if (proto_data == null)
+                return;
+            var dic = proto_data.m_component_variables;
+            if (dic == null)
+                return;
+            string value;
+            if (dic.TryGetValue("speed", out value))
+                m_speed = FixPoint.Parse(value);
+            if (dic.TryGetValue("lifetime", out value))
+                m_lifetime = FixPoint.Parse(value);
         }
 
         protected override void OnDestruct()
@@ -52,25 +59,36 @@ namespace Combat
                 m_task = null;
             }
         }
+
+        public void InitParam(ProjectileParameters param)
+        {
+            m_param = param;
+
+            if (m_task == null)
+                m_task = LogicTask.Create<UpdateProjectileTask>();
+            m_task.Construct(this, m_lifetime);
+            var schedeler = GetLogicWorld().GetTaskScheduler();
+            schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
+
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
+        }
         #endregion
 
-        public void UpdateProjectile(FixPoint delta_time)
+        public bool UpdateProjectile(FixPoint delta_time)
         {
             PositionComponent position_component = ParentObject.GetComponent<PositionComponent>();
-            Vector3FP new_position = position_component.CurrentPosition + m_param.m_facing * (m_param.m_speed * delta_time);
+            Vector3FP new_position = position_component.CurrentPosition + m_param.m_facing * (m_speed * delta_time);
             position_component.CurrentPosition = new_position;
             if (DetectCollision(new_position))
-                return;
+                return true;
             GridGraph grid_graph = GetLogicWorld().GetGridGraph();
             if (grid_graph != null)
             {
                 GridNode node = grid_graph.Position2Node(new_position);
                 if (node == null || !node.Walkable)
-                {
-                    m_task.LockRemainTime(m_param.m_speed);
-                    return;
-                }
+                    m_task.LockRemainTime(m_speed);
             }
+            return false;
         }
 
         bool DetectCollision(Vector3FP position)
@@ -87,6 +105,10 @@ namespace Combat
                 Entity entity = entity_manager.GetObject(list[i]);
                 if (entity == null)
                     continue;
+                if (GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()) != FactionRelation.Enemy)
+                    continue;
+                Explode(entity);
+                return true;
             }
             return false;
         }
@@ -100,7 +122,21 @@ namespace Combat
                 LogicTask.Recycle(m_task);
                 m_task = null;
             }
+            if (entity != null)
+                ApplyGenerator(entity);
             EntityUtil.KillEntity((Entity)ParentObject);
+        }
+
+        void ApplyGenerator(Entity entity)
+        {
+            LogicWorld logic_world = GetLogicWorld();
+            EffectGenerator generator = logic_world.GetEffectManager().GetGenerator(m_param.m_generator_id);
+            if (generator == null)
+                return;
+            EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
+            app_data.m_original_entity_id = m_param.m_source_entity_id;
+            app_data.m_source_entity_id = GetOwnerEntityID();
+            generator.Activate(app_data, entity);
         }
     }
 
@@ -124,7 +160,8 @@ namespace Combat
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
-            m_component.UpdateProjectile(delta_time);
+            if (m_component.UpdateProjectile(delta_time))
+                return;
             m_remain_time -= delta_time;
             if (m_remain_time < 0)
                 m_component.Explode(null);

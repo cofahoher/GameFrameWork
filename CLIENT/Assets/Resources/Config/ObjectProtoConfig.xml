@@ -41,6 +41,8 @@
 		
 		<ConfigItem id="301001" name="missile_entity">
 			<Component>
+				<var key="speed" value="15"/>
+				<var key="lifetime" value="10"/>
 				<var key="asset" value="Objects/3D/zzw_missile_entity"/>
 			</Component>
 		</ConfigItem>

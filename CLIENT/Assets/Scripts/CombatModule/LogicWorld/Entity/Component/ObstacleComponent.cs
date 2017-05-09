@@ -35,7 +35,7 @@ namespace Combat
 
         public override void OnDeletePending()
         {
-            UnCoverArea();
+            UncoverArea();
         }
         #endregion
 
@@ -57,7 +57,7 @@ namespace Combat
             grid_graph.CoverArea(position_component.CurrentPosition, extents);
         }
 
-        void UnCoverArea()
+        void UncoverArea()
         {
             GridGraph grid_graph = GetLogicWorld().GetGridGraph();
             if (grid_graph == null)

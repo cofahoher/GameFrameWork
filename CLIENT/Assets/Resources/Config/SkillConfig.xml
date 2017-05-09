@@ -26,7 +26,7 @@
 				<var key="offset_x" value="0"/>
 				<var key="offset_y" value="1"/>
 				<var key="offset_z" value="1"/>
-				<var key="speed" value="15"/>
+				<var key="generator_id" value="1"/>
 			</Component>
 		</ConfigItem>
 	</SkillConfig>

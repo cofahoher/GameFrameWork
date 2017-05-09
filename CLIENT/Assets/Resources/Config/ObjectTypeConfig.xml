@@ -17,6 +17,7 @@
 				<var key="ext_y" value="0.5"/>
 				<var key="ext_z" value="0.5"/>
 			</Component>
+			<Component id="EffectManagerComponent"/>
 			<Component id="DamagableComponent">
 				<var key="max_health" value="1000"/>
 				<var key="current_health" value="900"/>
@@ -43,6 +44,7 @@
 				<var key="max_speed" value="5.0"/>
 			</Component>
 			<Component id="PathFindingComponent"/>
+			<Component id="EffectManagerComponent"/>
 			<Component id="DamagableComponent"/>
 			<Component id="DeathComponent">
 				<var key="hide_delay" value="1"/>
@@ -71,6 +73,7 @@
 				<var key="max_speed" value="5.0"/>
 			</Component>
 			<Component id="PathFindingComponent"/>
+			<Component id="EffectManagerComponent"/>
 			<Component id="DamagableComponent"/>
 			<Component id="DeathComponent">
 				<var key="hide_delay" value="1"/>

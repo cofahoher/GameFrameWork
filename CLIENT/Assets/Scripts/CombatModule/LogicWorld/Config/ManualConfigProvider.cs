@@ -6,19 +6,23 @@ namespace Combat
     {
         Dictionary<int, LevelTableData> m_leveltable_data = new Dictionary<int, LevelTableData>();
         Dictionary<int, LevelData> m_level_data = new Dictionary<int, LevelData>();
+        Dictionary<int, AttributeData> m_attribute_data = new Dictionary<int, AttributeData>();
         Dictionary<int, ObjectTypeData> m_object_type_data = new Dictionary<int, ObjectTypeData>();
         Dictionary<int, ObjectProtoData> m_object_proto_data = new Dictionary<int, ObjectProtoData>();
-        Dictionary<int, AttributeData> m_attribute_data = new Dictionary<int, AttributeData>();
         Dictionary<int, ObjectTypeData> m_skill_data = new Dictionary<int, ObjectTypeData>();
+        Dictionary<int, EffectGeneratorData> m_effect_generator_data = new Dictionary<int, EffectGeneratorData>();
+        Dictionary<int, ObjectTypeData> m_effect_data = new Dictionary<int, ObjectTypeData>();
 
         private ManualConfigProvider()
         {
             InitLevelTableData();
             InitLevelData();
+            InitAttributeData();
             InitObjectTypeData();
             InitObjectProtoData();
-            InitAttributeData();
             InitSkillData();
+            InitEffectGeneratorData();
+            InitEffectData();
         }
 
         public override void Destruct()
@@ -48,6 +52,14 @@ namespace Combat
             return level_data;
         }
 
+        public AttributeData GetAttributeData(int id)
+        {
+            AttributeData attribute_data = null;
+            if (!m_attribute_data.TryGetValue(id, out attribute_data))
+                return null;
+            return attribute_data;
+        }
+
         public ObjectTypeData GetObjectTypeData(int id)
         {
             ObjectTypeData type_data = null;
@@ -64,14 +76,6 @@ namespace Combat
             return proto_data;
         }
 
-        public AttributeData GetAttributeData(int id)
-        {
-            AttributeData attribute_data = null;
-            if (!m_attribute_data.TryGetValue(id, out attribute_data))
-                return null;
-            return attribute_data;
-        }
-
         public ObjectTypeData GetSkillData(int id)
         {
             ObjectTypeData skill_data = null;
@@ -79,8 +83,24 @@ namespace Combat
                 return null;
             return skill_data;
         }
+
+        public EffectGeneratorData GetEffectGeneratorData(int id)
+        {
+            EffectGeneratorData generator_data = null;
+            if (!m_effect_generator_data.TryGetValue(id, out generator_data))
+                return null;
+            return generator_data;
+        }
+
+        public ObjectTypeData GetEffectData(int id)
+        {
+            ObjectTypeData effect_data = null;
+            if (!m_effect_data.TryGetValue(id, out effect_data))
+                return null;
+            return effect_data;
+        }
         #endregion
-        
+
         #region 手工配置
         void InitLevelTableData()
         {
@@ -129,6 +149,61 @@ namespace Combat
             LevelData level_data = new LevelData();
             level_data.m_scene_name = "Scenes/zzw_test";
             m_level_data[1] = level_data;
+        }
+
+        void InitAttributeData()
+        {
+            AttributeData attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "MaxHealth";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "BaseValue";
+            attribute_data.m_reflection_property = (int)CRC.Calculate("max_health");
+            attribute_data.m_clamp_property = (int)CRC.Calculate("current_health");
+            attribute_data.m_clamp_min_value = FixPoint.Zero;
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "测试属性1";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "BaseValue";
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "TestAttribute2";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "BaseValue + LevelTable.name3";
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "TestAttribute3";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "BaseValue + TestAttribute1.Value";
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "TestAttribute14";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "(BaseValue + TestAttribute2.Value) * LevelTable.name1";
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "TestAttribute5";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "BaseValue + Max(TestAttribute3.Value, Entity.Attribute.TestAttribute4.Value)";
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+
+            attribute_data = new AttributeData();
+            attribute_data.m_attribute_name = "TestAttribute6";
+            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
+            attribute_data.m_formula = "BaseValue * TestAttribute2.Value * TestAttribute5.Value";
+            AttributeSystem.RegisterAttribute(attribute_data);
+            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
         }
 
         void InitObjectTypeData()
@@ -401,63 +476,10 @@ namespace Combat
 
             proto_data = new ObjectProtoData();
             proto_data.m_name = "missile_entity";
+            proto_data.m_component_variables["speed"] = "15";
+            proto_data.m_component_variables["lifetime"] = "10";
             proto_data.m_component_variables["asset"] = "Objects/3D/zzw_missile_entity";
             m_object_proto_data[301001] = proto_data;
-        }
-
-        void InitAttributeData()
-        {
-            AttributeData attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "MaxHealth";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "BaseValue";
-            attribute_data.m_reflection_property = (int)CRC.Calculate("max_health");
-            attribute_data.m_clamp_property = (int)CRC.Calculate("current_health");
-            attribute_data.m_clamp_min_value = FixPoint.Zero;
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
-
-            attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "测试属性1";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "BaseValue";
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
-
-            attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "TestAttribute2";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "BaseValue + LevelTable.name3";
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
-
-            attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "TestAttribute3";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "BaseValue + TestAttribute1.Value";
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
-
-            attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "TestAttribute14";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "(BaseValue + TestAttribute2.Value) * LevelTable.name1";
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
-
-            attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "TestAttribute5";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "BaseValue + Max(TestAttribute3.Value, Entity.Attribute.TestAttribute4.Value)";
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
-
-            attribute_data = new AttributeData();
-            attribute_data.m_attribute_name = "TestAttribute6";
-            attribute_data.m_attribute_id = (int)CRC.Calculate(attribute_data.m_attribute_name);
-            attribute_data.m_formula = "BaseValue * TestAttribute2.Value * TestAttribute5.Value";
-            AttributeSystem.RegisterAttribute(attribute_data);
-            m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
         }
 
         void InitSkillData()
@@ -505,10 +527,18 @@ namespace Combat
             cd.m_component_variables["offset_x"] = "0";
             cd.m_component_variables["offset_y"] = "1";
             cd.m_component_variables["offset_z"] = "1";
-            cd.m_component_variables["speed"] = "15";
             skill_data.m_components_data.Add(cd);
 
             m_skill_data[1002] = skill_data;
+        }
+
+
+        void InitEffectGeneratorData()
+        {
+        }
+
+        void InitEffectData()
+        {
         }
         #endregion
     }

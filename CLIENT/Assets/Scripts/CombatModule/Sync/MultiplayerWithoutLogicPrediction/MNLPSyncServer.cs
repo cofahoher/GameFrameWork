@@ -88,6 +88,7 @@ namespace Combat
             {
                 for (int j = 0; j < commands.Count; ++j)
                     AddOutputCommand(commands[j]);
+                m_command_synchronizer.ClearCommands(turn_index);
             }
         }
 
