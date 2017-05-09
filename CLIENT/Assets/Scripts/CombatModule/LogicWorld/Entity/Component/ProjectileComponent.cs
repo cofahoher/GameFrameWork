@@ -137,6 +137,7 @@ namespace Combat
             app_data.m_original_entity_id = m_param.m_source_entity_id;
             app_data.m_source_entity_id = GetOwnerEntityID();
             generator.Activate(app_data, entity);
+            RecyclableObject.Recycle(app_data);
         }
     }
 

@@ -10,6 +10,13 @@ namespace Combat
         SortedDictionary<int, int> m_effect2entity = new SortedDictionary<int, int>();
         List<Target> m_targets;
 
+        #region GETTER
+        public bool Idle
+        {
+            get { return m_effect2entity.Count == 0; }
+        }
+        #endregion
+
         #region 初始化/销毁
         public void Construct(EffectGenerator generator, EffectGeneratorEntryData data, int index)
         {
@@ -27,6 +34,9 @@ namespace Combat
         {
             m_generator = null;
             m_data = null;
+            m_index = -1;
+            m_effect2entity.Clear();
+            ClearTargets();
         }
 
         void ClearTargets()
@@ -76,8 +86,6 @@ namespace Combat
                     return;
                 if (m_targets == null)
                     m_targets = new List<Target>();
-                else
-                    m_targets.Clear();
                 m_generator.GetLogicWorld().GetTargetGatheringManager().BuildTargetList(source_entity, m_data.m_target_gathering_type, m_data.m_target_gathering_param1, m_data.m_target_gathering_param2, m_targets);
                 for (int i = 0; i < m_targets.Count; ++i)
                 {
@@ -85,6 +93,7 @@ namespace Combat
                     if (entity != null)
                         Activate(app_data, entity);
                 }
+                ClearTargets();
             }
         }
 
@@ -99,8 +108,10 @@ namespace Combat
             if (effect == null)
                 return;
             app_data.m_target_entity_id = target.ID;
+            app_data.m_generator_id = m_generator.ID;
+            app_data.m_entry_index = m_index;
             EffectDefinitionComponent definition_cmp = effect.GetDefinitionComponent();
-            definition_cmp.InitializeApplicationData(app_data, m_generator.ID, m_index);
+            definition_cmp.InitializeApplicationData(app_data);
             if (!registry.AddEffect(effect))
             {
                 m_generator.GetLogicWorld().GetEffectManager().DestroyObject(effect.ID);
@@ -113,11 +124,34 @@ namespace Combat
 
         public void RemoveEffect(int effect_id)
         {
+            if (m_effect2entity == null)
+                return;
             m_effect2entity.Remove(effect_id);
+            if (Idle)
+                m_generator.CheckIdle();
         }
 
         public void Deactivate()
         {
+            if (m_effect2entity.Count == 0)
+                return;
+
+            LogicWorld logic_world = m_generator.GetLogicWorld();
+            EntityManager entity_manager = logic_world.GetEntityManager();
+
+            SortedDictionary<int, int> temp = m_effect2entity;
+            m_effect2entity = null;
+            var enumerator = temp.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Entity entity = entity_manager.GetObject(enumerator.Current.Value);
+                EffectRegistry registry = EntityUtil.GetEffectRegistry(entity);
+                if (registry != null)
+                    registry.RemoveEffect(enumerator.Current.Key);
+            }
+
+            temp.Clear();
+            m_effect2entity = temp;
         }
     }
 }

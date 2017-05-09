@@ -16,6 +16,7 @@ namespace Combat
 
         public void Destruct()
         {
+            m_registry = null;
             m_category = null;
             m_active_effects.Clear();
         }
@@ -27,7 +28,6 @@ namespace Combat
             {
                 effect.Apply();
                 effect.Unapply();
-                effect.GetLogicWorld().GetEffectManager().DestroyObject(effect.ID);
                 return false;
             }
 
@@ -43,7 +43,6 @@ namespace Combat
                 Effect rejected_effect = PickRejectedEffect(effect, active_effect);
                 if (rejected_effect == effect)
                 {
-                    effect.GetLogicWorld().GetEffectManager().DestroyObject(effect.ID);
                     return false;
                 }
                 else

@@ -43,6 +43,8 @@ namespace Combat
 
         public bool AddEffect(Effect effect)
         {
+            if (!CanAddEffect())
+                return false;
             EffectDefinitionComponent definition_cmp = effect.GetDefinitionComponent();
             ClassifiedEffectContainer container = GetContainer(definition_cmp.Category);
             if (container == null)

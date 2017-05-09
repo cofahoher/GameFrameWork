@@ -177,6 +177,8 @@
     <None Include="Assets\AstarPathfindingProject\link.xml" />
     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
     <None Include="Assets\Resources\Config\AttributeConfig.xml" />
+    <None Include="Assets\Resources\Config\EffectConfig.xml" />
+    <None Include="Assets\Resources\Config\EffectGeneratorConfig.xml" />
     <None Include="Assets\Resources\Config\LevelConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />

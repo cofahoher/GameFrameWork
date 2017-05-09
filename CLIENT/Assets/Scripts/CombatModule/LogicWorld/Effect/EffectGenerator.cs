@@ -11,8 +11,13 @@ namespace Combat
 
         bool m_remove_self_when_idle = false;
         bool m_is_active = false;
-        
+
         #region GETTER
+        public LogicWorld GetLogicWorld()
+        {
+            return m_logic_world;
+        }
+
         public int ID
         {
             get { return m_id; }
@@ -36,11 +41,6 @@ namespace Combat
         public bool Active
         {
             get { return m_is_active; }
-        }
-
-        public LogicWorld GetLogicWorld()
-        {
-            return m_logic_world;
         }
         #endregion
 
@@ -69,8 +69,10 @@ namespace Combat
             m_id = 0;
             m_data = null;
             for (int i = 0; i < m_entries.Count; ++i)
-                m_entries[i].Destruct();
+                RecyclableObject.Recycle(m_entries[i]);
             m_entries.Clear();
+            m_remove_self_when_idle = false;
+            m_is_active = false;
         }
         #endregion
 
@@ -86,6 +88,7 @@ namespace Combat
             Deactivate();
             for (int i = 0; i < m_entries.Count; ++i)
                 m_entries[i].Activate(app_data, targets);
+            m_is_active = true;
         }
 
         public void Activate(EffectApplicationData app_data, Entity target)
@@ -93,6 +96,7 @@ namespace Combat
             Deactivate();
             for (int i = 0; i < m_entries.Count; ++i)
                 m_entries[i].Activate(app_data, target);
+            m_is_active = true;
         }
 
         public void Deactivate()
@@ -104,10 +108,19 @@ namespace Combat
                 return;
             for (int i = 0; i < m_entries.Count; ++i)
                 m_entries[i].Deactivate();
+            CheckIdle();
         }
 
         public void CheckIdle()
         {
+            if (!m_remove_self_when_idle)
+                return;
+            for (int i = 0; i < m_entries.Count; ++i)
+            {
+                if (!m_entries[i].Idle)
+                    return;
+            }
+            m_logic_world.GetEffectManager().DestroyGenerator(m_id, 0);
         }
     }
 }

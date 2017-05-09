@@ -21,6 +21,7 @@ namespace Combat
 
         protected override void OnDestruct()
         {
+            m_definition_component = null;
         }
         #endregion
 

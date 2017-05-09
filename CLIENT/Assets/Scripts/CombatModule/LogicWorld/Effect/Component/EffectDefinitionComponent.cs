@@ -40,13 +40,13 @@ namespace Combat
         #endregion
 
         #region 初始化/销毁
-        public void InitializeApplicationData(EffectApplicationData app_data, int generator_id, int entry_index)
+        public void InitializeApplicationData(EffectApplicationData app_data)
         {
             m_original_entity_id = app_data.m_original_entity_id;
             m_source_entity_id = app_data.m_source_entity_id;
             m_target_entity_id = app_data.m_target_entity_id;
-            m_generator_id = generator_id;
-            m_entry_index = entry_index;
+            m_generator_id = app_data.m_generator_id;
+            m_entry_index = app_data.m_entry_index;
             FixPoint duration = m_duration.Evaluate(this);
             if (duration < 0)
                 m_expiration_time = FixPoint.MaxValue;
