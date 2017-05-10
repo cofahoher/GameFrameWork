@@ -6,8 +6,4 @@ namespace Combat
     {
         public const string CAST = "cast";
     }
-
-    public partial class AnimatorParameter
-    {
-    }
 }

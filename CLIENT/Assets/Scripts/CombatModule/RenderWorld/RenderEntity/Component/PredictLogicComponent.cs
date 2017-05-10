@@ -393,7 +393,7 @@ namespace Combat
                 animation_component.PlayerAnimation(AnimationName.RUN, true);
             AnimatorComponent animator_component = ParentObject.GetComponent<AnimatorComponent>();
             if (animator_component != null)
-                animator_component.SetParameter(AnimatorParameter.MOVING, true);
+                animator_component.PlayAnimation(AnimationName.RUN);
         }
 
         void StopMoveAnimation()
@@ -403,7 +403,7 @@ namespace Combat
                 animation_component.PlayerAnimation(AnimationName.IDLE, true);
             AnimatorComponent animator_component = ParentObject.GetComponent<AnimatorComponent>();
             if (animator_component != null)
-                animator_component.SetParameter(AnimatorParameter.MOVING, false);
+                animator_component.PlayAnimation(AnimationName.IDLE);
         }
         #endregion
     }

@@ -69,7 +69,6 @@ namespace Combat
         public virtual void Reset()
         {
             m_player_pstid = -1;
-            m_type = CommandType.Invalid;
             m_syncturn = -1;
             m_entity_id = 0;
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class RenderMessageProcessor: IRenderMessageProcessor
+    public class RenderMessageProcessor : IRenderMessageProcessor
     {
         RenderWorld m_render_world;
         LogicWorld m_logic_world;
@@ -23,38 +23,38 @@ namespace Combat
         }
 
         public void Process(RenderMessage msg)
-		{
+        {
             switch (msg.Type)
             {
-            case RenderMessageType.StartMoving:
-                ProcessRenderMessage_StartMoving(msg as SimpleRenderMessage);
-                break;
-            case RenderMessageType.StopMoving:
-                ProcessRenderMessage_StopMoving(msg as SimpleRenderMessage);
-                break;
-            case RenderMessageType.ChangeDirection:
-                ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
-                break;
-            case RenderMessageType.CreateEntity:
-                ProcessRenderMessage_CreateEntity(msg.EntityID);
-                break;
-            case RenderMessageType.DestroyEntity:
-                ProcessRenderMessage_DestroyEntity(msg.EntityID);
-                break;
-            case RenderMessageType.ChangeHealth:
-                ProcessRenderMessage_ChangeHealth(msg as ChangeHealthRenderMessage);
-                break;
-            case RenderMessageType.Die:
-                ProcessRenderMessage_Die(msg.EntityID);
-                break;
-            case RenderMessageType.Hide:
-                ProcessRenderMessage_Hide(msg.EntityID);
-                break;
-            case RenderMessageType.PlayAnimation:
-                ProcessRenderMessage_PlayAnimation(msg as PlayAnimationRenderMessage);
-                break;
-            default:
-                break;
+                case RenderMessageType.StartMoving:
+                    ProcessRenderMessage_StartMoving(msg as SimpleRenderMessage);
+                    break;
+                case RenderMessageType.StopMoving:
+                    ProcessRenderMessage_StopMoving(msg as SimpleRenderMessage);
+                    break;
+                case RenderMessageType.ChangeDirection:
+                    ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
+                    break;
+                case RenderMessageType.CreateEntity:
+                    ProcessRenderMessage_CreateEntity(msg.EntityID);
+                    break;
+                case RenderMessageType.DestroyEntity:
+                    ProcessRenderMessage_DestroyEntity(msg.EntityID);
+                    break;
+                case RenderMessageType.ChangeHealth:
+                    ProcessRenderMessage_ChangeHealth(msg as ChangeHealthRenderMessage);
+                    break;
+                case RenderMessageType.Die:
+                    ProcessRenderMessage_Die(msg.EntityID);
+                    break;
+                case RenderMessageType.Hide:
+                    ProcessRenderMessage_Hide(msg.EntityID);
+                    break;
+                case RenderMessageType.PlayAnimation:
+                    ProcessRenderMessage_PlayAnimation(msg as PlayAnimationRenderMessage);
+                    break;
+                default:
+                    break;
             }
             RenderMessage.Recycle(msg);
         }
@@ -89,7 +89,7 @@ namespace Combat
                     animation_component.PlayerAnimation(AnimationName.RUN, true);
                 AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
                 if (animator_component != null)
-                    animator_component.SetParameter(AnimatorParameter.MOVING, true);
+                    animator_component.PlayAnimation(AnimationName.RUN);
             }
             m_render_world.RegisterMovingEntity(model_component);
         }
@@ -110,7 +110,7 @@ namespace Combat
                     animation_component.PlayerAnimation(AnimationName.IDLE, true);
                 AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
                 if (animator_component != null)
-                    animator_component.SetParameter(AnimatorParameter.MOVING, false);
+                    animator_component.PlayAnimation(AnimationName.IDLE);
             }
             m_render_world.UnregisterMovingEntity(model_component);
         }
@@ -159,16 +159,22 @@ namespace Combat
             if (render_entity == null)
                 return;
             AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
-            if (animation_component == null)
-                return;
-            if (msg.m_animation_name_2 == null)
+            if (animation_component != null)
             {
-                animation_component.PlayerAnimation(msg.m_animation_name, msg.m_loop);
+                if (msg.m_animation_name_2 == null)
+                {
+                    animation_component.PlayerAnimation(msg.m_animation_name, msg.m_loop);
+                }
+                else
+                {
+                    animation_component.PlayerAnimation(msg.m_animation_name, false);
+                    animation_component.QueueAnimation(msg.m_animation_name_2, msg.m_loop);
+                }
             }
-            else
+            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+            if (animator_component != null)
             {
-                animation_component.PlayerAnimation(msg.m_animation_name, false);
-                animation_component.QueueAnimation(msg.m_animation_name_2, msg.m_loop);
+                animator_component.PlayAnimation(msg.m_animation_name);
             }
         }
     }

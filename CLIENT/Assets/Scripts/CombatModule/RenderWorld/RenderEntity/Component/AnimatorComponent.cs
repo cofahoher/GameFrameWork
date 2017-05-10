@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Combat
 {
-    public partial class AnimatorParameter
-    {
-        public const string MOVING = "moving";
-    }
-
     public partial class AnimatorComponent : RenderEntityComponent
     {
         //配置数据
@@ -48,9 +43,15 @@ namespace Combat
         }
         #endregion
 
+        public void PlayAnimation(string key, float speed = -1.0f)
+        {
+            m_unity_animator_cmp.speed = speed > 0 ? speed : m_animation_speed;
+            m_unity_animator_cmp.Play(key);
+        }
+
         public void SetParameter(string key, bool value)
         {
-            m_unity_animator_cmp.SetBool(key, value);
+            m_unity_animator_cmp.SetBool(key, value); 
         }
 
         public void SetParameter(string key, int value)

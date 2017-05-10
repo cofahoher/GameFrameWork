@@ -9,6 +9,7 @@ namespace Combat
         public const string RUN = "run";
         public const string DIE = "die";
         public const string ATTACK = "attack";
+        public const string SKILL = "skill";
     }
 
     public partial class AnimationComponent : RenderEntityComponent
