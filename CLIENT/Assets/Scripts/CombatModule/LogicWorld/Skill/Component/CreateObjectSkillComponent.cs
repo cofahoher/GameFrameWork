@@ -11,20 +11,21 @@ namespace Combat
         Vector3FP m_offset;
 
         //运行数据
-        int m_generator_id = 0;
+        EffectGenerator m_generator;
 
         #region 初始化/销毁
         public override void InitializeComponent()
         {
-            EffectGenerator generator = GetLogicWorld().GetEffectManager().CreateGenerator(m_generator_cfgid, GetOwnerEntity());
-            if (generator != null)
-                m_generator_id = generator.ID;
+            m_generator = GetLogicWorld().GetEffectManager().CreateGenerator(m_generator_cfgid, GetOwnerEntity());
         }
 
         protected override void OnDestruct()
         {
-            if (m_generator_id > 0)
-                GetLogicWorld().GetEffectManager().DestroyGenerator(m_generator_id, GetOwnerEntityID());
+            if (m_generator != null)
+            {
+                GetLogicWorld().GetEffectManager().DestroyGenerator(m_generator.ID, GetOwnerEntityID());
+                m_generator = null;
+            }
         }
         #endregion
 
@@ -91,13 +92,15 @@ namespace Combat
                 else
                     param.m_target_entity_id = target.GetEntityID();
                 param.m_facing = facing;
-                param.m_generator_id = m_generator_id;
+                param.m_generator_id = m_generator == null ? 0 : m_generator.ID;
                 projectile_component.InitParam(param);
             }
         }
 
         public override void Deactivate()
         {
+            if (m_generator != null)
+                m_generator.Deactivate();
         }
     }
 }

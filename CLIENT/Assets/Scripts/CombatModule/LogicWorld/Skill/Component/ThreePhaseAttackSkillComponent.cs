@@ -18,7 +18,7 @@ namespace Combat
         int[] m_generator_cfg_id = new int[THREE];
 
         //运行数据
-        int[] m_generator_id = new int[THREE];
+        EffectGenerator[] m_generator = new EffectGenerator[THREE];
         ThreePhaseAttackInflictTask m_task;
         int m_next_impact = 0;
 
@@ -29,7 +29,7 @@ namespace Combat
                 m_inflict_time[i] = FixPoint.MinusOne;
                 m_damage_amount[i] = RecyclableObject.Create<Formula>();
                 m_generator_cfg_id[i] = 0;
-                m_generator_id[i] = 0;
+                m_generator[i] = null;
             }
         }
 
@@ -40,9 +40,7 @@ namespace Combat
             Entity owner_entity = GetOwnerEntity();
             for (int i = 0; i < THREE; ++i)
             {
-                EffectGenerator generator = effect_manager.CreateGenerator(m_generator_cfg_id[i], owner_entity);
-                if (generator != null)
-                    m_generator_id[i] = generator.ID;
+                m_generator[i] = effect_manager.CreateGenerator(m_generator_cfg_id[i], owner_entity);
             }
         }
 
@@ -54,8 +52,11 @@ namespace Combat
             {
                 RecyclableObject.Recycle(m_damage_amount[i]);
                 m_damage_amount[i] = null;
-                if (m_generator_id[i] > 0)
-                    effect_manager.DestroyGenerator(m_generator_id[i], owner_entity_id);
+                if (m_generator[i] != null)
+                {
+                    effect_manager.DestroyGenerator(m_generator[i].ID, owner_entity_id);
+                    m_generator[i] = null;
+                }
             }
 
             if (m_task != null)
@@ -99,7 +100,7 @@ namespace Combat
             BuildSkillTargets();
             Entity attacker = GetOwnerEntity();
             List<Target> targets = GetOwnerSkill().GetTargets();
-            EffectGenerator generator = GetLogicWorld().GetEffectManager().GetGenerator(m_generator_id[m_next_impact]);
+            EffectGenerator generator = m_generator[m_next_impact];
             EffectApplicationData app_data = null;
             if (generator != null)
             {
@@ -133,6 +134,8 @@ namespace Combat
 
         public override void Deactivate()
         {
+            for (int i = 0; i < m_next_impact; ++i)
+                m_generator[i].Deactivate();
             m_next_impact = 0;
         }
     }
