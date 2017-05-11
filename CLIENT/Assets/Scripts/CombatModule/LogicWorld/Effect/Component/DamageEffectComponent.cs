@@ -7,6 +7,12 @@ namespace Combat
         int m_damage_type_id = 0;
         Formula m_damage_amount = RecyclableObject.Create<Formula>();
 
+        protected override void OnDestruct()
+        {
+            RecyclableObject.Recycle(m_damage_amount);
+            m_damage_amount = null;
+        }
+
         public override void Apply()
         {
             EffectDefinitionComponent definition_component = ((Effect)ParentObject).GetDefinitionComponent();
