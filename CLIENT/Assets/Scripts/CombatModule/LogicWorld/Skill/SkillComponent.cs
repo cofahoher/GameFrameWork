@@ -41,12 +41,19 @@ namespace Combat
         #region Variable
         public override FixPoint GetVariable(ExpressionVariable variable, int index)
         {
-            if (variable[index] == ExpressionVariable.VID_Target)
+            int vid = variable[index];
+            if (vid == ExpressionVariable.VID_Target)
             {
                 if (m_current_target != null)
                     return m_current_target.GetVariable(variable, index + 1);
                 else
                     return FixPoint.Zero;
+            }
+            else if (vid == ExpressionVariable.VID_Source)
+            {
+                Object owner_entity = GetOwnerEntity();
+                if (owner_entity != null)
+                    return owner_entity.GetVariable(variable, index + 1);
             }
             return base.GetVariable(variable, index);
         }

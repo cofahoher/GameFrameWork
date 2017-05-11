@@ -42,7 +42,7 @@ namespace Combat
             int vid = variable[index];
             if (index == variable.MaxIndex)
             {
-                if (vid == ExpressionVariable.VID_BaseValue)
+                if (vid == ExpressionVariable.VID_BaseDamage)
                     return m_value;
             }
             else if (vid == ExpressionVariable.VID_Attacker)

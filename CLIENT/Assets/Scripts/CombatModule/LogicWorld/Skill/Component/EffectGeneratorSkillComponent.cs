@@ -50,6 +50,7 @@ namespace Combat
 
         public override void Deactivate()
         {
+            //deactivate generator？？
         }
     }
 }
