@@ -55,6 +55,7 @@ namespace Combat
         }
         #endregion
 
+        #region Effect流程
         public void Apply()
         {
             if (m_is_applied)
@@ -82,6 +83,11 @@ namespace Combat
                     cmp.Unapply();
             }
         }
+        #endregion
+
+        #region Variable
+        //ZZW no need
+        #endregion
     }
 
     public class EffectExpireTask : Task<LogicWorld>
