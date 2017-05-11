@@ -318,16 +318,16 @@ namespace Combat
         public const int VID_X = -1505763071;
         public const int VID_Y = -1088106432;
         public const int VID_Z = -1811315837;
-        public const int VID_Radius = -1373094910;
         public const int VID_CurrentAngle = 1682267402;
+        public const int VID_Radius = -1373094910;
 
         static PositionComponent()
         {
             ComponentTypeRegistry.RegisterVariable(VID_X, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Y, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Z, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_Radius, ID);
             ComponentTypeRegistry.RegisterVariable(VID_CurrentAngle, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_Radius, ID);
         }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
@@ -339,10 +339,10 @@ namespace Combat
                 m_current_position.y = FixPoint.Parse(value);
             if (variables.TryGetValue("z", out value))
                 m_current_position.z = FixPoint.Parse(value);
-            if (variables.TryGetValue("radius", out value))
-                m_radius = FixPoint.Parse(value);
             if (variables.TryGetValue("angle", out value))
                 m_current_angle = FixPoint.Parse(value);
+            if (variables.TryGetValue("radius", out value))
+                m_radius = FixPoint.Parse(value);
             if (variables.TryGetValue("collision_sender", out value))
                 m_collision_sender = bool.Parse(value);
             if (variables.TryGetValue("visible", out value))
@@ -362,11 +362,11 @@ namespace Combat
             case VID_Z:
                 value = m_current_position.z;
                 return true;
-            case VID_Radius:
-                value = m_radius;
-                return true;
             case VID_CurrentAngle:
                 value = m_current_angle;
+                return true;
+            case VID_Radius:
+                value = m_radius;
                 return true;
             default:
                 value = FixPoint.Zero;
@@ -387,11 +387,11 @@ namespace Combat
             case VID_Z:
                 m_current_position.z = value;
                 return true;
-            case VID_Radius:
-                m_radius = value;
-                return true;
             case VID_CurrentAngle:
                 m_current_angle = value;
+                return true;
+            case VID_Radius:
+                m_radius = value;
                 return true;
             default:
                 return false;
@@ -515,28 +515,6 @@ namespace Combat
     public partial class SkillDefinitionComponent
     {
         public const int ID = -1434735094;
-        public const int VID_ManaCost = -840738116;
-        public const int VID_MinRange = -57630839;
-        public const int VID_MaxRange = 301168412;
-        public const int VID_StartsActive = -1080178819;
-        public const int VID_BlocksOtherSkillsWhenActive = 1224845959;
-        public const int VID_BlocksMovementWhenActive = 321038501;
-        public const int VID_DeactivateWhenMoving = 1559564677;
-        public const int VID_CanActivateWhileMoving = -366942315;
-        public const int VID_CanActivateWhenDisabled = -117959764;
-
-        static SkillDefinitionComponent()
-        {
-            ComponentTypeRegistry.RegisterVariable(VID_ManaCost, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_MinRange, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_MaxRange, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_StartsActive, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_BlocksOtherSkillsWhenActive, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_BlocksMovementWhenActive, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_DeactivateWhenMoving, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_CanActivateWhileMoving, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_CanActivateWhenDisabled, ID);
-        }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
@@ -589,70 +567,6 @@ namespace Combat
                 m_main_animation = value;
             if (variables.TryGetValue("expiration_animation", out value))
                 m_expiration_animation = value;
-        }
-
-        public override bool GetVariable(int id, out FixPoint value)
-        {
-            switch (id)
-            {
-            case VID_ManaCost:
-                value = m_mana_cost.Evaluate(this);
-                return true;
-            case VID_MinRange:
-                value = m_min_range.Evaluate(this);
-                return true;
-            case VID_MaxRange:
-                value = m_max_range.Evaluate(this);
-                return true;
-            case VID_StartsActive:
-                value = (FixPoint)(m_starts_active);
-                return true;
-            case VID_BlocksOtherSkillsWhenActive:
-                value = (FixPoint)(m_blocks_other_skills_when_active);
-                return true;
-            case VID_BlocksMovementWhenActive:
-                value = (FixPoint)(m_blocks_movement_when_active);
-                return true;
-            case VID_DeactivateWhenMoving:
-                value = (FixPoint)(m_deactivate_when_moving);
-                return true;
-            case VID_CanActivateWhileMoving:
-                value = (FixPoint)(m_can_activate_while_moving);
-                return true;
-            case VID_CanActivateWhenDisabled:
-                value = (FixPoint)(m_can_activate_when_disabled);
-                return true;
-            default:
-                value = FixPoint.Zero;
-                return false;
-            }
-        }
-
-        public override bool SetVariable(int id, FixPoint value)
-        {
-            switch (id)
-            {
-            case VID_StartsActive:
-                m_starts_active = (bool)value;
-                return true;
-            case VID_BlocksOtherSkillsWhenActive:
-                m_blocks_other_skills_when_active = (bool)value;
-                return true;
-            case VID_BlocksMovementWhenActive:
-                m_blocks_movement_when_active = (bool)value;
-                return true;
-            case VID_DeactivateWhenMoving:
-                m_deactivate_when_moving = (bool)value;
-                return true;
-            case VID_CanActivateWhileMoving:
-                m_can_activate_while_moving = (bool)value;
-                return true;
-            case VID_CanActivateWhenDisabled:
-                m_can_activate_when_disabled = (bool)value;
-                return true;
-            default:
-                return false;
-            }
         }
 
 #region GETTER/SETTER
@@ -821,12 +735,6 @@ namespace Combat
     public partial class EffectDefinitionComponent
     {
         public const int ID = 473097098;
-        public const int VID_Duration = 109660124;
-
-        static EffectDefinitionComponent()
-        {
-            ComponentTypeRegistry.RegisterVariable(VID_Duration, ID);
-        }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
@@ -837,19 +745,6 @@ namespace Combat
                 m_conflict_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("duration", out value))
                 m_duration.Compile(value);
-        }
-
-        public override bool GetVariable(int id, out FixPoint value)
-        {
-            switch (id)
-            {
-            case VID_Duration:
-                value = m_duration.Evaluate(this);
-                return true;
-            default:
-                value = FixPoint.Zero;
-                return false;
-            }
         }
 
 #region GETTER/SETTER

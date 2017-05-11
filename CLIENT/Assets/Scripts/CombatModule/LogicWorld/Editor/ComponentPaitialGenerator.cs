@@ -82,8 +82,8 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("x", "VID_X", "m_current_position.x")
                 .REGISTER_VARIABLE<FixPoint>("y", "VID_Y", "m_current_position.y")
                 .REGISTER_VARIABLE<FixPoint>("z", "VID_Z", "m_current_position.z")
-                .REGISTER_VARIABLE<FixPoint>("radius", "VID_Radius", "m_radius")
                 .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle", Flag_Variable_GetSet)
+                .REGISTER_VARIABLE<FixPoint>("radius", "VID_Radius", "m_radius")
                 .REGISTER_VARIABLE<bool>("collision_sender", null, "m_collision_sender")
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<ProjectileComponent>()
@@ -112,19 +112,19 @@ namespace Combat
                 .REGISTER_VARIABLE<int>("generator_id", null, "m_generator_cfgid");
             REGISTER_COMPONENT<SkillDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("mana_type", "VID_ManaType", "m_mana_type", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost")
-                .REGISTER_VARIABLE<Formula>("min_range", "VID_MinRange", "m_min_range")
-                .REGISTER_VARIABLE<Formula>("max_range", "VID_MaxRange", "m_max_range")
+                .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("min_range", "VID_MinRange", "m_min_range", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<Formula>("max_range", "VID_MaxRange", "m_max_range", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("cooldown_time", "VID_CooldownTime", "m_cooldown_time", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("casting_time", "VID_CastingTime", "m_casting_time", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("inflict_time", "VID_InflictTime", "m_inflict_time", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("expiration_time", "VID_ExpirationTime", "m_expiration_time", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<bool>("starts_active", "VID_StartsActive", "m_starts_active")
-                .REGISTER_VARIABLE<bool>("blocks_other_skills_when_active", "VID_BlocksOtherSkillsWhenActive", "m_blocks_other_skills_when_active")
-                .REGISTER_VARIABLE<bool>("blocks_movement_when_active", "VID_BlocksMovementWhenActive", "m_blocks_movement_when_active")
-                .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving")
-                .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving")
-                .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled")
+                .REGISTER_VARIABLE<bool>("starts_active", "VID_StartsActive", "m_starts_active", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("blocks_other_skills_when_active", "VID_BlocksOtherSkillsWhenActive", "m_blocks_other_skills_when_active", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("blocks_movement_when_active", "VID_BlocksMovementWhenActive", "m_blocks_movement_when_active", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("target_gathering_type", "VID_TargetGatheringID", "m_target_gathering_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", "VID_TargetGatheringParam1", "m_target_gathering_param1", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", "VID_TargetGatheringParam2", "m_target_gathering_param2", Flag_Attribute_Get)
@@ -160,7 +160,7 @@ namespace Combat
             REGISTER_COMPONENT<EffectDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("category", "VID_Category", "m_category", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("conflict_id", "VID_ConflictID", "m_conflict_id", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration");
+                .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration", Flag_Attribute_Get);
             REGISTER_COMPONENT<HealEffectComponent>();
             #endregion
         }
