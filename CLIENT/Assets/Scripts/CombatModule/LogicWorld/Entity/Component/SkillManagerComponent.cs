@@ -46,6 +46,8 @@ namespace Combat
                 m_index2id[skill_index] = skill.ID;
                 if (skill_index == DEFAULT_SKILL_INDEX)
                     m_default_skill_id = skill.ID;
+                if (skill.GetDefinitionComponent().StartsActive)
+                    skill.Activate(GetCurrentTime());
             }
 
             m_locomotor_cmp = ParentObject.GetComponent(LocomotorComponent.ID) as LocomotorComponent;

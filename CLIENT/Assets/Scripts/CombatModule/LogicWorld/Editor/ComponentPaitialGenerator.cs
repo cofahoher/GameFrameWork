@@ -106,7 +106,6 @@ namespace Combat
             REGISTER_COMPONENT<DirectDamageSkillComponent>()
                 .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
                 .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
-                .REGISTER_VARIABLE<bool>("can_critical", null, "m_can_critical")
                 .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
                 .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>()
@@ -136,6 +135,20 @@ namespace Combat
                 .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
                 .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
                 .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation");
+            REGISTER_COMPONENT<ThreePhaseAttackSkillComponent>()
+                .REGISTER_VARIABLE_CRC<int>("target_gathering_type", null, "m_target_gathering_type")
+                .REGISTER_VARIABLE<FixPoint>("target_gathering_param1", null, "m_target_gathering_param1")
+                .REGISTER_VARIABLE<FixPoint>("target_gathering_param2", null, "m_target_gathering_param2")
+                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
+                .REGISTER_VARIABLE<FixPoint>("phase1_inflict_time", null, "m_inflict_time[0]")
+                .REGISTER_VARIABLE<Formula>("phase1_damage_amount", null, "m_damage_amount[0]")
+                .REGISTER_VARIABLE<int>("phase1_generator_id", null, "m_generator_cfg_id[0]")
+                .REGISTER_VARIABLE<FixPoint>("phase2_inflict_time", null, "m_inflict_time[1]")
+                .REGISTER_VARIABLE<Formula>("phase2_damage_amount", null, "m_damage_amount[1]")
+                .REGISTER_VARIABLE<int>("phase2_generator_id", null, "m_generator_cfg_id[1]")
+                .REGISTER_VARIABLE<FixPoint>("phase3_inflict_time", null, "m_inflict_time[2]")
+                .REGISTER_VARIABLE<Formula>("phase3_damage_amount", null, "m_damage_amount[2]")
+                .REGISTER_VARIABLE<int>("phase3_generator_id", null, "m_generator_cfg_id[2]");
             #endregion
 
             #region Effect

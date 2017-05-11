@@ -26,9 +26,6 @@ namespace Combat
 
         public override void Initialize(IOutsideWorld outside_world, bool need_render_message)
         {
-            base.Initialize(outside_world, need_render_message);
-            m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
-
             m_grid_graph = new SquareGridGraph();
             //m_grid_graph = new HexagonGridGraph();
             FixPoint grid_size = FixPoint.One;
@@ -41,6 +38,9 @@ namespace Combat
             m_grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[5]));
             m_grid_graph.CoverArea(new Vector3FP(-FixPoint.FixPointDigit[7] - FixPoint.Half, FixPoint.Zero, FixPoint.Two), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[7] + FixPoint.Half));
             m_space_manager = new CellSpaceManager(this, x_size, z_size, left_bottom_position);
+
+            base.Initialize(outside_world, need_render_message);
+            m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
         }
 
         public override void Destruct()

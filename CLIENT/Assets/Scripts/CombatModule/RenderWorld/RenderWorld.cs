@@ -28,6 +28,9 @@ namespace Combat
 
         public virtual void Initialize(CombatClient combat_client, LogicWorld logic_world)
         {
+#if ALLOW_UPDATE
+            AddComponent<RenderWorldEveryFrameUpdater>(true);
+#endif
             m_current_time = FixPoint.Zero;
             m_combat_client = combat_client;
             m_logic_world = logic_world;

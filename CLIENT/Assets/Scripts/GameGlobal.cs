@@ -54,18 +54,18 @@ public class GameGlobal : MonoBehaviour
 
     void InitializeSyncModelTest()
     {
-        if (m_sync_tester != null)
+        if (m_combat_tester != null)
             return;
-        m_sync_tester = new Combat.SyncTester(this);
-        m_sync_tester.Init();
+        //m_sync_tester = new Combat.SyncTester(this);
+        //m_sync_tester.Init();
         m_combat_tester = new Combat.CombatTester();
         m_combat_tester.Initialize();
     }
 
     void UpdateSyncModelTest()
     {
-        if (m_sync_tester != null)
-            m_sync_tester.Update();
+        //if (m_sync_tester != null)
+        //    m_sync_tester.Update();
         if (m_combat_tester != null)
             m_combat_tester.Update();
     }

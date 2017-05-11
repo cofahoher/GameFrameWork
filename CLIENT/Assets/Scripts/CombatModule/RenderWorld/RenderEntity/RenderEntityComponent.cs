@@ -4,6 +4,33 @@ namespace Combat
 {
     public abstract class RenderEntityComponent : Component
     {
+        #region 初始化/销毁
+        public override void OnObjectCreated()
+        {
+            PostInitializeComponent();
+            if (m_disable_count == 0)
+                OnEnable();
+            else if (m_disable_count > 0)
+                OnDisable();
+#if ALLOW_UPDATE
+            IRenderNeedUpdateEveryFrame iupdate = this as IRenderNeedUpdateEveryFrame;
+            if (iupdate != null)
+                GetRenderWorld().GetComponent<RenderWorldEveryFrameUpdater>().Register(iupdate);
+#endif
+        }
+
+        public override void Destruct()
+        {
+#if ALLOW_UPDATE
+            IRenderNeedUpdateEveryFrame iupdate = this as IRenderNeedUpdateEveryFrame;
+            if (iupdate != null)
+                GetRenderWorld().GetComponent<RenderWorldEveryFrameUpdater>().Unregister(iupdate);
+#endif
+            OnDestruct();
+            m_parent_object = null;
+        }
+        #endregion
+
         #region ILogicOwnerInfo
         public override int GetOwnerPlayerID()
         {

@@ -10,16 +10,6 @@ namespace Combat
         protected int m_component_type_id = -1;
         protected int m_disable_count = 0;
 
-        public Component()
-        {
-        }
-
-        public void Destruct()
-        {
-            OnDestruct();
-            m_parent_object = null;
-        }
-
         #region GETTER
         public Object ParentObject
         {
@@ -78,13 +68,18 @@ namespace Combat
         {
         }
 
-        public void OnObjectCreated()
+        public virtual void OnObjectCreated()
         {
             PostInitializeComponent();
             if (m_disable_count == 0)
                 OnEnable();
             else if (m_disable_count > 0)
                 OnDisable();
+#if ALLOW_UPDATE
+            ILogicNeedUpdateEveryFrame iupdate = this as ILogicNeedUpdateEveryFrame;
+            if (iupdate != null)
+                GetLogicWorld().GetComponent<LogicWorldEveryFrameUpdater>().Register(iupdate);
+#endif
         }
 
         protected virtual void PostInitializeComponent()
@@ -93,6 +88,17 @@ namespace Combat
 
         public virtual void OnDeletePending()
         {
+        }
+
+        public virtual void Destruct()
+        {
+#if ALLOW_UPDATE
+            ILogicNeedUpdateEveryFrame iupdate = this as ILogicNeedUpdateEveryFrame;
+            if (iupdate != null)
+                GetLogicWorld().GetComponent<LogicWorldEveryFrameUpdater>().Unregister(iupdate);
+#endif
+            OnDestruct();
+            m_parent_object = null;
         }
 
         protected virtual void OnDestruct()

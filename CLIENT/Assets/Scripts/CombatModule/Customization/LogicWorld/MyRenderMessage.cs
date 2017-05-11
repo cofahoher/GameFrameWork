@@ -8,10 +8,12 @@ namespace Combat
         public const int StartMoving = 101;               //SimpleRenderMessage
         public const int StopMoving = 102;                //SimpleRenderMessage
         public const int ChangeDirection = 103;           //ChangeDirectionRenderMessage
+        public const int FindPath = 104;                  //SimpleRenderMessage
         public const int ChangeHealth = 110;              //ChangeHealthRenderMessage
         public const int Die = 111;                       //SimpleRenderMessage
         public const int Hide = 112;                      //SimpleRenderMessage
         public const int PlayAnimation = 120;             //SimpleRenderMessage
+        public const int TakeDamage = 130;                //TakeDamageRenderMessage
     }
 
     public class ChangeDirectionRenderMessage : RenderMessage
@@ -78,6 +80,29 @@ namespace Combat
             m_animation_name = animation_name;
             m_animation_name_2 = animation_name_2;
             m_loop = loop;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+        }
+    }
+
+    public class TakeDamageRenderMessage : RenderMessage
+    {
+        public FixPoint m_origina_damage_amount;
+        public FixPoint m_final_damage_amount;
+
+        public TakeDamageRenderMessage()
+        {
+            m_type = RenderMessageType.TakeDamage;
+        }
+
+        public void Construct(int entity_id, FixPoint origina_damage_amount, FixPoint final_damage_amount)
+        {
+            m_entity_id = entity_id;
+            m_origina_damage_amount = origina_damage_amount;
+            m_final_damage_amount = final_damage_amount;
         }
 
         public override void Reset()

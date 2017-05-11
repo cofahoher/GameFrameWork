@@ -19,6 +19,7 @@ namespace Combat
         protected override void OnDestruct()
         {
             m_owner_player = null;
+            m_context.Destruct();
         }
 
         #region ILogicOwnerInfo

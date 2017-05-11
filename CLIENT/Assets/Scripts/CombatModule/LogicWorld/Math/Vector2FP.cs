@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 namespace Combat
 {
+    /*
+     * 实现基于Unity：左手系，Y轴指向天空
+     */
     public struct Vector2FP : IEquatable<Vector2FP>
     {
         public FixPoint x;
@@ -159,10 +162,10 @@ namespace Combat
             z = -z;
         }
 
-        //v2fp在当前向量的哪个方向
         public enum VectorSign { CLOCKWISE = 1, ANTICLOCKWISE = -1 };
         public VectorSign Sign(ref Vector2FP v2fp)
         {
+            //返回沿-Y的方向看，v2fp在当前向量的哪个方向
             if (z * v2fp.x > x * v2fp.z)
                 return VectorSign.CLOCKWISE;
             else
@@ -179,42 +182,40 @@ namespace Combat
             v2fp.z = x;
         }
 
-        public Vector2FP PerpClockwise()
+        public Vector2FP PerpendicularClockwise()
         {
             return new Vector2FP(z, -x);
         }
-        public void PerpClockwise(ref Vector2FP v2fp)
+        public void PerpendicularClockwise(ref Vector2FP v2fp)
         {
             v2fp.x = z;
             v2fp.z = -x;
         }
 
-        public Vector2FP PerpAnticlockwise()
+        public Vector2FP PerpendicularAnticlockwise()
         {
             return new Vector2FP(-z, x);
         }
-        public void PerpAnticlockwise(ref Vector2FP v2fp)
+        public void PerpendicularAnticlockwise(ref Vector2FP v2fp)
         {
             v2fp.x = -z;
             v2fp.z = x;
         }
 
-        // 与normalized_basis平行的分量
         public Vector2FP ParallelComponent(ref Vector2FP normalized_basis)
         {
             FixPoint projection = this.Dot(ref normalized_basis);
             return normalized_basis * projection;
         }
 
-        // 与normalized_basis垂直的分量
         public Vector2FP PerpendicularComponent(ref Vector2FP normalized_basis)
         {
             return this - ParallelComponent(ref normalized_basis);
         }
 
-        // 入射是this，法向是this，求反射
         public Vector2FP GetReflect(ref Vector2FP norm)
         {
+            //入射是this，法向是norm，求反射
             return this - this.Dot(ref norm) * norm * FixPoint.Two;
         }
 
@@ -225,14 +226,13 @@ namespace Combat
 
         public FixPoint ToDegree()
         {
-            //ZZWTODO 和美术资源的默认朝向相关
-            return FixPoint.Radian2Degree(FixPoint.Atan2(z, x));
+            //返回绕Y轴的旋转角度
+            return FixPoint.Radian2Degree(FixPoint.Atan2(-z, x));
         }
 
         public void FromDegree(FixPoint degree)
         {
-            //ZZWTODO 和美术资源的默认朝向相关
-            FixPoint radian = FixPoint.Degree2Radian(degree);
+            FixPoint radian = FixPoint.Degree2Radian(-degree);
             x = FixPoint.Cos(radian);
             z = FixPoint.Sin(radian);
         }
@@ -242,9 +242,9 @@ namespace Combat
             return !(p.x < min_xz.x || p.z < min_xz.z || p.x > max_xz.x || p.z > max_xz.z);
         }
 
-        // 判断target是否在以source为中心的朝向为facing的角度范围fov_deg里面
         public static bool InsideFov(ref Vector2FP source, ref Vector2FP facing, FixPoint fov_degree, ref Vector2FP target)
         {
+            // 判断target是否在以source为中心的朝向为facing的角度范围fov_deg里面
             Vector2FP to_target = target - source;
             to_target.Normalize();
             return to_target.Dot(ref facing) >= FixPoint.Cos(FixPoint.Degree2Radian(fov_degree / FixPoint.Two));

@@ -13,7 +13,28 @@
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="1002" name="弹道发射物">
+		<ConfigItem id="1002" name="3段近战">
+			<Component id="SkillDefinitionComponent">
+				<var key="max_range" value="1"/>
+				<var key="cooldown_time" value="6"/>
+				<var key="expiration_time" value="6"/>
+				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="ThreePhaseAttackSkillComponent">
+				<var key="target_gathering_type" value="ForwardAreaEnemy"/>
+				<var key="target_gathering_param1" value="2"/>
+				<var key="target_gathering_param2" value="1"/>
+				<var key="phase1_inflict_time" value="1"/>
+				<var key="phase2_inflict_time" value="3"/>
+				<var key="phase3_inflict_time" value="5"/>
+				<var key="phase1_damage_amount" value="20"/>
+				<var key="phase2_damage_amount" value="40"/>
+				<var key="phase3_damage_amount" value="60"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="1011" name="弹道发射物">
 			<Component id="SkillDefinitionComponent">
 				<var key="cooldown_time" value="1"/>
 				<var key="inflict_time" value="0.5"/>
@@ -28,6 +49,6 @@
 				<var key="offset_z" value="1"/>
 				<var key="generator_id" value="1"/>
 			</Component>
-		</ConfigItem>
+		</ConfigItem>		
 	</SkillConfig>
 </ConfigSystem>

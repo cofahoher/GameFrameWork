@@ -35,6 +35,9 @@ namespace Combat
                 case RenderMessageType.ChangeDirection:
                     ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
                     break;
+                case RenderMessageType.FindPath:
+                    ProcessRenderMessage_FindPath(msg as SimpleRenderMessage);
+                    break;
                 case RenderMessageType.CreateEntity:
                     ProcessRenderMessage_CreateEntity(msg.EntityID);
                     break;
@@ -52,6 +55,9 @@ namespace Combat
                     break;
                 case RenderMessageType.PlayAnimation:
                     ProcessRenderMessage_PlayAnimation(msg as PlayAnimationRenderMessage);
+                    break;
+                case RenderMessageType.TakeDamage:
+                    ProcessRenderMessage_TakeDamage(msg as TakeDamageRenderMessage);
                     break;
                 default:
                     break;
@@ -129,6 +135,17 @@ namespace Combat
             model_component.UpdateAngle();
         }
 
+        void ProcessRenderMessage_FindPath(SimpleRenderMessage msg)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
+            if (predic_component == null)
+                return;
+            predic_component.OnLogicFindPath();
+        }
+
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)
         {
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
@@ -170,12 +187,22 @@ namespace Combat
                     animation_component.PlayerAnimation(msg.m_animation_name, false);
                     animation_component.QueueAnimation(msg.m_animation_name_2, msg.m_loop);
                 }
+                if (!msg.m_loop)
+                    animation_component.QueueAnimation(AnimationName.IDLE, true);
             }
             AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
             if (animator_component != null)
             {
                 animator_component.PlayAnimation(msg.m_animation_name);
             }
+        }
+
+        void ProcessRenderMessage_TakeDamage(TakeDamageRenderMessage msg)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+            //ZZWTODO
         }
     }
 }

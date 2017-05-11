@@ -80,9 +80,10 @@ namespace Combat
             }
         }
 
+        #region 移动预测
         public void OnLogicUpdatePosition(Vector3 offset)
         {
-            if (m_copy_state == DoCopy || m_movement_predicts.Count == 0)
+            if (m_copy_state == DoCopy/* || m_movement_predicts.Count == 0*/)
             {
                 Interpolate();
                 return;
@@ -120,6 +121,11 @@ namespace Combat
                 Interpolate();
         }
 
+        public void OnLogicFindPath()
+        {
+            m_copy_state = DoCopy;
+        }
+
         void Interpolate()
         {
             if (m_interpolation_time < 0)
@@ -140,7 +146,6 @@ namespace Combat
             m_interpolation_tr.localPosition -= elimination;
         }
 
-        #region 移动预测
         void PredictEntityMove(EntityMoveCommand cmd)
         {
             switch (cmd.m_move_type)

@@ -55,9 +55,6 @@ namespace Combat
             if (m_mana_type == 0)
                 m_mana_type = ManaComponent.DEFAULT_MANA_TYPE_ID;
 
-            if (m_target_gathering_type == 0)
-                m_target_gathering_type = TargetGatheringType.DefaultTarget;
-
             m_timers.Clear();
             for (int i = 0; i < SkillTimer.TimerCount; ++i)
             {

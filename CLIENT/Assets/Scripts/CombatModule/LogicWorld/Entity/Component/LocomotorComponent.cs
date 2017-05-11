@@ -159,21 +159,21 @@ namespace Combat
 
     class LocomoterTask : Task<LogicWorld>
     {
-        LocomotorComponent m_locomotor_component;
+        LocomotorComponent m_component;
 
-        public void Construct(LocomotorComponent locomotor_component)
+        public void Construct(LocomotorComponent component)
         {
-            m_locomotor_component = locomotor_component;
+            m_component = component;
         }
 
         public override void OnReset()
         {
-            m_locomotor_component = null;
+            m_component = null;
         }
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
-            m_locomotor_component.UpdatePosition(delta_time);
+            m_component.UpdatePosition(delta_time);
         }
     }
 }

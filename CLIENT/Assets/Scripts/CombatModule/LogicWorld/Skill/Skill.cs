@@ -59,6 +59,7 @@ namespace Combat
             if (m_is_active)
                 Deactivate();
             ClearTargets();
+            m_context.Destruct();
         }
         #endregion
 
@@ -91,6 +92,13 @@ namespace Combat
             ClearTargets();
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
             target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.TargetGatheringID, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2, m_skill_targets);
+        }
+
+        public void BuildSkillTargets(int target_gathering_type, FixPoint target_gathering_param1, FixPoint target_gathering_param2)
+        {
+            ClearTargets();
+            TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
+            target_gathering_manager.BuildTargetList(GetOwnerEntity(), target_gathering_type, target_gathering_param1, target_gathering_param2, m_skill_targets);
         }
 
         public void AddTarget(Target target)
@@ -175,15 +183,18 @@ namespace Combat
         {
             Target target = GetMajorTarget();
             if (target == null)
-                return false;
+                return true;
             Entity entity = target.GetEntity();
             if (entity == null)
-                return false;
+                return true;
             return CheckTargetRange(entity) == CastSkillResult.Success;
         }
 
         public bool Activate(FixPoint start_time)
         {
+            if (!CanActivate())
+                return false;
+
             Deactivate();
             SetSkillActive(true);
 
@@ -414,9 +425,13 @@ namespace Combat
 
         void NotifySkillExpired()
         {
+#if COMBAT_CLIENT
+            PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+            msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
         #endregion
-
     }
 
     class SkillCountdownTask : Task<LogicWorld>

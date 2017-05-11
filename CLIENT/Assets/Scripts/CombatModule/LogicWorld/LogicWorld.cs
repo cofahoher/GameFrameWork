@@ -34,6 +34,9 @@ namespace Combat
 
         public virtual void Initialize(IOutsideWorld outside_world, bool need_render_message)
         {
+#if ALLOW_UPDATE
+            AddComponent<LogicWorldEveryFrameUpdater>(true);
+#endif
             m_outside_world = outside_world;
             m_need_render_message = need_render_message;
             if (m_need_render_message)

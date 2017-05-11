@@ -20,6 +20,12 @@ namespace Combat
             if (generator != null)
                 m_generator_id = generator.ID;
         }
+
+        protected override void OnDestruct()
+        {
+            if (m_generator_id > 0)
+                GetLogicWorld().GetEffectManager().DestroyGenerator(m_generator_id, GetOwnerEntityID());
+        }
         #endregion
 
         public override void Inflict(FixPoint start_time)

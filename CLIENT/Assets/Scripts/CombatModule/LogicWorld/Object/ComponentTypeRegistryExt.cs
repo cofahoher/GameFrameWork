@@ -37,6 +37,7 @@ namespace Combat
             Register<DirectDamageSkillComponent>(false);
             Register<EffectGeneratorSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
+            Register<ThreePhaseAttackSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<DamageEffectComponent>(false);
@@ -492,8 +493,6 @@ namespace Combat
                 m_damage_type_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("damage_amount", out value))
                 m_damage_amount.Compile(value);
-            if (variables.TryGetValue("can_critical", out value))
-                m_can_critical = bool.Parse(value);
             if (variables.TryGetValue("combo_attack_cnt", out value))
                 m_combo_attack_cnt = int.Parse(value);
             if (variables.TryGetValue("combo_interval", out value))
@@ -757,6 +756,42 @@ namespace Combat
             get { return m_impact_delay; }
         }
 #endregion
+    }
+
+    public partial class ThreePhaseAttackSkillComponent
+    {
+        public const int ID = -466972422;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("target_gathering_type", out value))
+                m_target_gathering_type = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("target_gathering_param1", out value))
+                m_target_gathering_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("target_gathering_param2", out value))
+                m_target_gathering_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("damage_type", out value))
+                m_damage_type_id = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("phase1_inflict_time", out value))
+                m_inflict_time[0] = FixPoint.Parse(value);
+            if (variables.TryGetValue("phase1_damage_amount", out value))
+                m_damage_amount[0].Compile(value);
+            if (variables.TryGetValue("phase1_generator_id", out value))
+                m_generator_cfg_id[0] = int.Parse(value);
+            if (variables.TryGetValue("phase2_inflict_time", out value))
+                m_inflict_time[1] = FixPoint.Parse(value);
+            if (variables.TryGetValue("phase2_damage_amount", out value))
+                m_damage_amount[1].Compile(value);
+            if (variables.TryGetValue("phase2_generator_id", out value))
+                m_generator_cfg_id[1] = int.Parse(value);
+            if (variables.TryGetValue("phase3_inflict_time", out value))
+                m_inflict_time[2] = FixPoint.Parse(value);
+            if (variables.TryGetValue("phase3_damage_amount", out value))
+                m_damage_amount[2].Compile(value);
+            if (variables.TryGetValue("phase3_generator_id", out value))
+                m_generator_cfg_id[2] = int.Parse(value);
+        }
     }
 
     public partial class AddStateEffectComponent

@@ -63,9 +63,15 @@ namespace Combat
                 return;
             }
             LastDamage = damage;
+            FixPoint original_damage_amount = damage.m_damage_amount;
             FixPoint final_damage_amount = CalculateFinalDamageAmount(damage);
             ChangeHealth(-final_damage_amount);
             ParentObject.SendSignal(SignalType.TakeDamage, damage);
+#if COMBAT_CLIENT
+            TakeDamageRenderMessage msg = RenderMessage.Create<TakeDamageRenderMessage>();
+            msg.Construct(GetOwnerEntityID(), original_damage_amount, final_damage_amount);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
 
         FixPoint CalculateFinalDamageAmount(Damage damage)

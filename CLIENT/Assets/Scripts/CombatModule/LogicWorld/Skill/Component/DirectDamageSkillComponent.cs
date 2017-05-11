@@ -7,7 +7,6 @@ namespace Combat
         //配置数据
         int m_damage_type_id = 0;
         Formula m_damage_amount = RecyclableObject.Create<Formula>();
-        bool m_can_critical = false;
         int m_combo_attack_cnt = 1;
         FixPoint m_combo_interval = FixPoint.Zero;
 

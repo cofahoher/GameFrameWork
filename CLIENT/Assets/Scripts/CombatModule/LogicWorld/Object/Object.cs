@@ -29,11 +29,11 @@ namespace Combat
             }
             m_components.Clear();
             OnDestruct();
-            m_context.Destruct();
         }
 
         protected virtual void OnDestruct()
         {
+            m_context.Destruct();
         }
 
         #region GETTER
