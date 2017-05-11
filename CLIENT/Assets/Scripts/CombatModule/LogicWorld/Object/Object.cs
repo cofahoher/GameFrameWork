@@ -18,6 +18,7 @@ namespace Combat
         protected SortedDictionary<int, Component> m_components = new SortedDictionary<int, Component>();
         protected bool m_is_delete_pending = false;
 
+        #region 销毁
         public void Destruct()
         {
             NotifyGeneratorDestroyAndRemoveAllListeners();
@@ -35,6 +36,7 @@ namespace Combat
         {
             m_context.Destruct();
         }
+        #endregion
 
         #region GETTER
         public ObjectCreationContext GetCreationContext()
@@ -297,6 +299,7 @@ namespace Combat
         }
         #endregion
 
+        #region Variable
         public FixPoint GetVariable(ExpressionVariable variable, int index)
         {
             int vid = variable[index];
@@ -338,5 +341,6 @@ namespace Combat
             else
                 return FixPoint.Zero;
         }
+        #endregion
     }
 }

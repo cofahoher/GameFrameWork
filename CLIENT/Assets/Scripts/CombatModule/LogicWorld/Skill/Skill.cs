@@ -432,6 +432,10 @@ namespace Combat
 #endif
         }
         #endregion
+
+        #region Variable
+        //ZZW no need
+        #endregion
     }
 
     class SkillCountdownTask : Task<LogicWorld>

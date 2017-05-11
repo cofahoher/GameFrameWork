@@ -11,10 +11,7 @@ namespace Combat
         SortedDictionary<int, int> m_dynamic_dependent_attributes;
         SortedDictionary<int, AttributeModifier> m_modifiers;
 
-        public Attribute()
-        {
-        }
-
+        #region 初始化/销毁
         public void Construct(AttributeManagerComponent owner_component, AttributeDefinition definition, FixPoint base_value)
         {
             m_owner_component = owner_component;
@@ -45,6 +42,7 @@ namespace Combat
                 m_modifiers.Clear();
             }
         }
+        #endregion
 
         #region GETTER
         public FixPoint BaseValue
@@ -146,6 +144,7 @@ namespace Combat
             m_value = m_definition.ComputeValue(this);
         }
 
+        #region Variable
         public FixPoint GetVariable(ExpressionVariable variable, int index)
         {
             int vid = variable[index];
@@ -167,5 +166,6 @@ namespace Combat
                 return m_owner_component.GetVariable(variable, index);
             }
         }
+        #endregion
     }
 }

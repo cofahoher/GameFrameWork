@@ -21,7 +21,6 @@ namespace Combat
         int[] m_generator_id = new int[THREE];
         ThreePhaseAttackInflictTask m_task;
         int m_next_impact = 0;
-        Entity m_current_target = null;
 
         public ThreePhaseAttackSkillComponent()
         {
@@ -135,18 +134,6 @@ namespace Combat
         public override void Deactivate()
         {
             m_next_impact = 0;
-        }
-
-        public override FixPoint GetVariable(ExpressionVariable variable, int index)
-        {
-            if (variable[index] == ExpressionVariable.VID_Target)
-            {
-                if (m_current_target != null)
-                    return m_current_target.GetVariable(variable, index + 1);
-                else
-                    return FixPoint.Zero;
-            }
-            return base.GetVariable(variable, index);
         }
     }
 

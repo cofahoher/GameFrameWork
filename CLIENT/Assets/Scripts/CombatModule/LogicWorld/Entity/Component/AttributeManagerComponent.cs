@@ -114,6 +114,7 @@ namespace Combat
             return attribute;
         }
 
+        #region Variable
         public override FixPoint GetVariable(ExpressionVariable variable, int index)
         {
             if (index < variable.MaxIndex)
@@ -125,5 +126,6 @@ namespace Combat
             }
             return base.GetVariable(variable, index);
         }
+        #endregion
     }
 }

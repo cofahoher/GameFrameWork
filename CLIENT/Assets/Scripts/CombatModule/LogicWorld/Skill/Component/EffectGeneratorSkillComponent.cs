@@ -9,7 +9,6 @@ namespace Combat
 
         //运行数据
         int m_generator_id = 0;
-        Entity m_current_target = null;
 
         #region 初始化/销毁
         public override void InitializeComponent()
@@ -51,18 +50,6 @@ namespace Combat
 
         public override void Deactivate()
         {
-        }
-
-        public override FixPoint GetVariable(ExpressionVariable variable, int index)
-        {
-            if (variable[index] == ExpressionVariable.VID_Target)
-            {
-                if (m_current_target != null)
-                    return m_current_target.GetVariable(variable, index + 1);
-                else
-                    return FixPoint.Zero;
-            }
-            return base.GetVariable(variable, index);
         }
     }
 }
