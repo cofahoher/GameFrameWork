@@ -135,7 +135,11 @@ namespace Combat
         public override void Deactivate()
         {
             for (int i = 0; i < m_next_impact; ++i)
-                m_generator[i].Deactivate();
+            {
+                if (m_generator[i] != null)
+                    m_generator[i].Deactivate();
+            }
+            m_task.Cancel();
             m_next_impact = 0;
         }
     }
