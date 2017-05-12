@@ -711,6 +711,13 @@ namespace Combat
     public partial class AddStateEffectComponent
     {
         public const int ID = 347312498;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("state", out value))
+                m_state = (int)CRC.Calculate(value);
+        }
     }
 
     public partial class ApplyGeneratorEffectComponent
@@ -773,11 +780,31 @@ namespace Combat
     public partial class AnimationComponent
     {
         public const int ID = 60050710;
+
+#if COMBAT_CLIENT
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("animation_path", out value))
+                m_animation_path = value;
+        }
+#endif
     }
 
     public partial class AnimatorComponent
     {
         public const int ID = -1773924714;
+
+#if COMBAT_CLIENT
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("animator_path", out value))
+                m_animator_path = value;
+        }
+#endif
     }
 
     public partial class ModelComponent

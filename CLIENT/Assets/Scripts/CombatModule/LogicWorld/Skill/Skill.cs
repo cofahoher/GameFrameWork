@@ -35,14 +35,14 @@ namespace Combat
             Entity ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_owner_id);
             if(ownerEntity != null)
             {
-                m_owner_component = ownerEntity.GetComponent<SkillManagerComponent>();
-                m_mana_component = ownerEntity.GetComponent<ManaComponent>();
+                m_owner_component = ownerEntity.GetComponent(SkillManagerComponent.ID) as SkillManagerComponent;
+                m_mana_component = ownerEntity.GetComponent(ManaComponent.ID) as ManaComponent;
             }
         }
 
         protected override void PostInitializeObject(ObjectCreationContext context)
         {
-            m_definition_component = GetComponent<SkillDefinitionComponent>();
+            m_definition_component = GetComponent(SkillDefinitionComponent.ID) as SkillDefinitionComponent;
         }
 
         protected override void OnDestruct()

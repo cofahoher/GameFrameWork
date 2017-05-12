@@ -17,7 +17,7 @@ namespace Combat
         //逻辑的更新间隔
         public const int FRAME_TIME = 25;
         //一个syncturn含几个frame
-        public const int FRAME_COUNT_PER_SYNCTURN = 1;
+        public const int FRAME_COUNT_PER_SYNCTURN = 4;
         //同步回合的间隔
         public const int SYNCTURN_TIME = FRAME_TIME * FRAME_COUNT_PER_SYNCTURN;
 

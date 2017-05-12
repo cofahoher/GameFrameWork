@@ -9,6 +9,8 @@ namespace Combat
 
         public bool FindPath(Vector3FP destination)
         {
+            if (!IsEnable())
+                return false;
             GridGraph graph = GetLogicWorld().GetGridGraph();
             if (graph == null)
                 return false;

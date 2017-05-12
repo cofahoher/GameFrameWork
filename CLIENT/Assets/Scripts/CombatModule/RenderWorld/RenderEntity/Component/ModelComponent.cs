@@ -38,11 +38,6 @@ namespace Combat
         #endregion
 
         #region 初始化/销毁
-        //public override void InitializeVariable(Dictionary<string, string> variables)
-        //{
-        //    variables.TryGetValue("asset", out m_asset_name);
-        //}
-
         public override void InitializeComponent()
         {
             ObjectProtoData proto_data = ParentObject.GetCreationContext().m_proto_data;
@@ -67,7 +62,7 @@ namespace Combat
             else
                 m_bodyctrl_tr = m_unity_go.transform;
             Entity logic_entity = GetLogicEntity();
-            m_position_component = logic_entity.GetComponent<PositionComponent>();
+            m_position_component = logic_entity.GetComponent(PositionComponent.ID) as PositionComponent;
             if (m_position_component != null)
             {
                 m_last_position = RenderWorld.Vector3FP_To_Vector3(m_position_component.CurrentPosition);

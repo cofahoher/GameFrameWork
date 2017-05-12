@@ -5,7 +5,7 @@ namespace Combat
     public class EffectGeneratorData
     {
         public bool m_deactivate_entry_when_deactive = false;
-        public bool m_remove_by_self = false;
+        public bool m_remove_by_self = true;
         public List<EffectGeneratorEntryData> m_entries = new List<EffectGeneratorEntryData>();
     }
 

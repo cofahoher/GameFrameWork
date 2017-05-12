@@ -167,7 +167,7 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(cmd.m_entity_id);
             if (render_entity == null)
                 return;
-            PredictLogicComponent predict_logic_component = render_entity.GetComponent<PredictLogicComponent>(PredictLogicComponent.ID);
+            PredictLogicComponent predict_logic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
             if (predict_logic_component == null)
                 return;
             predict_logic_component.PredictCommand(cmd);
@@ -178,7 +178,7 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(cmd.m_entity_id);
             if (render_entity == null)
                 return;
-            PredictLogicComponent predict_logic_component = render_entity.GetComponent<PredictLogicComponent>(PredictLogicComponent.ID);
+            PredictLogicComponent predict_logic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
             if (predict_logic_component == null)
                 return;
             predict_logic_component.ConfirmCommand(cmd, result);

@@ -34,6 +34,19 @@
 			</Component>
 		</ConfigItem>
 		
+		<ConfigItem id="1003" name="近战攻击带眩晕">
+			<Component id="SkillDefinitionComponent">
+				<var key="max_range" value="1"/>
+				<var key="cooldown_time" value="1"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="EffectGeneratorSkillComponent">
+				<var key="generator_id" value="2"/>
+			</Component>
+		</ConfigItem>
+		
 		<ConfigItem id="1011" name="弹道发射物">
 			<Component id="SkillDefinitionComponent">
 				<var key="cooldown_time" value="1"/>
@@ -48,6 +61,23 @@
 				<var key="offset_y" value="1"/>
 				<var key="offset_z" value="1"/>
 				<var key="generator_id" value="1"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="1012" name="弹道发射物带眩晕">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="1"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="CreateObjectSkillComponent">
+				<var key="object_type_id" value="301"/>
+				<var key="object_proto_id" value="301001"/>
+				<var key="offset_x" value="0"/>
+				<var key="offset_y" value="1"/>
+				<var key="offset_z" value="1"/>
+				<var key="generator_id" value="2"/>
 			</Component>
 		</ConfigItem>		
 	</SkillConfig>

@@ -9,5 +9,19 @@
 				<var key="damage_amount" value="100"/>
 			</Component>
 		</ConfigItem>
+		
+		<ConfigItem id="2" name="Effect2">
+			<Component id="EffectDefinitionComponent">
+				<var key="category" value="Common"/>
+				<var key="conflict_id" value="2"/>
+				<var key="duration" value="1.5"/>
+			</Component>
+			<Component id="DamageEffectComponent">
+				<var key="damage_amount" value="100"/>
+			</Component>
+			<Component id="AddStateEffectComponent">
+				<var key="state" value="Stunned"/>
+			</Component>
+		</ConfigItem>
 	</EffectConfig>
 </ConfigSystem>

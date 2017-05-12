@@ -93,11 +93,5 @@ namespace Combat
             FixPoint delay = m_expiration_time - current_time;
             schedeler.Schedule(m_task, current_time, delay);
         }
-
-        public override FixPoint GetVariable(ExpressionVariable variable, int index)
-        {
-            //ZZWTODO
-            return base.GetVariable(variable, index);
-        }
     }
 }

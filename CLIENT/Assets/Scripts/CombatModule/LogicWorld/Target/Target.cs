@@ -86,7 +86,7 @@ namespace Combat
                 if (entity == null)
                     return new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.Zero);
                 else
-                    return entity.GetComponent<PositionComponent>().CurrentPosition;
+                    return (entity.GetComponent(PositionComponent.ID) as PositionComponent).CurrentPosition;
             }
             else
             {

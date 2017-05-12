@@ -19,7 +19,7 @@ namespace Combat
             Player player = entity.GetOwnerPlayer();
             if (player != null)
                 player.AddEntity(entity);
-            PositionComponent position_component = entity.GetComponent<PositionComponent>();
+            PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
             if (position_component != null && position_component.Visible)
                 m_logic_world.AddSimpleRenderMessage(RenderMessageType.CreateEntity, entity.ID);
         }

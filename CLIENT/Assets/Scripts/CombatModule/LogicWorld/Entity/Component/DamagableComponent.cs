@@ -80,11 +80,11 @@ namespace Combat
             Entity attacker = GetLogicWorld().GetEntityManager().GetObject(damage.m_attacker_id);
             if (attacker != null)
             {
-                DamageModificationComponent attacker_cmp = attacker.GetComponent<DamageModificationComponent>(DamageModificationComponent.ID);
+                DamageModificationComponent attacker_cmp = attacker.GetComponent(DamageModificationComponent.ID) as DamageModificationComponent;
                 if(attacker_cmp != null)
                     damage_amount = attacker_cmp.ApplyModifiersToDamage(damage, damage_amount, ParentObject, true);
             }
-            DamageModificationComponent self_cmp = ParentObject.GetComponent<DamageModificationComponent>(DamageModificationComponent.ID);
+            DamageModificationComponent self_cmp = ParentObject.GetComponent(DamageModificationComponent.ID) as DamageModificationComponent;
             if (self_cmp != null)
                 damage_amount = self_cmp.ApplyModifiersToDamage(damage, damage_amount, attacker, false);
             return damage_amount;
@@ -115,7 +115,7 @@ namespace Combat
 
             if (m_current_health <= 0)
             {
-                DeathComponent death_component = ParentObject.GetComponent<DeathComponent>(DeathComponent.ID);
+                DeathComponent death_component = ParentObject.GetComponent(DeathComponent.ID) as DeathComponent;
                 if (death_component != null)
                     death_component.KillOwner();
                 else

@@ -1,0 +1,20 @@
+<ConfigSystem>
+	<StateConfig>
+		<ConfigItem name="Dead" category="common">
+			<DisableComponent>
+				<component name="AIComponent"/>
+				<component name="LocomotorComponent"/>
+				<component name="SkillManagerComponent"/>
+				<component name="TargetingComponent"/>
+			</DisableComponent>
+		</ConfigItem>
+		<ConfigItem name="Stunned" category="common">
+			<DisableComponent>
+				<component name="AIComponent"/>
+				<component name="LocomotorComponent"/>
+				<component name="SkillManagerComponent"/>
+				<component name="TargetingComponent"/>
+			</DisableComponent>
+		</ConfigItem>
+	</StateConfig>
+</ConfigSystem>

@@ -68,7 +68,7 @@ namespace Combat
             }
             else
             {
-                generator.Deactivate();
+                generator.ForceDeactivate();
                 m_generators.Remove(generator_id);
                 Entity owner = m_logic_world.GetEntityManager().GetObject(owner_entity_id);
                 EffectGeneratorRegistry registry = EntityUtil.GetEffectGeneratorRegistry(owner);

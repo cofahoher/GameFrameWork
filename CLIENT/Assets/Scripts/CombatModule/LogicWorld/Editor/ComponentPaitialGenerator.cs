@@ -152,7 +152,8 @@ namespace Combat
             #endregion
 
             #region Effect
-            REGISTER_COMPONENT<AddStateEffectComponent>();
+            REGISTER_COMPONENT<AddStateEffectComponent>()
+                .REGISTER_VARIABLE_CRC<int>("state", null, "m_state");
             REGISTER_COMPONENT<ApplyGeneratorEffectComponent>();
             REGISTER_COMPONENT<DamageEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
@@ -168,8 +169,10 @@ namespace Combat
         static void InitRenderComponents()
         {
             m_logic = false;
-            REGISTER_COMPONENT<AnimationComponent>(Flag_RenderComponent);
-            REGISTER_COMPONENT<AnimatorComponent>(Flag_RenderComponent);
+            REGISTER_COMPONENT<AnimationComponent>(Flag_RenderComponent)
+                .REGISTER_VARIABLE<string>("animation_path", null, "m_animation_path");
+            REGISTER_COMPONENT<AnimatorComponent>(Flag_RenderComponent)
+                .REGISTER_VARIABLE<string>("animator_path", null, "m_animator_path");
             REGISTER_COMPONENT<ModelComponent>(Flag_RenderComponent)
                 .REGISTER_VARIABLE<string>("asset", null, "m_asset_name")
                 .REGISTER_VARIABLE<string>("bodyctrl_path", null, "m_bodyctrl_path");

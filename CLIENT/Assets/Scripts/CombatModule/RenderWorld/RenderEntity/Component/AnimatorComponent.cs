@@ -18,14 +18,9 @@ namespace Combat
         }
 
         #region 初始化/销毁
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            variables.TryGetValue("animator_path", out m_animator_path);
-        }
-
         protected override void PostInitializeComponent()
         {
-            ModelComponent model_component = ParentObject.GetComponent<ModelComponent>();
+            ModelComponent model_component = ParentObject.GetComponent(ModelComponent.ID) as ModelComponent;
             if (model_component == null)
                 return;
             GameObject go = model_component.GetUnityGameObject();

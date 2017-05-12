@@ -111,6 +111,13 @@ namespace Combat
             CheckIdle();
         }
 
+        public void ForceDeactivate()
+        {
+            m_is_active = false;
+            for (int i = 0; i < m_entries.Count; ++i)
+                m_entries[i].Deactivate();
+        }
+
         public void CheckIdle()
         {
             if (!m_remove_self_when_idle)

@@ -52,14 +52,14 @@ namespace Combat
         #region Faction
         public FactionRelation GetFaction(int player_id)
         {
-            FactionComponent faction_component = GetComponent<FactionComponent>();
+            FactionComponent faction_component = GetComponent(FactionComponent.ID) as FactionComponent;
             if (faction_component != null)
             {
                 int faction_id_1 = faction_component.FactionID;
                 Player player = GetLogicWorld().GetPlayerManager().GetObject(player_id);
                 if (player != null)
                 {
-                    faction_component = player.GetComponent<FactionComponent>();
+                    faction_component = player.GetComponent(FactionComponent.ID) as FactionComponent;
                     if (faction_component != null)
                     {
                         int faction_id_2 = faction_component.FactionID;

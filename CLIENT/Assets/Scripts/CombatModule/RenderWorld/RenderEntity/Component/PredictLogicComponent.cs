@@ -31,7 +31,7 @@ namespace Combat
         protected override void PostInitializeComponent()
         {
             m_grid_graph = ParentObject.GetLogicWorld().GetGridGraph();
-            m_model_component = ParentObject.GetComponent<ModelComponent>();
+            m_model_component = ParentObject.GetComponent(ModelComponent.ID) as ModelComponent;
             if (m_model_component == null)
                 return;
             GameObject go = m_model_component.GetUnityGameObject();
@@ -40,7 +40,7 @@ namespace Combat
             m_interpolation_tr = go.transform;
             m_model_component.SetPredictComponent(this);
             Entity entity = GetLogicEntity();
-            m_locomotor_component = entity.GetComponent<LocomotorComponent>(LocomotorComponent.ID);
+            m_locomotor_component = entity.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
         }
         #endregion
 
@@ -393,20 +393,20 @@ namespace Combat
         void PlayMoveAnimation(Vector3 direction)
         {
             m_model_component.SetAngle(Mathf.Atan2(-direction.z, direction.x) * 180 / Mathf.PI);
-            AnimationComponent animation_component = ParentObject.GetComponent<AnimationComponent>();
+            AnimationComponent animation_component = ParentObject.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
                 animation_component.PlayerAnimation(AnimationName.RUN, true);
-            AnimatorComponent animator_component = ParentObject.GetComponent<AnimatorComponent>();
+            AnimatorComponent animator_component = ParentObject.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
             if (animator_component != null)
                 animator_component.PlayAnimation(AnimationName.RUN);
         }
 
         void StopMoveAnimation()
         {
-            AnimationComponent animation_component = ParentObject.GetComponent<AnimationComponent>();
+            AnimationComponent animation_component = ParentObject.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
                 animation_component.PlayerAnimation(AnimationName.IDLE, true);
-            AnimatorComponent animator_component = ParentObject.GetComponent<AnimatorComponent>();
+            AnimatorComponent animator_component = ParentObject.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
             if (animator_component != null)
                 animator_component.PlayAnimation(AnimationName.IDLE);
         }

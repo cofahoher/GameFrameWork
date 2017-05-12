@@ -26,6 +26,8 @@
 				<var key="hide_delay" value="1"/>
 				<var key="delete_delay" value="2"/>
 			</Component>
+			<Component id="StateComponent"/>
+			<Component id="AIComponent"/>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
@@ -51,6 +53,7 @@
 				<var key="delete_delay" value="2"/>
 			</Component>
 			<Component id="SkillManagerComponent"/>
+			<Component id="StateComponent"/>
 			<Component id="TargetingComponent"/>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
@@ -80,6 +83,7 @@
 				<var key="delete_delay" value="2"/>
 			</Component>
 			<Component id="SkillManagerComponent"/>
+			<Component id="StateComponent"/>
 			<Component id="TargetingComponent"/>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>

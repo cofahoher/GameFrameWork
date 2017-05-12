@@ -151,7 +151,7 @@ namespace Combat
                 var attributes = context.m_proto_data.m_attributes;
                 if (attributes != null && attributes.Count > 0)
                 {
-                    AttributeManagerComponent cmp = GetComponent<AttributeManagerComponent>(AttributeManagerComponent.ID);
+                    AttributeManagerComponent cmp = GetComponent(AttributeManagerComponent.ID) as AttributeManagerComponent;
                     if (cmp != null)
                     {
                         var enumerator = attributes.GetEnumerator();
@@ -313,7 +313,7 @@ namespace Combat
             }
             else if (vid == ExpressionVariable.VID_Attribute)
             {
-                AttributeManagerComponent cmp = GetComponent<AttributeManagerComponent>(AttributeManagerComponent.ID);
+                AttributeManagerComponent cmp = GetComponent(AttributeManagerComponent.ID) as AttributeManagerComponent;
                 if (cmp != null)
                     return cmp.GetVariable(variable, index + 1);
             }

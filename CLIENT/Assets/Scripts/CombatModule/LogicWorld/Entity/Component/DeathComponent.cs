@@ -13,6 +13,9 @@ namespace Combat
         public void KillOwner()
         {
             ParentObject.DeletePending = true;
+            StateComponent state_component = ParentObject.GetComponent(StateComponent.ID) as StateComponent;
+            if (state_component != null)
+                state_component.AddState(StateSystem.DEAD_STATE, 0);
             GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Die, ParentObject.ID);
 
             var schedeler = GetLogicWorld().GetTaskScheduler();
@@ -22,6 +25,13 @@ namespace Combat
             DeleteEntityTask delete_task = LogicTask.Create<DeleteEntityTask>();
             delete_task.Construct(ParentObject.ID);
             schedeler.Schedule(delete_task, GetCurrentTime(), m_delete_delay);
+        }
+
+        void Resurrect()
+        {
+            StateComponent state_component = ParentObject.GetComponent(StateComponent.ID) as StateComponent;
+            if (state_component != null)
+                state_component.RemoveState(StateSystem.DEAD_STATE, 0);
         }
     }
 

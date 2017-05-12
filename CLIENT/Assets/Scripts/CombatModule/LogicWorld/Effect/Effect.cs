@@ -98,7 +98,7 @@ namespace Combat
         public void Construct(int entity_id, int effect_id)
         {
             m_entity_id = entity_id;
-            m_effect_id = m_entity_id;
+            m_effect_id = effect_id;
         }
 
         public override void OnReset()

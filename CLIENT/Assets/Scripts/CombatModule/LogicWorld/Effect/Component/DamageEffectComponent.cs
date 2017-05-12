@@ -20,7 +20,7 @@ namespace Combat
             Entity attacker = entity_manager.GetObject(definition_component.OriginalEntityID);
             Entity target = entity_manager.GetObject(definition_component.TargetEntityID);
 
-            DamagableComponent damageable_component = target.GetComponent<DamagableComponent>();
+            DamagableComponent damageable_component = target.GetComponent(DamagableComponent.ID) as DamagableComponent;
             if (damageable_component == null)
                 return;
             Damage damage = RecyclableObject.Create<Damage>();
@@ -32,10 +32,8 @@ namespace Combat
             damageable_component.TakeDamage(damage);
         }
 
-        public override FixPoint GetVariable(ExpressionVariable variable, int index)
+        public override void Unapply()
         {
-            //ZZWTODO
-            return base.GetVariable(variable, index);
         }
     }
 }

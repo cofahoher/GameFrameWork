@@ -76,7 +76,7 @@ namespace Combat
 
         public bool UpdateProjectile(FixPoint delta_time)
         {
-            PositionComponent position_component = ParentObject.GetComponent<PositionComponent>();
+            PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             Vector3FP new_position = position_component.CurrentPosition + m_param.m_facing * (m_speed * delta_time);
             position_component.CurrentPosition = new_position;
             if (DetectCollision(new_position))

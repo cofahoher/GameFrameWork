@@ -7,6 +7,9 @@ namespace Combat
         Dictionary<int, LevelTableData> m_leveltable_data = new Dictionary<int, LevelTableData>();
         Dictionary<int, LevelData> m_level_data = new Dictionary<int, LevelData>();
         Dictionary<int, AttributeData> m_attribute_data = new Dictionary<int, AttributeData>();
+        Dictionary<int, DamageData> m_damage_data = new Dictionary<int, DamageData>();
+        Dictionary<int, EffectCategoryData> m_effect_category_data = new Dictionary<int, EffectCategoryData>();
+        Dictionary<int, StateData> m_state_data = new Dictionary<int, StateData>();
         Dictionary<int, ObjectTypeData> m_object_type_data = new Dictionary<int, ObjectTypeData>();
         Dictionary<int, ObjectProtoData> m_object_proto_data = new Dictionary<int, ObjectProtoData>();
         Dictionary<int, ObjectTypeData> m_skill_data = new Dictionary<int, ObjectTypeData>();
@@ -18,6 +21,9 @@ namespace Combat
             InitLevelTableData();
             InitLevelData();
             InitAttributeData();
+            InitDamageData();
+            InitEffectCategoryData();
+            InitStateData();
             InitObjectTypeData();
             InitObjectProtoData();
             InitSkillData();
@@ -204,6 +210,18 @@ namespace Combat
             attribute_data.m_formula = "BaseValue * TestAttribute2.Value * TestAttribute5.Value";
             AttributeSystem.RegisterAttribute(attribute_data);
             m_attribute_data[attribute_data.m_attribute_id] = attribute_data;
+        }
+
+        void InitDamageData()
+        {
+        }
+
+        void InitEffectCategoryData()
+        {
+        }
+
+        void InitStateData()
+        {
         }
 
         void InitObjectTypeData()

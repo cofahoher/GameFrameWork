@@ -74,6 +74,8 @@ namespace Combat
 
         public void StartTargeting(Entity target)
         {
+            if (!IsEnable())
+                return;
             if (m_current_target != null && target.ID == m_current_target.ID)
                 return;
             if (ObjectUtil.IsDead(target))
@@ -186,6 +188,11 @@ namespace Combat
                     ScheduleTargeting(delay);
                 }
             }
+        }
+
+        protected override void OnDisable()
+        {
+            StopTargeting();
         }
     }
 

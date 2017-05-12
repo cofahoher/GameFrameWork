@@ -83,17 +83,17 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
                 return;
-            ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
+            ModelComponent model_component = render_entity.GetComponent(ModelComponent.ID) as ModelComponent;
             if (model_component == null)
                 return;
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
             if (predic_component == null || !predic_component.HasMovementPredict)
             {
                 model_component.UpdateAngle();
-                AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+                AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
                 if (animation_component != null)
                     animation_component.PlayerAnimation(AnimationName.RUN, true);
-                AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+                AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
                 if (animator_component != null)
                     animator_component.PlayAnimation(AnimationName.RUN);
             }
@@ -105,16 +105,16 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
                 return;
-            ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
+            ModelComponent model_component = render_entity.GetComponent(ModelComponent.ID) as ModelComponent;
             if (model_component == null)
                 return;
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
             if (predic_component == null || !predic_component.HasMovementPredict)
             {
-                AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+                AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
                 if (animation_component != null)
                     animation_component.PlayerAnimation(AnimationName.IDLE, true);
-                AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+                AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
                 if (animator_component != null)
                     animator_component.PlayAnimation(AnimationName.IDLE);
             }
@@ -129,7 +129,7 @@ namespace Combat
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
             if (predic_component != null && predic_component.HasMovementPredict)
                 return;
-            ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
+            ModelComponent model_component = render_entity.GetComponent(ModelComponent.ID) as ModelComponent;
             if (model_component == null)
                 return;
             model_component.UpdateAngle();
@@ -158,7 +158,7 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
             if (render_entity == null)
                 return;
-            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
                 animation_component.PlayerAnimation(AnimationName.DIE);
         }
@@ -175,7 +175,7 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
                 return;
-            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
             {
                 if (msg.m_animation_name_2 == null)
@@ -190,7 +190,7 @@ namespace Combat
                 if (!msg.m_loop)
                     animation_component.QueueAnimation(AnimationName.IDLE, true);
             }
-            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+            AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
             if (animator_component != null)
             {
                 animator_component.PlayAnimation(msg.m_animation_name);

@@ -108,7 +108,7 @@ namespace Combat
                 RenderEntity render_entity = m_render_entity_manager.GetObject(m_current_operate_entityi_id);
                 if (render_entity == null)
                     return;
-                LocomotorComponent locomotor_component = render_entity.GetLogicEntity().GetComponent<LocomotorComponent>();
+                LocomotorComponent locomotor_component = render_entity.GetLogicEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
                 if (locomotor_component == null || !locomotor_component.IsEnable())
                     return;
                 EntityMoveCommand cmd = Command.Create<EntityMoveCommand>();
@@ -117,7 +117,7 @@ namespace Combat
 #if UNITY_EDITOR
                 if (m_draw_grid && m_grid_graph != null)
                 {
-                    PositionComponent position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
+                    PositionComponent position_component = render_entity.GetLogicEntity().GetComponent(PositionComponent.ID) as PositionComponent;
                     if (!m_grid_graph.FindPath(position_component.CurrentPosition, Vector3_To_Vector3FP(hit.point)))
                     {
                         Debug.LogError("FindPath Failed!");
@@ -156,8 +156,8 @@ namespace Combat
                     if (m_draw_grid && m_grid_graph != null)
                     {
                         RenderEntity self_entity = m_render_entity_manager.GetObject(m_current_operate_entityi_id);
-                        PositionComponent self_position_component = self_entity.GetLogicEntity().GetComponent<PositionComponent>();
-                        PositionComponent target_position_component = render_entity.GetLogicEntity().GetComponent<PositionComponent>();
+                        PositionComponent self_position_component = self_entity.GetLogicEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+                        PositionComponent target_position_component = render_entity.GetLogicEntity().GetComponent(PositionComponent.ID) as PositionComponent;
                         if (!m_grid_graph.FindPath(self_position_component.CurrentPosition, target_position_component.CurrentPosition))
                         {
                             Debug.LogError("FindPath Failed!");

@@ -34,7 +34,7 @@ namespace Combat
         {
             while (obj != null)
             {
-                LevelComponent level_component = obj.GetComponent<LevelComponent>(LevelComponent.ID);
+                LevelComponent level_component = obj.GetComponent(LevelComponent.ID) as LevelComponent;
                 if (level_component != null)
                     return level_component.CurrentLevel;
                 else

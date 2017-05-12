@@ -29,7 +29,7 @@ namespace Combat
                 m_current_target = targets[i].GetEntity();
                 if (m_current_target == null)
                     continue;
-                DamagableComponent damageable_component = m_current_target.GetComponent<DamagableComponent>();
+                DamagableComponent damageable_component = m_current_target.GetComponent(DamagableComponent.ID) as DamagableComponent;
                 if (damageable_component == null)
                     continue;
                 Damage damage = RecyclableObject.Create<Damage>();
