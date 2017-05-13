@@ -177,12 +177,15 @@
     <None Include="Assets\AstarPathfindingProject\link.xml" />
     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
     <None Include="Assets\Resources\Config\AttributeConfig.xml" />
+    <None Include="Assets\Resources\Config\DamageConfig.xml" />
+    <None Include="Assets\Resources\Config\EffectCategoryConfig.xml" />
     <None Include="Assets\Resources\Config\EffectConfig.xml" />
     <None Include="Assets\Resources\Config\EffectGeneratorConfig.xml" />
     <None Include="Assets\Resources\Config\LevelConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />
     <None Include="Assets\Resources\Config\SkillConfig.xml" />
+    <None Include="Assets\Resources\Config\StateConfig.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

@@ -238,6 +238,8 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\AttributeData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\DamageData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\EffectCategoryData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\EffectGeneratorData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\IConfigProvider.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\LevelData.cs" />
@@ -245,6 +247,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ManualConfigProvider.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectProtoData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\ObjectTypeData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\StateData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\Damage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageSystem.cs" />
@@ -353,6 +356,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\ISpaceManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\RegionCallbak.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\RegionCallbakManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\State\StateSystem.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Target\Target.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Target\TargetGatheringManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\WorldCreationContext.cs" />
@@ -422,12 +426,15 @@
     <None Include="Assets\AstarPathfindingProject\link.xml" />
     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
     <None Include="Assets\Resources\Config\AttributeConfig.xml" />
+    <None Include="Assets\Resources\Config\DamageConfig.xml" />
+    <None Include="Assets\Resources\Config\EffectCategoryConfig.xml" />
     <None Include="Assets\Resources\Config\EffectConfig.xml" />
     <None Include="Assets\Resources\Config\EffectGeneratorConfig.xml" />
     <None Include="Assets\Resources\Config\LevelConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
     <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />
     <None Include="Assets\Resources\Config\SkillConfig.xml" />
+    <None Include="Assets\Resources\Config\StateConfig.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>
