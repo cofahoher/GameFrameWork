@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Combat
 {
-    public class SkillTimer : IRecyclable, IDestruct
+    public class SkillTimer : IRecyclable
     {
         public const int CooldownTimer = 0;
         public const int CastingTimer = 1;
@@ -20,10 +20,6 @@ namespace Combat
             m_strat_time = FixPoint.Zero;
             m_end_time = FixPoint.Zero;
             m_active = false;
-        }
-
-        public void Destruct()
-        {
         }
 
         public bool Active

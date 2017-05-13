@@ -9,7 +9,7 @@ namespace Combat
         PositionType,
     }
 
-    public class Target : IRecyclable, IDestruct
+    public class Target : IRecyclable
     {
         LogicWorld m_logic_world;
         TargetType m_target_type = TargetType.InvalidType;
@@ -19,11 +19,6 @@ namespace Combat
         public void Construct(LogicWorld logic_world)
         {
             m_logic_world = logic_world;
-        }
-
-        public void Destruct()
-        {
-            Reset();
         }
 
         public void Reset()

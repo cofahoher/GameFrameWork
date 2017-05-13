@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class EffectGenerator : IRecyclable, IDestruct
+    public class EffectGenerator : IRecyclable
     {
         LogicWorld m_logic_world;
         int m_id = 0;
@@ -56,11 +56,6 @@ namespace Combat
                 entry.Construct(this, m_data.m_entries[i], i);
                 m_entries.Add(entry);
             }
-        }
-
-        public void Destruct()
-        {
-            Reset();
         }
 
         public void Reset()

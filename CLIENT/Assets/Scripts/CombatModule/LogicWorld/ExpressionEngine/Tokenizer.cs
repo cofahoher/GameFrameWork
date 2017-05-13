@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class Tokenizer : IRecyclable, IDestruct
+    public class Tokenizer : IRecyclable
     {
         public const char Eof        = (char)0;
         public const char WhiteSpace = (char)1;
@@ -61,18 +61,13 @@ namespace Combat
             m_text_buffer.Construct(expression);
         }
 
-        public void Destruct()
-        {
-            if (m_text_buffer != null)
-                RecyclableObject.Recycle(m_text_buffer);
-            m_text_buffer = null;
-        }
-
         public void Reset()
         {
             if (m_text_buffer != null)
                 RecyclableObject.Recycle(m_text_buffer);
             m_text_buffer = null;
+            m_error = false;
+            m_current_token = null;
         }
 
         public Token GetCurrentToken()

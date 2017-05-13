@@ -2,26 +2,22 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ExpressionProgram : IRecyclable, IDestruct
+    public class ExpressionProgram : IRecyclable
     {
         protected bool m_error_occurred = false;
         protected List<ExpressionVariable> m_variables = new List<ExpressionVariable>();
         protected List<long> m_instructions = new List<long>();
 
-        #region Compile的临时变量，Destruct和Reset不用关心
+        #region Compile的临时变量，Reset不用关心
         protected Tokenizer m_tokenizer;
         protected Token m_token;
         protected TokenType m_token_type;
         protected List<string> m_raw_variable = new List<string>();
         #endregion
 
-        public virtual void Destruct()
-        {
-            RecycleVariable();
-        }
-
         public virtual void Reset()
         {
+            m_error_occurred = false;
             RecycleVariable();
             m_instructions.Clear();
         }

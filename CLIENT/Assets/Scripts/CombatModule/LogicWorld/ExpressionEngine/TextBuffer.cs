@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class TextBuffer : IRecyclable, IDestruct
+    public class TextBuffer : IRecyclable
     {
         string m_buffer;
         int m_index = -1;
@@ -11,10 +11,6 @@ namespace Combat
         {
             m_buffer = buffer;
             m_index = 0;
-        }
-
-        public void Destruct()
-        {
         }
 
         public void Reset()

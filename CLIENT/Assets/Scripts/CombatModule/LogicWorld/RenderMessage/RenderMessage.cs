@@ -10,7 +10,7 @@ namespace Combat
         public const int DestroyEntity = 2;             //SimpleRenderMessage
     }
 
-    public abstract class RenderMessage : IRecyclable, IDestruct
+    public abstract class RenderMessage : IRecyclable
     {
         public static TRenderMessage Create<TRenderMessage>() where TRenderMessage : RenderMessage, new()
         {
@@ -47,10 +47,6 @@ namespace Combat
         {
             get { return m_entity_id; }
             set { m_entity_id = value; }
-        }
-
-        public virtual void Destruct()
-        {
         }
 
         public abstract void Reset();

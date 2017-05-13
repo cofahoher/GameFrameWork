@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ProjectileParameters : IRecyclable, IDestruct
+    public class ProjectileParameters : IRecyclable
     {
         public int m_source_entity_id = 0;
         public int m_target_entity_id = 0;
@@ -13,11 +13,8 @@ namespace Combat
         {
             m_source_entity_id = 0;
             m_target_entity_id = 0;
+            m_facing.MakeZero();
             m_generator_id = 0;
-        }
-
-        public void Destruct()
-        {
         }
     }
 

@@ -2,19 +2,10 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class Formula : IRecyclable, IDestruct
+    public class Formula : IRecyclable
     {
-        FixPoint m_constant = default(FixPoint);
+        FixPoint m_constant = FixPoint.Zero;
         ExpressionProgram m_program;
-
-        public void Destruct()
-        {
-            if (m_program != null)
-            {
-                RecyclableObject.Recycle(m_program);
-                m_program = null;
-            }
-        }
 
         public void Reset()
         {

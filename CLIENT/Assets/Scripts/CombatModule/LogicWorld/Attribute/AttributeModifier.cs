@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class AttributeModifier : IRecyclable, IDestruct
+    public class AttributeModifier : IRecyclable
     {
         public AttributeModifier()
-        {
-        }
-
-        public void Destruct()
         {
         }
 

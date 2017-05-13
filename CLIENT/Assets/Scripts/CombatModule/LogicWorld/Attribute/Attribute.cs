@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class Attribute : IExpressionVariableProvider, IRecyclable, IDestruct
+    public class Attribute : IExpressionVariableProvider, IRecyclable
     {
         AttributeManagerComponent m_owner_component;
         AttributeDefinition m_definition;
-        FixPoint m_base_value = default(FixPoint);
-        FixPoint m_value = default(FixPoint);
+        FixPoint m_base_value = FixPoint.Zero;
+        FixPoint m_value = FixPoint.Zero;
         SortedDictionary<int, int> m_dynamic_dependent_attributes;
         SortedDictionary<int, AttributeModifier> m_modifiers;
 
@@ -21,17 +21,12 @@ namespace Combat
             m_definition.Reflect(m_owner_component.ParentObject, this, true);
         }
 
-        public void Destruct()
-        {
-            Reset();
-        }
-
         public void Reset()
         {
             m_owner_component = null;
             m_definition = null;
-            m_base_value = default(FixPoint);
-            m_value = default(FixPoint);
+            m_base_value = FixPoint.Zero;
+            m_value = FixPoint.Zero;
             if (m_dynamic_dependent_attributes != null)
                 m_dynamic_dependent_attributes.Clear();
             if (m_modifiers != null)

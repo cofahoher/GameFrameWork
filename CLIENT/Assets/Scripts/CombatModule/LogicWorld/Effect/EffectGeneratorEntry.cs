@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class EffectGeneratorEntry : IRecyclable, IDestruct
+    public class EffectGeneratorEntry : IRecyclable
     {
         EffectGenerator m_generator;
         EffectGeneratorEntryData m_data;
@@ -23,11 +23,6 @@ namespace Combat
             m_generator = generator;
             m_data = data;
             m_index = index;
-        }
-
-        public void Destruct()
-        {
-            Reset();
         }
 
         public void Reset()

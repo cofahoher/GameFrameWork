@@ -57,12 +57,12 @@ namespace Combat
         }
     }
 
-    public abstract class Task<TContext> : HeapItem, IRecyclable, IDestruct
+    public abstract class Task<TContext> : HeapItem, IRecyclable
     {
         protected TaskScheduler<TContext> m_scheduler;
-        protected FixPoint m_schedule_time = default(FixPoint);
-        protected FixPoint m_period = default(FixPoint);
-        protected FixPoint m_next_execution_time = default(FixPoint);
+        protected FixPoint m_schedule_time = FixPoint.Zero;
+        protected FixPoint m_period = FixPoint.Zero;
+        protected FixPoint m_next_execution_time = FixPoint.Zero;
 
         public FixPoint ScheduleTime
         {
@@ -89,26 +89,20 @@ namespace Combat
             m_scheduler = scheduler;
         }
 
-        public void Destruct()
-        {
-            if (m_scheduler != null && _heap_index >= 0)
-                m_scheduler.Cancel(this);
-            m_scheduler = null;
-        }
-
         public void Reset()
         {
             OnReset();
 
-            Destruct();
+            if (m_scheduler != null && _heap_index >= 0)
+                m_scheduler.Cancel(this);
+            m_scheduler = null;
+
+            m_schedule_time = FixPoint.Zero;
+            m_period = FixPoint.Zero;
+            m_next_execution_time = FixPoint.Zero;
 
             _heap_index = -1;
             _insertion_index = -1;
-
-            m_scheduler = null;
-            m_schedule_time = default(FixPoint);
-            m_period = default(FixPoint);
-            m_next_execution_time = default(FixPoint);
         }
 
         public abstract void OnReset();

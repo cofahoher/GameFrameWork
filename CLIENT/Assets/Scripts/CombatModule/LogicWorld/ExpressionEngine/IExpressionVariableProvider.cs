@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class ExpressionVariable : IRecyclable, IDestruct
+    public class ExpressionVariable : IRecyclable
     {
         public static readonly int VID_Object = (int)CRC.Calculate("Object");                   //最好别用，可能你说不清楚是下面四个中的哪个
         public static readonly int VID_Player = (int)CRC.Calculate("Player");                   //所属Player
@@ -27,11 +27,6 @@ namespace Combat
             int count = raw_variable.Count;
             for (int i = 0; i < count; ++i)
                 m_variable.Add((int)CRC.Calculate(raw_variable[i]));
-        }
-
-        public void Destruct()
-        {
-            m_variable = null;
         }
 
         public void Reset()
