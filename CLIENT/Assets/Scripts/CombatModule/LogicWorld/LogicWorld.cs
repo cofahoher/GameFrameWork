@@ -25,6 +25,7 @@ namespace Combat
         protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
         protected TargetGatheringManager m_target_gathering_manager;
+        protected RegionCallbackManager m_region_callback_manager;
         protected ISpaceManager m_space_manager;
         protected GridGraph m_grid_graph;
 
@@ -53,6 +54,7 @@ namespace Combat
             m_effect_manager = new EffectManager(this);
             m_faction_manager = new FactionManager(this);
             m_target_gathering_manager = new TargetGatheringManager(this);
+            m_region_callback_manager = new RegionCallbackManager(this);
 
             m_command_handler = CreateCommandHandler();
         }
@@ -86,6 +88,8 @@ namespace Combat
             m_faction_manager = null;
             m_target_gathering_manager.Destruct();
             m_target_gathering_manager = null;
+            m_region_callback_manager.Destruct();
+            m_region_callback_manager = null;
 
             if (m_space_manager != null)
             {
@@ -164,6 +168,10 @@ namespace Combat
         public TargetGatheringManager GetTargetGatheringManager()
         {
             return m_target_gathering_manager;
+        }
+        public RegionCallbackManager GetRegionCallbackManager()
+        {
+            return m_region_callback_manager;
         }
         public GridGraph GetGridGraph()
         {

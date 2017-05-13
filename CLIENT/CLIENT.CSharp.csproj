@@ -354,6 +354,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillTimer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\CellSpaceManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\ISpaceManager.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\Region.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\RegionCallbak.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\SpaceManager\RegionCallbakManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\State\StateSystem.cs" />

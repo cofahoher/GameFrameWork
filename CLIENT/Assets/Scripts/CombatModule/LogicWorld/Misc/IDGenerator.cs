@@ -13,6 +13,7 @@ namespace Combat
         public const int ATTRIBUTE_MODIFIER_FIRST_ID  =  4000000;
         public const int DAMAGE_MODIFICATION_FIRST_ID =  5000000;
         public const int SIGNAL_LISTENER_FIRST_ID     =  6000000;
+        public const int REGION_CALLBACK_FIRST_ID     =  7000000;
 
         int m_next_id = 0;
 
