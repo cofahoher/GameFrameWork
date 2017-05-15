@@ -163,6 +163,7 @@ namespace Combat
                 .REGISTER_VARIABLE_CRC<int>("conflict_id", "VID_ConflictID", "m_conflict_id", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration", Flag_Attribute_Get);
             REGISTER_COMPONENT<HealEffectComponent>();
+            REGISTER_COMPONENT<ModifyAttributeEffectComponent>();
             #endregion
         }
 

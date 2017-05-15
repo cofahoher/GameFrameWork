@@ -257,6 +257,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\DamageEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\EffectDefinitionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\HealEffectComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ModifyAttributeEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Effect.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\EffectApplicationData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\EffectComponent.cs" />
