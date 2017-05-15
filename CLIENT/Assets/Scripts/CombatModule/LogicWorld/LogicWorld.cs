@@ -17,6 +17,8 @@ namespace Combat
 
         protected RandomGenerator m_random_generator;
         protected IDGenerator m_signal_listener_id_generator;
+        protected IDGenerator m_attribute_modifier_id_generator;
+        protected IDGenerator m_damage_modifier_id_generator;
 
         protected PlayerManager m_player_manager;
         protected EntityManager m_entity_manager;
@@ -47,6 +49,8 @@ namespace Combat
 
             m_random_generator = new RandomGenerator();
             m_signal_listener_id_generator = new IDGenerator(IDGenerator.SIGNAL_LISTENER_FIRST_ID);
+            m_attribute_modifier_id_generator = new IDGenerator(IDGenerator.ATTRIBUTE_MODIFIER_FIRST_ID);
+            m_damage_modifier_id_generator = new IDGenerator(IDGenerator.DAMAGE_MODIFIER_FIRST_ID);
 
             m_player_manager = new PlayerManager(this);
             m_entity_manager = new EntityManager(this);
@@ -74,6 +78,10 @@ namespace Combat
             m_random_generator = null;
             m_signal_listener_id_generator.Destruct();
             m_signal_listener_id_generator = null;
+            m_attribute_modifier_id_generator.Destruct();
+            m_attribute_modifier_id_generator = null;
+            m_damage_modifier_id_generator.Destruct();
+            m_damage_modifier_id_generator = null;
 
             m_entity_manager.Destruct();
             m_entity_manager = null;
@@ -144,6 +152,14 @@ namespace Combat
         public IDGenerator GetSignalListenerIDGenerator()
         {
             return m_signal_listener_id_generator;
+        }
+        public IDGenerator GetAttributeModifierIDGenerator()
+        {
+            return m_attribute_modifier_id_generator;
+        }
+        public IDGenerator GetDamageModifierIDGenerator()
+        {
+            return m_damage_modifier_id_generator;
         }
         public PlayerManager GetPlayerManager()
         {
@@ -320,10 +336,20 @@ namespace Combat
         }
         #endregion
 
+        #region ID
         public int GenerateSignalListenerID()
         {
             return m_signal_listener_id_generator.GenID();
         }
+        public int GenerateAttributeModifierID()
+        {
+            return m_attribute_modifier_id_generator.GenID();
+        }
+        public int GenerateDamageModifierID()
+        {
+            return m_damage_modifier_id_generator.GenID();
+        }
+        #endregion
 
         #region GeneralComposableObject
         protected override LogicWorld GetSelf()
