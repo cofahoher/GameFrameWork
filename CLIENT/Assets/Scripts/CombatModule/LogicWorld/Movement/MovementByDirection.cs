@@ -15,6 +15,8 @@ namespace Combat
             m_callback = null;
             m_grid_graph = null;
             m_position_component = null;
+            m_max_speed = FixPoint.Zero;
+            m_direction.MakeZero();
         }
 
         public void SetCallback(IMovementCallback callback)

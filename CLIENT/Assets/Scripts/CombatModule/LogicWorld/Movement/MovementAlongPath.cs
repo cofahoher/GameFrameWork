@@ -9,12 +9,11 @@ namespace Combat
 
         IMovementCallback m_callback = null;
         PositionComponent m_position_component;
-        FixPoint m_max_speed;
+        FixPoint m_max_speed = FixPoint.Zero;
+        FixPoint m_remain_time = FixPoint.Zero;
         List<Vector3FP> m_path = new List<Vector3FP>();
         int m_cur_way_point = INVALID_WAYPOINT_INDEX;
         Vector3FP m_direction;
-        FixPoint m_remain_time;
-
         PositionComponent m_target;
         FixPoint m_range;
 
@@ -22,7 +21,13 @@ namespace Combat
         {
             m_callback = null;
             m_position_component = null;
+            m_max_speed = FixPoint.Zero;
+            m_remain_time = FixPoint.Zero;
             m_path.Clear();
+            m_cur_way_point = INVALID_WAYPOINT_INDEX;
+            m_direction.MakeZero();
+            m_target = null;
+            m_range = FixPoint.Zero;
         }
 
         public void SetCallback(IMovementCallback callback)

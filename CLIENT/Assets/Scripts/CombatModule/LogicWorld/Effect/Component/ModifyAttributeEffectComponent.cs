@@ -9,6 +9,8 @@ namespace Combat
         public Formula m_value = RecyclableObject.Create<Formula>();
         public void Reset()
         {
+            m_attribute_id = 0;
+            m_attribute_category = 0;
             m_value.Reset();
         }
     }
