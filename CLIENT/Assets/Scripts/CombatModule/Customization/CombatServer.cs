@@ -10,6 +10,7 @@ namespace Combat
     public class CombatServer : IOutsideWorld
     {
         protected ICombatFactory m_combat_factory;
+        protected LevelData m_level_data = null;
         protected CombatServerState m_state = CombatServerState.NotRunning;
         protected int m_start_time = -1;
         protected int m_last_update_time = -1;
@@ -48,6 +49,7 @@ namespace Combat
         public virtual void Initializa(CombatStartInfo combat_start_info)
         {
             AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
+            m_level_data = GetConfigProvider().GetLevelData(combat_start_info.m_level_id);
             m_logic_world = m_combat_factory.CreateLogicWorld();
             m_logic_world.Initialize(this, false);
             m_sync_server = m_combat_factory.CreateSyncServer();
@@ -74,6 +76,11 @@ namespace Combat
         public IConfigProvider GetConfigProvider()
         {
             return m_combat_factory.GetConfigProvider();
+        }
+
+        public LevelData GetLevelData()
+        {
+            return m_level_data;
         }
 
         public virtual int GetCurrentTime()

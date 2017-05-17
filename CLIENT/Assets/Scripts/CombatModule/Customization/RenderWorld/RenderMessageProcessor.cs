@@ -87,7 +87,12 @@ namespace Combat
             if (model_component == null)
                 return;
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
-            if (predic_component == null || !predic_component.HasMovementPredict)
+            if (msg.m_simple_data == SimpleRenderMessage.NotLocomotion)
+            {
+                if (predic_component != null)
+                    predic_component.OnLogicMove();
+            }
+            else if (msg.m_simple_data == SimpleRenderMessage.NotFromCommand || predic_component == null || !predic_component.HasMovementPredict)
             {
                 model_component.UpdateAngle();
                 AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
@@ -96,6 +101,8 @@ namespace Combat
                 AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
                 if (animator_component != null)
                     animator_component.PlayAnimation(AnimationName.RUN);
+                if (msg.m_simple_data == SimpleRenderMessage.NotFromCommand && predic_component != null)
+                    predic_component.OnLogicMove();
             }
             m_render_world.RegisterMovingEntity(model_component);
         }
@@ -109,7 +116,7 @@ namespace Combat
             if (model_component == null)
                 return;
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
-            if (predic_component == null || !predic_component.HasMovementPredict)
+            if (msg.m_simple_data == SimpleRenderMessage.NotFromCommand || predic_component == null || !predic_component.HasMovementPredict)
             {
                 AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
                 if (animation_component != null)
@@ -143,7 +150,7 @@ namespace Combat
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
             if (predic_component == null)
                 return;
-            predic_component.OnLogicFindPath();
+            predic_component.OnLogicMove();
         }
 
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)

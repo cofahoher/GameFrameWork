@@ -76,7 +76,7 @@ namespace Combat
             PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             Vector3FP new_position = position_component.CurrentPosition + m_param.m_facing * (m_speed * delta_time);
             position_component.CurrentPosition = new_position;
-            if (DetectCollision(new_position))
+            if (DetectCollision(new_position, position_component.Radius))
                 return true;
             GridGraph grid_graph = GetLogicWorld().GetGridGraph();
             if (grid_graph != null)
@@ -88,12 +88,12 @@ namespace Combat
             return false;
         }
 
-        bool DetectCollision(Vector3FP position)
+        bool DetectCollision(Vector3FP position, FixPoint radius)
         {
             ISpaceManager space_manager = GetLogicWorld().GetSpaceManager();
             if (space_manager == null)
                 return false;
-            List<int> list = space_manager.CollectEntity_Point(position, m_param.m_source_entity_id);
+            List<int> list = space_manager.CollectEntity_CircleArea(position, radius, m_param.m_source_entity_id);
             if (list.Count == 0)
                 return false;
             EntityManager entity_manager = GetLogicWorld().GetEntityManager();
@@ -153,6 +153,7 @@ namespace Combat
         public override void OnReset()
         {
             m_component = null;
+            m_remain_time = FixPoint.Zero;
             m_lock = false;
         }
 

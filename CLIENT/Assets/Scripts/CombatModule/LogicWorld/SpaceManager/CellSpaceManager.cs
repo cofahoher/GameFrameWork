@@ -10,7 +10,7 @@ namespace Combat
     public class CellSpaceManager : ISpaceManager
     {
         static readonly FixPoint CELL_SIZE = FixPoint.Ten;
-        static readonly FixPoint MAX_ENTITY_RADIUS = FixPoint.Two;
+        static readonly FixPoint MAX_ENTITY_RADIUS = FixPoint.One;
 
         LogicWorld m_logic_world;
         Vector3FP m_left_bottom_position = new Vector3FP();
@@ -102,21 +102,29 @@ namespace Combat
             pos2.z -= m_left_bottom_position.z;
             if (pos1.x < pos2.x)
             {
+                pos1.x -= MAX_ENTITY_RADIUS;
+                pos2.x += MAX_ENTITY_RADIUS;
                 m_min_x = (int)(pos1.x / CELL_SIZE);
                 m_max_x = (int)(pos2.x / CELL_SIZE);
             }
             else
             {
+                pos2.x -= MAX_ENTITY_RADIUS;
+                pos1.x += MAX_ENTITY_RADIUS;
                 m_min_x = (int)(pos2.x / CELL_SIZE);
                 m_max_x = (int)(pos1.x / CELL_SIZE);
             }
             if (pos1.z < pos2.z)
             {
+                pos1.z -= MAX_ENTITY_RADIUS;
+                pos2.z += MAX_ENTITY_RADIUS;
                 m_min_z = (int)(pos1.z / CELL_SIZE);
                 m_max_z = (int)(pos2.z / CELL_SIZE);
             }
             else
             {
+                pos2.z -= MAX_ENTITY_RADIUS;
+                pos1.z += MAX_ENTITY_RADIUS;
                 m_min_z = (int)(pos2.z / CELL_SIZE);
                 m_max_z = (int)(pos1.z / CELL_SIZE);
             }
@@ -131,47 +139,7 @@ namespace Combat
         }
         #endregion
 
-        public List<int> CollectEntity_Point(Vector3FP position, int exclude_id)
-        {
-            m_collection.Clear();
-            FixPoint position_x = position.x - m_left_bottom_position.x;
-            FixPoint position_z = position.z - m_left_bottom_position.z;
-            int min_x = (int)((position_x - MAX_ENTITY_RADIUS) / CELL_SIZE);
-            if (min_x < 0)
-                min_x = 0;
-            int max_x = (int)((position_x + MAX_ENTITY_RADIUS) / CELL_SIZE);
-            if (max_x > MAX_X_INDEX)
-                max_x = MAX_X_INDEX;
-            int min_z = (int)((position_z - MAX_ENTITY_RADIUS) / CELL_SIZE);
-            if (min_z < 0)
-                min_z = 0;
-            int max_z = (int)((position_z + MAX_ENTITY_RADIUS) / CELL_SIZE);
-            if (max_z > MAX_Z_INDEX)
-                max_z = MAX_Z_INDEX;
-            Cell cell;
-            PositionComponent cmp;
-            for (int x = min_x; x <= max_x; ++x)
-            {
-                for (int z = min_z; z <= max_z; ++z)
-                {
-                    cell = m_cells[x, z];
-                    for (int i = 0; i < cell.m_entities.Count; ++i)
-                    {
-                        cmp = cell.m_entities[i];
-                        Vector3FP offset = position - cmp.CurrentPosition;
-                        if (FixPoint.FastDistance(offset.x, offset.z) < cmp.Radius)
-                        {
-                            int id = cmp.GetOwnerEntityID();
-                            if (id != exclude_id)
-                                m_collection.Add(cmp.GetOwnerEntityID());
-                        }
-                    }
-                }
-            }
-            return m_collection;
-        }
-
-        public List<int> CollectEntity_ForwardArea(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width)
+        public List<int> CollectEntity_ForwardArea(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
         {
             m_collection.Clear();
             Vector2FP start_position = new Vector2FP(position);
@@ -201,7 +169,37 @@ namespace Combat
                             component = -component;
                         if (component > width + radius)
                             continue;
-                        m_collection.Add(cmp.GetOwnerEntityID());
+                        if (cmp.GetOwnerEntityID() != exclude_id)
+                            m_collection.Add(cmp.GetOwnerEntityID());
+                    }
+                }
+            }
+            return m_collection;
+        }
+
+        public List<int> CollectEntity_CircleArea(Vector3FP position, FixPoint radius, int exclude_id)
+        {
+            m_collection.Clear();
+            Vector2FP start_position = new Vector2FP(position.x - radius, position.z - radius);
+            Vector2FP end_position = new Vector2FP(position.x + radius, position.z + radius);
+            ComputeAreaXZ(start_position, end_position);
+            Cell cell;
+            PositionComponent cmp;
+            for (int x = m_min_x; x <= m_max_x; ++x)
+            {
+                for (int z = m_min_z; z <= m_max_z; ++z)
+                {
+                    cell = m_cells[x, z];
+                    for (int i = 0; i < cell.m_entities.Count; ++i)
+                    {
+                        cmp = cell.m_entities[i];
+                        Vector3FP offset = position - cmp.CurrentPosition;
+                        if (FixPoint.FastDistance(offset.x, offset.z) < (cmp.Radius + radius))
+                        {
+                            int id = cmp.GetOwnerEntityID();
+                            if (id != exclude_id)
+                                m_collection.Add(cmp.GetOwnerEntityID());
+                        }
                     }
                 }
             }

@@ -19,6 +19,7 @@ namespace Combat
         protected DateTime m_dt_original = DateTime.Now;
         protected ICombatFactory m_combat_factory;
         protected long m_local_player_pstid = -1;
+        protected LevelData m_level_data = null;
 
         protected CombatClientState m_state = CombatClientState.None;
         protected int m_state_frame_cnt = 0;
@@ -43,6 +44,7 @@ namespace Combat
         public virtual void Destruct()
         {
             m_combat_factory = null;
+            m_level_data = null;
             m_sync_client.Destruct();
             m_sync_client = null;
             m_render_world.Destruct();
@@ -83,6 +85,7 @@ namespace Combat
         {
             //真正的local_player_pstid在局外，传进来就好；combat_start_info是给所有玩家、观战者、以及录像回放时，都一致的消息
             m_local_player_pstid = local_player_pstid;
+            m_level_data = GetConfigProvider().GetLevelData(combat_start_info.m_level_id);
             m_state = CombatClientState.Loading;
             m_state_frame_cnt = 0;
             m_state_start_time = -1;
@@ -108,8 +111,7 @@ namespace Combat
             WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
             ++m_waiting_cnt;
-            LevelData level_data = GetConfigProvider().GetLevelData(combat_start_info.m_level_id);
-            m_render_world.LoadScene(level_data.m_scene_name);
+            m_render_world.LoadScene(m_level_data.m_scene_name);
         }
 
         public virtual void AddPlayer(long player_pstid)
@@ -161,6 +163,11 @@ namespace Combat
         public IConfigProvider GetConfigProvider()
         {
             return m_combat_factory.GetConfigProvider();
+        }
+
+        public LevelData GetLevelData()
+        {
+            return m_level_data;
         }
 
         public virtual int GetCurrentTime()

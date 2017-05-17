@@ -36,6 +36,7 @@ namespace Combat
             Register<CreateObjectSkillComponent>(false);
             Register<DirectDamageSkillComponent>(false);
             Register<EffectGeneratorSkillComponent>(false);
+            Register<SpurtSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
             Register<ThreePhaseAttackSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
@@ -43,6 +44,7 @@ namespace Combat
             Register<DamageEffectComponent>(false);
             Register<EffectDefinitionComponent>(false);
             Register<HealEffectComponent>(false);
+            Register<ModifyAttributeEffectComponent>(false);
 
 #if COMBAT_CLIENT
             Register<AnimationComponent>(true);
@@ -512,6 +514,20 @@ namespace Combat
         }
     }
 
+    public partial class SpurtSkillComponent
+    {
+        public const int ID = -781874088;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("distance", out value))
+                m_distance = FixPoint.Parse(value);
+            if (variables.TryGetValue("time", out value))
+                m_time = FixPoint.Parse(value);
+        }
+    }
+
     public partial class SkillDefinitionComponent
     {
         public const int ID = -1434735094;
@@ -775,6 +791,11 @@ namespace Combat
     public partial class HealEffectComponent
     {
         public const int ID = -679969353;
+    }
+
+    public partial class ModifyAttributeEffectComponent
+    {
+        public const int ID = -107304768;
     }
 
     public partial class AnimationComponent

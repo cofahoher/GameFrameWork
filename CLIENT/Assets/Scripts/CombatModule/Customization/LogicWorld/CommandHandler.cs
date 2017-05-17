@@ -64,7 +64,7 @@ namespace Combat
             }
             else if (cmd.m_move_type == EntityMoveCommand.StopMoving)
             {
-                locomotor_component.StopMoving();
+                locomotor_component.StopMoving(true);
             }
             return true;
         }

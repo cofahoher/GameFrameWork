@@ -69,7 +69,8 @@ namespace Combat
         {
             //TODO 根据游戏配置和某种规则，找范围内的某个可攻击的敌人
             Entity target = null;
-            StartTargeting(target);
+            if (target != null)
+                StartTargeting(target);
         }
 
         public void StartTargeting(Entity target)

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using BaseUtil;
 namespace Combat
 {
     public partial class CommandType
@@ -14,7 +15,9 @@ namespace Combat
         public const int DirectionType = 1;
         public const int DestinationType = 2;
 
-        public int m_move_type = 0; 
+        [ProtoBufAttribute(Index = 1)]
+        public int m_move_type = 0;
+        [ProtoBufAttribute(Index = 2)]
         public Vector3FP m_vector;
 
         public EntityMoveCommand()
@@ -52,6 +55,7 @@ namespace Combat
 
     public class EntityTargetCommand : Command
     {
+        [ProtoBufAttribute(Index = 1)]
         public int m_target_entity_id = 0;
 
         public EntityTargetCommand()

@@ -6,7 +6,7 @@ namespace Combat
     {
         TestCombatClient m_combat_client;
         TestLogicWorld m_logic_world;
-        RandomGenerator m_random_generator = new RandomGenerator();
+        RandomGeneratorI m_random_generator = new RandomGeneratorI();
         bool m_started = false;
         int m_time = 0;
         int m_interval = 50;

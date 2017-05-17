@@ -67,6 +67,11 @@ namespace Combat
             return null;
         }
 
+        public LevelData GetLevelData()
+        {
+            return null;
+        }
+
         public int GetCurrentTime()
         {
             return m_last_update_time;

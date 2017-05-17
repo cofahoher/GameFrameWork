@@ -307,6 +307,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDestruct.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\ILogicOwnerInfo.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\MersenneTwister.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\RandomGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\ResuableObjectPool.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Singleton.cs" />
@@ -348,6 +349,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\DirectDamageSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\EffectGeneratorSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\SkillDefinitionComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\SpurtSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\ThreePhaseAttackSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Skill.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\SkillComponent.cs" />

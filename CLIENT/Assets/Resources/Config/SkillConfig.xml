@@ -79,6 +79,20 @@
 				<var key="offset_z" value="1"/>
 				<var key="generator_id" value="2"/>
 			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="1021" name="冲刺">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="3"/>
+				<var key="inflict_time" value="0"/>
+				<var key="expiration_time" value="0.2"/>
+				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="main_animation" value="run"/>
+			</Component>
+			<Component id="SpurtSkillComponent">
+				<var key="distance" value="5"/>
+				<var key="time" value="0.2"/>
+			</Component>
 		</ConfigItem>		
 	</SkillConfig>
 </ConfigSystem>

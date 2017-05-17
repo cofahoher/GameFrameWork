@@ -15,7 +15,8 @@ namespace Combat
         protected bool m_collapsing = false;
         protected TaskScheduler<LogicWorld> m_scheduler;
 
-        protected RandomGenerator m_random_generator;
+        protected RandomGeneratorI m_random_generator_int;
+        protected RandomGeneratorFP m_random_generator_fp;
         protected IDGenerator m_signal_listener_id_generator;
         protected IDGenerator m_attribute_modifier_id_generator;
         protected IDGenerator m_damage_modifier_id_generator;
@@ -47,7 +48,6 @@ namespace Combat
 
             m_scheduler = new TaskScheduler<LogicWorld>(this);
 
-            m_random_generator = new RandomGenerator();
             m_signal_listener_id_generator = new IDGenerator(IDGenerator.SIGNAL_LISTENER_FIRST_ID);
             m_attribute_modifier_id_generator = new IDGenerator(IDGenerator.ATTRIBUTE_MODIFIER_FIRST_ID);
             m_damage_modifier_id_generator = new IDGenerator(IDGenerator.DAMAGE_MODIFIER_FIRST_ID);
@@ -74,8 +74,10 @@ namespace Combat
 
             m_scheduler.Destruct();
             m_scheduler = null;
-            m_random_generator.Destruct();
-            m_random_generator = null;
+            m_random_generator_int.Destruct();
+            m_random_generator_int = null;
+            m_random_generator_fp.Destruct();
+            m_random_generator_fp = null;
             m_signal_listener_id_generator.Destruct();
             m_signal_listener_id_generator = null;
             m_attribute_modifier_id_generator.Destruct();
@@ -145,9 +147,13 @@ namespace Combat
         {
             return m_scheduler;
         }
-        public RandomGenerator GetRandomGenerator()
+        public RandomGeneratorI GetRandomGeneratorI()
         {
-            return m_random_generator;
+            return m_random_generator_int;
+        }
+        public RandomGeneratorFP GetRandomGeneratorFP()
+        {
+            return m_random_generator_fp;
         }
         public IDGenerator GetSignalListenerIDGenerator()
         {
@@ -292,7 +298,8 @@ namespace Combat
 
         public virtual void BuildLogicWorld(WorldCreationContext world_context)
         {
-            m_random_generator.ResetSeed(world_context.m_world_seed);
+            m_random_generator_int = new RandomGeneratorI(world_context.m_world_seed);
+            m_random_generator_fp = new RandomGeneratorFP(world_context.m_world_seed);
             m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
             IConfigProvider config = GetConfigProvider();
             for (int i = 0; i < world_context.m_players.Count; ++i)

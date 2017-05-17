@@ -6,6 +6,8 @@ namespace Combat
     {
         //配置
         IConfigProvider GetConfigProvider();
+        //关卡配置
+        LevelData GetLevelData();
         //返回当前时间（单位毫秒）
         int GetCurrentTime();
         //游戏开始，不用驱动逻辑世界，让渲染世界开始就好了（对服务器，这就无视了）

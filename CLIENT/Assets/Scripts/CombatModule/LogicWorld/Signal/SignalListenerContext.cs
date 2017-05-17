@@ -6,6 +6,7 @@ namespace Combat
     {
         Invalid = 0,
         EntityComponent,
+        EffectComponent,
     }
 
     public class SignalListenerContext : IRecyclable
@@ -40,6 +41,16 @@ namespace Combat
             return context;
         }
 
+        public static SignalListenerContext CreateForEffectComponent(int listener_id, int effect_id, int component_type_id)
+        {
+            SignalListenerContext context = RecyclableObject.Create<SignalListenerContext>();
+            context.m_context_type = SignalListenerContextType.EffectComponent;
+            context.m_listener_id = listener_id;
+            context.m_object_id = effect_id;
+            context.m_component_type_id = component_type_id;
+            return context;
+        }
+
         public static void Recycle(SignalListenerContext instance)
         {
             RecyclableObject.Recycle(instance);
@@ -47,9 +58,8 @@ namespace Combat
 
         public ISignalListener GetListener(LogicWorld logic_world)
         {
-            switch (m_context_type)
+            if (SignalListenerContextType.EntityComponent == m_context_type)
             {
-            case SignalListenerContextType.EntityComponent:
                 Entity entity = logic_world.GetEntityManager().GetObject(m_object_id);
                 if (entity == null)
                     return null;
@@ -57,9 +67,18 @@ namespace Combat
                 if (component == null)
                     return null;
                 return component as ISignalListener;
-            default:
-                break;
             }
+            else if (SignalListenerContextType.EffectComponent == m_context_type)
+            {
+                Effect effect = logic_world.GetEffectManager().GetObject(m_object_id);
+                if (effect == null)
+                    return null;
+                Component component = effect.GetComponent(m_component_type_id);
+                if (component == null)
+                    return null;
+                return component as ISignalListener;
+            }
+
             return null;
         }
     }

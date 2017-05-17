@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using BaseUtil;
 namespace Combat
 {
     public struct Vector3FP : IEquatable<Vector3FP>
     {
+        [ProtoBufAttribute(Index = 1)]
         public FixPoint x;
+        [ProtoBufAttribute(Index = 2)]
         public FixPoint y;
+        [ProtoBufAttribute(Index = 3)]
         public FixPoint z;
 
         public Vector3FP(FixPoint term_x = default(FixPoint), FixPoint term_y = default(FixPoint), FixPoint term_z = default(FixPoint))

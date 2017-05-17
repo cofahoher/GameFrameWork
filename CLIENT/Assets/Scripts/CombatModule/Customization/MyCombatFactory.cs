@@ -43,6 +43,7 @@ namespace Combat
                 Command.Registered = true;
             Command.Register(CommandType.SyncTurnDone, typeof(SyncTurnDoneCommand));
             Command.Register(CommandType.EntityMove, typeof(EntityMoveCommand));
+            Command.Register(CommandType.EntityTarget, typeof(EntityTargetCommand));
         }
 
         public void RegisterRenderMessages()

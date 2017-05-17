@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using BaseUtil;
 namespace Combat
 {
     /*
@@ -8,7 +9,9 @@ namespace Combat
      */
     public struct Vector2FP : IEquatable<Vector2FP>
     {
+        [ProtoBufAttribute(Index = 1)]
         public FixPoint x;
+        [ProtoBufAttribute(Index = 2)]
         public FixPoint z;
 
         public Vector2FP(FixPoint term_x = default(FixPoint), FixPoint term_y = default(FixPoint))

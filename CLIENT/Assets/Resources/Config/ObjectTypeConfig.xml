@@ -6,6 +6,20 @@
 		</ConfigItem>
 		<ConfigItem id="3" name="LocalPlayer">
 		</ConfigItem>
+		<ConfigItem id="4" name="RealPlayer">
+		</ConfigItem>
+		
+		<ConfigItem id="100" name="EnvironmentEntity">
+			<Component id="PositionComponent">
+				<var key="x" value="99999"/>
+				<var key="y" value="99999"/>
+				<var key="z" value="99999"/>
+				<var key="radius" value="0"/>
+				<var key="collision_sender" value="False"/>
+				<var key="visible" value="False"/>
+			</Component>
+			<Component id="EffectManagerComponent"/>
+		</ConfigItem>
 		
 		<ConfigItem id="101" name="DamagableObstruct">
 			<Component id="PositionComponent">

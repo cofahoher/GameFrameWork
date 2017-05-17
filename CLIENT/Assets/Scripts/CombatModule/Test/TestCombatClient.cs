@@ -124,6 +124,11 @@ namespace Combat
             return null;
         }
 
+        public LevelData GetLevelData()
+        {
+            return null;
+        }
+
         public int GetCurrentTime()
         {
             return m_network.GetCurrentTime();

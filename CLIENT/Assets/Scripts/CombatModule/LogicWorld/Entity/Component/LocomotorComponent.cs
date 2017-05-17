@@ -94,13 +94,13 @@ namespace Combat
             return true;
         }
 
-        public void StopMoving()
+        public void StopMoving(bool from_command = false)
         {
             if (!m_is_moving)
                 return;
             m_task.Cancel();
             m_is_moving = false;
-            OnMovementStopped();
+            OnMovementStopped(from_command);
         }
         #endregion
 
@@ -117,7 +117,7 @@ namespace Combat
         #endregion
 
         #region 实现
-        void StartMoving()
+        void StartMoving(bool from_command = true)
         {
             if (m_task == null)
             {
@@ -129,20 +129,20 @@ namespace Combat
             if (!m_is_moving)
             {
                 m_is_moving = true;
-                OnMovementStarted();
+                OnMovementStarted(from_command);
             }
         }
 
-        protected void OnMovementStarted()
+        protected void OnMovementStarted(bool from_command)
         {
             ParentObject.SendSignal(SignalType.StartMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID, from_command ? 0 : SimpleRenderMessage.NotFromCommand);
         }
 
-        protected void OnMovementStopped()
+        protected void OnMovementStopped(bool from_command)
         {
             ParentObject.SendSignal(SignalType.StopMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID, from_command ? 0 : SimpleRenderMessage.NotFromCommand);
         }
 
         public void UpdatePosition(FixPoint delta_time)

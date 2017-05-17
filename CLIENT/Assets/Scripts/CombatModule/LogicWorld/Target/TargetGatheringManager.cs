@@ -63,7 +63,7 @@ namespace Combat
                 PositionComponent position_cmp = source_entity.GetComponent(PositionComponent.ID) as PositionComponent;
                 if (position_cmp == null)
                     return;
-                List<int> ids = m_space_manager.CollectEntity_ForwardArea(position_cmp.CurrentPosition, position_cmp.Facing, target_gathering_param1, target_gathering_param2);
+                List<int> ids = m_space_manager.CollectEntity_ForwardArea(position_cmp.CurrentPosition, position_cmp.Facing2D, target_gathering_param1, target_gathering_param2);
                 Player source_player = source_entity.GetOwnerPlayer();
                 for (int i = 0; i < ids.Count; ++i)
                 {
@@ -85,7 +85,7 @@ namespace Combat
                 PositionComponent position_cmp = source_entity.GetComponent(PositionComponent.ID) as PositionComponent;
                 if (position_cmp == null)
                     return;
-                List<int> ids = m_space_manager.CollectEntity_ForwardArea(position_cmp.CurrentPosition, position_cmp.Facing, target_gathering_param1, target_gathering_param2);
+                List<int> ids = m_space_manager.CollectEntity_ForwardArea(position_cmp.CurrentPosition, position_cmp.Facing2D, target_gathering_param1, target_gathering_param2);
                 Player source_player = source_entity.GetOwnerPlayer();
                 for (int i = 0; i < ids.Count; ++i)
                 {

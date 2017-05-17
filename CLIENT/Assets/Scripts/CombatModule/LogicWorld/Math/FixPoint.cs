@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using BaseUtil;
 
 public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 {
-    readonly long m_raw_value;
+    [ProtoBufAttribute(Index = 1)]
+    public long m_raw_value;
 
     public FixPoint(int value = 0)
     {

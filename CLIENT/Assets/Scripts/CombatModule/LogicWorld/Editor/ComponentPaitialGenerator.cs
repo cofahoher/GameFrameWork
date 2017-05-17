@@ -110,6 +110,9 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>()
                 .REGISTER_VARIABLE<int>("generator_id", null, "m_generator_cfgid");
+            REGISTER_COMPONENT<SpurtSkillComponent>()
+                .REGISTER_VARIABLE<FixPoint>("distance", null, "m_distance")
+                .REGISTER_VARIABLE<FixPoint>("time", null, "m_time");
             REGISTER_COMPONENT<SkillDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("mana_type", "VID_ManaType", "m_mana_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("mana_cost", "VID_ManaCost", "m_mana_cost", Flag_Attribute_Get)

@@ -121,6 +121,7 @@ namespace Combat
                 else
                     EntityUtil.KillEntity(ParentObject as Entity);
                 ParentObject.SendSignal(SignalType.Die);
+                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Die, ParentObject.ID);
             }
         }
     }

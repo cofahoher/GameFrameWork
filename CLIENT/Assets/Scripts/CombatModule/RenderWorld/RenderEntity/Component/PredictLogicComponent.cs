@@ -121,7 +121,7 @@ namespace Combat
                 Interpolate();
         }
 
-        public void OnLogicFindPath()
+        public void OnLogicMove()
         {
             m_copy_state = DoCopy;
         }

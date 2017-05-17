@@ -57,12 +57,21 @@ namespace Combat
             }
         }
 
-        public Vector2FP Facing
+        public Vector2FP Facing2D
         {
             get
             {
                 FixPoint radian = FixPoint.Degree2Radian(-m_current_angle);
                 return new Vector2FP(FixPoint.Cos(radian), FixPoint.Sin(radian));
+            }
+        }
+
+        public Vector3FP Facing3D
+        {
+            get
+            {
+                FixPoint radian = FixPoint.Degree2Radian(-m_current_angle);
+                return new Vector3FP(FixPoint.Cos(radian), FixPoint.Zero, FixPoint.Sin(radian));
             }
         }
         #endregion
@@ -118,9 +127,11 @@ namespace Combat
         public void SetAngle(FixPoint new_angle)
         {
             m_current_angle = new_angle;
+#if COMBAT_CLIENT
             ChangeDirectionRenderMessage msg = RenderMessage.Create<ChangeDirectionRenderMessage>();
             msg.Construct(ParentObject.ID, m_current_angle);
             GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
 
         public void SetAngle(Vector3FP direction)

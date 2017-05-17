@@ -46,7 +46,7 @@ namespace Combat
             Vector3FP facing;
             if (target == null)
             {
-                xz_facing = owner_position_cmp.Facing;
+                xz_facing = owner_position_cmp.Facing2D;
                 angle = owner_position_cmp.CurrentAngle;
                 facing.x = xz_facing.x;
                 facing.y = FixPoint.Zero;
