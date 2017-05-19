@@ -7,6 +7,7 @@ namespace Combat
     {
         //配置数据
         string m_animator_path;
+        string m_locomotor_animation_name = AnimationName.RUN;
         //运行数据
         float m_animation_speed = 1.0f;
         Animator m_unity_animator_cmp;
@@ -15,6 +16,22 @@ namespace Combat
         {
             get { return m_animation_speed; }
             set { m_animation_speed = value; }
+        }
+
+        public string LocomotorAnimationName
+        {
+            get { return m_locomotor_animation_name; }
+            set { m_locomotor_animation_name = value; }
+        }
+
+        public bool LocomotorAnimationNameChanged
+        {
+            get { return m_locomotor_animation_name != AnimationName.RUN; }
+        }
+
+        public void ResetLocomotorAnimationName()
+        {
+            m_locomotor_animation_name = AnimationName.RUN;
         }
 
         #region 初始化/销毁

@@ -5,15 +5,47 @@ namespace Combat
     public partial class RenderMessageType
     {
         //命名是：做（什么）
-        public const int StartMoving = 101;               //SimpleRenderMessage
-        public const int StopMoving = 102;                //SimpleRenderMessage
+        public const int StartMoving = 101;               //LocomoteRenderMessage
+        public const int StopMoving = 102;                //LocomoteRenderMessage
         public const int ChangeDirection = 103;           //ChangeDirectionRenderMessage
-        public const int FindPath = 104;                  //SimpleRenderMessage
         public const int ChangeHealth = 110;              //ChangeHealthRenderMessage
         public const int Die = 111;                       //SimpleRenderMessage
         public const int Hide = 112;                      //SimpleRenderMessage
         public const int PlayAnimation = 120;             //SimpleRenderMessage
         public const int TakeDamage = 130;                //TakeDamageRenderMessage
+    }
+
+    public class LocomoteRenderMessage : RenderMessage
+    {
+        public const int NotFromCommand = 1;
+        public const int NotLocomotion = 2;
+
+        public bool m_block_animation = false;
+        public int m_reason = 0;
+
+        public void ConstructAsStartMoving(int entity_id, bool block_animation = false, int reason = 0)
+        {
+            m_type = RenderMessageType.StartMoving;
+            m_entity_id = entity_id;
+            m_block_animation = block_animation;
+            m_reason = reason;
+        }
+
+        public void ConstructAsStopMoving(int entity_id, bool block_animation = false, int reason = 0)
+        {
+            m_type = RenderMessageType.StopMoving;
+            m_entity_id = entity_id;
+            m_block_animation = block_animation;
+            m_reason = reason;
+        }
+
+        public override void Reset()
+        {
+            m_type = RenderMessageType.Invalid;
+            m_entity_id = -1;
+            m_block_animation = false;
+            m_reason = 0;
+        }
     }
 
     public class ChangeDirectionRenderMessage : RenderMessage

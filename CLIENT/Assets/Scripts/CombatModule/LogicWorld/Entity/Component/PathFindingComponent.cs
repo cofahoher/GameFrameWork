@@ -28,11 +28,8 @@ namespace Combat
                 return false;
             }
             List<Vector3FP> path = graph.GetPath();
-            if (!locomotor_cmp.MoveAlongPath(path))
+            if (!locomotor_cmp.MoveAlongPath(path, false))
                 return false;
-            ObjectCreationContext context = ParentObject.GetCreationContext();
-            if (context.m_is_local && !context.m_is_ai)
-                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.FindPath, ParentObject.ID);
             //m_destination = destination;
             return true;
         }

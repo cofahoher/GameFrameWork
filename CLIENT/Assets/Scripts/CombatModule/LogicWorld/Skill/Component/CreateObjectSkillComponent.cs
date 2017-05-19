@@ -2,21 +2,27 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class CreateObjectSkillComponent : SkillComponent
+    public partial class CreateObjectSkillComponent : SkillComponent, INeedTaskService
     {
         //配置数据
         int m_object_type_id = 0;
         int m_object_proto_id = 0;
+        FixPoint m_object_life_time = FixPoint.Zero;
         int m_generator_cfgid = 0;
         Vector3FP m_offset;
+        int m_combo_attack_cnt = 1;
+        FixPoint m_combo_interval = FixPoint.Zero;
 
         //运行数据
         EffectGenerator m_generator;
+        int m_remain_attack_cnt = 0;
+        ComponentCommonTask m_task;
 
         #region 初始化/销毁
         public override void InitializeComponent()
         {
-            m_generator = GetLogicWorld().GetEffectManager().CreateGenerator(m_generator_cfgid, GetOwnerEntity());
+            if (m_generator_cfgid != 0)
+                m_generator = GetLogicWorld().GetEffectManager().CreateGenerator(m_generator_cfgid, GetOwnerEntity());
         }
 
         protected override void OnDestruct()
@@ -26,13 +32,55 @@ namespace Combat
                 GetLogicWorld().GetEffectManager().DestroyGenerator(m_generator.ID, GetOwnerEntityID());
                 m_generator = null;
             }
+
+            if (m_task != null)
+            {
+                m_task.Cancel();
+                LogicTask.Recycle(m_task);
+                m_task = null;
+            }
         }
         #endregion
 
         public override void Inflict(FixPoint start_time)
         {
-            Target target = GetOwnerSkill().GetMajorTarget();
+            m_remain_attack_cnt = m_combo_attack_cnt;
+            Impact();
+            if (m_combo_attack_cnt > 1)
+            {
+                if (m_task == null)
+                {
+                    m_task = LogicTask.Create<ComponentCommonTask>();
+                    m_task.Construct(this);
+                }
+                var schedeler = GetLogicWorld().GetTaskScheduler();
+                schedeler.Schedule(m_task, GetCurrentTime(), m_combo_interval, m_combo_interval);
+            }
+        }
 
+        public override void Deactivate()
+        {
+            if (m_generator != null)
+                m_generator.Deactivate();
+            if (m_task != null)
+                m_task.Cancel();
+        }
+
+        public void OnTaskService(FixPoint delta_time)
+        {
+            Impact();
+        }
+
+        void Impact()
+        {
+            --m_remain_attack_cnt;
+            if (m_remain_attack_cnt <= 0)
+            {
+                if (m_task != null)
+                    m_task.Cancel();
+            }
+
+            Target target = GetOwnerSkill().GetMajorTarget();
             LogicWorld logic_world = GetLogicWorld();
             EntityManager entity_manager = logic_world.GetEntityManager();
             IConfigProvider config = logic_world.GetConfigProvider();
@@ -82,10 +130,17 @@ namespace Combat
             object_context.m_is_local = owner_player.IsLocal;
             Entity obj = entity_manager.CreateObject(object_context);
 
+            DeathComponent death_component = obj.GetComponent(DeathComponent.ID) as DeathComponent;
+            if (death_component != null && m_object_life_time > FixPoint.Zero)
+            {
+                death_component.SetLifeTime(m_object_life_time);
+            }
+
             ProjectileComponent projectile_component = obj.GetComponent(ProjectileComponent.ID) as ProjectileComponent;
             if (projectile_component != null)
             {
                 ProjectileParameters param = RecyclableObject.Create<ProjectileParameters>();
+                param.m_life_time = m_object_life_time;
                 param.m_source_entity_id = owner_entity.ID;
                 if (target == null)
                     param.m_target_entity_id = 0;
@@ -95,12 +150,6 @@ namespace Combat
                 param.m_generator_id = m_generator == null ? 0 : m_generator.ID;
                 projectile_component.InitParam(param);
             }
-        }
-
-        public override void Deactivate()
-        {
-            if (m_generator != null)
-                m_generator.Deactivate();
         }
     }
 }

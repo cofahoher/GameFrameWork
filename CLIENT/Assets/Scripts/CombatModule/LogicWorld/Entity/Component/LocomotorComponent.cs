@@ -9,6 +9,7 @@ namespace Combat
         FixPoint m_current_max_speed = FixPoint.Zero;
         IMovementProvider m_movement_provider = null;
         bool m_is_moving = false;
+        int m_animation_block_cnt = 0;
         LocomoterTask m_task;
 
         #region GETTER
@@ -31,6 +32,11 @@ namespace Combat
         public IMovementProvider GetMovementProvider()
         {
             return m_movement_provider;
+        }
+
+        public bool IsAnimationBlocked
+        {
+            get { return m_animation_block_cnt > 0; }
         }
         #endregion
 
@@ -77,7 +83,7 @@ namespace Combat
             return true;
         }
 
-        public bool MoveAlongPath(List<Vector3FP> path)
+        public bool MoveAlongPath(List<Vector3FP> path, bool from_command)
         {
             //不可以保存path
             if (!IsEnable())
@@ -90,7 +96,7 @@ namespace Combat
                 m_movement_provider.SetMaxSpeed(m_current_max_speed);
             }
             m_movement_provider.MoveAlongPath(path);
-            StartMoving();
+            StartMoving(from_command);
             return true;
         }
 
@@ -136,13 +142,21 @@ namespace Combat
         protected void OnMovementStarted(bool from_command)
         {
             ParentObject.SendSignal(SignalType.StartMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID, from_command ? 0 : SimpleRenderMessage.NotFromCommand);
+#if COMBAT_CLIENT
+            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+            msg.ConstructAsStartMoving(ParentObject.ID, IsAnimationBlocked, from_command ? 0 : LocomoteRenderMessage.NotFromCommand);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
 
         protected void OnMovementStopped(bool from_command)
         {
             ParentObject.SendSignal(SignalType.StopMoving);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID, from_command ? 0 : SimpleRenderMessage.NotFromCommand);
+#if COMBAT_CLIENT
+            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+            msg.ConstructAsStopMoving(ParentObject.ID, IsAnimationBlocked, from_command ? 0 : LocomoteRenderMessage.NotFromCommand);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
 
         public void UpdatePosition(FixPoint delta_time)
@@ -153,6 +167,18 @@ namespace Combat
         protected override void OnDisable()
         {
             StopMoving();
+        }
+        #endregion
+
+        #region Block Animation
+        public void BlockAnimation()
+        {
+            ++m_animation_block_cnt;
+        }
+
+        public void UnblockAnimation()
+        {
+            --m_animation_block_cnt;
         }
         #endregion
     }

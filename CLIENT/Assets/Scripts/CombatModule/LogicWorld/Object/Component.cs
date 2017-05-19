@@ -198,4 +198,30 @@ namespace Combat
         }
         #endregion
     }
+
+    public interface INeedTaskService
+    {
+        void OnTaskService(FixPoint delta_time);
+    }
+
+
+    public class ComponentCommonTask : Task<LogicWorld>
+    {
+        INeedTaskService m_component;
+
+        public void Construct(INeedTaskService component)
+        {
+            m_component = component;
+        }
+
+        public override void OnReset()
+        {
+            m_component = null;
+        }
+
+        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
+        {
+            m_component.OnTaskService(delta_time);
+        }
+    }
 }

@@ -29,7 +29,9 @@ namespace Combat
             set
             {
                 FixPoint delta_health = value - m_current_health;
-                ChangeHealth(delta_health);
+                if (ObjectUtil.IsDead(ParentObject))
+                    return;
+                ChangeHealth(delta_health, ParentObject.ID);
             }
         }
 
@@ -53,7 +55,7 @@ namespace Combat
             }
             if (damage.m_damage_amount < 0)
             {
-                ChangeHealth(-damage.m_damage_amount);
+                ChangeHealth(-damage.m_damage_amount, damage.m_attacker_id);
                 RecyclableObject.Recycle(damage);
                 return;
             }
@@ -65,7 +67,7 @@ namespace Combat
             LastDamage = damage;
             FixPoint original_damage_amount = damage.m_damage_amount;
             FixPoint final_damage_amount = CalculateFinalDamageAmount(damage);
-            ChangeHealth(-final_damage_amount);
+            ChangeHealth(-final_damage_amount, damage.m_attacker_id);
             ParentObject.SendSignal(SignalType.TakeDamage, damage);
 #if COMBAT_CLIENT
             TakeDamageRenderMessage msg = RenderMessage.Create<TakeDamageRenderMessage>();
@@ -90,7 +92,7 @@ namespace Combat
             return damage_amount;
         }
 
-        void ChangeHealth(FixPoint delta_health)
+        void ChangeHealth(FixPoint delta_health, int source_id)
         {
             if (delta_health > 0)
             {
@@ -117,11 +119,9 @@ namespace Combat
             {
                 DeathComponent death_component = ParentObject.GetComponent(DeathComponent.ID) as DeathComponent;
                 if (death_component != null)
-                    death_component.KillOwner();
+                    death_component.KillOwner(source_id);
                 else
-                    EntityUtil.KillEntity(ParentObject as Entity);
-                ParentObject.SendSignal(SignalType.Die);
-                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Die, ParentObject.ID);
+                    EntityUtil.KillEntity(ParentObject as Entity, source_id);
             }
         }
     }

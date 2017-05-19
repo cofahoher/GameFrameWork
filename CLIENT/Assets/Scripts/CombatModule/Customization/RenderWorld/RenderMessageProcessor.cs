@@ -27,16 +27,13 @@ namespace Combat
             switch (msg.Type)
             {
                 case RenderMessageType.StartMoving:
-                    ProcessRenderMessage_StartMoving(msg as SimpleRenderMessage);
+                    ProcessRenderMessage_StartMoving(msg as LocomoteRenderMessage);
                     break;
                 case RenderMessageType.StopMoving:
-                    ProcessRenderMessage_StopMoving(msg as SimpleRenderMessage);
+                    ProcessRenderMessage_StopMoving(msg as LocomoteRenderMessage);
                     break;
                 case RenderMessageType.ChangeDirection:
                     ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
-                    break;
-                case RenderMessageType.FindPath:
-                    ProcessRenderMessage_FindPath(msg as SimpleRenderMessage);
                     break;
                 case RenderMessageType.CreateEntity:
                     ProcessRenderMessage_CreateEntity(msg.EntityID);
@@ -78,7 +75,7 @@ namespace Combat
             m_render_entity_manager.DestroyObject(entity_id);
         }
 
-        void ProcessRenderMessage_StartMoving(SimpleRenderMessage msg)
+        void ProcessRenderMessage_StartMoving(LocomoteRenderMessage msg)
         {
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
@@ -86,28 +83,39 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent(ModelComponent.ID) as ModelComponent;
             if (model_component == null)
                 return;
+            m_render_world.RegisterMovingEntity(model_component);
             PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
-            if (msg.m_simple_data == SimpleRenderMessage.NotLocomotion)
+            if (msg.m_reason == LocomoteRenderMessage.NotLocomotion || msg.m_block_animation)
             {
+                model_component.UpdateAngle();
                 if (predic_component != null)
                     predic_component.OnLogicMove();
             }
-            else if (msg.m_simple_data == SimpleRenderMessage.NotFromCommand || predic_component == null || !predic_component.HasMovementPredict)
+            else if (msg.m_reason == LocomoteRenderMessage.NotFromCommand)
             {
                 model_component.UpdateAngle();
-                AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
-                if (animation_component != null)
-                    animation_component.PlayerAnimation(AnimationName.RUN, true);
-                AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
-                if (animator_component != null)
-                    animator_component.PlayAnimation(AnimationName.RUN);
-                if (msg.m_simple_data == SimpleRenderMessage.NotFromCommand && predic_component != null)
+                PlayerLocomotorAnimation(render_entity);
+                if (predic_component != null)
                     predic_component.OnLogicMove();
             }
-            m_render_world.RegisterMovingEntity(model_component);
+            else if (predic_component == null || !predic_component.HasMovementPredict)
+            {
+                model_component.UpdateAngle();
+                PlayerLocomotorAnimation(render_entity);
+            }
         }
 
-        void ProcessRenderMessage_StopMoving(SimpleRenderMessage msg)
+        void PlayerLocomotorAnimation(RenderEntity render_entity)
+        {
+            AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
+            if (animation_component != null)
+                animation_component.PlayerAnimation(animation_component.LocomotorAnimationName, true);
+            AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
+            if (animator_component != null)
+                animator_component.PlayAnimation(animator_component.LocomotorAnimationName);
+        }
+
+        void ProcessRenderMessage_StopMoving(LocomoteRenderMessage msg)
         {
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
@@ -115,21 +123,29 @@ namespace Combat
             ModelComponent model_component = render_entity.GetComponent(ModelComponent.ID) as ModelComponent;
             if (model_component == null)
                 return;
-            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
-            if (msg.m_simple_data == SimpleRenderMessage.NotFromCommand || predic_component == null || !predic_component.HasMovementPredict)
-            {
-                AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
-                if (animation_component != null)
-                    animation_component.PlayerAnimation(AnimationName.IDLE, true);
-                AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
-                if (animator_component != null)
-                    animator_component.PlayAnimation(AnimationName.IDLE);
-            }
             m_render_world.UnregisterMovingEntity(model_component);
+            if (msg.m_block_animation)
+                return;
+            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
+            if (msg.m_reason == LocomoteRenderMessage.NotFromCommand || predic_component == null || !predic_component.HasMovementPredict)
+            {
+                PlayIdleAnimation(render_entity);
+            }
+        }
+
+        void PlayIdleAnimation(RenderEntity render_entity)
+        {
+            AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
+            if (animation_component != null)
+                animation_component.PlayerAnimation(AnimationName.IDLE, true);
+            AnimatorComponent animator_component = render_entity.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
+            if (animator_component != null)
+                animator_component.PlayAnimation(AnimationName.IDLE);
         }
 
         void ProcessRenderMessage_ChangeDirection(ChangeDirectionRenderMessage msg)
         {
+            //ZZWTODO 移动动作和朝向
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
             if (render_entity == null)
                 return;
@@ -140,17 +156,6 @@ namespace Combat
             if (model_component == null)
                 return;
             model_component.UpdateAngle();
-        }
-
-        void ProcessRenderMessage_FindPath(SimpleRenderMessage msg)
-        {
-            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
-            if (render_entity == null)
-                return;
-            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
-            if (predic_component == null)
-                return;
-            predic_component.OnLogicMove();
         }
 
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)

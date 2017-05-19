@@ -392,17 +392,21 @@ namespace Combat
 
         void PlayMoveAnimation(Vector3 direction)
         {
+            if (m_locomotor_component.IsAnimationBlocked)
+                return;
             m_model_component.SetAngle(Mathf.Atan2(-direction.z, direction.x) * 180 / Mathf.PI);
             AnimationComponent animation_component = ParentObject.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
-                animation_component.PlayerAnimation(AnimationName.RUN, true);
+                animation_component.PlayerAnimation(animation_component.LocomotorAnimationName, true);
             AnimatorComponent animator_component = ParentObject.GetComponent(AnimatorComponent.ID) as AnimatorComponent;
             if (animator_component != null)
-                animator_component.PlayAnimation(AnimationName.RUN);
+                animator_component.PlayAnimation(animator_component.LocomotorAnimationName);
         }
 
         void StopMoveAnimation()
         {
+            if (m_locomotor_component.IsAnimationBlocked)
+                return;
             AnimationComponent animation_component = ParentObject.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
                 animation_component.PlayerAnimation(AnimationName.IDLE, true);

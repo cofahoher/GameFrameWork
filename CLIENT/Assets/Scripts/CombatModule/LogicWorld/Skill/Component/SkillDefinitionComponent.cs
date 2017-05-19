@@ -35,6 +35,7 @@ namespace Combat
         int m_target_gathering_type = 0;
         FixPoint m_target_gathering_param1;
         FixPoint m_target_gathering_param2;
+        bool m_need_gather_targets = true;
 
         int m_inflict_type = 1;
         string m_inflict_missile;

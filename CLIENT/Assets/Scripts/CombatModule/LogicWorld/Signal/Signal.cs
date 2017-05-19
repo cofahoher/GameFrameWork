@@ -6,11 +6,15 @@ namespace Combat
     {
         //命名是：做（什么）
         public const int Invalid = 0;
-        public const int StartMoving = 1;
-        public const int StopMoving = 2;
-        public const int TakeDamage = 3;
-        public const int Die = 4;
-        public const int ChangeLevel = 5;
+        //Player
+        public const int ChangeFaction = 1;
+        //Entity
+        public const int StartMoving = 1001;
+        public const int StopMoving = 1002;
+        public const int TakeDamage = 1003;
+        public const int Die = 1004;
+        public const int ChangeLevel = 1005;
+
     }
 
     //public abstract class Signal

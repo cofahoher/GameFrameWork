@@ -130,13 +130,24 @@ namespace Combat
         public void OnSkillActivated(Skill skill)
         {
             SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
-            if(def_cmp.BlocksMovementWhenActive)
+            if (def_cmp.BlocksMovementWhenActive)
             {
                 ++m_move_block_count;
-                if(m_move_block_count == 1)
+                if (m_move_block_count == 1)
                 {
                     if (m_locomotor_cmp != null)
                         m_locomotor_cmp.Disable();
+                }
+            }
+            else
+            {
+                if (def_cmp.m_main_animation != null)
+                {
+                    if (m_locomotor_cmp != null)
+                    {
+                        m_locomotor_cmp.StopMoving();
+                        m_locomotor_cmp.BlockAnimation();
+                    }
                 }
             }
             if (def_cmp.BlocksOtherSkillsWhenActive)
@@ -150,10 +161,21 @@ namespace Combat
             if (def_cmp.BlocksMovementWhenActive)
             {
                 --m_move_block_count;
-                if(m_move_block_count == 0)
+                if (m_move_block_count == 0)
                 {
                     if (m_locomotor_cmp != null)
                         m_locomotor_cmp.Enable();
+                }
+            }
+            else
+            {
+                if (def_cmp.m_main_animation != null)
+                {
+                    if (m_locomotor_cmp != null)
+                    {
+                        m_locomotor_cmp.StopMoving();
+                        m_locomotor_cmp.UnblockAnimation();
+                    }
                 }
             }
             if (def_cmp.BlocksOtherSkillsWhenActive)

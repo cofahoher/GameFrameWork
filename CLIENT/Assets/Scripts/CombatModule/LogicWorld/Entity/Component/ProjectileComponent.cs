@@ -4,6 +4,7 @@ namespace Combat
 {
     public class ProjectileParameters : IRecyclable
     {
+        public FixPoint m_life_time = FixPoint.Zero;
         public int m_source_entity_id = 0;
         public int m_target_entity_id = 0;
         public Vector3FP m_facing;
@@ -63,11 +64,14 @@ namespace Combat
 
             if (m_task == null)
                 m_task = LogicTask.Create<UpdateProjectileTask>();
-            m_task.Construct(this, m_lifetime);
+            m_task.Construct(this, m_param.m_life_time > FixPoint.Zero ? m_param.m_life_time : m_lifetime);
             var schedeler = GetLogicWorld().GetTaskScheduler();
             schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
-
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, ParentObject.ID);
+#if COMBAT_CLIENT
+            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+            msg.ConstructAsStartMoving(ParentObject.ID, true);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
         #endregion
 
@@ -93,7 +97,7 @@ namespace Combat
             ISpaceManager space_manager = GetLogicWorld().GetSpaceManager();
             if (space_manager == null)
                 return false;
-            List<int> list = space_manager.CollectEntity_CircleArea(position, radius, m_param.m_source_entity_id);
+            List<int> list = space_manager.CollectEntity_SurroundingArea(position, radius, m_param.m_source_entity_id);
             if (list.Count == 0)
                 return false;
             EntityManager entity_manager = GetLogicWorld().GetEntityManager();
@@ -112,7 +116,11 @@ namespace Combat
 
         public void Explode(Entity entity)
         {
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, ParentObject.ID);
+#if COMBAT_CLIENT
+            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+            msg.ConstructAsStopMoving(ParentObject.ID, true);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
             if (m_task != null)
             {
                 m_task.Cancel();
@@ -121,7 +129,7 @@ namespace Combat
             }
             if (entity != null)
                 ApplyGenerator(entity);
-            EntityUtil.KillEntity((Entity)ParentObject);
+            EntityUtil.KillEntity((Entity)ParentObject, ParentObject.ID);
         }
 
         void ApplyGenerator(Entity entity)

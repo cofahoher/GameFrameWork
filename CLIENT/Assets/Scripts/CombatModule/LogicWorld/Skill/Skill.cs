@@ -227,12 +227,14 @@ namespace Combat
 
         public bool PostActivate(FixPoint start_time)
         {
-            BuildSkillTargets();
-
-            if (!CheckTargetRange())
+            if (m_definition_component.NeedGatherTargets)
             {
-                Deactivate();
-                return false;
+                BuildSkillTargets();
+                if (!CheckTargetRange())
+                {
+                    Deactivate();
+                    return false;
+                }
             }
 
             FixPoint mana_cost = m_definition_component.ManaCost;

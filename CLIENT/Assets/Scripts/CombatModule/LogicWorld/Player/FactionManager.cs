@@ -23,9 +23,20 @@ namespace Combat
             m_logic_world = null;
         }
 
-        public FactionRelation GetRelationShip(int faction_id_1, int faction_id_2)
+        public int Faction2Index(int faction)
         {
-            return FactionRelation.Neutral;
+            //ZZWTODO
+            return faction;
+        }
+
+        public FactionRelation GetRelationShip(int faction_index_1, int faction_index_2)
+        {
+            //ZZWTODO
+            if (faction_index_1 == 0 || faction_index_2 == 0)
+                return FactionRelation.Neutral;
+            if (faction_index_1 == faction_index_2)
+                return FactionRelation.Ally;
+            return FactionRelation.Enemy;
         }
     }
 }

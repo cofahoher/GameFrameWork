@@ -29,6 +29,7 @@ namespace Combat
             Register<PathFindingComponent>(false);
             Register<PositionComponent>(false);
             Register<ProjectileComponent>(false);
+            Register<SimpleAIComponent>(false);
             Register<SkillManagerComponent>(false);
             Register<StateComponent>(false);
             Register<TargetingComponent>(false);
@@ -41,9 +42,12 @@ namespace Combat
             Register<ThreePhaseAttackSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
+            Register<ChangePlayerFactionEffectComponent>(false);
+            Register<CreateObjectEffectComponent>(false);
             Register<DamageEffectComponent>(false);
             Register<EffectDefinitionComponent>(false);
             Register<HealEffectComponent>(false);
+            Register<KillOwnerEffectComponent>(false);
             Register<ModifyAttributeEffectComponent>(false);
 
 #if COMBAT_CLIENT
@@ -106,6 +110,13 @@ namespace Combat
     public partial class FactionComponent
     {
         public const int ID = -2067245938;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("faction", out value))
+                m_faction = (int)CRC.Calculate(value);
+        }
     }
 
     public partial class PlayerAIComponent
@@ -200,6 +211,14 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
+            if (variables.TryGetValue("born_generator_id", out value))
+                m_born_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("die_generator_id", out value))
+                m_die_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("killer_generator_id", out value))
+                m_killer_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("life_time", out value))
+                m_life_time = FixPoint.Parse(value);
             if (variables.TryGetValue("hide_delay", out value))
                 m_hide_delay = FixPoint.Parse(value);
             if (variables.TryGetValue("delete_delay", out value))
@@ -442,6 +461,18 @@ namespace Combat
         }
     }
 
+    public partial class SimpleAIComponent
+    {
+        public const int ID = 1341755975;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("guard_range", out value))
+                m_guard_range = FixPoint.Parse(value);
+        }
+    }
+
     public partial class SkillManagerComponent
     {
         public const int ID = 2066148607;
@@ -473,6 +504,8 @@ namespace Combat
                 m_object_type_id = int.Parse(value);
             if (variables.TryGetValue("object_proto_id", out value))
                 m_object_proto_id = int.Parse(value);
+            if (variables.TryGetValue("object_life_time", out value))
+                m_object_life_time = FixPoint.Parse(value);
             if (variables.TryGetValue("generator_id", out value))
                 m_generator_cfgid = int.Parse(value);
             if (variables.TryGetValue("offset_x", out value))
@@ -481,6 +514,10 @@ namespace Combat
                 m_offset.y = FixPoint.Parse(value);
             if (variables.TryGetValue("offset_z", out value))
                 m_offset.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("combo_attack_cnt", out value))
+                m_combo_attack_cnt = int.Parse(value);
+            if (variables.TryGetValue("combo_interval", out value))
+                m_combo_interval = FixPoint.Parse(value);
         }
     }
 
@@ -569,6 +606,8 @@ namespace Combat
                 m_target_gathering_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("target_gathering_param2", out value))
                 m_target_gathering_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("need_gather_targets", out value))
+                m_need_gather_targets = bool.Parse(value);
             if (variables.TryGetValue("inflict_type", out value))
                 m_inflict_type = int.Parse(value);
             if (variables.TryGetValue("inflict_missile", out value))
@@ -671,6 +710,11 @@ namespace Combat
             get { return m_target_gathering_param2; }
         }
 
+        public bool NeedGatherTargets
+        {
+            get { return m_need_gather_targets; }
+        }
+
         public int InflictType
         {
             get { return m_inflict_type; }
@@ -741,6 +785,44 @@ namespace Combat
         public const int ID = -943248477;
     }
 
+    public partial class ChangePlayerFactionEffectComponent
+    {
+        public const int ID = -2128128422;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("faction", out value))
+                m_faction = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("revert_when_unapply", out value))
+                m_revert_when_unapply = bool.Parse(value);
+        }
+    }
+
+    public partial class CreateObjectEffectComponent
+    {
+        public const int ID = 709457371;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("object_type_id", out value))
+                m_object_type_id = int.Parse(value);
+            if (variables.TryGetValue("object_proto_id", out value))
+                m_object_proto_id = int.Parse(value);
+            if (variables.TryGetValue("object_life_time", out value))
+                m_object_life_time = FixPoint.Parse(value);
+            if (variables.TryGetValue("offset_x", out value))
+                m_offset.x = FixPoint.Parse(value);
+            if (variables.TryGetValue("offset_y", out value))
+                m_offset.y = FixPoint.Parse(value);
+            if (variables.TryGetValue("offset_z", out value))
+                m_offset.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("revert_when_unapply", out value))
+                m_revert_when_unapply = bool.Parse(value);
+        }
+    }
+
     public partial class DamageEffectComponent
     {
         public const int ID = 1635290451;
@@ -793,6 +875,11 @@ namespace Combat
         public const int ID = -679969353;
     }
 
+    public partial class KillOwnerEffectComponent
+    {
+        public const int ID = 1345354818;
+    }
+
     public partial class ModifyAttributeEffectComponent
     {
         public const int ID = -107304768;
@@ -809,6 +896,8 @@ namespace Combat
             string value;
             if (variables.TryGetValue("animation_path", out value))
                 m_animation_path = value;
+            if (variables.TryGetValue("locomotor_animation_name", out value))
+                m_locomotor_animation_name = value;
         }
 #endif
     }
@@ -824,6 +913,8 @@ namespace Combat
             string value;
             if (variables.TryGetValue("animator_path", out value))
                 m_animator_path = value;
+            if (variables.TryGetValue("locomotor_animation_name", out value))
+                m_locomotor_animation_name = value;
         }
 #endif
     }

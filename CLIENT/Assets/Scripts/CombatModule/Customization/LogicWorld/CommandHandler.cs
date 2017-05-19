@@ -55,7 +55,7 @@ namespace Combat
                     List<Vector3FP> path = new List<Vector3FP>();
                     path.Add(position_component.CurrentPosition);
                     path.Add(cmd.m_vector);
-                    locomotor_component.MoveAlongPath(path);
+                    locomotor_component.MoveAlongPath(path, true);
                 }
             }
             else if (cmd.m_move_type == EntityMoveCommand.DirectionType)

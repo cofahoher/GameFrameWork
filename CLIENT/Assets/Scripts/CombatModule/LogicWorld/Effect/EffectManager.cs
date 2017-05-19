@@ -62,7 +62,7 @@ namespace Combat
             EffectGenerator generator;
             if (!m_generators.TryGetValue(generator_id, out generator))
                 return;
-            if (generator.RemoveBySelf)
+            if (generator.RemoveBySelf && !generator.RemoveSelfWhenIdle)
             {
                 generator.RemoveSelfWhenIdle = true;
             }

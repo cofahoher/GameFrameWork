@@ -55,14 +55,14 @@ namespace Combat
             FactionComponent faction_component = GetComponent(FactionComponent.ID) as FactionComponent;
             if (faction_component != null)
             {
-                int faction_id_1 = faction_component.FactionID;
+                int faction_id_1 = faction_component.FactionIndex;
                 Player player = GetLogicWorld().GetPlayerManager().GetObject(player_id);
                 if (player != null)
                 {
                     faction_component = player.GetComponent(FactionComponent.ID) as FactionComponent;
                     if (faction_component != null)
                     {
-                        int faction_id_2 = faction_component.FactionID;
+                        int faction_id_2 = faction_component.FactionIndex;
                         return GetLogicWorld().GetFactionManager().GetRelationShip(faction_id_1, faction_id_2);
                     }
                 }                

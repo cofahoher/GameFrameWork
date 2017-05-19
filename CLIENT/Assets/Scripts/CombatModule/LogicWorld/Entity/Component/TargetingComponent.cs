@@ -163,7 +163,7 @@ namespace Combat
                             List<Vector3FP> path = new List<Vector3FP>();
                             path.Add(position_cmp.CurrentPosition);
                             path.Add(target_position_cmp.CurrentPosition);
-                            locomotor_cmp.MoveAlongPath(path);
+                            locomotor_cmp.MoveAlongPath(path, false);
                             locomotor_cmp.GetMovementProvider().FinishMovementWhenTargetInRange(target_position_cmp, max_range);
                         }
                         ScheduleTargeting(delay);

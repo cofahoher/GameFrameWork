@@ -54,9 +54,6 @@ namespace Combat
 
     public class SimpleRenderMessage : RenderMessage
     {
-        public const int NotFromCommand = 1;
-        public const int NotLocomotion = 2;
-
         public int m_simple_data = 0;
 
         public void Construct(int type, int entity_id, int simple_data = 0)

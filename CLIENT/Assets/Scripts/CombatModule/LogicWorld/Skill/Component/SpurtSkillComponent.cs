@@ -30,13 +30,21 @@ namespace Combat
             m_task.Construct(this, m_time);
             var schedeler = GetLogicWorld().GetTaskScheduler();
             schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StartMoving, GetOwnerEntityID(), SimpleRenderMessage.NotLocomotion);
+#if COMBAT_CLIENT
+            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+            msg.ConstructAsStartMoving(GetOwnerEntityID(), true, LocomoteRenderMessage.NotLocomotion);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
 
         public override void Deactivate()
         {
             m_task.Cancel();
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.StopMoving, GetOwnerEntityID(), SimpleRenderMessage.NotFromCommand);
+#if COMBAT_CLIENT
+            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+            msg.ConstructAsStopMoving(GetOwnerEntityID(), false, LocomoteRenderMessage.NotFromCommand);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
 
         public void UpdateSpurt(FixPoint delta_time)

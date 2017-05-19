@@ -4,15 +4,17 @@ namespace Combat
 {
     public partial class EntityUtil
     {
-        public static void KillEntity(Entity entity)
+        public static void KillEntity(Entity entity, int killer_id)
         {
             DeathComponent death_component = entity.GetComponent(DeathComponent.ID) as DeathComponent;
             if (death_component != null)
             {
-                death_component.KillOwner();
+                death_component.KillOwner(killer_id);
             }
             else
             {
+                entity.SendSignal(SignalType.Die);
+                entity.GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Die, entity.ID);
                 entity.DeletePending = true;
                 var schedeler = entity.GetLogicWorld().GetTaskScheduler();
                 DeleteEntityTask delete_task = LogicTask.Create<DeleteEntityTask>();

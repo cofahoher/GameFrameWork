@@ -30,6 +30,7 @@ namespace Combat
 
         public bool RemoveSelfWhenIdle
         {
+            get { return m_remove_self_when_idle; }
             set
             {
                 m_remove_self_when_idle = value;
