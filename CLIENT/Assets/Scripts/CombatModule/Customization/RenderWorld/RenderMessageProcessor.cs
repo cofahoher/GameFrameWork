@@ -50,6 +50,9 @@ namespace Combat
                 case RenderMessageType.Hide:
                     ProcessRenderMessage_Hide(msg.EntityID);
                     break;
+                case RenderMessageType.Show:
+                    ProcessRenderMessage_Show(msg.EntityID);
+                    break;
                 case RenderMessageType.PlayAnimation:
                     ProcessRenderMessage_PlayAnimation(msg as PlayAnimationRenderMessage);
                     break;
@@ -180,6 +183,15 @@ namespace Combat
             RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
             if (render_entity == null)
                 return;
+            render_entity.Hide = true;
+        }
+
+        void ProcessRenderMessage_Show(int entity_id)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(entity_id);
+            if (render_entity == null)
+                return;
+            render_entity.Hide = false;
         }
 
         void ProcessRenderMessage_PlayAnimation(PlayAnimationRenderMessage msg)

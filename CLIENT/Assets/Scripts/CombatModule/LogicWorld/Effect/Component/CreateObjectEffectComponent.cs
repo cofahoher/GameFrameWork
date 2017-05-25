@@ -45,14 +45,15 @@ namespace Combat
             object_context.m_is_ai = true;
             object_context.m_is_local = owner_player.IsLocal;
             Entity obj = entity_manager.CreateObject(object_context);
-
             m_object_id = obj.ID;
 
             DeathComponent death_component = obj.GetComponent(DeathComponent.ID) as DeathComponent;
             if (death_component != null && m_object_life_time > FixPoint.Zero)
-            {
                 death_component.SetLifeTime(m_object_life_time);
-            }
+
+            SummonedEntityComponent summoned_component = obj.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+            if (summoned_component != null)
+                summoned_component.SetMaster(owner_entity);
         }
 
         public override void Unapply()

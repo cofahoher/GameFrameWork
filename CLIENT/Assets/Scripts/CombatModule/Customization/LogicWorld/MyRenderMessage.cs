@@ -11,6 +11,7 @@ namespace Combat
         public const int ChangeHealth = 110;              //ChangeHealthRenderMessage
         public const int Die = 111;                       //SimpleRenderMessage
         public const int Hide = 112;                      //SimpleRenderMessage
+        public const int Show = 113;                      //SimpleRenderMessage
         public const int PlayAnimation = 120;             //SimpleRenderMessage
         public const int TakeDamage = 130;                //TakeDamageRenderMessage
     }

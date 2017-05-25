@@ -37,21 +37,17 @@ namespace Combat
         }
 
         #region 初始化
-        protected override Player CreateObjectInstance()
+        protected override Player CreateObjectInstance(ObjectCreationContext context)
         {
-            return new Player();
-        }
-
-        protected override void AfterObjectCreated(Player player)
-        {
-            int object_id = player.ID;
-            int proxy_id = player.ProxyID;
+            int object_id = context.m_object_id;
+            int proxy_id = context.m_object_proxy_id;
             m_objectid2proxyid[object_id] = proxy_id;
             m_proxyid2objectid[proxy_id] = object_id;
             if (proxy_id == LOCAL_PLAYER_PROXYID)
                 m_local_player_id = object_id;
             else if (proxy_id == AI_ENEMY_PLAYER_PROXYID)
                 m_ai_enemy_player_id = object_id;
+            return new Player();
         }
 
         public void SetPstidAndProxyid(Dictionary<long, int> pstid2proxyid, Dictionary<int, long> proxyid2pstid)

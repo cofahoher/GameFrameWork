@@ -3,28 +3,28 @@ using System.Collections.Generic;
 namespace Combat
 {
     /*
-     * 这是专门写的近战三段攻击，如果还要更复杂的，等待行为树技能
+     * 这是专门写的近战四段攻击，如果还要更复杂的，等待行为树技能
      */
     public partial class ThreePhaseAttackSkillComponent : SkillComponent
     {
-        public const int THREE = 3;
+        public const int FOUR = 4;
         //配置数据
-        int m_target_gathering_type = 0;
-        FixPoint m_target_gathering_param1;
-        FixPoint m_target_gathering_param2;
         int m_damage_type_id = 0;
-        FixPoint[] m_inflict_time = new FixPoint[THREE];
-        Formula[] m_damage_amount = new Formula[THREE];
-        int[] m_generator_cfg_id = new int[THREE];
+        FixPoint[] m_inflict_time = new FixPoint[FOUR];
+        FixPoint[] m_link_time = new FixPoint[FOUR];
+        Formula[] m_damage_amount = new Formula[FOUR];
+        int[] m_generator_cfg_id = new int[FOUR];
 
         //运行数据
-        EffectGenerator[] m_generator = new EffectGenerator[THREE];
+        EffectGenerator[] m_generator = new EffectGenerator[FOUR];
+        ThreePhaseAttackLinkTask m_link_task;
         ThreePhaseAttackInflictTask m_task;
         int m_next_impact = 0;
+        int m_next_link = -1;
 
         public ThreePhaseAttackSkillComponent()
         {
-            for (int i = 0; i < THREE; ++i)
+            for (int i = 0; i < FOUR; ++i)
             {
                 m_inflict_time[i] = FixPoint.MinusOne;
                 m_damage_amount[i] = RecyclableObject.Create<Formula>();
@@ -38,7 +38,7 @@ namespace Combat
         {
             EffectManager effect_manager = GetLogicWorld().GetEffectManager();
             Entity owner_entity = GetOwnerEntity();
-            for (int i = 0; i < THREE; ++i)
+            for (int i = 0; i < FOUR; ++i)
             {
                 m_generator[i] = effect_manager.CreateGenerator(m_generator_cfg_id[i], owner_entity);
             }
@@ -48,7 +48,7 @@ namespace Combat
         {
             EffectManager effect_manager = GetLogicWorld().GetEffectManager();
             int owner_entity_id = GetOwnerEntityID();
-            for (int i = 0; i < THREE; ++i)
+            for (int i = 0; i < FOUR; ++i)
             {
                 RecyclableObject.Recycle(m_damage_amount[i]);
                 m_damage_amount[i] = null;
@@ -65,25 +65,40 @@ namespace Combat
                 LogicTask.Recycle(m_task);
                 m_task = null;
             }
+
+            if (m_link_task != null)
+            {
+                m_link_task.Cancel();
+                LogicTask.Recycle(m_link_task);
+                m_link_task = null;
+            }
         }
         #endregion
 
-        void BuildSkillTargets()
-        {
-            if (m_target_gathering_type != 0)
-                ((Skill)ParentObject).BuildSkillTargets(m_target_gathering_type, m_target_gathering_param1, m_target_gathering_param2);
-        }
-
         public override void Inflict(FixPoint start_time)
         {
-            ScheduleNextImpact();
+            if (m_next_link <= m_next_impact)
+                m_next_link++;
+            if (m_next_link == 0)
+                ScheduleNextImpact();
         }
 
         void ScheduleNextImpact()
         {
-            FixPoint delay = m_inflict_time[m_next_impact];
-            if (delay < FixPoint.Zero)
+            FixPoint linkDelay = m_link_time[m_next_impact];
+            if (m_link_task == null)
+            {
+                m_link_task = LogicTask.Create<ThreePhaseAttackLinkTask>();
+                m_link_task.Construct(this);
+            }
+            var linkSchedler = GetLogicWorld().GetTaskScheduler();
+            if (m_next_impact > 0)
+                linkDelay -= m_link_time[m_next_impact - 1];
+            if (linkDelay < FixPoint.Zero)
                 return;
+            linkSchedler.Schedule(m_link_task, GetCurrentTime(), linkDelay);
+
+            FixPoint delay = m_inflict_time[m_next_impact];
             if (m_task == null)
             {
                 m_task = LogicTask.Create<ThreePhaseAttackInflictTask>();
@@ -91,15 +106,49 @@ namespace Combat
             }
             var schedeler = GetLogicWorld().GetTaskScheduler();
             if (m_next_impact > 0)
-                delay -= m_inflict_time[m_next_impact - 1];
+                delay -= m_link_time[m_next_impact - 1];
+            if (delay < FixPoint.Zero)
+                return;
             schedeler.Schedule(m_task, GetCurrentTime(), delay);
+        }
+
+        public void AttackLink() {
+            if (++m_next_impact < FOUR)
+            {
+                //打断技能
+                if (m_next_impact > m_next_link) {
+                    EndAttack();
+                    return;
+                }
+                ScheduleNextImpact();
+            }
+            else {
+                EndAttack();
+            }
+        }
+
+        public void EndAttack() {
+            PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+            msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true);
+            GetLogicWorld().AddRenderMessage(msg);
+            for (int i = 0; i < m_next_impact; ++i)
+            {
+                if (m_generator[i] != null)
+                    m_generator[i].Deactivate();
+            }
+            m_task.Cancel();
+            m_link_task.Cancel();
+            m_next_impact = 0;
+            m_next_link = -1;
         }
 
         public void Impact()
         {
-            BuildSkillTargets();
+            Skill skill = GetOwnerSkill();
+            if (!skill.GetDefinitionComponent().NeedGatherTargets)
+                skill.BuildSkillTargets();
             Entity attacker = GetOwnerEntity();
-            List<Target> targets = GetOwnerSkill().GetTargets();
+            List<Target> targets = skill.GetTargets();
             EffectGenerator generator = m_generator[m_next_impact];
             EffectApplicationData app_data = null;
             if (generator != null)
@@ -128,19 +177,10 @@ namespace Combat
             }
             m_current_target = null;
             RecyclableObject.Recycle(app_data);
-            if (++m_next_impact < THREE)
-                ScheduleNextImpact();
         }
 
         public override void Deactivate()
         {
-            for (int i = 0; i < m_next_impact; ++i)
-            {
-                if (m_generator[i] != null)
-                    m_generator[i].Deactivate();
-            }
-            m_task.Cancel();
-            m_next_impact = 0;
         }
     }
 
@@ -162,6 +202,27 @@ namespace Combat
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
             m_component.Impact();
+        }
+    }
+
+    class ThreePhaseAttackLinkTask : Task<LogicWorld>
+    {
+        ThreePhaseAttackSkillComponent m_component;
+        int m_index = 0;
+
+        public void Construct(ThreePhaseAttackSkillComponent component)
+        {
+            m_component = component;
+        }
+
+        public override void OnReset()
+        {
+            m_component = null;
+        }
+
+        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
+        {
+            m_component.AttackLink();
         }
     }
 }

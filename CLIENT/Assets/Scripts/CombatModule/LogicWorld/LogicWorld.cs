@@ -143,6 +143,10 @@ namespace Combat
         {
             return m_outside_world.GetConfigProvider();
         }
+        public LevelData GetLevelData()
+        {
+            return m_outside_world.GetLevelData();
+        }
         public TaskScheduler<LogicWorld> GetTaskScheduler()
         {
             return m_scheduler;
@@ -327,10 +331,6 @@ namespace Combat
             context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
             context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
             m_entity_manager.CreateObject(context);
-        }
-
-        public virtual void CustomInitializeObject(Object obj, System.Object custom_data)
-        {
         }
 
         public virtual void OnGameOver(GameResult game_result)

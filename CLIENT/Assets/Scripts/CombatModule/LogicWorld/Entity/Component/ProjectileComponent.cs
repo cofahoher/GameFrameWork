@@ -21,8 +21,10 @@ namespace Combat
 
     public partial class ProjectileComponent : EntityComponent
     {
+        //配置数据
         FixPoint m_speed;
         FixPoint m_lifetime = FixPoint.Ten;
+        int m_collision_faction = FactionRelation.NotAlly;
 
         ProjectileParameters m_param;
         UpdateProjectileTask m_task;
@@ -41,6 +43,8 @@ namespace Combat
                 m_speed = FixPoint.Parse(value);
             if (dic.TryGetValue("lifetime", out value))
                 m_lifetime = FixPoint.Parse(value);
+            if (dic.TryGetValue("collision_faction", out value))
+                m_collision_faction = (int)CRC.Calculate(value);
         }
 
         protected override void OnDestruct()
@@ -97,7 +101,7 @@ namespace Combat
             ISpaceManager space_manager = GetLogicWorld().GetSpaceManager();
             if (space_manager == null)
                 return false;
-            List<int> list = space_manager.CollectEntity_SurroundingArea(position, radius, m_param.m_source_entity_id);
+            List<int> list = space_manager.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, m_param.m_source_entity_id);
             if (list.Count == 0)
                 return false;
             EntityManager entity_manager = GetLogicWorld().GetEntityManager();
@@ -106,7 +110,10 @@ namespace Combat
                 Entity entity = entity_manager.GetObject(list[i]);
                 if (entity == null)
                     continue;
-                if (GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()) != FactionRelation.Enemy)
+                PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
+                if (position_component.Height <= FixPoint.Zero)
+                    continue;
+                if (!FactionRelation.IsFactionSatisfied(GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()), m_collision_faction))
                     continue;
                 Explode(entity);
                 return true;

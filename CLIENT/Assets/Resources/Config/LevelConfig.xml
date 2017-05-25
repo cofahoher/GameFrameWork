@@ -2,5 +2,7 @@
 	<LevelConfig>
 		<ConfigItem id="1" name="Scenes/zzw_test">
 		</ConfigItem>
+		<ConfigItem id="2" name="Scenes/crawl" center_x ="0" center_z ="0" length_x ="20" length_z ="10">
+		</ConfigItem>
 	</LevelConfig>
 </ConfigSystem>

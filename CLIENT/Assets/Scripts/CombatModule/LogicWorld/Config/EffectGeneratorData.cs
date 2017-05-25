@@ -14,6 +14,7 @@ namespace Combat
         public int m_target_gathering_type = 0;
         public FixPoint m_target_gathering_param1;
         public FixPoint m_target_gathering_param2;
+        public int m_target_gathering_fation = FactionRelation.All;
         public int m_effect_id = 0;
     }
 }

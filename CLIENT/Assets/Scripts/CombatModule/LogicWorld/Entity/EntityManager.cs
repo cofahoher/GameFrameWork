@@ -9,7 +9,7 @@ namespace Combat
         {
         }
 
-        protected override Entity CreateObjectInstance()
+        protected override Entity CreateObjectInstance(ObjectCreationContext context)
         {
             return new Entity();
         }

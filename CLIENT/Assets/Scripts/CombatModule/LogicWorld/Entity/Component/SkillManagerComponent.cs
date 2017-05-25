@@ -141,6 +141,8 @@ namespace Combat
             }
             else
             {
+                if (def_cmp.DeactivateWhenMoving && m_locomotor_cmp != null)
+                    m_locomotor_cmp.StopMoving();
                 if (def_cmp.m_main_animation != null)
                 {
                     if (m_locomotor_cmp != null)

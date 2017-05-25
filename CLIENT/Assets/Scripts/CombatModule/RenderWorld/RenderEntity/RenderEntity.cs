@@ -7,6 +7,7 @@ namespace Combat
     {
         RenderWorld m_render_world;
         Entity m_entity;
+        int m_hide_reference_count = 0;
 
         public RenderEntity(RenderWorld render_world)
         {
@@ -52,6 +53,11 @@ namespace Combat
         {
             return ComponentTypeRegistry.IsRenderComponent(component_type_id);
         }
+
+        protected override bool OwnContext()
+        {
+            return false;
+        }
         #endregion
 
         #region GETTER
@@ -63,6 +69,37 @@ namespace Combat
         public Entity GetLogicEntity()
         {
             return m_entity;
+        }
+
+        public bool Hide
+        {
+            get { return m_hide_reference_count > 0; }
+            set
+            {
+                if (value)
+                {
+                    if (++m_hide_reference_count == 1)
+                        Show(false);
+                }
+                else
+                {
+                    if (--m_hide_reference_count == 0)
+                        Show(true);
+                }
+            }
+        }
+        #endregion
+
+        #region Hide/Show
+        void Show(bool is_show)
+        {
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                RenderEntityComponent component = enumerator.Current.Value as RenderEntityComponent;
+                if (component != null)
+                    component.Show(is_show);
+            }
         }
         #endregion
     }

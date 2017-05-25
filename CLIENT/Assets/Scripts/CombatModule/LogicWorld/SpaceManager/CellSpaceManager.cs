@@ -139,7 +139,7 @@ namespace Combat
         }
         #endregion
 
-        public List<int> CollectEntity_ForwardArea(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
+        public List<int> CollectEntity_ForwardRectangle(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
         {
             m_collection.Clear();
             Vector2FP start_position = new Vector2FP(position);
@@ -177,7 +177,12 @@ namespace Combat
             return m_collection;
         }
 
-        public List<int> CollectEntity_SurroundingArea(Vector3FP position, FixPoint radius, int exclude_id)
+        public List<int> CollectEntity_SurroundingRing(Vector3FP position, FixPoint outer_radius, FixPoint inner_radius, int exclude_id)
+        {
+            return CollectEntity_SurroundingCircle(position, outer_radius, exclude_id);
+        }
+
+        public List<int> CollectEntity_SurroundingCircle(Vector3FP position, FixPoint radius, int exclude_id)
         {
             m_collection.Clear();
             Vector2FP start_position = new Vector2FP(position.x - radius, position.z - radius);

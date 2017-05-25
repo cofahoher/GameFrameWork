@@ -576,6 +576,16 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     }
 
     #region 方便函数
+    public static FixPoint XZToUnityRotationRadian(FixPoint x, FixPoint z)
+    {
+        return FixPoint.Atan2(-z, x);
+    }
+
+    public static FixPoint XZToUnityRotationDegree(FixPoint x, FixPoint z)
+    {
+        return FixPoint.Radian2Degree(FixPoint.Atan2(-z, x));
+    }
+
     public static FixPoint Min(FixPoint term1, FixPoint term2)
     {
         if (term2 < term1)

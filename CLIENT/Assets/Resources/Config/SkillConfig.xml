@@ -1,11 +1,12 @@
 <ConfigSystem>
 	<SkillConfig>
-		<ConfigItem id="1001" name="近战普通攻击">
+		<!--！！！！！！！！！！以下是ZZW测试的，不要使用和修改！！！！！！！！！！-->
+		<ConfigItem id="1001" name="zzw测试近战">
 			<Component id="SkillDefinitionComponent">
 				<var key="max_range" value="1"/>
 				<var key="cooldown_time" value="1"/>
 				<var key="inflict_time" value="0.5"/>
-				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="target_gathering_type" value="Default"/>
 				<var key="main_animation" value="attack"/>
 			</Component>
 			<Component id="DirectDamageSkillComponent">
@@ -13,50 +14,32 @@
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="1002" name="3段近战">
-			<Component id="SkillDefinitionComponent">
-				<var key="max_range" value="1"/>
-				<var key="cooldown_time" value="6"/>
-				<var key="expiration_time" value="6"/>
-				<var key="blocks_other_skills_when_active" value="true"/>
-				<var key="main_animation" value="attack"/>
-			</Component>
-			<Component id="ThreePhaseAttackSkillComponent">
-				<var key="target_gathering_type" value="ForwardAreaEnemy"/>
-				<var key="target_gathering_param1" value="2"/>
-				<var key="target_gathering_param2" value="1"/>
-				<var key="phase1_inflict_time" value="1"/>
-				<var key="phase2_inflict_time" value="3"/>
-				<var key="phase3_inflict_time" value="5"/>
-				<var key="phase1_damage_amount" value="20"/>
-				<var key="phase2_damage_amount" value="40"/>
-				<var key="phase3_damage_amount" value="60"/>
-			</Component>
-		</ConfigItem>
-		
-		<ConfigItem id="1003" name="近战攻击带眩晕">
+		<ConfigItem id="1002" name="zzw测试近战带眩晕">
 			<Component id="SkillDefinitionComponent">
 				<var key="max_range" value="1"/>
 				<var key="cooldown_time" value="1"/>
 				<var key="inflict_time" value="0.5"/>
-				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="target_gathering_type" value="Default"/>
 				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="DirectDamageSkillComponent">
+				<var key="damage_amount" value="50"/>
 			</Component>
 			<Component id="EffectGeneratorSkillComponent">
 				<var key="generator_id" value="2"/>
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="1011" name="弹道发射物">
+		<ConfigItem id="1011" name="zzw测试弹道发射物">
 			<Component id="SkillDefinitionComponent">
 				<var key="cooldown_time" value="1"/>
 				<var key="inflict_time" value="0.5"/>
-				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="target_gathering_type" value="Default"/>
 				<var key="main_animation" value="attack"/>
 			</Component>
 			<Component id="CreateObjectSkillComponent">
-				<var key="object_type_id" value="301"/>
-				<var key="object_proto_id" value="301001"/>
+				<var key="object_type_id" value="103"/>
+				<var key="object_proto_id" value="103001"/>
 				<var key="offset_x" value="0"/>
 				<var key="offset_y" value="1"/>
 				<var key="offset_z" value="1"/>
@@ -64,11 +47,11 @@
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="1012" name="弹道发射物带眩晕">
+		<ConfigItem id="1012" name="zzw测试弹道发射物带眩晕">
 			<Component id="SkillDefinitionComponent">
 				<var key="cooldown_time" value="1"/>
 				<var key="inflict_time" value="0.5"/>
-				<var key="target_gathering_type" value="DefaultTarget"/>
+				<var key="target_gathering_type" value="Default"/>
 				<var key="main_animation" value="attack"/>
 			</Component>
 			<Component id="CreateObjectSkillComponent">
@@ -80,19 +63,176 @@
 				<var key="generator_id" value="2"/>
 			</Component>
 		</ConfigItem>
+		<!--！！！！！！！！！！以上是ZZW测试的，不要使用和修改！！！！！！！！！！-->
 		
-		<ConfigItem id="1021" name="冲刺">
+		
+		<ConfigItem id="20100101" name="Crawl人近战四连击">
 			<Component id="SkillDefinitionComponent">
-				<var key="cooldown_time" value="3"/>
+				<var key="cooldown_time" value="0"/>
+				<var key="expiration_time" value="1"/>
+				<var key="main_animation" value="attack"/>
+				<var key="target_gathering_type" value="ForwardRectangle"/>
+				<var key="target_gathering_param1" value="3"/>
+				<var key="target_gathering_param2" value="2"/>
+				<var key="need_gather_targets" value="False"/>
+			</Component>
+			<Component id="ThreePhaseAttackSkillComponent">
+				<var key="phase1_inflict_time" value="0.5"/>
+				<var key="phase2_inflict_time" value="1"/>
+				<var key="phase3_inflict_time" value="1.5"/>
+				<var key="phase4_inflict_time" value="2"/>
+				<var key="phase1_link_time" value="0.7"/>
+				<var key="phase2_link_time" value="1.2"/>
+				<var key="phase3_link_time" value="1.65"/>
+				<var key="phase4_link_time" value="2.8"/>
+				<var key="phase1_damage_amount" value="200"/>
+				<var key="phase2_damage_amount" value="200"/>
+				<var key="phase3_damage_amount" value="200"/>
+				<var key="phase4_damage_amount" value="300"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="20100102" name="Crawl人冲锋">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="4"/>
 				<var key="inflict_time" value="0"/>
-				<var key="expiration_time" value="0.2"/>
+				<var key="expiration_time" value="0.3"/>
 				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="need_gather_targets" value="False"/>
+				<var key="external_data_type" value="direction"/>
 				<var key="main_animation" value="run"/>
 			</Component>
 			<Component id="SpurtSkillComponent">
-				<var key="distance" value="5"/>
-				<var key="time" value="0.2"/>
+				<var key="distance" value="8"/>
+				<var key="time" value="0.3"/>
+			</Component>
+		</ConfigItem>
+
+		<ConfigItem id="20300101" name="Crawl龙3连发">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="1.3"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="expiration_time" value="0.3"/>
+				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="external_data_type" value="direction"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="CreateObjectSkillComponent">
+				<var key="object_type_id" value="301"/>
+				<var key="object_proto_id" value="301001"/>
+				<var key="offset_x" value="0"/>
+				<var key="offset_y" value="1"/>
+				<var key="offset_z" value="1"/>
+				<var key="generator_id" value="101"/>
+				<var key="combo_attack_cnt" value="3"/>
+				<var key="combo_interval" value="0.1"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="20300102" name="Crawl龙冲锋">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="4"/>
+				<var key="inflict_time" value="0"/>
+				<var key="expiration_time" value="0.3"/>
+				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="need_gather_targets" value="False"/>
+				<var key="external_data_type" value="direction"/>
+				<var key="main_animation" value="run"/>
+			</Component>
+			<Component id="SpurtSkillComponent">
+				<var key="distance" value="8"/>
+				<var key="time" value="0.3"/>
+			</Component>
+		</ConfigItem>
+
+		<ConfigItem id="20300201" name="Crawl哥布林魔法弹">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="0.8"/>
+				<var key="inflict_time" value="0.3"/>
+				<var key="expiration_time" value="0.3"/>
+				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="external_data_type" value="direction"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="CreateObjectSkillComponent">
+				<var key="object_type_id" value="301"/>
+				<var key="object_proto_id" value="301001"/>
+				<var key="offset_x" value="0"/>
+				<var key="offset_y" value="1"/>
+				<var key="offset_z" value="1"/>
+				<var key="generator_id" value="101"/>
+			</Component>
+		</ConfigItem>
+
+		<ConfigItem id="20300202" name="Crawl哥布林召唤">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="6"/>
+				<var key="inflict_time" value="0.3"/>
+				<var key="expiration_time" value="0.6"/>
+				<var key="blocks_other_skills_when_active" value="true"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="CreateObjectSkillComponent">
+				<var key="object_type_id" value="204"/>
+				<var key="object_proto_id" value="204001"/>
+				<var key="object_life_time" value="30"/>
+				<var key="offset_x" value="0"/>
+				<var key="offset_y" value="0"/>
+				<var key="offset_z" value="2"/>
 			</Component>
 		</ConfigItem>		
+		
+		<ConfigItem id="20300301" name="Craw牛头近战攻击">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="1"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="expiration_time" value="0.6"/>
+				<var key="target_gathering_type" value="ForwardRectangle"/>
+				<var key="target_gathering_param1" value="3"/>
+				<var key="target_gathering_param2" value="3.5"/>
+				<var key="need_gather_targets" value="False"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="DirectDamageSkillComponent">
+				<var key="damage_amount" value="200"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="20300302" name="Craw牛头旋风斩">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="10"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="expiration_time" value="3"/>
+				<var key="deactivate_when_moving" value="False"/>
+				<var key="blocks_movement_when_active" value="False"/>
+				<var key="blocks_other_skills_when_active" value="True"/>
+				<var key="target_gathering_type" value="SurroundingRing"/>
+				<var key="target_gathering_param1" value="2"/>
+				<var key="need_gather_targets" value="False"/>
+				<var key="main_animation" value="skill"/>
+			</Component>
+			<Component id="DirectDamageSkillComponent">
+				<var key="damage_amount" value="40"/>
+				<var key="combo_attack_cnt" value="99"/>
+				<var key="combo_interval" value="0.1"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="20400101" name="Craw召唤物哥布林魔法弹">
+			<Component id="SkillDefinitionComponent">
+				<var key="cooldown_time" value="1"/>
+				<var key="inflict_time" value="0.5"/>
+				<var key="target_gathering_type" value="Default"/>
+				<var key="main_animation" value="attack"/>
+			</Component>
+			<Component id="CreateObjectSkillComponent">
+				<var key="object_type_id" value="301"/>
+				<var key="object_proto_id" value="301001"/>
+				<var key="offset_x" value="0"/>
+				<var key="offset_y" value="1"/>
+				<var key="offset_z" value="1"/>
+				<var key="generator_id" value="101"/>
+			</Component>
+		</ConfigItem>
 	</SkillConfig>
 </ConfigSystem>

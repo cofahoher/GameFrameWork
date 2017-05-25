@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
+#if !CONSOLE_CLIENT
     public class MyCombatFactory : ICombatFactory
     {
         public IConfigProvider GetConfigProvider()
@@ -87,8 +88,8 @@ namespace Combat
             //本地玩家的Entity
             obj_context = new ObjectCreationContext();
             obj_context.m_object_proxy_id = PlayerManager.LOCAL_PLAYER_PROXYID;
-            obj_context.m_object_type_id = 102;
-            obj_context.m_object_proto_id = 102001;
+            obj_context.m_object_type_id = 111;
+            obj_context.m_object_proto_id = 111001;
             obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-5), new FixPoint(0), new FixPoint(-5), new FixPoint(90));
             obj_context.m_is_local = true;
             world_context.m_entities.Add(obj_context);
@@ -104,8 +105,8 @@ namespace Combat
 
             obj_context = new ObjectCreationContext();
             obj_context.m_object_proxy_id = PlayerManager.LOCAL_PLAYER_PROXYID;
-            obj_context.m_object_type_id = 103;
-            obj_context.m_object_proto_id = 103001;
+            obj_context.m_object_type_id = 112;
+            obj_context.m_object_proto_id = 112001;
             obj_context.m_birth_info = new BirthPositionInfo(new FixPoint(-5), new FixPoint(0), new FixPoint(7), new FixPoint(90));
             obj_context.m_is_local = true;
             obj_context.m_is_ai = true;
@@ -122,4 +123,5 @@ namespace Combat
             return world_context;
         }
     }
+#endif
 }

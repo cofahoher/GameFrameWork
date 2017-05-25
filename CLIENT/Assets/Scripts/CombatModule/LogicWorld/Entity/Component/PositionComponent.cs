@@ -32,6 +32,7 @@ namespace Combat
         Vector3FP m_current_position;
         FixPoint m_current_angle;  //绕Z轴的转角，注意Unity是左手系
         FixPoint m_radius = FixPoint.Zero;
+        FixPoint m_height = FixPoint.One;
         bool m_collision_sender = true;
         bool m_visible = true;
         ISpaceManager m_space_manager = null;
@@ -91,6 +92,19 @@ namespace Combat
                 m_birth_info.m_birth_position = m_current_position;
                 m_birth_info.m_birth_angle = m_current_angle;
             }
+
+            ObjectProtoData proto_data = ParentObject.GetCreationContext().m_proto_data;
+            if (proto_data != null)
+            {
+                var dic = proto_data.m_component_variables;
+                if (dic != null)
+                {
+                    string value;
+                    if (dic.TryGetValue("radius", out value))
+                        m_radius = FixPoint.Parse(value);
+                }
+            }
+
             if (m_collision_sender)
             {
                 m_space_manager = GetLogicWorld().GetSpaceManager();
@@ -101,8 +115,11 @@ namespace Combat
 
         public override void OnDeletePending()
         {
-            if (m_space_manager != null)
-                m_space_manager.RemoveEntity(this);
+            if (m_collision_sender)
+            {
+                if (m_space_manager != null)
+                    m_space_manager.RemoveEntity(this);
+            }
         }
 
         protected override void OnDestruct()
@@ -136,7 +153,7 @@ namespace Combat
 
         public void SetAngle(Vector3FP direction)
         {
-            SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-direction.z, direction.x)));
+            SetAngle(FixPoint.XZToUnityRotationDegree(direction.x, direction.z));
         }
         #endregion
     }

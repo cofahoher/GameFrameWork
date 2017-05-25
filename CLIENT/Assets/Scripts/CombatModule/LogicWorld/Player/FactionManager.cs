@@ -2,11 +2,46 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public enum FactionRelation
+    public class FactionRelation
     {
-        Ally = 1,
-        Enemy = 2,
-        Neutral = 3,
+        //元关系
+        public static readonly int Ally = (int)CRC.Calculate("Ally");
+        public static readonly int Enemy = (int)CRC.Calculate("Enemy");
+        public static readonly int Neutral = (int)CRC.Calculate("Neutral");
+        //复合关系
+        public static readonly int NotAlly = (int)CRC.Calculate("NotAlly");
+        public static readonly int NotEnemy = (int)CRC.Calculate("NotEnemy");
+        public static readonly int NotNeutral = (int)CRC.Calculate("NotNeutral");
+        public static readonly int All = (int)CRC.Calculate("All");
+        public static readonly int None = (int)CRC.Calculate("None");
+
+        public static bool IsFactionSatisfied(int meta_faction, int composed_faction)
+        {
+            if (meta_faction == composed_faction || composed_faction == All)
+                return true;
+            else if (composed_faction == NotAlly)
+            {
+                if (meta_faction == Ally)
+                    return false;
+                else
+                    return true;
+            }
+            else if (composed_faction == NotEnemy)
+            {
+                if (meta_faction == Enemy)
+                    return false;
+                else
+                    return true;
+            }
+            else if (composed_faction == NotNeutral)
+            {
+                if (meta_faction == Neutral)
+                    return false;
+                else
+                    return true;
+            }
+            return false;
+        }
     }
 
     public class FactionManager : IDestruct
@@ -29,7 +64,7 @@ namespace Combat
             return faction;
         }
 
-        public FactionRelation GetRelationShip(int faction_index_1, int faction_index_2)
+        public int GetRelationShip(int faction_index_1, int faction_index_2)
         {
             //ZZWTODO
             if (faction_index_1 == 0 || faction_index_2 == 0)

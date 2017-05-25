@@ -9,21 +9,19 @@
 		<ConfigItem id="4" name="RealPlayer">
 		</ConfigItem>
 		
-		<ConfigItem id="100" name="EnvironmentEntity">
-			<Component id="PositionComponent">
-				<var key="x" value="99999"/>
-				<var key="y" value="99999"/>
-				<var key="z" value="99999"/>
-				<var key="radius" value="0"/>
-				<var key="collision_sender" value="False"/>
-				<var key="visible" value="False"/>
-			</Component>
-			<Component id="EffectManagerComponent"/>
+		<ConfigItem id="11" name="CrawlPlayer">
+			<Component id="FactionComponent"/>
+			<Component id="PlayerGameplaySpecilaComponent"/>
 		</ConfigItem>
 		
-		<ConfigItem id="101" name="DamagableObstruct">
+		<!--！！！！！！！！！！以下是ZZW测试的，不要使用和修改！！！！！！！！！！-->
+		<ConfigItem id="100" name="zzw测试虚拟的环境角色">
+		</ConfigItem>
+		
+		<ConfigItem id="101" name="zzw测试可破坏障碍">
 			<Component id="PositionComponent">
 				<var key="radius" value="0.5"/>
+				<var key="height" value="1"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="ObstacleComponent">
@@ -31,7 +29,6 @@
 				<var key="ext_y" value="0.5"/>
 				<var key="ext_z" value="0.5"/>
 			</Component>
-			<Component id="EffectManagerComponent"/>
 			<Component id="DamagableComponent">
 				<var key="max_health" value="1000"/>
 				<var key="current_health" value="900"/>
@@ -40,20 +37,50 @@
 				<var key="hide_delay" value="1"/>
 				<var key="delete_delay" value="2"/>
 			</Component>
-			<Component id="StateComponent"/>
-			<Component id="AIComponent"/>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="102" name="LegacyHero">
+		<ConfigItem id="102" name="zzw测试不可破坏的障碍">
+			<Component id="PositionComponent">
+				<var key="radius" value="0.5"/>
+				<var key="height" value="1"/>
+				<var key="collision_sender" value="False"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="ObstacleComponent">
+				<var key="ext_x" value="0.5"/>
+				<var key="ext_y" value="0.5"/>
+				<var key="ext_z" value="0.5"/>
+			</Component>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="103" name="zzw测试发射物">
+			<Component id="PositionComponent">
+				<var key="radius" value="0.3"/>
+				<var key="height" value="0"/>
+				<var key="collision_sender" value="False"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="ProjectileComponent">
+			</Component>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="111" name="zzw测试Legacy动画的角色">
 			<Component id="LevelComponent">
 				<var key="level" value="1"/>
 			</Component>
 			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
 				<var key="radius" value="0.5"/>
+				<var key="height" value="1"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="LocomotorComponent">
@@ -77,13 +104,14 @@
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="103" name="MecanimHero">
+		<ConfigItem id="112" name="zzw测试Mecanim动画的角色">
 			<Component id="LevelComponent">
 				<var key="level" value="1"/>
 			</Component>
 			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
 				<var key="radius" value="0.5"/>
+				<var key="height" value="1"/>
 				<var key="visible" value="True"/>
 			</Component>
 			<Component id="LocomotorComponent">
@@ -106,26 +134,140 @@
 				<var key="animator_path" value="bodyctrl/animationctrl"/>
 			</Component>
 		</ConfigItem>
+		<!--！！！！！！！！！！以上是ZZW测试的，不要使用和修改！！！！！！！！！！-->
 		
-		<ConfigItem id="201" name="UndamagableObstruct">
+		
+		<ConfigItem id="200" name="Crawl虚拟的环境角色">
+			<Component id="SpawnObjectComponent">
+				<var key="object_type_id" value="251"/>
+				<var key="object_proto_id" value="251001"/>
+				<var key="object_distance" value="3"/>
+				<var key="init_count" value="3"/>
+				<var key="max_count" value="1"/>
+				<var key="update_interval" value="10"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="201" name="Crawl中的人和怪">
+			<Component id="EntityDefinitionComponent">
+			</Component>
+			<Component id="LevelComponent">
+				<var key="level" value="1"/>
+			</Component>
+			<Component id="AttributeManagerComponent"/>
 			<Component id="PositionComponent">
 				<var key="radius" value="0.5"/>
-				<var key="collision_sender" value="False"/>
+				<var key="height" value="1"/>
 				<var key="visible" value="True"/>
 			</Component>
-			<Component id="ObstacleComponent">
-				<var key="ext_x" value="0.5"/>
-				<var key="ext_y" value="0.5"/>
-				<var key="ext_z" value="0.5"/>
+			<Component id="LocomotorComponent">
+				<var key="max_speed" value="5.0"/>
+			</Component>
+			<Component id="EffectManagerComponent"/>
+			<Component id="DamagableComponent"/>
+			<Component id="DeathComponent">
+				<var key="hide_delay" value="1"/>
+				<var key="delete_delay" value="2"/>
+			</Component>
+			<Component id="SkillManagerComponent"/>
+			<Component id="StateComponent"/>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+			<Component id="AnimatorComponent">
+				<var key="animator_path" value="bodyctrl/animationctrl"/>
+			</Component>
+			<Component id="HeadbarComponent">
+				<var key="root_path" value="bodyctrl/animationctrl"/>
+				<var key="self_path" value="Objects/UI/FightUI/SelfHpBar"/>
+				<var key="enemy_path" value="Objects/UI/FightUI/EnemyHpBar"/>
+				<var key="team_path" value="Objects/UI/FightUI/TeamHpBar"/>
+				<var key="actorFoot_path" value="Objects/UI/FightUI/ActorFoot"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="202" name="Crawl中的灵魂">
+			<Component id="AttributeManagerComponent"/>
+			<Component id="PositionComponent">
+				<var key="radius" value="0.5"/>
+				<var key="height" value="1"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="LocomotorComponent">
+				<var key="max_speed" value="5.0"/>
+				<var key="avoid_obstacle" value="False"/>
+			</Component>
+			<Component id="EffectManagerComponent"/>
+			<Component id="SkillManagerComponent"/>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+			<Component id="AnimatorComponent">
+				<var key="animator_path" value="bodyctrl/animationctrl"/>
+			</Component>
+			<Component id="HeadbarComponent">
+				<var key="root_path" value="bodyctrl/animationctrl"/>
+				<var key="self_path" value="Objects/UI/FightUI/SelfHpBar"/>
+				<var key="enemy_path" value="Objects/UI/FightUI/EnemyHpBar"/>
+				<var key="actorFoot_path" value="Objects/UI/FightUI/ActorFoot"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="204" name="Crawl召唤生物">
+			<Component id="LevelComponent">
+				<var key="level" value="1"/>
+			</Component>
+			<Component id="AttributeManagerComponent"/>
+			<Component id="PositionComponent">
+				<var key="radius" value="0.5"/>
+				<var key="height" value="1"/>
+				<var key="visible" value="True"/>
+			</Component>
+			<Component id="LocomotorComponent">
+				<var key="max_speed" value="5.0"/>
+			</Component>
+			<Component id="EffectManagerComponent"/>
+			<Component id="DamagableComponent"/>
+			<Component id="DeathComponent">
+				<var key="hide_delay" value="1"/>
+				<var key="delete_delay" value="2"/>
+			</Component>
+			<Component id="SimpleAIComponent">
+				<var key="guard_range" value="100"/>
+			</Component>
+			<Component id="SummonedEntityComponent"/>
+			<Component id="SkillManagerComponent"/>
+			<Component id="StateComponent"/>
+			<Component id="TargetingComponent"/>
+			<Component id="ModelComponent">
+				<var key="bodyctrl_path" value="bodyctrl"/>
+			</Component>
+			<Component id="AnimatorComponent">
+				<var key="animator_path" value="bodyctrl/animationctrl"/>
+			</Component>
+			<Component id="HeadbarComponent">
+				<var key="root_path" value="bodyctrl/animationctrl"/>
+				<var key="self_path" value="Objects/UI/FightUI/SelfHpBar"/>
+				<var key="enemy_path" value="Objects/UI/FightUI/EnemyHpBar"/>
+				<var key="actorFoot_path" value="Objects/UI/FightUI/ActorFoot"/>
+			</Component>
+		</ConfigItem>
+		
+		<ConfigItem id="251" name="Crawl法阵">
+			<Component id="PositionComponent">
+				<var key="radius" value="1.5"/>
+				<var key="height" value="0"/>
+				<var key="visible" value="True"/>
 			</Component>
 			<Component id="ModelComponent">
 				<var key="bodyctrl_path" value="bodyctrl"/>
 			</Component>
 		</ConfigItem>
 		
-		<ConfigItem id="301" name="Missile">
+		<ConfigItem id="301" name="Crawl发射物">
 			<Component id="PositionComponent">
-				<var key="radius" value="0"/>
+				<var key="radius" value="0.3"/>
+				<var key="height" value="0"/>
 				<var key="collision_sender" value="False"/>
 				<var key="visible" value="True"/>
 			</Component>

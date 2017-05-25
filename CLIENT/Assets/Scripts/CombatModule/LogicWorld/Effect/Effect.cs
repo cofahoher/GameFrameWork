@@ -28,7 +28,6 @@ namespace Combat
         protected override void OnDestruct()
         {
             m_definition_component = null;
-            m_context.Destruct();
         }
         #endregion
 

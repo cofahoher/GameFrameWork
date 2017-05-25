@@ -13,6 +13,16 @@ namespace Combat
             }
             else
             {
+                //Player player = entity.GetOwnerPlayer();
+                //Entity killer = entity.GetLogicWorld().GetEntityManager().GetObject(killer_id);
+                //player.OnEntityBeKilled(killer, entity);
+                //if (killer != null)
+                //{
+                //    Player killer_player = killer.GetOwnerPlayer();
+                //    killer_player.OnKillEntity(killer, entity);
+                //}
+
+                //没有死亡组件的就从简了
                 entity.SendSignal(SignalType.Die);
                 entity.GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Die, entity.ID);
                 entity.DeletePending = true;

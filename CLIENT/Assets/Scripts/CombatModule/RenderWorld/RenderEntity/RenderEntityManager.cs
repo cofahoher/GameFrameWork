@@ -18,7 +18,7 @@ namespace Combat
             m_render_world = null;
         }
 
-        protected override RenderEntity CreateObjectInstance()
+        protected override RenderEntity CreateObjectInstance(ObjectCreationContext context)
         {
             return new RenderEntity(m_render_world);
         }

@@ -228,7 +228,6 @@
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\RenderMessageProcessor.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Empty.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\GeneralComposableObject.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\AI.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\Attribute.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
@@ -240,13 +239,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTreeFactory.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Actions\BTAction.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTComposites.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTParallelSelector.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTParallelSequence.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTReference.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTSelector.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTSequence.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Conditions\BTCondition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Decorators\BTDecorator.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Ext\BTReference.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\AttributeData.cs" />
@@ -266,9 +261,12 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\ClassifiedEffectContainer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddStateEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ApplyGeneratorEffectComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ChangePlayerFactionEffectComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\CreateObjectEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\DamageEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\EffectDefinitionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\HealEffectComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\KillOwnerEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ModifyAttributeEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Effect.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\EffectApplicationData.cs" />
@@ -286,14 +284,18 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\DeathComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\EffectManagerComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\EntityDefinitionComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\EntityGameplaySpecilaComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\LocomotorComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\ManaComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\ObstacleComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\PathFindingComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\PositionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\ProjectileComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\SimpleAIComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\SkillManagerComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\SpawnObjectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\StateComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\SummonedEntityComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\TargetingComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Entity.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityComponent.cs" />
@@ -315,6 +317,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Math\Vector2FP.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Math\Vector3FP.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\CRC.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\GeneralComposableObject.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\Heap.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Misc\IDestruct.cs" />
@@ -343,6 +346,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\PathFinding\SquareGridGraph.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\FactionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerAIComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerGameplaySpecilaComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Component\PlayerTargetingComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\FactionManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Player\Player.cs" />
@@ -360,6 +364,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\CreateObjectSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\DirectDamageSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\EffectGeneratorSkillComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\PossessSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\SkillDefinitionComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\SpurtSkillComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Skill\Component\ThreePhaseAttackSkillComponent.cs" />
@@ -378,6 +383,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\WorldCreationContext.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimationComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\AnimatorComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\HeadbarComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\ModelComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\Component\PredictLogicComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\RenderWorld\RenderEntity\RenderEntity.cs" />
@@ -393,7 +399,6 @@
     <Compile Include="Assets\Scripts\CombatModule\Sync\ISyncClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\ISyncServer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\IWorldSynchronizer.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithLogicPrediction\MultiplayerWithLogicPrediction.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithoutLogicPrediction\MNLPCommandSynchronizer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithoutLogicPrediction\MNLPSyncClient.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Sync\MultiplayerWithoutLogicPrediction\MNLPSyncServer.cs" />
@@ -423,6 +428,7 @@
     <Compile Include="Assets\Scripts\GameGlobal.cs" />
     <Compile Include="Assets\Scripts\LogWrapper.cs" />
     <Compile Include="Assets\Scripts\SingletonMonobehaviour.cs" />
+    <Compile Include="Assets\Scripts\UI\HearBarUI.cs" />
     <Compile Include="Assets\Scripts\Util\ProtoBufMessage.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,10 @@ namespace Combat
         public const int Invalid = 0;
         //Player
         public const int ChangeFaction = 1;
+        public const int AddEntity = 2;
+        public const int RemoveEntity = 3;
+        public const int KillEntity = 4;
+        public const int EntityBeKilled = 5;
         //Entity
         public const int StartMoving = 1001;
         public const int StopMoving = 1002;

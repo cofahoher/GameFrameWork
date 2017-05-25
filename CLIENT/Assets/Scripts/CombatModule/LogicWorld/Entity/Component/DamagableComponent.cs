@@ -116,13 +116,7 @@ namespace Combat
 #endif
 
             if (m_current_health <= 0)
-            {
-                DeathComponent death_component = ParentObject.GetComponent(DeathComponent.ID) as DeathComponent;
-                if (death_component != null)
-                    death_component.KillOwner(source_id);
-                else
-                    EntityUtil.KillEntity(ParentObject as Entity, source_id);
-            }
+                EntityUtil.KillEntity(ParentObject as Entity, source_id);
         }
     }
 }

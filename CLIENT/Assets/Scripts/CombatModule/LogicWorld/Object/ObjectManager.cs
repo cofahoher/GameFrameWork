@@ -67,7 +67,7 @@ namespace Combat
                 int id = m_id_generator.GenID();
                 context.m_object_id = id;
             }
-            TObject obj = CreateObjectInstance();
+            TObject obj = CreateObjectInstance(context);
             context.m_creation_time = m_logic_world.GetCurrentTime();
             m_objects[context.m_object_id] = obj;
             if (context.m_name != null && context.m_name.Length > 0)
@@ -78,7 +78,7 @@ namespace Combat
             return obj;
         }
 
-        protected abstract TObject CreateObjectInstance();
+        protected abstract TObject CreateObjectInstance(ObjectCreationContext context);
 
         protected virtual void AfterObjectCreated(TObject obj)
         {

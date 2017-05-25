@@ -108,10 +108,15 @@ namespace Combat
             m_sync_client = m_combat_factory.CreateSyncClient();
             m_sync_client.Init(m_logic_world);
 
-            WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
-            m_logic_world.BuildLogicWorld(world_context);
+            BuildLogicWorld(combat_start_info);
             ++m_waiting_cnt;
             m_render_world.LoadScene(m_level_data.m_scene_name);
+        }
+
+        protected virtual void BuildLogicWorld(CombatStartInfo combat_start_info)
+        {
+            WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
+            m_logic_world.BuildLogicWorld(world_context);
         }
 
         public virtual void AddPlayer(long player_pstid)

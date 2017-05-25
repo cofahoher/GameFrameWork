@@ -15,6 +15,7 @@ namespace Combat
     public interface IMovementCallback
     {
         ILogicOwnerInfo GetOwnerInfo();
+        bool AvoidObstacle();
         void MovementFinished();
     }
 }

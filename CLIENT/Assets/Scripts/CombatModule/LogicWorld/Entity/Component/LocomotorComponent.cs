@@ -5,6 +5,7 @@ namespace Combat
     public partial class LocomotorComponent : EntityComponent, IMovementCallback
     {
         //需要备份的初始数据
+        bool m_avoid_obstacle = true;
         //运行数据
         FixPoint m_current_max_speed = FixPoint.Zero;
         IMovementProvider m_movement_provider = null;
@@ -114,6 +115,11 @@ namespace Combat
         public ILogicOwnerInfo GetOwnerInfo()
         {
             return this;
+        }
+
+        public bool AvoidObstacle()
+        {
+            return m_avoid_obstacle;
         }
 
         public void MovementFinished()

@@ -97,5 +97,11 @@ namespace Combat
         {
             m_bodyctrl_tr.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
         }
+        
+        public override void Show(bool is_show)
+        {
+            if (m_unity_go != null)
+                m_unity_go.SetActive(is_show);
+        }
     }
 }

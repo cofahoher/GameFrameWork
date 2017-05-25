@@ -114,20 +114,23 @@ namespace Combat
 
         public void KillOwner(int killer_id)
         {
+            //ZZWTODO Resurrect
+
             if (m_die_task != null)
                 m_die_task.Cancel();
 
-            if (!DieSilently && killer_id != ParentObject.ID && m_killer_generator != null)
+            Entity killer = GetLogicWorld().GetEntityManager().GetObject(killer_id);
+            SummonedEntityComponent extinfo_component = killer.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+            if (extinfo_component != null)
+                killer = GetLogicWorld().GetEntityManager().GetObject(extinfo_component.MasterID);
+
+            if (!DieSilently && killer_id != ParentObject.ID && m_killer_generator != null && killer != null)
             {
-                Entity killer = GetLogicWorld().GetEntityManager().GetObject(killer_id);
-                if (killer != null)
-                {
-                    EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
-                    app_data.m_original_entity_id = ParentObject.ID;
-                    app_data.m_source_entity_id = ParentObject.ID;
-                    m_killer_generator.Activate(app_data, killer);
-                    RecyclableObject.Recycle(app_data);
-                }
+                EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
+                app_data.m_original_entity_id = ParentObject.ID;
+                app_data.m_source_entity_id = ParentObject.ID;
+                m_killer_generator.Activate(app_data, killer);
+                RecyclableObject.Recycle(app_data);
             }
 
             var schedeler = GetLogicWorld().GetTaskScheduler();
@@ -140,6 +143,13 @@ namespace Combat
                 HideEntityTask hide_task = LogicTask.Create<HideEntityTask>();
                 hide_task.Construct(ParentObject.ID);
                 schedeler.Schedule(hide_task, GetCurrentTime(), m_hide_delay);
+            }
+
+            GetOwnerPlayer().OnEntityBeKilled(killer, (Entity)ParentObject);
+            if (killer != null)
+            {
+                Player killer_player = killer.GetOwnerPlayer();
+                killer_player.OnKillEntity(killer, (Entity)ParentObject);
             }
 
             ParentObject.DeletePending = true;

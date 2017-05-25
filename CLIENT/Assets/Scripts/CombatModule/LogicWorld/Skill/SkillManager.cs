@@ -9,7 +9,7 @@ namespace Combat
         {
         }
 
-        protected override Skill CreateObjectInstance()
+        protected override Skill CreateObjectInstance(ObjectCreationContext context)
         {
             return new Skill();
         }

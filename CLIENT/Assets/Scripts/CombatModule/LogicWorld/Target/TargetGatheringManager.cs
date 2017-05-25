@@ -5,12 +5,17 @@ namespace Combat
 {
     public class TargetGatheringType
     {
+        //不需要目标，或者不配，默认是0
         public static readonly int NoTarget = (int)CRC.Calculate("NoTarget");
-        public static readonly int DefaultTarget = (int)CRC.Calculate("DefaultTarget");
+        //技能的默认目标是有其他组件提供的（现在是TargetingComponent），EffectGeneretor的默认目标是Activate时传递的
+        public static readonly int Default = (int)CRC.Calculate("Default");
+        //查找技能是提供的目标Entitiy（技能释放者，或者EffectGeneretor的拥有者）
         public static readonly int Source = (int)CRC.Calculate("Source");
-        public static readonly int ForwardAreaNotAlly = (int)CRC.Calculate("ForwardAreaNotAlly");
-        public static readonly int ForwardAreaEnemy = (int)CRC.Calculate("ForwardAreaEnemy");
-        public static readonly int SurroundingEnemy = (int)CRC.Calculate("SurroundingEnemy");
+
+        //前方矩形范围（param1长，param2宽）
+        public static readonly int ForwardRectangle = (int)CRC.Calculate("ForwardRectangle");
+        //周围圆环形范围（param1外半径，param2内半径）
+        public static readonly int SurroundingRing = (int)CRC.Calculate("SurroundingRing");
     }
 
     public class TargetGatheringManager : IDestruct
@@ -33,9 +38,9 @@ namespace Combat
             m_space_manager = null;
         }
 
-        public void BuildTargetList(Entity source_entity, int target_gathering_type, FixPoint target_gathering_param1, FixPoint target_gathering_param2, List<Target> targets)
+        public void BuildTargetList(Entity source_entity, int gathering_type, FixPoint gathering_param1, FixPoint gathering_param2, int gathering_faction, List<Target> targets)
         {
-            if (target_gathering_type == TargetGatheringType.DefaultTarget)
+            if (gathering_type == TargetGatheringType.Default)
             {
                 TargetingComponent targeting_component = source_entity.GetComponent(TargetingComponent.ID) as TargetingComponent;
                 if (targeting_component != null)
@@ -50,7 +55,7 @@ namespace Combat
                     }
                 }
             }
-            else if (target_gathering_type == TargetGatheringType.Source)
+            else if (gathering_type == TargetGatheringType.Source)
             {
                 Target target = RecyclableObject.Create<Target>();
                 target.Construct(m_logic_world);
@@ -64,54 +69,33 @@ namespace Combat
             if (position_cmp == null)
                 return;
             Player source_player = source_entity.GetOwnerPlayer();
-            
-            if (target_gathering_type == TargetGatheringType.ForwardAreaNotAlly)
+
+            List<int> ids = null;
+            if (gathering_type == TargetGatheringType.ForwardRectangle)
             {
-                List<int> ids = m_space_manager.CollectEntity_ForwardArea(position_cmp.CurrentPosition, position_cmp.Facing2D, target_gathering_param1, target_gathering_param2);
-                for (int i = 0; i < ids.Count; ++i)
-                {
-                    Entity entity = m_entity_manager.GetObject(ids[i]);
-                    if (entity == null)
-                        continue;
-                    if (source_player.GetFaction(entity.GetOwnerPlayerID()) == FactionRelation.Ally)
-                        continue;
-                    Target target = RecyclableObject.Create<Target>();
-                    target.Construct(m_logic_world);
-                    target.SetEntityTarget(entity);
-                    targets.Add(target);
-                }
+                ids = m_space_manager.CollectEntity_ForwardRectangle(position_cmp.CurrentPosition, position_cmp.Facing2D, gathering_param1, gathering_param2, source_entity.ID);
             }
-            else if (target_gathering_type == TargetGatheringType.ForwardAreaEnemy)
+            else if (gathering_type == TargetGatheringType.SurroundingRing)
             {
-                List<int> ids = m_space_manager.CollectEntity_ForwardArea(position_cmp.CurrentPosition, position_cmp.Facing2D, target_gathering_param1, target_gathering_param2, source_entity.ID);
-                for (int i = 0; i < ids.Count; ++i)
-                {
-                    Entity entity = m_entity_manager.GetObject(ids[i]);
-                    if (entity == null)
-                        continue;
-                    if (source_player.GetFaction(entity.GetOwnerPlayerID()) != FactionRelation.Enemy)
-                        continue;
-                    Target target = RecyclableObject.Create<Target>();
-                    target.Construct(m_logic_world);
-                    target.SetEntityTarget(entity);
-                    targets.Add(target);
-                }
+                ids = m_space_manager.CollectEntity_SurroundingRing(position_cmp.CurrentPosition, gathering_param1, gathering_param2, source_entity.ID);
             }
-            else if (target_gathering_type == TargetGatheringType.SurroundingEnemy)
+
+            if (ids == null)
+                return;
+            for (int i = 0; i < ids.Count; ++i)
             {
-                List<int> ids = m_space_manager.CollectEntity_SurroundingArea(position_cmp.CurrentPosition, target_gathering_param1, source_entity.ID);
-                for (int i = 0; i < ids.Count; ++i)
-                {
-                    Entity entity = m_entity_manager.GetObject(ids[i]);
-                    if (entity == null)
-                        continue;
-                    if (source_player.GetFaction(entity.GetOwnerPlayerID()) != FactionRelation.Enemy)
-                        continue;
-                    Target target = RecyclableObject.Create<Target>();
-                    target.Construct(m_logic_world);
-                    target.SetEntityTarget(entity);
-                    targets.Add(target);
-                }
+                Entity entity = m_entity_manager.GetObject(ids[i]);
+                if (entity == null)
+                    continue;
+                PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
+                if (position_component.Height <= FixPoint.Zero)
+                    continue;
+                if (!FactionRelation.IsFactionSatisfied(source_player.GetFaction(entity.GetOwnerPlayerID()), gathering_faction))
+                    continue;
+                Target target = RecyclableObject.Create<Target>();
+                target.Construct(m_logic_world);
+                target.SetEntityTarget(entity);
+                targets.Add(target);
             }
             //OVER
         }

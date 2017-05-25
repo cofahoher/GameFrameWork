@@ -7,6 +7,7 @@ namespace Combat
     {
         public const int EntityMove = 10;
         public const int EntityTarget = 11;
+        public const int EntityAttack = 12;
     }
 
     public class EntityMoveCommand : Command

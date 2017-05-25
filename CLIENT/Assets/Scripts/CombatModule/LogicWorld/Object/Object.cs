@@ -30,11 +30,18 @@ namespace Combat
             }
             m_components.Clear();
             OnDestruct();
+            //ZZWTODO 名字没取好
+            if (OwnContext())
+                m_context.Destruct();
+        }
+
+        protected virtual bool OwnContext()
+        {
+            return true;
         }
 
         protected virtual void OnDestruct()
         {
-            m_context.Destruct();
         }
         #endregion
 
@@ -62,6 +69,11 @@ namespace Combat
         public bool IsLocal
         {
             get { return m_context.m_is_local; }
+        }
+
+        public bool IsAI
+        {
+            get { return m_context.m_is_ai; }
         }
 
         public bool DeletePending
@@ -172,9 +184,6 @@ namespace Combat
                     }
                 }
             }
-
-            if (context.m_custom_data != null)
-                context.m_logic_world.CustomInitializeObject(this, context.m_custom_data);
 
             for (int i = 0; i < components_data.Count; ++i)
             {

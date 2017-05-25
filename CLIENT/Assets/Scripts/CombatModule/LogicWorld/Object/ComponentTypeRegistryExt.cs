@@ -15,6 +15,7 @@ namespace Combat
             Register<TurnManagerComponent>(false);
             Register<FactionComponent>(false);
             Register<PlayerAIComponent>(false);
+            Register<PlayerGameplaySpecilaComponent>(false);
             Register<PlayerTargetingComponent>(false);
             Register<AIComponent>(false);
             Register<AttributeManagerComponent>(false);
@@ -23,6 +24,7 @@ namespace Combat
             Register<DeathComponent>(false);
             Register<EffectManagerComponent>(false);
             Register<EntityDefinitionComponent>(false);
+            Register<EntityGameplaySpecilaComponent>(false);
             Register<LocomotorComponent>(false);
             Register<ManaComponent>(false);
             Register<ObstacleComponent>(false);
@@ -31,7 +33,9 @@ namespace Combat
             Register<ProjectileComponent>(false);
             Register<SimpleAIComponent>(false);
             Register<SkillManagerComponent>(false);
+            Register<SpawnObjectComponent>(false);
             Register<StateComponent>(false);
+            Register<SummonedEntityComponent>(false);
             Register<TargetingComponent>(false);
             Register<BehaviorTreeSkillComponent>(false);
             Register<CreateObjectSkillComponent>(false);
@@ -53,6 +57,7 @@ namespace Combat
 #if COMBAT_CLIENT
             Register<AnimationComponent>(true);
             Register<AnimatorComponent>(true);
+            Register<HeadbarComponent>(true);
             Register<ModelComponent>(true);
             Register<PredictLogicComponent>(true);
 #endif
@@ -122,6 +127,11 @@ namespace Combat
     public partial class PlayerAIComponent
     {
         public const int ID = -1685636568;
+    }
+
+    public partial class PlayerGameplaySpecilaComponent
+    {
+        public const int ID = -896397789;
     }
 
     public partial class PlayerTargetingComponent
@@ -250,18 +260,26 @@ namespace Combat
         public int Category1
         {
             get { return m_category_1; }
+            set { m_category_1 = value; }
         }
 
         public int Category2
         {
             get { return m_category_2; }
+            set { m_category_2 = value; }
         }
 
         public int Category3
         {
             get { return m_category_3; }
+            set { m_category_3 = value; }
         }
 #endregion
+    }
+
+    public partial class EntityGameplaySpecilaComponent
+    {
+        public const int ID = -1899933679;
     }
 
     public partial class LocomotorComponent
@@ -279,6 +297,8 @@ namespace Combat
             string value;
             if (variables.TryGetValue("max_speed", out value))
                 MaxSpeed = FixPoint.Parse(value);
+            if (variables.TryGetValue("avoid_obstacle", out value))
+                m_avoid_obstacle = bool.Parse(value);
         }
 
         public override bool GetVariable(int id, out FixPoint value)
@@ -341,6 +361,7 @@ namespace Combat
         public const int VID_Z = -1811315837;
         public const int VID_CurrentAngle = 1682267402;
         public const int VID_Radius = -1373094910;
+        public const int VID_Height = 231863489;
 
         static PositionComponent()
         {
@@ -349,6 +370,7 @@ namespace Combat
             ComponentTypeRegistry.RegisterVariable(VID_Z, ID);
             ComponentTypeRegistry.RegisterVariable(VID_CurrentAngle, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Radius, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_Height, ID);
         }
 
         public override void InitializeVariable(Dictionary<string, string> variables)
@@ -364,6 +386,8 @@ namespace Combat
                 m_current_angle = FixPoint.Parse(value);
             if (variables.TryGetValue("radius", out value))
                 m_radius = FixPoint.Parse(value);
+            if (variables.TryGetValue("height", out value))
+                m_height = FixPoint.Parse(value);
             if (variables.TryGetValue("collision_sender", out value))
                 m_collision_sender = bool.Parse(value);
             if (variables.TryGetValue("visible", out value))
@@ -389,6 +413,9 @@ namespace Combat
             case VID_Radius:
                 value = m_radius;
                 return true;
+            case VID_Height:
+                value = m_height;
+                return true;
             default:
                 value = FixPoint.Zero;
                 return false;
@@ -413,6 +440,9 @@ namespace Combat
                 return true;
             case VID_Radius:
                 m_radius = value;
+                return true;
+            case VID_Height:
+                m_height = value;
                 return true;
             default:
                 return false;
@@ -440,6 +470,11 @@ namespace Combat
             get { return m_radius; }
         }
 
+        public FixPoint Height
+        {
+            get { return m_height; }
+        }
+
         public bool Visible
         {
             get { return m_visible; }
@@ -458,6 +493,8 @@ namespace Combat
                 m_speed = FixPoint.Parse(value);
             if (variables.TryGetValue("lifetime", out value))
                 m_lifetime = FixPoint.Parse(value);
+            if (variables.TryGetValue("collision_faction", out value))
+                m_collision_faction = (int)CRC.Calculate(value);
         }
     }
 
@@ -478,9 +515,43 @@ namespace Combat
         public const int ID = 2066148607;
     }
 
+    public partial class SpawnObjectComponent
+    {
+        public const int ID = 1753005899;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("object_type_id", out value))
+                m_object_type_id = int.Parse(value);
+            if (variables.TryGetValue("object_proto_id", out value))
+                m_object_proto_id = int.Parse(value);
+            if (variables.TryGetValue("object_distance", out value))
+                m_object_distance = FixPoint.Parse(value);
+            if (variables.TryGetValue("init_count", out value))
+                m_init_count = int.Parse(value);
+            if (variables.TryGetValue("max_count", out value))
+                m_max_count = int.Parse(value);
+            if (variables.TryGetValue("update_interval", out value))
+                m_update_interval = FixPoint.Parse(value);
+        }
+    }
+
     public partial class StateComponent
     {
         public const int ID = 11707299;
+    }
+
+    public partial class SummonedEntityComponent
+    {
+        public const int ID = 1051926082;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("die_with_master", out value))
+                m_die_with_master = bool.Parse(value);
+        }
     }
 
     public partial class TargetingComponent
@@ -606,8 +677,14 @@ namespace Combat
                 m_target_gathering_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("target_gathering_param2", out value))
                 m_target_gathering_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("target_gathering_fation", out value))
+                m_target_gathering_fation = (int)CRC.Calculate(value);
             if (variables.TryGetValue("need_gather_targets", out value))
                 m_need_gather_targets = bool.Parse(value);
+            if (variables.TryGetValue("targets_min_count_for_activate", out value))
+                m_targets_min_count_for_activate = int.Parse(value);
+            if (variables.TryGetValue("external_data_type", out value))
+                m_external_data_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("inflict_type", out value))
                 m_inflict_type = int.Parse(value);
             if (variables.TryGetValue("inflict_missile", out value))
@@ -710,9 +787,19 @@ namespace Combat
             get { return m_target_gathering_param2; }
         }
 
+        public int TargetGatheringFation
+        {
+            get { return m_target_gathering_fation; }
+        }
+
         public bool NeedGatherTargets
         {
             get { return m_need_gather_targets; }
+        }
+
+        public int ExternalDataType
+        {
+            get { return m_external_data_type; }
         }
 
         public int InflictType
@@ -739,12 +826,6 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
-            if (variables.TryGetValue("target_gathering_type", out value))
-                m_target_gathering_type = (int)CRC.Calculate(value);
-            if (variables.TryGetValue("target_gathering_param1", out value))
-                m_target_gathering_param1 = FixPoint.Parse(value);
-            if (variables.TryGetValue("target_gathering_param2", out value))
-                m_target_gathering_param2 = FixPoint.Parse(value);
             if (variables.TryGetValue("damage_type", out value))
                 m_damage_type_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("phase1_inflict_time", out value))
@@ -753,18 +834,32 @@ namespace Combat
                 m_damage_amount[0].Compile(value);
             if (variables.TryGetValue("phase1_generator_id", out value))
                 m_generator_cfg_id[0] = int.Parse(value);
+            if (variables.TryGetValue("phase1_link_time", out value))
+                m_link_time[0] = FixPoint.Parse(value);
             if (variables.TryGetValue("phase2_inflict_time", out value))
                 m_inflict_time[1] = FixPoint.Parse(value);
             if (variables.TryGetValue("phase2_damage_amount", out value))
                 m_damage_amount[1].Compile(value);
             if (variables.TryGetValue("phase2_generator_id", out value))
                 m_generator_cfg_id[1] = int.Parse(value);
+            if (variables.TryGetValue("phase2_link_time", out value))
+                m_link_time[1] = FixPoint.Parse(value);
             if (variables.TryGetValue("phase3_inflict_time", out value))
                 m_inflict_time[2] = FixPoint.Parse(value);
             if (variables.TryGetValue("phase3_damage_amount", out value))
                 m_damage_amount[2].Compile(value);
             if (variables.TryGetValue("phase3_generator_id", out value))
                 m_generator_cfg_id[2] = int.Parse(value);
+            if (variables.TryGetValue("phase3_link_time", out value))
+                m_link_time[2] = FixPoint.Parse(value);
+            if (variables.TryGetValue("phase4_inflict_time", out value))
+                m_inflict_time[3] = FixPoint.Parse(value);
+            if (variables.TryGetValue("phase4_damage_amount", out value))
+                m_damage_amount[3].Compile(value);
+            if (variables.TryGetValue("phase4_generator_id", out value))
+                m_generator_cfg_id[3] = int.Parse(value);
+            if (variables.TryGetValue("phase4_link_time", out value))
+                m_link_time[3] = FixPoint.Parse(value);
         }
     }
 
@@ -915,6 +1010,29 @@ namespace Combat
                 m_animator_path = value;
             if (variables.TryGetValue("locomotor_animation_name", out value))
                 m_locomotor_animation_name = value;
+        }
+#endif
+    }
+
+    public partial class HeadbarComponent
+    {
+        public const int ID = 74982751;
+
+#if COMBAT_CLIENT
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("root_path", out value))
+                m_root_path = value;
+            if (variables.TryGetValue("self_path", out value))
+                m_self_asset_path = value;
+            if (variables.TryGetValue("enemy_path", out value))
+                m_enemy_asset_path = value;
+            if (variables.TryGetValue("team_path", out value))
+                m_team_asset_path = value;
+            if (variables.TryGetValue("actorFoot_path", out value))
+                m_actorFoot_path = value;
         }
 #endif
     }

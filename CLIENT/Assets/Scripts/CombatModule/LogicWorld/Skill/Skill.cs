@@ -47,9 +47,6 @@ namespace Combat
 
         protected override void OnDestruct()
         {
-            m_owner_component = null;
-            m_mana_component = null;
-            m_definition_component = null;
             if (m_task != null)
             {
                 m_task.Cancel();
@@ -58,8 +55,10 @@ namespace Combat
             }
             if (m_is_active)
                 Deactivate();
+            m_owner_component = null;
+            m_mana_component = null;
+            m_definition_component = null;
             ClearTargets();
-            m_context.Destruct();
         }
         #endregion
 
@@ -91,14 +90,14 @@ namespace Combat
         {
             ClearTargets();
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.TargetGatheringID, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2, m_skill_targets);
+            target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.TargetGatheringID, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2, m_definition_component.TargetGatheringFation, m_skill_targets);
         }
 
-        public void BuildSkillTargets(int target_gathering_type, FixPoint target_gathering_param1, FixPoint target_gathering_param2)
+        public void BuildSkillTargets(int gathering_type, FixPoint gathering_param1, FixPoint gathering_param2, int gathering_faction)
         {
             ClearTargets();
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            target_gathering_manager.BuildTargetList(GetOwnerEntity(), target_gathering_type, target_gathering_param1, target_gathering_param2, m_skill_targets);
+            target_gathering_manager.BuildTargetList(GetOwnerEntity(), gathering_type, gathering_param1, gathering_param2, gathering_faction, m_skill_targets);
         }
 
         public void AddTarget(Target target)
@@ -190,6 +189,27 @@ namespace Combat
             return CheckTargetRange(entity) == CastSkillResult.Success;
         }
 
+        void AdjustDirection()
+        {
+            int external_data_type = m_definition_component.ExternalDataType;
+            if (external_data_type == 0)
+                return;
+            Vector3FP vector = m_definition_component.ExternalVector;
+            if (vector.IsAllZero())
+                return;
+            PositionComponent position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+            if (position_component == null)
+                return;
+            if (external_data_type == SkillDefinitionComponent.NeedExternalDirection)
+            {
+                position_component.SetAngle(FixPoint.XZToUnityRotationDegree(vector.x, vector.z));
+            }
+            else if (external_data_type == SkillDefinitionComponent.NeedExternalOffset)
+            {
+                position_component.SetAngle(FixPoint.XZToUnityRotationDegree(vector.x, vector.z));
+            }
+        }
+
         public bool Activate(FixPoint start_time)
         {
             if (!CanActivate())
@@ -197,6 +217,8 @@ namespace Combat
 
             Deactivate();
             SetSkillActive(true);
+
+            AdjustDirection();
 
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())

@@ -35,7 +35,7 @@ namespace Combat
         public void MoveByDirection(Vector3FP direction)
         {
             m_direction = direction;
-            m_position_component.SetAngle(FixPoint.Radian2Degree(FixPoint.Atan2(-m_direction.z, m_direction.x)));
+            m_position_component.SetAngle(FixPoint.XZToUnityRotationDegree(m_direction.x, m_direction.z));
         }
 
         public void MoveAlongPath(List<Vector3FP> path) { }
@@ -46,7 +46,9 @@ namespace Combat
             if (m_grid_graph != null)
             {
                 GridNode node = m_grid_graph.Position2Node(new_position);
-                if (node == null || !node.Walkable)
+                if (node == null)
+                    return;
+                if (!node.Walkable && m_callback.AvoidObstacle())
                     return;
             }
             m_position_component.CurrentPosition = new_position;

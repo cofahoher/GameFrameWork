@@ -4,6 +4,9 @@ namespace Combat
 {
     public partial class SkillDefinitionComponent : SkillComponent
     {
+        public static readonly int NeedExternalDirection = (int)CRC.Calculate("direction");
+        public static readonly int NeedExternalOffset = (int)CRC.Calculate("offset");
+
         //直接对目标生效
         public const int InflictType_Immediately = 1;
         //播放朝向目标的特效，一定延迟后，对目标生效
@@ -18,8 +21,10 @@ namespace Combat
         #region 配置数据
         int m_mana_type = 0;
         Formula m_mana_cost = RecyclableObject.Create<Formula>();
+
         Formula m_min_range = RecyclableObject.Create<Formula>();  //配置小于等于0表示无限制
         Formula m_max_range = RecyclableObject.Create<Formula>();  //配置小于等于0表示无限制
+
         Formula m_cooldown_time = RecyclableObject.Create<Formula>();
         Formula m_casting_time = RecyclableObject.Create<Formula>();
         Formula m_inflict_time = RecyclableObject.Create<Formula>();
@@ -33,9 +38,12 @@ namespace Combat
         bool m_can_activate_when_disabled = false;
 
         int m_target_gathering_type = 0;
-        FixPoint m_target_gathering_param1;
-        FixPoint m_target_gathering_param2;
+        FixPoint m_target_gathering_param1 = FixPoint.Zero;
+        FixPoint m_target_gathering_param2 = FixPoint.Zero;
+        int m_target_gathering_fation = FactionRelation.Enemy;
         bool m_need_gather_targets = true;
+        int m_targets_min_count_for_activate = 0;
+        int m_external_data_type = 0;
 
         int m_inflict_type = 1;
         string m_inflict_missile;
@@ -49,6 +57,41 @@ namespace Combat
 
         //运行数据
         List<SkillTimer> m_timers = new List<SkillTimer>();
+        Vector3FP m_external_vector;
+
+        #region GETTER
+        public Vector3FP ExternalVector
+        {
+            get { return m_external_vector; }
+            set { m_external_vector = value; }
+        }
+
+        public static readonly FixPoint MIN_ESTIMATE_TIME = FixPoint.Two / FixPoint.Ten;
+        public static readonly FixPoint MAX_ESTIMATE_TIME = FixPoint.One;
+        public FixPoint GetEstimateBlockMovementTime()
+        {
+            if (m_blocks_movement_when_active)
+            {
+                FixPoint time = CastingTime;
+                if (time > FixPoint.Zero)
+                    return FixPoint.Max(MIN_ESTIMATE_TIME, time);
+                time = InflictTime;
+                if (time > FixPoint.Zero)
+                    return FixPoint.Max(MIN_ESTIMATE_TIME, time);
+                time = ExpirationTime;
+                if (time > FixPoint.Zero)
+                    return FixPoint.Min(MAX_ESTIMATE_TIME, time);
+            }
+            else
+            {
+                if (!m_deactivate_when_moving && m_main_animation == null)
+                    return FixPoint.Zero;
+                else
+                    return MIN_ESTIMATE_TIME;
+            }
+            return MIN_ESTIMATE_TIME;
+        }
+        #endregion
 
         #region 初始化/销毁
         public override void InitializeComponent()

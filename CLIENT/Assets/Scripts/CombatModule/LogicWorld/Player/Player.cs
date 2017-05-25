@@ -37,9 +37,12 @@ namespace Combat
         public void AddEntity(Entity entity)
         {
             m_entities[entity.ID] = entity;
+            //SendSignal(SignalType.AddEntity, entity);
         }
+
         public void RemoveEntity(Entity entity)
         {
+            //SendSignal(SignalType.RemoveEntity, entity);
             m_entities.Remove(entity.ID);
         }
 
@@ -47,10 +50,28 @@ namespace Combat
         {
             return m_entities;
         }
+
+        public void OnKillEntity(Entity the_killer, Entity the_dead)
+        {
+            KillingInfo info = RecyclableObject.Create<KillingInfo>();
+            info.m_the_killer = the_killer;
+            info.m_the_dead = the_dead;
+            SendSignal(SignalType.KillEntity, info);
+            RecyclableObject.Recycle(info);
+        }
+
+        public void OnEntityBeKilled(Entity the_killer, Entity the_dead)
+        {
+            KillingInfo info = RecyclableObject.Create<KillingInfo>();
+            info.m_the_killer = the_killer;
+            info.m_the_dead = the_dead;
+            SendSignal(SignalType.EntityBeKilled, info);
+            RecyclableObject.Recycle(info);
+        }
         #endregion
 
         #region Faction
-        public FactionRelation GetFaction(int player_id)
+        public int GetFaction(int player_id)
         {
             FactionComponent faction_component = GetComponent(FactionComponent.ID) as FactionComponent;
             if (faction_component != null)
@@ -88,5 +109,16 @@ namespace Combat
             return GetFaction(player_id) == FactionRelation.Neutral;
         }
         #endregion
+    }
+
+    public class KillingInfo : IRecyclable
+    {
+        public Entity m_the_killer;
+        public Entity m_the_dead;
+        public void Reset()
+        {
+            m_the_killer = null;
+            m_the_dead = null;
+        }
     }
 }

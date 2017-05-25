@@ -27,7 +27,7 @@ namespace Combat
             base.Destruct();
         }
 
-        protected override Effect CreateObjectInstance()
+        protected override Effect CreateObjectInstance(ObjectCreationContext context)
         {
             return new Effect();
         }

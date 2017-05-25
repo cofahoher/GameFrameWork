@@ -63,24 +63,22 @@ namespace Combat
             List<SignalListenerContext> listeners;
             if (!m_all_type_listeners.TryGetValue(signal_type, out listeners))
                 return;
-            int pre_count = listeners.Count;
-            if (pre_count == 0)
+            int cur_count = listeners.Count;
+            if (cur_count == 0)
                 return;
-            int left_count = pre_count;
-            int index = 0;
             LogicWorld logic_world = GetLogicWorldForSignal();
-            while (left_count > 0)
+            int index = 0;
+            while (index < cur_count)
             {
-                --left_count;
                 SignalListenerContext context = listeners[index];
                 ISignalListener listener = context.GetListener(logic_world);
                 if (listener == null)
                     listeners.RemoveAt(index);
                 else
                     listener.ReceiveSignal(this, signal_type, signal);
-                int cur_count = listeners.Count;
-                if (cur_count < pre_count)
-                    pre_count = cur_count;
+                int new_count = listeners.Count;
+                if (new_count < cur_count)
+                    cur_count = new_count;
                 else
                     ++index;
             }

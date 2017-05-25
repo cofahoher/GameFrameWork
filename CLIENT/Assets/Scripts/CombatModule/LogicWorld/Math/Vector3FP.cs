@@ -220,6 +220,11 @@ namespace Combat
             x = y = FixPoint.Zero;
         }
 
+        public bool IsAllZero()
+        {
+            return x == FixPoint.Zero && y == FixPoint.Zero && z == FixPoint.Zero;
+        }
+
         public static Vector3FP Reflect(ref Vector3FP I, ref Vector3FP N)
         {
             return I - I.Dot(ref N) * N * FixPoint.Two;

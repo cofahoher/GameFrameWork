@@ -64,35 +64,48 @@ namespace Combat
 
         public void Activate(EffectApplicationData app_data, List<Target> default_targets)
         {
-            if (m_data.m_target_gathering_type == TargetGatheringType.DefaultTarget)
+            if (m_data.m_target_gathering_type == TargetGatheringType.Default || m_data.m_target_gathering_type == 0)
             {
                 for (int i = 0; i < default_targets.Count; ++i)
                 {
                     Entity entity = default_targets[i].GetEntity();
                     if (entity != null)
-                        Activate(app_data, entity);
+                        ActivateOnOneTatget(app_data, entity);
                 }
             }
             else
             {
-                LogicWorld logic_world = m_generator.GetLogicWorld();
-                Entity source_entity = logic_world.GetEntityManager().GetObject(app_data.m_source_entity_id);
-                if (source_entity == null)
-                    return;
-                if (m_targets == null)
-                    m_targets = new List<Target>();
-                m_generator.GetLogicWorld().GetTargetGatheringManager().BuildTargetList(source_entity, m_data.m_target_gathering_type, m_data.m_target_gathering_param1, m_data.m_target_gathering_param2, m_targets);
-                for (int i = 0; i < m_targets.Count; ++i)
-                {
-                    Entity entity = m_targets[i].GetEntity();
-                    if (entity != null)
-                        Activate(app_data, entity);
-                }
-                ClearTargets();
+                GatherTargetsAndActivate(app_data);
             }
         }
 
         public void Activate(EffectApplicationData app_data, Entity target)
+        {
+            if (m_data.m_target_gathering_type == TargetGatheringType.Default || m_data.m_target_gathering_type == 0)
+                ActivateOnOneTatget(app_data, target);
+            else
+                GatherTargetsAndActivate(app_data);
+        }
+
+        void GatherTargetsAndActivate(EffectApplicationData app_data)
+        {
+            LogicWorld logic_world = m_generator.GetLogicWorld();
+            Entity source_entity = logic_world.GetEntityManager().GetObject(app_data.m_source_entity_id);
+            if (source_entity == null)
+                return;
+            if (m_targets == null)
+                m_targets = new List<Target>();
+            m_generator.GetLogicWorld().GetTargetGatheringManager().BuildTargetList(source_entity, m_data.m_target_gathering_type, m_data.m_target_gathering_param1, m_data.m_target_gathering_param2, m_data.m_target_gathering_fation, m_targets);
+            for (int i = 0; i < m_targets.Count; ++i)
+            {
+                Entity entity = m_targets[i].GetEntity();
+                if (entity != null)
+                    ActivateOnOneTatget(app_data, entity);
+            }
+            ClearTargets();
+        }
+
+        void ActivateOnOneTatget(EffectApplicationData app_data, Entity target)
         {
             EffectRegistry registry = EntityUtil.GetEffectRegistry(target);
             if (registry == null)

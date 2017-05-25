@@ -15,13 +15,14 @@ namespace Combat
         float m_max_predict_time = 0.5f;
         float m_interpolation_speed = 0.5f;
         float m_min_threshold = 0.2f;
-        float m_max_threshold = 2f;
+        float m_max_threshold = 3f;
         //运行数据
         GridGraph m_grid_graph = null;
         Transform m_interpolation_tr;
         ModelComponent m_model_component;
         LocomotorComponent m_locomotor_component;
         List<MovementPredic> m_movement_predicts = new List<MovementPredic>();
+        int m_block_locomotor_predict = 0;
         int m_copy_state = NoCopy;
         Vector3 m_accumulated_offset = Vector3.zero;
         Vector3 m_offset_dir = Vector3.zero;
@@ -54,6 +55,11 @@ namespace Combat
         {
             return m_locomotor_component;
         }
+
+        public bool CanPredictLocomotor
+        {
+            get { return m_block_locomotor_predict <= 0; }
+        }
         #endregion
 
         public void PredictCommand(Command cmd)
@@ -63,6 +69,9 @@ namespace Combat
             case CommandType.EntityMove:
                 PredictEntityMove(cmd as EntityMoveCommand);
                 break;
+            //case CommandType.EntityAttack:
+            //    ++m_block_locomotor_predict;
+            //    break;
             default:
                 break;
             }
@@ -75,6 +84,9 @@ namespace Combat
             case CommandType.EntityMove:
                 ConfirmEntityMove(cmd as EntityMoveCommand, result);
                 break;
+            //case CommandType.EntityAttack:
+            //    --m_block_locomotor_predict;
+            //    break;
             default:
                 break;
             }
@@ -342,7 +354,9 @@ namespace Combat
                 Vector3 interpolation_position = m_interpolation_tr.localPosition + offset;
                 Vector3 entity_position = m_model_component.GetCurrentPosition() + interpolation_position;
                 GridNode node = m_grid_graph.Position2Node(RenderWorld.Vector3_To_Vector3FP(entity_position));
-                if (node == null || !node.Walkable)
+                if (node == null)
+                    return;
+                if (!node.Walkable && m_locomotor_component.AvoidObstacle())
                     return;
             }
 
@@ -486,7 +500,7 @@ namespace Combat
                 m_remain_predict_time -= delta_time;
             }
             LocomotorComponent locomotor_component = m_predict_component.GetLocomotorComponent();
-            if (locomotor_component.IsEnable())
+            if (m_predict_component.CanPredictLocomotor && locomotor_component.IsEnable())
             {
                 Vector3 offset = m_direction * (float)locomotor_component.MaxSpeed * delta_time;
                 m_predict_component.AddPredictOffset(offset);

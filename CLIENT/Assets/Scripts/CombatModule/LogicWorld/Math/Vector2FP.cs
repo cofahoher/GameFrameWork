@@ -230,7 +230,7 @@ namespace Combat
         public FixPoint ToDegree()
         {
             //返回绕Y轴的旋转角度
-            return FixPoint.Radian2Degree(FixPoint.Atan2(-z, x));
+            return FixPoint.XZToUnityRotationDegree(x, z);
         }
 
         public void FromDegree(FixPoint degree)

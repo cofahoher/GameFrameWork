@@ -14,6 +14,7 @@ namespace Combat
     public class Command : IRecyclable
     {
         //ZZWTODO 现在在客户端保存了所有的Command，因此没有回收
+        #region 注册创建回收
         public static TCommand Create<TCommand>() where TCommand : Command, new()
         {
             return ResuableObjectFactory<Command>.Create<TCommand>();
@@ -36,6 +37,7 @@ namespace Combat
         {
             return ResuableObjectFactory<Command>.Create(id);
         }
+        #endregion
 
         [ProtoBufAttribute(Index = 1)] 
         public long m_player_pstid = -1;

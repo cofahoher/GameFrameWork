@@ -4,7 +4,7 @@ namespace Combat
 {
     public partial class SimpleAIComponent : EntityComponent, INeedTaskService, ISignalListener
     {
-        // 配置数据
+        //配置数据
         FixPoint m_guard_range = FixPoint.Ten;
         //运行数据
         TargetingComponent m_targeting_component;
@@ -26,11 +26,8 @@ namespace Combat
         protected override void OnDestruct()
         {
             m_targeting_component = null;
-            if (m_listener_context != null)
-            {
-                SignalListenerContext.Recycle(m_listener_context);
-                m_listener_context = null;
-            }
+            SignalListenerContext.Recycle(m_listener_context);
+            m_listener_context = null;
             if (m_task != null)
             {
                 m_task.Cancel();
@@ -99,7 +96,7 @@ namespace Combat
         void Retarget()
         {
             TargetGatheringManager manager = GetLogicWorld().GetTargetGatheringManager();
-            manager.BuildTargetList(GetOwnerEntity(), TargetGatheringType.SurroundingEnemy, m_guard_range, FixPoint.Zero, m_targets);
+            manager.BuildTargetList(GetOwnerEntity(), TargetGatheringType.SurroundingRing, m_guard_range, FixPoint.Zero, FactionRelation.Enemy, m_targets);
             if (m_targets.Count == 0)
                 return;
             Entity new_enemy = m_targets[0].GetEntity();

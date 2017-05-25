@@ -87,5 +87,9 @@ namespace Combat
         {
             return ((RenderEntity)ParentObject).GetLogicEntity();
         }
+
+        public virtual void Show(bool is_show)
+        {
+        }
     }
 }

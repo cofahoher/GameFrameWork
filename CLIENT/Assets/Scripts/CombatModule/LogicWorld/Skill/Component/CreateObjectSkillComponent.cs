@@ -106,7 +106,7 @@ namespace Combat
                 xz_facing.x = target_pos.x - source_pos.x;
                 xz_facing.z = target_pos.z - source_pos.z;
                 xz_facing.Normalize();
-                angle = FixPoint.Radian2Degree(FixPoint.Atan2(-xz_facing.z, xz_facing.x));
+                angle = xz_facing.ToDegree();
                 facing = target_pos - source_pos;
                 facing.Normalize();
             }
@@ -128,15 +128,18 @@ namespace Combat
             object_context.m_owner_id = owner_player.ID;
             object_context.m_is_ai = true;
             object_context.m_is_local = owner_player.IsLocal;
-            Entity obj = entity_manager.CreateObject(object_context);
 
-            DeathComponent death_component = obj.GetComponent(DeathComponent.ID) as DeathComponent;
+            m_current_target = entity_manager.CreateObject(object_context);
+
+            DeathComponent death_component = m_current_target.GetComponent(DeathComponent.ID) as DeathComponent;
             if (death_component != null && m_object_life_time > FixPoint.Zero)
-            {
                 death_component.SetLifeTime(m_object_life_time);
-            }
 
-            ProjectileComponent projectile_component = obj.GetComponent(ProjectileComponent.ID) as ProjectileComponent;
+            SummonedEntityComponent extinfo_component = m_current_target.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+            if (extinfo_component != null)
+                extinfo_component.SetMaster(owner_entity);
+
+            ProjectileComponent projectile_component = m_current_target.GetComponent(ProjectileComponent.ID) as ProjectileComponent;
             if (projectile_component != null)
             {
                 ProjectileParameters param = RecyclableObject.Create<ProjectileParameters>();
@@ -150,6 +153,15 @@ namespace Combat
                 param.m_generator_id = m_generator == null ? 0 : m_generator.ID;
                 projectile_component.InitParam(param);
             }
+            else if (m_generator != null)
+            {
+                EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
+                app_data.m_original_entity_id = owner_entity.ID;
+                app_data.m_source_entity_id = owner_entity.ID;
+                m_generator.Activate(app_data, m_current_target);
+                RecyclableObject.Recycle(app_data);
+            }
+            m_current_target = null;
         }
     }
 }
