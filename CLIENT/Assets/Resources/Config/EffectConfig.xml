@@ -1,6 +1,5 @@
 <ConfigSystem>
 	<EffectConfig>
-		<!--！！！！！！！！！！以下是ZZW测试的，不要使用和修改！！！！！！！！！！-->
 		<ConfigItem id="1" name="zzw测试Effect1">
 			<Component id="EffectDefinitionComponent">
 				<var key="category" value="Common"/>
@@ -22,92 +21,6 @@
 			</Component>
 			<Component id="AddStateEffectComponent">
 				<var key="state" value="Stunned"/>
-			</Component>
-		</ConfigItem>
-		<!--！！！！！！！！！！以上是ZZW测试的，不要使用和修改！！！！！！！！！！-->
-		
-		
-		<!--以下的暂时不用
-		<ConfigItem id="11" name="Crawl临时成为人类阵营">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="11"/>
-			</Component>
-			<Component id="ChangePlayerFactionEffectComponent">
-				<var key="faction" value="human"/>
-				<var key="revert_when_unapply" value="False"/>
-			</Component>
-		</ConfigItem>
-		
-		<ConfigItem id="12" name="Crawl临时成为魂怪阵营">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="12"/>
-			</Component>
-			<Component id="ChangePlayerFactionEffectComponent">
-				<var key="faction" value="monster"/>
-				<var key="revert_when_unapply" value="False"/>
-			</Component>
-		</ConfigItem>
-		
-		<ConfigItem id="21" name="Crawl临时创建203001">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="21"/>
-			</Component>
-			<Component id="CreateObjectEffectComponent">
-				<var key="object_type_id" value="201"/>
-				<var key="object_proto_id" value="203001"/>
-				<var key="revert_when_unapply" value="False"/>
-			</Component>
-		</ConfigItem>
-		
-		<ConfigItem id="22" name="Crawl临时创建203002">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="22"/>
-			</Component>
-			<Component id="CreateObjectEffectComponent">
-				<var key="object_type_id" value="201"/>
-				<var key="object_proto_id" value="203002"/>
-				<var key="revert_when_unapply" value="False"/>
-			</Component>
-		</ConfigItem>
-		
-		<ConfigItem id="23" name="Crawl临时创建203003">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="23"/>
-			</Component>
-			<Component id="CreateObjectEffectComponent">
-				<var key="object_type_id" value="201"/>
-				<var key="object_proto_id" value="203003"/>
-				<var key="revert_when_unapply" value="False"/>
-			</Component>
-		</ConfigItem>
-		
-		<ConfigItem id="24" name="Crawl临时杀死自己创建人201001">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="24"/>
-			</Component>
-			<Component id="KillOwnerEffectComponent"/>
-			<Component id="CreateObjectEffectComponent">
-				<var key="object_type_id" value="201"/>
-				<var key="object_proto_id" value="201001"/>
-				<var key="revert_when_unapply" value="False"/>
-			</Component>
-		</ConfigItem>
-		-->
-		
-		
-		<ConfigItem id="10101" name="Crawl魔法弹1">
-			<Component id="EffectDefinitionComponent">
-				<var key="category" value="Common"/>
-				<var key="conflict_id" value="1"/>
-			</Component>
-			<Component id="DamageEffectComponent">
-				<var key="damage_amount" value="330"/>
 			</Component>
 		</ConfigItem>
 	</EffectConfig>

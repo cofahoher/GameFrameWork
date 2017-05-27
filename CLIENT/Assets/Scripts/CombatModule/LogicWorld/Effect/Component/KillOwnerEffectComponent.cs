@@ -9,9 +9,6 @@ namespace Combat
             Entity owner = GetOwnerEntity();
             if (owner == null)
                 return;
-            DeathComponent death_component = owner.GetComponent(DeathComponent.ID) as DeathComponent;
-            if (death_component != null)
-                death_component.DieSilently = true;  //ZZWTODO
             EntityUtil.KillEntity(owner, owner.ID);
         }
 

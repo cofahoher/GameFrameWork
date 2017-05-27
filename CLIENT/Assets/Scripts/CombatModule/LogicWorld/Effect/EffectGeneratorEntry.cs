@@ -64,7 +64,7 @@ namespace Combat
 
         public void Activate(EffectApplicationData app_data, List<Target> default_targets)
         {
-            if (m_data.m_target_gathering_type == TargetGatheringType.Default || m_data.m_target_gathering_type == 0)
+            if (m_data.m_target_gathering_param.m_type == TargetGatheringType.Default || m_data.m_target_gathering_param.m_type == 0)
             {
                 for (int i = 0; i < default_targets.Count; ++i)
                 {
@@ -81,7 +81,7 @@ namespace Combat
 
         public void Activate(EffectApplicationData app_data, Entity target)
         {
-            if (m_data.m_target_gathering_type == TargetGatheringType.Default || m_data.m_target_gathering_type == 0)
+            if (m_data.m_target_gathering_param.m_type == TargetGatheringType.Default || m_data.m_target_gathering_param.m_type == 0)
                 ActivateOnOneTatget(app_data, target);
             else
                 GatherTargetsAndActivate(app_data);
@@ -95,7 +95,7 @@ namespace Combat
                 return;
             if (m_targets == null)
                 m_targets = new List<Target>();
-            m_generator.GetLogicWorld().GetTargetGatheringManager().BuildTargetList(source_entity, m_data.m_target_gathering_type, m_data.m_target_gathering_param1, m_data.m_target_gathering_param2, m_data.m_target_gathering_fation, m_targets);
+            m_generator.GetLogicWorld().GetTargetGatheringManager().BuildTargetList(source_entity, m_data.m_target_gathering_param, m_targets);
             for (int i = 0; i < m_targets.Count; ++i)
             {
                 Entity entity = m_targets[i].GetEntity();

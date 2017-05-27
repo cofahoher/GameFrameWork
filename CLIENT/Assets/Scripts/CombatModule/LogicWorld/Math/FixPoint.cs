@@ -5,7 +5,7 @@ using BaseUtil;
 public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 {
     [ProtoBufAttribute(Index = 1)]
-    public long m_raw_value;
+    public long m_raw_value;  //ZZWTODO 为了ProtoBuf，必须public
 
     public FixPoint(int value = 0)
     {

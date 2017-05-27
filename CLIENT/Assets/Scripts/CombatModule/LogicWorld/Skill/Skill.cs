@@ -9,6 +9,7 @@ namespace Combat
         NotEnoughMana,
         ObjectIsMoving,
         SkillDisabled,
+        NotEnoughTargets,
         TargetTooNear,
         TargetTooFar,
     }
@@ -45,7 +46,7 @@ namespace Combat
             m_definition_component = GetComponent(SkillDefinitionComponent.ID) as SkillDefinitionComponent;
         }
 
-        protected override void OnDestruct()
+        protected override void PreDestruct()
         {
             if (m_task != null)
             {
@@ -55,6 +56,10 @@ namespace Combat
             }
             if (m_is_active)
                 Deactivate();
+        }
+
+        protected override void OnDestruct()
+        {
             m_owner_component = null;
             m_mana_component = null;
             m_definition_component = null;
@@ -90,14 +95,14 @@ namespace Combat
         {
             ClearTargets();
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.TargetGatheringID, m_definition_component.TargetGatheringParam1, m_definition_component.TargetGatheringParam2, m_definition_component.TargetGatheringFation, m_skill_targets);
+            target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.m_target_gathering_param, m_skill_targets);
         }
 
-        public void BuildSkillTargets(int gathering_type, FixPoint gathering_param1, FixPoint gathering_param2, int gathering_faction)
+        public void BuildSkillTargets(TargetGatheringParam target_gathering_param)
         {
             ClearTargets();
             TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            target_gathering_manager.BuildTargetList(GetOwnerEntity(), gathering_type, gathering_param1, gathering_param2, gathering_faction, m_skill_targets);
+            target_gathering_manager.BuildTargetList(GetOwnerEntity(), target_gathering_param, m_skill_targets);
         }
 
         public void AddTarget(Target target)
@@ -157,6 +162,14 @@ namespace Combat
                 LocomotorComponent locomotor_cmp = GetOwnerEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
                 if (locomotor_cmp != null && locomotor_cmp.IsMoving)
                     return CastSkillResult.ObjectIsMoving;
+            }
+
+            if (m_definition_component.TargetsMinCountForActivate > 0)
+            {
+                BuildSkillTargets();
+                //ZZWTODO clear targets?
+                if (m_skill_targets.Count < m_definition_component.TargetsMinCountForActivate)
+                    return CastSkillResult.NotEnoughTargets;
             }
 
             return CastSkillResult.Success;

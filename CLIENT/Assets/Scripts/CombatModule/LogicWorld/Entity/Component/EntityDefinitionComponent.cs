@@ -4,13 +4,6 @@ namespace Combat
 {
     public partial class EntityDefinitionComponent : EntityComponent
     {
-        #region Crawl m_category_1 分类
-        public static readonly int DonotCareCategory = 0;
-        public static readonly int HumanCategory = (int)CRC.Calculate("human");
-        public static readonly int MonsterCategory = (int)CRC.Calculate("monster");
-        public static readonly int SoulCategory = (int)CRC.Calculate("soul");
-        #endregion
-
         //配置数据
         int m_category_1 = 0;
         int m_category_2 = 0;
@@ -34,5 +27,12 @@ namespace Combat
                 m_category_3 = (int)CRC.Calculate(value);
         }
         #endregion
+
+        public bool IsCategory(int category)
+        {
+            if (m_category_1 == category || m_category_2 == category || m_category_3 == category)
+                return true;
+            return false;
+        }
     }
 }

@@ -121,7 +121,7 @@ namespace Combat
 
         bool RandomPosition(ref Vector2FP random_position)
         {
-            //ZZW TODO 随机分布算法
+            //ZZWTODO 随机分布，分成grid，随机选一个然后标志占用
             RandomGeneratorFP random_generator_fp = GetLogicWorld().GetRandomGeneratorFP();
             for (int i = 0; i < 50; ++i)
             {

@@ -11,10 +11,13 @@ namespace Combat
 
     public class EffectGeneratorEntryData
     {
-        public int m_target_gathering_type = 0;
-        public FixPoint m_target_gathering_param1;
-        public FixPoint m_target_gathering_param2;
-        public int m_target_gathering_fation = FactionRelation.All;
+        public TargetGatheringParam m_target_gathering_param = null;
         public int m_effect_id = 0;
+
+        public EffectGeneratorEntryData()
+        {
+            m_target_gathering_param = new TargetGatheringParam();
+            m_target_gathering_param.m_fation = FactionRelation.All;
+        }
     }
 }

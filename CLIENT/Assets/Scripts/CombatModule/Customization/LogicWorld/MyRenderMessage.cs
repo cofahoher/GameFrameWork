@@ -14,6 +14,8 @@ namespace Combat
         public const int Show = 113;                      //SimpleRenderMessage
         public const int PlayAnimation = 120;             //SimpleRenderMessage
         public const int TakeDamage = 130;                //TakeDamageRenderMessage
+
+        public const int PlayerChangeFaction = 1001;      //SimpleRenderMessage
     }
 
     public class LocomoteRenderMessage : RenderMessage

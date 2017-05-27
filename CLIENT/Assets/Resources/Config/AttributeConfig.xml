@@ -7,5 +7,6 @@
 		<ConfigItem name="TestAttribute5" formula="BaseValue + Max(TestAttribute3.Value, Entity.Attribute.TestAttribute4.Value)"/>
 		<ConfigItem name="TestAttribute6" formula="BaseValue * TestAttribute2.Value * TestAttribute5.Value"/>
 		<ConfigItem name="MaxHealth" formula="BaseValue" reflection="max_health" clamp="current_health" clamp_min="0"/>
+		<ConfigItem name="MaxSpeed" formula="BaseValue" reflection="max_speed"/>
 	</AttributeConfig>
 </ConfigSystem>

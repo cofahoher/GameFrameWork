@@ -31,18 +31,16 @@ namespace Combat
         Formula m_expiration_time = RecyclableObject.Create<Formula>();
 
         bool m_starts_active = false;
-        bool m_blocks_other_skills_when_active = false;
+        bool m_blocks_other_skills_when_active = true;
         bool m_blocks_movement_when_active = true;
         bool m_deactivate_when_moving = true;
         bool m_can_activate_while_moving = true;
         bool m_can_activate_when_disabled = false;
 
-        int m_target_gathering_type = 0;
-        FixPoint m_target_gathering_param1 = FixPoint.Zero;
-        FixPoint m_target_gathering_param2 = FixPoint.Zero;
-        int m_target_gathering_fation = FactionRelation.Enemy;
+        public TargetGatheringParam m_target_gathering_param = new TargetGatheringParam();
         bool m_need_gather_targets = true;
         int m_targets_min_count_for_activate = 0;
+
         int m_external_data_type = 0;
 
         int m_inflict_type = 1;
@@ -94,6 +92,11 @@ namespace Combat
         #endregion
 
         #region 初始化/销毁
+        public SkillDefinitionComponent()
+        {
+            m_target_gathering_param.m_fation = FactionRelation.Enemy;
+        }
+
         public override void InitializeComponent()
         {
             if (m_mana_type == 0)

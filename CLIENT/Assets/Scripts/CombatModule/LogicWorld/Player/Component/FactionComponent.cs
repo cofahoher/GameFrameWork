@@ -4,11 +4,6 @@ namespace Combat
 {
     public partial class FactionComponent : PlayerComponent
     {
-        #region Crawl阵营
-        public static readonly int HumanFaction = (int)CRC.Calculate("human");
-        public static readonly int MonsterFaction = (int)CRC.Calculate("monster");
-        #endregion
-
         //配置
         int m_faction = 0;
         //运行数据
@@ -57,6 +52,7 @@ namespace Combat
                 return;
             m_faction_index = new_faction_index;
             ParentObject.SendSignal(SignalType.ChangeFaction);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.PlayerChangeFaction, ParentObject.ID);
         }
     }
 }

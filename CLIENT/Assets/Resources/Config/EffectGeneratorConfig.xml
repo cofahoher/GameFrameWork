@@ -1,39 +1,10 @@
 <ConfigSystem>
-	<EffectGeneratorConfig>		
-		<!--！！！！！！！！！！以下是ZZW测试的，不要使用和修改！！！！！！！！！！-->
+	<EffectGeneratorConfig>
 		<ConfigItem id="1" name="zzw测试Generator1" deactivate_entry_when_deactive="False" remove_by_self="False">
-			<Entry target_gathering_type="Default" effect_id="1"/>
+			<Entry gathering_type="Default" effect_id="1"/>
 		</ConfigItem>
 		<ConfigItem id="2" name="zzw测试Generator2" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="2"/>
-		</ConfigItem>
-		<!--！！！！！！！！！！以上是ZZW测试的，不要使用和修改！！！！！！！！！！-->
-		
-		
-		<!--以下的暂时不用
-		<ConfigItem id="11" name="Crawl临时成为人类阵营" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="11"/>
-		</ConfigItem>
-		<ConfigItem id="12" name="Crawl临时成为魂怪阵营" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="12"/>
-		</ConfigItem>
-		<ConfigItem id="21" name="Crawl临时死了创建203001" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="21"/>
-		</ConfigItem>
-		<ConfigItem id="22" name="Crawl临时死了创建203002" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="22"/>
-		</ConfigItem>
-		<ConfigItem id="23" name="Crawl临时死了创建203003" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="23"/>
-		</ConfigItem>
-		<ConfigItem id="24" name="Crawl临时死了变成201001" deactivate_entry_when_deactive="False" remove_by_self="True">
-			<Entry target_gathering_type="Default" effect_id="24"/>
-		</ConfigItem>
-		-->
-		
-		
-		<ConfigItem id="101" name="Crawl魔法弹" deactivate_entry_when_deactive="False" remove_by_self="False">
-			<Entry target_gathering_type="Default" effect_id="10101"/>
+			<Entry gathering_type="Default" effect_id="2"/>
 		</ConfigItem>
 	</EffectGeneratorConfig>
 </ConfigSystem>

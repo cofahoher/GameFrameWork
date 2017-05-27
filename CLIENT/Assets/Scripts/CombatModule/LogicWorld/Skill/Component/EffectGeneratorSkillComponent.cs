@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class EffectGeneratorSkillComponent : SkillComponent
+    public partial class EffectGeneratorSkillComponent : SkillComponent, INeedTaskService
     {
         //配置数据
         int m_generator_cfgid = 0;
+        FixPoint m_delay_time = FixPoint.Zero;
 
         //运行数据
         EffectGenerator m_generator;
+        ComponentCommonTask m_task;
 
         #region 初始化/销毁
         public override void InitializeComponent()
@@ -23,6 +25,12 @@ namespace Combat
                 GetLogicWorld().GetEffectManager().DestroyGenerator(m_generator.ID, GetOwnerEntityID());
                 m_generator = null;
             }
+            if (m_task != null)
+            {
+                m_task.Cancel();
+                LogicTask.Recycle(m_task);
+                m_task = null;
+            }
         }
         #endregion
 
@@ -30,20 +38,30 @@ namespace Combat
         {
             if (m_generator == null)
                 return;
-            List<Target> targets = GetOwnerSkill().GetTargets();
-            if (targets.Count == 0)
-                return;
-            Entity attacker = GetOwnerEntity();
-            EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
-            app_data.m_original_entity_id = attacker.ID;
-            app_data.m_source_entity_id = attacker.ID;
-            for (int i = 0; i < targets.Count; ++i)
+            if (m_delay_time == FixPoint.Zero)
             {
-                m_current_target = targets[i].GetEntity();
-                if (m_current_target == null)
-                    continue;
-                m_generator.Activate(app_data, m_current_target);
+                Impact();
             }
+            else
+            {
+                if (m_task == null)
+                {
+                    m_task = LogicTask.Create<ComponentCommonTask>();
+                    m_task.Construct(this);
+                }
+                var schedeler = GetLogicWorld().GetTaskScheduler();
+                schedeler.Schedule(m_task, GetCurrentTime(), m_delay_time);
+            }
+        }
+
+        void Impact()
+        {
+            List<Target> targets = GetOwnerSkill().GetTargets();
+            Entity caster = GetOwnerEntity();
+            EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
+            app_data.m_original_entity_id = caster.ID;
+            app_data.m_source_entity_id = caster.ID;
+            m_generator.Activate(app_data, targets);
             m_current_target = null;
             RecyclableObject.Recycle(app_data);
         }
@@ -51,6 +69,11 @@ namespace Combat
         public override void Deactivate()
         {
             m_generator.Deactivate();
+        }
+
+        public void OnTaskService(FixPoint delta_time)
+        {
+            Impact();
         }
     }
 }

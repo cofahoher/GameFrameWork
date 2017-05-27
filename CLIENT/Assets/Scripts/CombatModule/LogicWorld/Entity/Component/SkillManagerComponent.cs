@@ -189,5 +189,17 @@ namespace Combat
         {
             return m_move_block_count == 0;
         }
+
+        protected override void OnDisable()
+        {
+            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+            var enumerator = m_active_skill_ids.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Skill skill = skill_manager.GetObject(enumerator.Current);
+                if (skill != null)
+                    skill.Interrupt();
+            }
+        }
     }
 }

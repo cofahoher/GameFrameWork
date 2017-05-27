@@ -11,6 +11,7 @@ namespace Combat
         //运行数据
         GameObject m_unity_go;
         Transform m_bodyctrl_tr;
+        GameObject m_bodyctrl_obj;
         PositionComponent m_position_component;
         Vector3 m_last_position = Vector3.zero;
         PredictLogicComponent m_predict_component = null;
@@ -33,7 +34,8 @@ namespace Combat
 
         public void SetAngle(float angle)
         {
-            m_bodyctrl_tr.localEulerAngles = new Vector3(0, angle, 0);
+            //m_bodyctrl_tr.localEulerAngles = new Vector3(0, angle, 0);
+            Turn(new Vector3(0, angle, 0), 0.2f);
         }
         #endregion
 
@@ -73,6 +75,7 @@ namespace Combat
             if (binding == null)
                 binding = m_bodyctrl_tr.gameObject.AddComponent<UnityObjectBinding>();
             binding.EntityID = logic_entity.ID;
+            m_bodyctrl_obj = m_bodyctrl_tr.gameObject;
         }
 
         protected override void OnDestruct()
@@ -95,7 +98,13 @@ namespace Combat
 
         public void UpdateAngle()
         {
-            m_bodyctrl_tr.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
+            //m_bodyctrl_tr.localEulerAngles = new Vector3(0, (float)m_position_component.CurrentAngle, 0);
+            Turn(new Vector3(0, (float)m_position_component.CurrentAngle, 0), 0.2f);
+        }
+
+        void Turn(Vector3 vec, float duration)
+        {
+            iTween.RotateTo(m_bodyctrl_obj, iTween.Hash("rotation", vec, "time", duration, "easetype", "linear"));
         }
         
         public override void Show(bool is_show)

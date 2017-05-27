@@ -158,6 +158,8 @@ namespace Combat
                     for (int i = 0; i < cell.m_entities.Count; ++i)
                     {
                         cmp = cell.m_entities[i];
+                        if (cmp.GetOwnerEntityID() == exclude_id)
+                            continue;
                         offset.x = cmp.CurrentPosition.x - position.x;
                         offset.z = cmp.CurrentPosition.z - position.z;
                         FixPoint component = offset.Dot(ref direction);
@@ -169,8 +171,7 @@ namespace Combat
                             component = -component;
                         if (component > width + radius)
                             continue;
-                        if (cmp.GetOwnerEntityID() != exclude_id)
-                            m_collection.Add(cmp.GetOwnerEntityID());
+                        m_collection.Add(cmp.GetOwnerEntityID());
                     }
                 }
             }
@@ -179,14 +180,9 @@ namespace Combat
 
         public List<int> CollectEntity_SurroundingRing(Vector3FP position, FixPoint outer_radius, FixPoint inner_radius, int exclude_id)
         {
-            return CollectEntity_SurroundingCircle(position, outer_radius, exclude_id);
-        }
-
-        public List<int> CollectEntity_SurroundingCircle(Vector3FP position, FixPoint radius, int exclude_id)
-        {
             m_collection.Clear();
-            Vector2FP start_position = new Vector2FP(position.x - radius, position.z - radius);
-            Vector2FP end_position = new Vector2FP(position.x + radius, position.z + radius);
+            Vector2FP start_position = new Vector2FP(position.x - outer_radius, position.z - outer_radius);
+            Vector2FP end_position = new Vector2FP(position.x + outer_radius, position.z + outer_radius);
             ComputeAreaXZ(start_position, end_position);
             Cell cell;
             PositionComponent cmp;
@@ -198,13 +194,51 @@ namespace Combat
                     for (int i = 0; i < cell.m_entities.Count; ++i)
                     {
                         cmp = cell.m_entities[i];
+                        if (cmp.GetOwnerEntityID() == exclude_id)
+                            continue;
                         Vector3FP offset = position - cmp.CurrentPosition;
-                        if (FixPoint.FastDistance(offset.x, offset.z) < (cmp.Radius + radius))
-                        {
-                            int id = cmp.GetOwnerEntityID();
-                            if (id != exclude_id)
-                                m_collection.Add(cmp.GetOwnerEntityID());
-                        }
+                        FixPoint distance = FixPoint.FastDistance(offset.x, offset.z);
+                        if (distance >= (outer_radius + cmp.Radius))
+                            continue;
+                        if (inner_radius > FixPoint.Zero && distance <= (inner_radius - cmp.Radius))
+                            continue;
+                        m_collection.Add(cmp.GetOwnerEntityID());
+                    }
+                }
+            }
+            return m_collection;
+        }
+
+        public List<int> CollectEntity_ForwardSector(Vector3FP position, Vector2FP facing, FixPoint radius, FixPoint degree, int exclude_id)
+        {
+            FixPoint cos = FixPoint.Cos(FixPoint.Degree2Radian(degree >> 1));
+            m_collection.Clear();
+            Vector2FP start_position = new Vector2FP(position.x - radius, position.z - radius);
+            Vector2FP end_position = new Vector2FP(position.x + radius, position.z + radius);
+            ComputeAreaXZ(start_position, end_position);
+            Cell cell;
+            Vector2FP source = new Vector2FP(position.x, position.z);
+            Vector2FP target = new Vector2FP();
+            PositionComponent cmp;
+            for (int x = m_min_x; x <= m_max_x; ++x)
+            {
+                for (int z = m_min_z; z <= m_max_z; ++z)
+                {
+                    cell = m_cells[x, z];
+                    for (int i = 0; i < cell.m_entities.Count; ++i)
+                    {
+                        cmp = cell.m_entities[i];
+                        if (cmp.GetOwnerEntityID() == exclude_id)
+                            continue;
+                        target.x = cmp.CurrentPosition.x;
+                        target.z = cmp.CurrentPosition.z;
+                        Vector2FP to_target = target - source;
+                        FixPoint distance = to_target.FastNormalize();
+                        if (distance > radius + cmp.Radius)
+                            continue;
+                        if (to_target.Dot(ref facing) < cos)
+                            continue;
+                        m_collection.Add(cmp.GetOwnerEntityID());
                     }
                 }
             }

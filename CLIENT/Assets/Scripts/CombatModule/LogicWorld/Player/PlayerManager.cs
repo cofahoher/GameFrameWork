@@ -43,9 +43,9 @@ namespace Combat
             int proxy_id = context.m_object_proxy_id;
             m_objectid2proxyid[object_id] = proxy_id;
             m_proxyid2objectid[proxy_id] = object_id;
-            if (proxy_id == LOCAL_PLAYER_PROXYID)
+            if (context.m_is_local)
                 m_local_player_id = object_id;
-            else if (proxy_id == AI_ENEMY_PLAYER_PROXYID)
+            if (proxy_id == AI_ENEMY_PLAYER_PROXYID)
                 m_ai_enemy_player_id = object_id;
             return new Player();
         }
@@ -100,11 +100,12 @@ namespace Combat
         }
         #endregion
 
-        #region SingleGame Player
+        #region Specila
         public int GetLocalPlayerID()
         {
             return m_local_player_id;
         }
+
         public Player GetLocalPlayer()
         {
             if (m_local_player_id > 0)
@@ -112,10 +113,12 @@ namespace Combat
             else
                 return null;
         }
+
         public int GetAIEnemyPlayerID()
         {
             return m_ai_enemy_player_id;
         }
+
         public Player GetAIEnemyPlayer()
         {
             if (m_ai_enemy_player_id > 0)

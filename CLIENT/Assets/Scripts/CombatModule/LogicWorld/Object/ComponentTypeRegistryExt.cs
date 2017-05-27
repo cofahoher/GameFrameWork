@@ -41,8 +41,9 @@ namespace Combat
             Register<CreateObjectSkillComponent>(false);
             Register<DirectDamageSkillComponent>(false);
             Register<EffectGeneratorSkillComponent>(false);
-            Register<SpurtSkillComponent>(false);
+            Register<KillTargetSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
+            Register<SpurtSkillComponent>(false);
             Register<ThreePhaseAttackSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
@@ -57,7 +58,6 @@ namespace Combat
 #if COMBAT_CLIENT
             Register<AnimationComponent>(true);
             Register<AnimatorComponent>(true);
-            Register<HeadbarComponent>(true);
             Register<ModelComponent>(true);
             Register<PredictLogicComponent>(true);
 #endif
@@ -255,26 +255,6 @@ namespace Combat
             if (variables.TryGetValue("category3", out value))
                 m_category_3 = (int)CRC.Calculate(value);
         }
-
-#region GETTER/SETTER
-        public int Category1
-        {
-            get { return m_category_1; }
-            set { m_category_1 = value; }
-        }
-
-        public int Category2
-        {
-            get { return m_category_2; }
-            set { m_category_2 = value; }
-        }
-
-        public int Category3
-        {
-            get { return m_category_3; }
-            set { m_category_3 = value; }
-        }
-#endregion
     }
 
     public partial class EntityGameplaySpecilaComponent
@@ -619,21 +599,14 @@ namespace Combat
             string value;
             if (variables.TryGetValue("generator_id", out value))
                 m_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("delay_time", out value))
+                m_delay_time = FixPoint.Parse(value);
         }
     }
 
-    public partial class SpurtSkillComponent
+    public partial class KillTargetSkillComponent
     {
-        public const int ID = -781874088;
-
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            string value;
-            if (variables.TryGetValue("distance", out value))
-                m_distance = FixPoint.Parse(value);
-            if (variables.TryGetValue("time", out value))
-                m_time = FixPoint.Parse(value);
-        }
+        public const int ID = -1694896567;
     }
 
     public partial class SkillDefinitionComponent
@@ -671,14 +644,16 @@ namespace Combat
                 m_can_activate_while_moving = bool.Parse(value);
             if (variables.TryGetValue("can_activate_when_disabled", out value))
                 m_can_activate_when_disabled = bool.Parse(value);
-            if (variables.TryGetValue("target_gathering_type", out value))
-                m_target_gathering_type = (int)CRC.Calculate(value);
-            if (variables.TryGetValue("target_gathering_param1", out value))
-                m_target_gathering_param1 = FixPoint.Parse(value);
-            if (variables.TryGetValue("target_gathering_param2", out value))
-                m_target_gathering_param2 = FixPoint.Parse(value);
-            if (variables.TryGetValue("target_gathering_fation", out value))
-                m_target_gathering_fation = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_type", out value))
+                m_target_gathering_param.m_type = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_param1", out value))
+                m_target_gathering_param.m_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("gathering_param2", out value))
+                m_target_gathering_param.m_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("gathering_fation", out value))
+                m_target_gathering_param.m_fation = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_category", out value))
+                m_target_gathering_param.m_category = (int)CRC.Calculate(value);
             if (variables.TryGetValue("need_gather_targets", out value))
                 m_need_gather_targets = bool.Parse(value);
             if (variables.TryGetValue("targets_min_count_for_activate", out value))
@@ -772,29 +747,14 @@ namespace Combat
             get { return m_can_activate_when_disabled; }
         }
 
-        public int TargetGatheringID
-        {
-            get { return m_target_gathering_type; }
-        }
-
-        public FixPoint TargetGatheringParam1
-        {
-            get { return m_target_gathering_param1; }
-        }
-
-        public FixPoint TargetGatheringParam2
-        {
-            get { return m_target_gathering_param2; }
-        }
-
-        public int TargetGatheringFation
-        {
-            get { return m_target_gathering_fation; }
-        }
-
         public bool NeedGatherTargets
         {
             get { return m_need_gather_targets; }
+        }
+
+        public int TargetsMinCountForActivate
+        {
+            get { return m_targets_min_count_for_activate; }
         }
 
         public int ExternalDataType
@@ -817,6 +777,20 @@ namespace Combat
             get { return m_impact_delay; }
         }
 #endregion
+    }
+
+    public partial class SpurtSkillComponent
+    {
+        public const int ID = -781874088;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("distance", out value))
+                m_distance = FixPoint.Parse(value);
+            if (variables.TryGetValue("time", out value))
+                m_time = FixPoint.Parse(value);
+        }
     }
 
     public partial class ThreePhaseAttackSkillComponent
@@ -1010,29 +984,6 @@ namespace Combat
                 m_animator_path = value;
             if (variables.TryGetValue("locomotor_animation_name", out value))
                 m_locomotor_animation_name = value;
-        }
-#endif
-    }
-
-    public partial class HeadbarComponent
-    {
-        public const int ID = 74982751;
-
-#if COMBAT_CLIENT
-
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            string value;
-            if (variables.TryGetValue("root_path", out value))
-                m_root_path = value;
-            if (variables.TryGetValue("self_path", out value))
-                m_self_asset_path = value;
-            if (variables.TryGetValue("enemy_path", out value))
-                m_enemy_asset_path = value;
-            if (variables.TryGetValue("team_path", out value))
-                m_team_asset_path = value;
-            if (variables.TryGetValue("actorFoot_path", out value))
-                m_actorFoot_path = value;
         }
 #endif
     }

@@ -7,6 +7,7 @@ namespace Combat
         //配置数据
         FixPoint m_guard_range = FixPoint.Ten;
         //运行数据
+        TargetGatheringParam m_target_gathering_param;
         TargetingComponent m_targeting_component;
         SignalListenerContext m_listener_context;
         ComponentCommonTask m_task;
@@ -16,6 +17,10 @@ namespace Combat
         #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
+            m_target_gathering_param = new TargetGatheringParam();
+            m_target_gathering_param.m_type = TargetGatheringType.SurroundingRing;
+            m_target_gathering_param.m_param1 = m_guard_range;
+            m_target_gathering_param.m_fation = FactionRelation.Enemy;
             m_targeting_component = ParentObject.GetComponent(TargetingComponent.ID) as TargetingComponent;
             if (m_targeting_component == null)
                 return;
@@ -96,7 +101,7 @@ namespace Combat
         void Retarget()
         {
             TargetGatheringManager manager = GetLogicWorld().GetTargetGatheringManager();
-            manager.BuildTargetList(GetOwnerEntity(), TargetGatheringType.SurroundingRing, m_guard_range, FixPoint.Zero, FactionRelation.Enemy, m_targets);
+            manager.BuildTargetList(GetOwnerEntity(), m_target_gathering_param, m_targets);
             if (m_targets.Count == 0)
                 return;
             Entity new_enemy = m_targets[0].GetEntity();

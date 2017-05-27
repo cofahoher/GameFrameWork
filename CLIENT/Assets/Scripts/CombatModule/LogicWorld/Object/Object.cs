@@ -22,6 +22,7 @@ namespace Combat
         public void Destruct()
         {
             NotifyGeneratorDestroyAndRemoveAllListeners();
+            PreDestruct();
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -38,6 +39,10 @@ namespace Combat
         protected virtual bool OwnContext()
         {
             return true;
+        }
+
+        protected virtual void PreDestruct()
+        {
         }
 
         protected virtual void OnDestruct()

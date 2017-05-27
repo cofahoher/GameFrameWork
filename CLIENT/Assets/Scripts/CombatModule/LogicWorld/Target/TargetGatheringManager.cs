@@ -16,6 +16,19 @@ namespace Combat
         public static readonly int ForwardRectangle = (int)CRC.Calculate("ForwardRectangle");
         //周围圆环形范围（param1外半径，param2内半径）
         public static readonly int SurroundingRing = (int)CRC.Calculate("SurroundingRing");
+        //周围扇形形范围（param1半径，param2角度）
+        public static readonly int ForwardSector = (int)CRC.Calculate("ForwardSector");
+    }
+
+    public class TargetGatheringParam
+    {
+        //Example：前方   三米长  两米宽 范围内的  敌方     英雄
+        //         type  param1  param2          faction  category
+        public int m_type = 0;
+        public FixPoint m_param1 = FixPoint.Zero;
+        public FixPoint m_param2 = FixPoint.Zero;
+        public int m_fation = FactionRelation.Enemy;
+        public int m_category = 0;
     }
 
     public class TargetGatheringManager : IDestruct
@@ -38,8 +51,9 @@ namespace Combat
             m_space_manager = null;
         }
 
-        public void BuildTargetList(Entity source_entity, int gathering_type, FixPoint gathering_param1, FixPoint gathering_param2, int gathering_faction, List<Target> targets)
+        public void BuildTargetList(Entity source_entity, TargetGatheringParam param, List<Target> targets)
         {
+            int gathering_type = param.m_type;
             if (gathering_type == TargetGatheringType.Default)
             {
                 TargetingComponent targeting_component = source_entity.GetComponent(TargetingComponent.ID) as TargetingComponent;
@@ -54,6 +68,7 @@ namespace Combat
                         targets.Add(target);
                     }
                 }
+                return;
             }
             else if (gathering_type == TargetGatheringType.Source)
             {
@@ -61,6 +76,7 @@ namespace Combat
                 target.Construct(m_logic_world);
                 target.SetEntityTarget(source_entity);
                 targets.Add(target);
+                return;
             }
 
             if (m_space_manager == null)
@@ -73,11 +89,15 @@ namespace Combat
             List<int> ids = null;
             if (gathering_type == TargetGatheringType.ForwardRectangle)
             {
-                ids = m_space_manager.CollectEntity_ForwardRectangle(position_cmp.CurrentPosition, position_cmp.Facing2D, gathering_param1, gathering_param2, source_entity.ID);
+                ids = m_space_manager.CollectEntity_ForwardRectangle(position_cmp.CurrentPosition, position_cmp.Facing2D, param.m_param1, param.m_param2, source_entity.ID);
             }
             else if (gathering_type == TargetGatheringType.SurroundingRing)
             {
-                ids = m_space_manager.CollectEntity_SurroundingRing(position_cmp.CurrentPosition, gathering_param1, gathering_param2, source_entity.ID);
+                ids = m_space_manager.CollectEntity_SurroundingRing(position_cmp.CurrentPosition, param.m_param1, param.m_param2, source_entity.ID);
+            }
+            else if (gathering_type == TargetGatheringType.ForwardSector)
+            {
+                ids = m_space_manager.CollectEntity_ForwardSector(position_cmp.CurrentPosition, position_cmp.Facing2D, param.m_param1, param.m_param2, source_entity.ID);
             }
 
             if (ids == null)
@@ -87,10 +107,18 @@ namespace Combat
                 Entity entity = m_entity_manager.GetObject(ids[i]);
                 if (entity == null)
                     continue;
-                PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
-                if (position_component.Height <= FixPoint.Zero)
-                    continue;
-                if (!FactionRelation.IsFactionSatisfied(source_player.GetFaction(entity.GetOwnerPlayerID()), gathering_faction))
+                if (param.m_category != 0)
+                {
+                    EntityDefinitionComponent definition_component = entity.GetComponent(EntityDefinitionComponent.ID) as EntityDefinitionComponent;
+                    if (definition_component == null)
+                        continue;
+                    if (!definition_component.IsCategory(param.m_category))
+                        continue;
+                }
+                //PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
+                //if (position_component.Height <= FixPoint.Zero)
+                //    continue;
+                if (!FactionRelation.IsFactionSatisfied(source_player.GetFaction(entity.GetOwnerPlayerID()), param.m_fation))
                     continue;
                 Target target = RecyclableObject.Create<Target>();
                 target.Construct(m_logic_world);
