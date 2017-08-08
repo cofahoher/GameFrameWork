@@ -19,28 +19,33 @@ namespace Combat
         FixPoint m_current_turn_index = FixPoint.Zero;
         FixPoint m_current_turn_time = FixPoint.Zero;
         TaskScheduler<LogicWorld> m_turn_scheduler;
+        SceneSpace m_scene_space;
 
-        public MyLogicWorld()
+        protected override void PostInitialize()
         {
-        }
+            m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
 
-        public override void Initialize(IOutsideWorld outside_world, bool need_render_message)
-        {
-            m_grid_graph = new SquareGridGraph();
-            //m_grid_graph = new HexagonGridGraph();
             FixPoint grid_size = FixPoint.One;
             FixPoint seeker_radius = FixPoint.One / FixPoint.FixPointDigit[4];
             FixPoint x_size = new FixPoint(40);
             FixPoint z_size = new FixPoint(30);
             Vector3FP left_bottom_position = new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15));
-            m_grid_graph.GenerateAsPlaneMap(grid_size, x_size, z_size, FixPoint.Zero, left_bottom_position, seeker_radius);
-            m_grid_graph.CoverArea(new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.FixPointDigit[5]), new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Half));
-            m_grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[5]));
-            m_grid_graph.CoverArea(new Vector3FP(-FixPoint.FixPointDigit[7] - FixPoint.Half, FixPoint.Zero, FixPoint.Two), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[7] + FixPoint.Half));
-            m_space_manager = new CellSpaceManager(this, x_size, z_size, left_bottom_position);
 
-            base.Initialize(outside_world, need_render_message);
-            m_turn_scheduler = new TaskScheduler<LogicWorld>(this);
+            SquareGridGraph grid_graph = new SquareGridGraph();
+            //m_grid_graph = new HexagonGridGraph();
+            grid_graph.GenerateAsPlaneMap(grid_size, x_size, z_size, FixPoint.Zero, left_bottom_position, seeker_radius);
+            grid_graph.CoverArea(new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.FixPointDigit[5]), new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Half));
+            grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[5]));
+            grid_graph.CoverArea(new Vector3FP(-FixPoint.FixPointDigit[7] - FixPoint.Half, FixPoint.Zero, FixPoint.Two), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[7] + FixPoint.Half));
+
+            CellSpacePartition space_partition = new CellSpacePartition(this, x_size, z_size, left_bottom_position);
+
+            m_scene_space = new SceneSpace();
+            m_scene_space.m_space_id = 0;
+            m_scene_space.m_min_position = left_bottom_position;
+            m_scene_space.m_max_position = new Vector3FP(left_bottom_position.x + x_size, FixPoint.Zero, left_bottom_position.z + z_size);
+            m_scene_space.m_graph = grid_graph;
+            m_scene_space.m_paitition = space_partition;
         }
 
         public override void Destruct()
@@ -48,6 +53,13 @@ namespace Combat
             m_turn_scheduler.Destruct();
             m_turn_scheduler = null;
             base.Destruct();
+            m_scene_space.Destruct();
+            m_scene_space = null;
+        }
+
+        public override SceneSpace GetDefaultSceneSpace()
+        {
+            return m_scene_space;
         }
 
         protected override ICommandHandler CreateCommandHandler()

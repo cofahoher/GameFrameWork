@@ -38,6 +38,16 @@ namespace Combat
                 m_task = null;
             }
         }
+
+        public override void OnDeletePending()
+        {
+            //ZZWTODO
+        }
+
+        public override void OnResurrect()
+        {
+            //ZZWTODO
+        }
         #endregion
 
         #region ISignalListener
@@ -93,7 +103,8 @@ namespace Combat
                 return;
             m_current_target.RemoveListener(SignalType.Die, m_listener_context.ID);
             m_current_target = null;
-            m_task.Cancel();
+            if (m_task != null)
+                m_task.Cancel();
         }
 
         public void ScheduleTargeting(FixPoint delay)
@@ -174,7 +185,7 @@ namespace Combat
             {
                 if (skill.CheckActivate() == CastSkillResult.Success)
                 {
-                    position_cmp.SetAngle(direction);
+                    position_cmp.SetFacing(direction);
                     skill.Activate(GetCurrentTime());
                     FixPoint delay = skill.GetDefinitionComponent().CooldownTime + FixPoint.PrecisionFP;
                     if (delay > TARGETING_UPDATE_MAX_FREQUENCY)

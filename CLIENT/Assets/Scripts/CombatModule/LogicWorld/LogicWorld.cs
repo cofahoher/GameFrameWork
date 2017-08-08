@@ -2,9 +2,45 @@
 using System.Collections.Generic;
 namespace Combat
 {
+    public class SceneSpace : IDestruct
+    {
+        public int m_space_id = 0;
+        public Vector3FP m_min_position;
+        public Vector3FP m_max_position;
+        public ISpacePartition m_paitition;
+        public GridGraph m_graph;
+
+        public virtual void Destruct()
+        {
+            m_paitition.Destruct();
+            m_paitition = null;
+            m_graph.Destruct();
+            m_graph = null;
+        }
+
+        public bool IsInRange(Vector3FP position)
+        {
+            if (position.x < m_min_position.x || position.z < m_min_position.z || position.x > m_max_position.x || position.z > m_max_position.z)
+                return false;
+            return true;
+        }
+
+        public virtual SceneSpace GetNeighbourSpace(Vector3FP position)
+        {
+            return this;
+        }
+
+        public virtual void OnEntityDestroy(Entity entity)
+        {
+        }
+    }
+
     public class LogicWorld : GeneralComposableObject<LogicWorld, FixPoint>, ILogicWorld, IRenderMessageGenerator
     {
         protected IOutsideWorld m_outside_world;
+        protected RandomGeneratorI m_random_generator_int;
+        protected RandomGeneratorFP m_random_generator_fp;
+
         protected IRenderWorld m_render_world;
         protected bool m_need_render_message = false;
         protected List<RenderMessage> m_render_messages;
@@ -15,8 +51,6 @@ namespace Combat
         protected bool m_collapsing = false;
         protected TaskScheduler<LogicWorld> m_scheduler;
 
-        protected RandomGeneratorI m_random_generator_int;
-        protected RandomGeneratorFP m_random_generator_fp;
         protected IDGenerator m_signal_listener_id_generator;
         protected IDGenerator m_attribute_modifier_id_generator;
         protected IDGenerator m_damage_modifier_id_generator;
@@ -25,23 +59,27 @@ namespace Combat
         protected EntityManager m_entity_manager;
         protected SkillManager m_skill_manager;
         protected EffectManager m_effect_manager;
-        protected ICommandHandler m_command_handler;
         protected FactionManager m_faction_manager;
+
         protected TargetGatheringManager m_target_gathering_manager;
         protected RegionCallbackManager m_region_callback_manager;
-        protected ISpaceManager m_space_manager;
-        protected GridGraph m_grid_graph;
+
+        protected ICommandHandler m_command_handler;
 
         public LogicWorld()
         {
         }
 
-        public virtual void Initialize(IOutsideWorld outside_world, bool need_render_message)
+        #region 初始化/销毁
+        public virtual void Initialize(IOutsideWorld outside_world, int world_seed, bool need_render_message)
         {
 #if ALLOW_UPDATE
             AddComponent<LogicWorldEveryFrameUpdater>(true);
 #endif
             m_outside_world = outside_world;
+            m_random_generator_int = new RandomGeneratorI(world_seed);
+            m_random_generator_fp = new RandomGeneratorFP(world_seed);
+
             m_need_render_message = need_render_message;
             if (m_need_render_message)
                 m_render_messages = new List<RenderMessage>();
@@ -57,15 +95,55 @@ namespace Combat
             m_skill_manager = new SkillManager(this);
             m_effect_manager = new EffectManager(this);
             m_faction_manager = new FactionManager(this);
+
             m_target_gathering_manager = new TargetGatheringManager(this);
             m_region_callback_manager = new RegionCallbackManager(this);
 
             m_command_handler = CreateCommandHandler();
+
+            PostInitialize();
+        }
+
+        protected virtual ICommandHandler CreateCommandHandler()
+        {
+            return new DummyCommandHandler();
+        }
+
+        protected virtual void PostInitialize()
+        {
         }
 
         public void SetIRenderWorld(IRenderWorld render_world)
         {
             m_render_world = render_world;
+        }
+
+        public virtual void BuildLogicWorld(WorldCreationContext world_context)
+        {
+            m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
+            IConfigProvider config = GetConfigProvider();
+            for (int i = 0; i < world_context.m_players.Count; ++i)
+            {
+                ObjectCreationContext context = world_context.m_players[i];
+                context.m_logic_world = this;
+                context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
+                context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
+                m_player_manager.CreateObject(context);
+            }
+            OnPlayersCreated();
+            for (int i = 0; i < world_context.m_entities.Count; ++i)
+            {
+                ObjectCreationContext context = world_context.m_entities[i];
+                context.m_logic_world = this;
+                context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
+                context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
+                m_entity_manager.CreateObject(context);
+            }
+            m_player_manager.OnWorldBuilt();
+        }
+
+        protected virtual void OnPlayersCreated()
+        {
         }
 
         public virtual void Destruct()
@@ -96,27 +174,18 @@ namespace Combat
             m_effect_manager = null;
             m_faction_manager.Destruct();
             m_faction_manager = null;
+
             m_target_gathering_manager.Destruct();
             m_target_gathering_manager = null;
             m_region_callback_manager.Destruct();
             m_region_callback_manager = null;
-
-            if (m_space_manager != null)
-            {
-                m_space_manager.Destruct();
-                m_space_manager = null;
-            }
-            if (m_grid_graph != null)
-            {
-                m_grid_graph.Destruct();
-                m_grid_graph = null;
-            }
 
             m_command_handler.Destruct();
             m_command_handler = null;
 
             DestroyAllGeneralComponent();
         }
+        #endregion
 
         #region GETTER
         public bool IsCollapsing
@@ -199,13 +268,10 @@ namespace Combat
         {
             return m_region_callback_manager;
         }
-        public GridGraph GetGridGraph()
+
+        public virtual SceneSpace GetDefaultSceneSpace()
         {
-            return m_grid_graph;
-        }
-        public ISpaceManager GetSpaceManager()
-        {
-            return m_space_manager;
+            return null;
         }
         #endregion
 
@@ -222,6 +288,7 @@ namespace Combat
             FixPoint delta_time = new FixPoint(delta_ms) / FixPoint.Thousand;
             m_current_time += delta_time;
             ++m_current_frame;
+            m_region_callback_manager.OnUpdate();
             m_scheduler.Update(m_current_time);
             UpdateGeneralComponent(delta_time, m_current_time);
             return m_game_over;
@@ -294,43 +361,23 @@ namespace Combat
         }
         #endregion
 
-        #region 可被继承修改
-        protected virtual ICommandHandler CreateCommandHandler()
+        #region 事件
+
+        public virtual void OnCauseDamage(Entity attacker, Entity victim, Damage damage)
         {
-            return new DummyCommandHandler();
         }
 
-        public virtual void BuildLogicWorld(WorldCreationContext world_context)
+        public virtual void OnKillEntity(Entity killer, Entity the_dead)
         {
-            m_random_generator_int = new RandomGeneratorI(world_context.m_world_seed);
-            m_random_generator_fp = new RandomGeneratorFP(world_context.m_world_seed);
-            m_player_manager.SetPstidAndProxyid(world_context.m_pstid2proxyid, world_context.m_proxyid2pstid);
-            IConfigProvider config = GetConfigProvider();
-            for (int i = 0; i < world_context.m_players.Count; ++i)
-            {
-                ObjectCreationContext context = world_context.m_players[i];
-                context.m_logic_world = this;
-                context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
-                context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
-                m_player_manager.CreateObject(context);
-            }
-            for (int i = 0; i < world_context.m_entities.Count; ++i)
-            {
-                ObjectCreationContext context = world_context.m_entities[i];
-                context.m_logic_world = this;
-                context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
-                context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
-                m_entity_manager.CreateObject(context);
-            }
         }
 
-        public void CreateEntity(ObjectCreationContext context)
+        public virtual void OnEntityChangeLevel(Object obj, int old_level, int new_level)
         {
-            IConfigProvider config = m_outside_world.GetConfigProvider();
-            context.m_logic_world = this;
-            context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
-            context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
-            m_entity_manager.CreateObject(context);
+        }
+
+        public virtual bool OnEntityOutOfEdge(Entity entity, Vector3FP position)
+        {
+            return false;
         }
 
         public virtual void OnGameOver(GameResult game_result)
@@ -340,6 +387,17 @@ namespace Combat
             m_game_over = true;
             game_result.m_end_frame = m_current_frame;
             m_outside_world.OnGameOver(game_result);
+        }
+        #endregion
+
+        #region 创建Entity
+        public Entity CreateEntity(ObjectCreationContext context)
+        {
+            IConfigProvider config = m_outside_world.GetConfigProvider();
+            context.m_logic_world = this;
+            context.m_type_data = config.GetObjectTypeData(context.m_object_type_id);
+            context.m_proto_data = config.GetObjectProtoData(context.m_object_proto_id);
+            return m_entity_manager.CreateObject(context);
         }
         #endregion
 

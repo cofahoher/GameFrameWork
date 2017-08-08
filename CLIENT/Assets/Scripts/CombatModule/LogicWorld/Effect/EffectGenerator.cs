@@ -107,6 +107,12 @@ namespace Combat
             CheckIdle();
         }
 
+        public void DeactivateOnOneTarget(Entity target)
+        {
+            for (int i = 0; i < m_entries.Count; ++i)
+                m_entries[i].DeactivateOnOneTarget(target);
+        }
+
         public void ForceDeactivate()
         {
             m_is_active = false;

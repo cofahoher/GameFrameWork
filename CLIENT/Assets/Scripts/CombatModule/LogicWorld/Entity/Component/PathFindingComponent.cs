@@ -11,9 +11,6 @@ namespace Combat
         {
             if (!IsEnable())
                 return false;
-            GridGraph graph = GetLogicWorld().GetGridGraph();
-            if (graph == null)
-                return false;
             //if (FixPoint.Abs(destination.x - m_destination.x) + FixPoint.Abs(destination.z - m_destination.z) < m_tolerance)
             //    return true;
             LocomotorComponent locomotor_cmp = ParentObject.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
@@ -21,6 +18,9 @@ namespace Combat
                 return false;
             PositionComponent position_cmp = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             if (position_cmp == null)
+                return false;
+            GridGraph graph = position_cmp.GetGridGraph();
+            if (graph == null)
                 return false;
             if (!graph.FindPath(position_cmp.CurrentPosition, destination))
             {

@@ -90,5 +90,14 @@ namespace Combat
             context.m_owner_id = player_id;
             m_owner_player = player_manager.GetObject(player_id);
         }
+
+        public void ChangeOwner(Player new_owner)
+        {
+            if (new_owner == null)
+                return;
+            m_owner_player.RemoveEntity(this);
+            m_owner_player = new_owner;
+            new_owner.AddEntity(this);
+        }
     }
 }

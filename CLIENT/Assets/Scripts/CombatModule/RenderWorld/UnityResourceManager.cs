@@ -37,5 +37,11 @@ namespace Combat
             go.SetActive(true);
             return go;
         }
+
+        public void RecycleGameObject(string asset_name, GameObject go)
+        {
+            if (go != null)
+                GameObject.Destroy(go);
+        }
     }
 }

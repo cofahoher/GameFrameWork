@@ -27,6 +27,14 @@ namespace Combat
         {
             get { return m_id; }
         }
+        public int Category
+        {
+            get { return m_category; }
+        }
+        public FixPoint Value
+        {
+            get { return m_value; }
+        }
         #endregion
     }
 }

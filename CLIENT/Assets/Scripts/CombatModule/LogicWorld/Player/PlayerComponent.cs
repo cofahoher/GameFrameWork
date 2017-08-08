@@ -22,5 +22,9 @@ namespace Combat
             return null;
         }
         #endregion
+
+        public virtual void OnWorldBuilt()
+        {
+        }
     }
 }

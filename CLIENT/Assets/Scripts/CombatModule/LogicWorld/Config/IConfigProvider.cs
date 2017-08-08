@@ -6,6 +6,8 @@ namespace Combat
     {
         FixPoint GetLevelBasedNumber(int table_id, int level);
         FixPoint GetLevelBasedNumber(string table_name, int level);
+        LevelTableData GetLevelTableData(int table_id);
+        LevelTableData GetLevelTableData(string table_name);
         LevelData GetLevelData(int id);
         AttributeData GetAttributeData(int id);
         ObjectTypeData GetObjectTypeData(int id);

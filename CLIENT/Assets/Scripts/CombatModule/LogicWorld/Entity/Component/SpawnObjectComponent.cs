@@ -49,6 +49,16 @@ namespace Combat
                 m_task = null;
             }
         }
+
+        public override void OnDeletePending()
+        {
+            //ZZWTODO
+        }
+
+        public override void OnResurrect()
+        {
+            //ZZWTODO
+        }
         #endregion
 
         #region ISignalListener

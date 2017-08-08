@@ -21,6 +21,11 @@ namespace Combat
             if (m_current_health < 0)
                 m_current_health = m_current_max_health;
         }
+
+        public override void OnResurrect()
+        {
+            m_current_health = m_current_max_health;
+        }
         #endregion
 
         public FixPoint CurrentHealth
@@ -64,22 +69,25 @@ namespace Combat
                 RecyclableObject.Recycle(damage);
                 return;
             }
+            Entity attacker = GetLogicWorld().GetEntityManager().GetObject(damage.m_attacker_id);
             LastDamage = damage;
             FixPoint original_damage_amount = damage.m_damage_amount;
-            FixPoint final_damage_amount = CalculateFinalDamageAmount(damage);
+            FixPoint final_damage_amount = CalculateFinalDamageAmount(damage, attacker);
             ChangeHealth(-final_damage_amount, damage.m_attacker_id);
             ParentObject.SendSignal(SignalType.TakeDamage, damage);
 #if COMBAT_CLIENT
             TakeDamageRenderMessage msg = RenderMessage.Create<TakeDamageRenderMessage>();
-            msg.Construct(GetOwnerEntityID(), original_damage_amount, final_damage_amount);
+            msg.Construct(GetOwnerEntityID(), original_damage_amount, final_damage_amount, damage.m_render_effect_cfgid, damage.m_sound_cfgid);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
+            if (m_current_health <= 0)
+                ApplyExperience(attacker);
+            GetLogicWorld().OnCauseDamage(attacker, (Entity)ParentObject, damage);
         }
 
-        FixPoint CalculateFinalDamageAmount(Damage damage)
+        FixPoint CalculateFinalDamageAmount(Damage damage, Entity attacker)
         {
             FixPoint damage_amount = damage.m_damage_amount;
-            Entity attacker = GetLogicWorld().GetEntityManager().GetObject(damage.m_attacker_id);
             if (attacker != null)
             {
                 DamageModificationComponent attacker_cmp = attacker.GetComponent(DamageModificationComponent.ID) as DamageModificationComponent;
@@ -117,6 +125,22 @@ namespace Combat
 
             if (m_current_health <= 0)
                 EntityUtil.KillEntity(ParentObject as Entity, source_id);
+        }
+
+        void ApplyExperience(Entity attacker)
+        {
+            if (attacker == null || attacker == ParentObject)
+                return;
+            LevelComponent level_cmp = ParentObject.GetComponent(LevelComponent.ID) as LevelComponent;
+            if (level_cmp == null)
+                return;
+            int xp = level_cmp.BeKilledExperience;
+            if (xp == 0)
+                return;
+            level_cmp = attacker.GetComponent(LevelComponent.ID) as LevelComponent;
+            if (level_cmp == null)
+                return;
+            level_cmp.AddExperience(xp);
         }
     }
 }

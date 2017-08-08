@@ -4,12 +4,16 @@ namespace Combat
 {
     public partial class CreateObjectSkillComponent : SkillComponent, INeedTaskService
     {
+        public static readonly int ComboType_Time = (int)CRC.Calculate("Time");
+        public static readonly int ComboType_Angle = (int)CRC.Calculate("Angle");
+
         //配置数据
         int m_object_type_id = 0;
         int m_object_proto_id = 0;
         FixPoint m_object_life_time = FixPoint.Zero;
         int m_generator_cfgid = 0;
         Vector3FP m_offset;
+        int m_combo_type_crc = 0;
         int m_combo_attack_cnt = 1;
         FixPoint m_combo_interval = FixPoint.Zero;
 
@@ -23,6 +27,8 @@ namespace Combat
         {
             if (m_generator_cfgid != 0)
                 m_generator = GetLogicWorld().GetEffectManager().CreateGenerator(m_generator_cfgid, GetOwnerEntity());
+            if (m_combo_type_crc == 0)
+                m_combo_type_crc = ComboType_Time;
         }
 
         protected override void OnDestruct()
@@ -45,20 +51,28 @@ namespace Combat
         public override void Inflict(FixPoint start_time)
         {
             m_remain_attack_cnt = m_combo_attack_cnt;
-            Impact();
-            if (m_combo_attack_cnt > 1)
+            if (m_combo_type_crc == ComboType_Time)
             {
-                if (m_task == null)
+                CreateOneObject(0);
+                if (m_combo_attack_cnt > 1)
                 {
-                    m_task = LogicTask.Create<ComponentCommonTask>();
-                    m_task.Construct(this);
+                    if (m_task == null)
+                    {
+                        m_task = LogicTask.Create<ComponentCommonTask>();
+                        m_task.Construct(this);
+                    }
+                    var schedeler = GetLogicWorld().GetTaskScheduler();
+                    schedeler.Schedule(m_task, GetCurrentTime(), m_combo_interval, m_combo_interval);
                 }
-                var schedeler = GetLogicWorld().GetTaskScheduler();
-                schedeler.Schedule(m_task, GetCurrentTime(), m_combo_interval, m_combo_interval);
+            }
+            else if (m_combo_type_crc == ComboType_Angle)
+            {
+                for (int i = 0; i < m_combo_attack_cnt; ++i)
+                    CreateOneObject(i);
             }
         }
 
-        public override void Deactivate()
+        public override void Deactivate(bool force)
         {
             if (m_generator != null)
                 m_generator.Deactivate();
@@ -68,18 +82,17 @@ namespace Combat
 
         public void OnTaskService(FixPoint delta_time)
         {
-            Impact();
-        }
-
-        void Impact()
-        {
-            --m_remain_attack_cnt;
+            CreateOneObject(m_combo_attack_cnt - m_remain_attack_cnt);
             if (m_remain_attack_cnt <= 0)
             {
                 if (m_task != null)
                     m_task.Cancel();
             }
+        }
 
+        void CreateOneObject(int index)
+        {
+            --m_remain_attack_cnt;
             Target target = GetOwnerSkill().GetMajorTarget();
             LogicWorld logic_world = GetLogicWorld();
             EntityManager entity_manager = logic_world.GetEntityManager();
@@ -95,14 +108,14 @@ namespace Combat
             if (target == null)
             {
                 xz_facing = owner_position_cmp.Facing2D;
-                angle = owner_position_cmp.CurrentAngle;
+                angle = owner_position_cmp.FacingAngle;
                 facing.x = xz_facing.x;
                 facing.y = FixPoint.Zero;
                 facing.z = xz_facing.z;
             }
             else
             {
-                Vector3FP target_pos = target.GetPosition();
+                Vector3FP target_pos = target.GetPosition(logic_world);
                 xz_facing.x = target_pos.x - source_pos.x;
                 xz_facing.z = target_pos.z - source_pos.z;
                 xz_facing.Normalize();
@@ -112,11 +125,33 @@ namespace Combat
             }
             Vector2FP side = xz_facing.Perpendicular();
             Vector2FP xz_offset = xz_facing * m_offset.z + side * m_offset.x;
+            if (m_combo_type_crc == ComboType_Angle)
+            {
+                if (m_combo_attack_cnt % 2 == 1)
+                {
+                    FixPoint angle_offset = m_combo_interval * (FixPoint)((index + 1)/2);
+                    if (index % 2 == 0)
+                        angle += angle_offset;
+                    else
+                        angle -= angle_offset;
+                }
+                else
+                {
+                    FixPoint angle_offset = m_combo_interval * ((FixPoint)(index / 2) + FixPoint.One / FixPoint.Two);
+                    if (index % 2 == 0)
+                        angle += angle_offset;
+                    else
+                        angle -= angle_offset;
+                }
+                FixPoint radian = FixPoint.Degree2Radian(-angle);
+                facing.x = FixPoint.Cos(radian);
+                facing.z = FixPoint.Sin(radian);
+            }
 
             ObjectTypeData type_data = config.GetObjectTypeData(m_object_type_id);
             if (type_data == null)
                 return;
-            BirthPositionInfo birth_info = new BirthPositionInfo(source_pos.x + xz_offset.x, source_pos.y + m_offset.y, source_pos.z + xz_offset.z, angle);
+            BirthPositionInfo birth_info = new BirthPositionInfo(source_pos.x + xz_offset.x, source_pos.y + m_offset.y, source_pos.z + xz_offset.z, angle, owner_position_cmp.GetCurrentSceneSpace());
             ObjectCreationContext object_context = new ObjectCreationContext();
             object_context.m_object_proxy_id = owner_player.ProxyID;
             object_context.m_object_type_id = m_object_type_id;
@@ -135,9 +170,9 @@ namespace Combat
             if (death_component != null && m_object_life_time > FixPoint.Zero)
                 death_component.SetLifeTime(m_object_life_time);
 
-            SummonedEntityComponent extinfo_component = m_current_target.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
-            if (extinfo_component != null)
-                extinfo_component.SetMaster(owner_entity);
+            SummonedEntityComponent summoned_component = m_current_target.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+            if (summoned_component != null)
+                summoned_component.SetMaster(owner_entity);
 
             ProjectileComponent projectile_component = m_current_target.GetComponent(ProjectileComponent.ID) as ProjectileComponent;
             if (projectile_component != null)

@@ -123,4 +123,34 @@ namespace Combat
             registry.RemoveEffect(m_effect_id);
         }
     }
+
+    public class RemoveEffectTask : Task<LogicWorld>
+    {
+        int m_entity_id = 0;
+        int m_effect_id = 0;
+
+        public void Construct(int entity_id, int effect_id)
+        {
+            m_entity_id = entity_id;
+            m_effect_id = effect_id;
+        }
+
+        public override void OnReset()
+        {
+            m_entity_id = 0;
+            m_effect_id = 0;
+        }
+
+        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
+        {
+            Entity entity = logic_world.GetEntityManager().GetObject(m_entity_id);
+            if (entity == null)
+                return;
+            EffectRegistry registry = EntityUtil.GetEffectRegistry(entity);
+            if (registry == null)
+                return;
+            registry.RemoveEffect(m_effect_id);
+            LogicTask.Recycle(this);
+        }
+    }
 }

@@ -18,7 +18,7 @@ namespace Combat
         protected SortedDictionary<int, Component> m_components = new SortedDictionary<int, Component>();
         protected bool m_is_delete_pending = false;
 
-        #region 销毁
+        #region 初始化、销毁
         public void Destruct()
         {
             NotifyGeneratorDestroyAndRemoveAllListeners();
@@ -47,6 +47,19 @@ namespace Combat
 
         protected virtual void OnDestruct()
         {
+        }
+
+        public void Resurrect()
+        {
+            if (!m_is_delete_pending)
+                return;
+            m_is_delete_pending = false;
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Component component = enumerator.Current.Value;
+                component.OnResurrect();
+            }
         }
         #endregion
 
@@ -97,6 +110,9 @@ namespace Combat
                         Component component = enumerator.Current.Value;
                         component.OnDeletePending();
                     }
+                    PositionComponent position_component = GetComponent(PositionComponent.ID) as PositionComponent;
+                    if (position_component != null)
+                        position_component.ClearSpace();
                 }
             }
         }
@@ -260,6 +276,11 @@ namespace Combat
             return AddComponent(component_data);
         }
 
+        protected virtual bool IsLogicObject()
+        {
+            return true;
+        }
+
         protected virtual bool IsSuitableComponent(int component_type_id)
         {
             return ComponentTypeRegistry.IsLogicComponent(component_type_id);
@@ -310,6 +331,22 @@ namespace Combat
             Component component;
             m_components.TryGetValue(component_type_id, out component);
             return component;
+        }
+
+        public void GetInterfaceInComponents<T>(ref List<T> interfaceList) where T : class
+        {
+            if (interfaceList == null)
+                interfaceList = new List<T>();
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Component component = enumerator.Current.Value;
+                T it = component as T;
+                if (it != null)
+                {
+                    interfaceList.Add(it);
+                }
+            }
         }
         #endregion
 

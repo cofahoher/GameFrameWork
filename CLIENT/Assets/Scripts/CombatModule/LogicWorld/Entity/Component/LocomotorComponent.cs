@@ -27,6 +27,10 @@ namespace Combat
                 m_current_max_speed = value;
                 if (m_movement_provider != null)
                     m_movement_provider.SetMaxSpeed(m_current_max_speed);
+#if COMBAT_CLIENT
+                if (m_is_moving)
+                    GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.ChangeMoveSpeed, GetOwnerEntityID());
+#endif
             }
         }
 

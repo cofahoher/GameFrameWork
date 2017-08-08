@@ -37,18 +37,23 @@ namespace Combat
         {
             UncoverArea();
         }
+
+        public override void OnResurrect()
+        {
+            CoverArea();
+        }
         #endregion
 
         void CoverArea()
         {
-            GridGraph grid_graph = GetLogicWorld().GetGridGraph();
-            if (grid_graph == null)
-                return;
             PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             if (position_component == null)
                 return;
+            GridGraph grid_graph = position_component.GetGridGraph();
+            if (grid_graph == null)
+                return;
             Vector3FP extents = m_extents;
-            if (position_component.CurrentAngle == DEGREE90 || position_component.CurrentAngle == DEGREE270)
+            if (position_component.BaseAngle == DEGREE90 || position_component.BaseAngle == DEGREE270)
             {
                 FixPoint temp = extents.x;
                 extents.x = extents.z;
@@ -59,14 +64,14 @@ namespace Combat
 
         void UncoverArea()
         {
-            GridGraph grid_graph = GetLogicWorld().GetGridGraph();
-            if (grid_graph == null)
-                return;
             PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             if (position_component == null)
                 return;
+            GridGraph grid_graph = position_component.GetGridGraph();
+            if (grid_graph == null)
+                return;
             Vector3FP extents = m_extents;
-            if (position_component.CurrentAngle == DEGREE90 || position_component.CurrentAngle == DEGREE270)
+            if (position_component.BaseAngle == DEGREE90 || position_component.BaseAngle == DEGREE270)
             {
                 FixPoint temp = extents.x;
                 extents.x = extents.z;

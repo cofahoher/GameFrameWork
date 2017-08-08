@@ -100,7 +100,7 @@ namespace Combat
         }
         #endregion
 
-        #region Specila
+        #region Special
         public int GetLocalPlayerID()
         {
             return m_local_player_id;
@@ -127,5 +127,15 @@ namespace Combat
                 return null;
         }
         #endregion
+
+        public void OnWorldBuilt()
+        {
+            var enumerator = m_objects.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Player player = enumerator.Current.Value;
+                player.OnWorldBuilt();
+            }
+        }
     }
 }

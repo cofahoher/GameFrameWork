@@ -51,6 +51,7 @@ namespace Combat
         GridNode Position2NearestNode(Vector3FP position);
         Vector3FP Node2Position(GridNode node);
         GridNode GetNode(int x_index, int z_index);
+        Vector3FP AdjustPosition2Walkable(Vector3FP position);
     }
 
     public abstract class GridGraph : IGridGraph
@@ -180,6 +181,15 @@ namespace Combat
             return m_nodes[x_index, z_index];
         }
 
+        public Vector3FP AdjustPosition2Walkable(Vector3FP position)
+        {
+            GridNode node = Position2NearestNode(position);
+            node = FindNearestWalkableNode(node, null);
+            if (node != null)
+                position = Node2Position(node);
+            return position;
+        }
+
         protected GridNode GetNodeUncheck(int x_index, int z_index)
         {
             return m_nodes[x_index, z_index];
@@ -210,7 +220,10 @@ namespace Combat
                         neighbour.m_g = current_node.m_g + neighbour_cost;
                         if (!neighbour.Walkable)
                             neighbour.m_g += 1000;
-                        neighbour.m_h = CalculateHCost(current_node, end_node);
+                        if (end_node != null)
+                            neighbour.m_h = CalculateHCost(current_node, end_node);
+                        else
+                            neighbour.m_h = 0;
                         m_open_set.Enqueue(neighbour);
                     }
                 }

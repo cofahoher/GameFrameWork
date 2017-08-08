@@ -5,11 +5,11 @@ namespace Combat
     public partial class AttributeManagerComponent : EntityComponent, ISignalListener
     {
         SignalListenerContext m_listener_context;
-        SortedDictionary<int, FixPoint> m_base_value = new SortedDictionary<int, FixPoint>();
+        SortedDictionary<int, string> m_base_value = new SortedDictionary<int, string>();
         SortedDictionary<int, Attribute> m_attributes = new SortedDictionary<int, Attribute>();
 
         #region 初始化/销毁
-        public void SetAttributeBaseValue(int id, FixPoint value)
+        public void SetAttributeBaseValue(int id, string value)
         {
             m_base_value[id] = value;
         }
@@ -20,13 +20,13 @@ namespace Combat
             while (enumerator.MoveNext())
             {
                 int id = enumerator.Current.Key;
-                FixPoint base_value = enumerator.Current.Value;
+                string base_value = enumerator.Current.Value;
                 if (!m_attributes.ContainsKey(id))
                     CreateAttribute(id, base_value);
             }
         }
 
-        void CreateAttribute(int id, FixPoint base_value)
+        void CreateAttribute(int id, string base_value)
         {
             AttributeDefinition definition = AttributeSystem.Instance.GetDefinitionByID(id);
             if (definition == null)
@@ -36,9 +36,9 @@ namespace Combat
             {
                 if (!m_attributes.ContainsKey(referenced_ids[i]))
                 {
-                    FixPoint referenced_attribute_base_value;
+                    string referenced_attribute_base_value;
                     if (!m_base_value.TryGetValue(referenced_ids[i], out referenced_attribute_base_value))
-                        referenced_attribute_base_value = FixPoint.Zero;
+                        referenced_attribute_base_value = null;
                     CreateAttribute(referenced_ids[i], referenced_attribute_base_value);
                 }
             }

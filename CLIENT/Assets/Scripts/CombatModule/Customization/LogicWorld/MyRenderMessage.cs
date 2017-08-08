@@ -7,15 +7,25 @@ namespace Combat
         //命名是：做（什么）
         public const int StartMoving = 101;               //LocomoteRenderMessage
         public const int StopMoving = 102;                //LocomoteRenderMessage
-        public const int ChangeDirection = 103;           //ChangeDirectionRenderMessage
+        public const int ChangeMoveSpeed = 103;           //SimpleRenderMessage
+        public const int ChangeDirection = 104;           //ChangeDirectionRenderMessage
+        public const int ChangePosition = 105;            //ChangePositionRenderMessage
         public const int ChangeHealth = 110;              //ChangeHealthRenderMessage
         public const int Die = 111;                       //SimpleRenderMessage
         public const int Hide = 112;                      //SimpleRenderMessage
         public const int Show = 113;                      //SimpleRenderMessage
-        public const int PlayAnimation = 120;             //SimpleRenderMessage
-        public const int TakeDamage = 130;                //TakeDamageRenderMessage
+        public const int PlayAnimation = 120;             //PlayAnimationRenderMessage
+        public const int InterruptAnimation = 121;        //InterruptAnimationRenderMessage
+        public const int PlayRenderEffect = 130;          //PlayRenderEffectMessage
+        public const int PlaySound = 131;                 //PlaySoundMessage
+        public const int TakeDamage = 140;                //TakeDamageRenderMessage
+        public const int ChangeLevel = 150;               //SimpleRenderMessage
+        public const int AddExperience = 151;             //SimpleRenderMessage
 
         public const int PlayerChangeFaction = 1001;      //SimpleRenderMessage
+        public const int ChangeCameraPosition = 1002;     //ChangeCameraPositionRenderMessage
+
+        public const int GameOver = 2000;                 //GameOverRenderMessage
     }
 
     public class LocomoteRenderMessage : RenderMessage
@@ -53,23 +63,48 @@ namespace Combat
 
     public class ChangeDirectionRenderMessage : RenderMessage
     {
-        public FixPoint m_new_angle = FixPoint.Zero;
+        public FixPoint m_base_angle = FixPoint.Zero;
+        public FixPoint m_head_angle = FixPoint.Zero;
 
         public ChangeDirectionRenderMessage()
         {
             m_type = RenderMessageType.ChangeDirection;
         }
 
-        public void Construct(int entity_id, FixPoint new_angle)
+        public void Construct(int entity_id, FixPoint base_angle, FixPoint head_angle)
         {
             m_entity_id = entity_id;
-            m_new_angle = new_angle;
+            m_base_angle = base_angle;
+            m_head_angle = head_angle;
         }
 
         public override void Reset()
         {
             m_entity_id = -1;
-            m_new_angle = FixPoint.Zero;
+            m_base_angle = FixPoint.Zero;
+            m_head_angle = FixPoint.Zero;
+        }
+    }
+    
+    public class ChangePositionRenderMessage : RenderMessage
+    {
+        public Vector3FP m_new_position;
+
+        public ChangePositionRenderMessage()
+        {
+            m_type = RenderMessageType.ChangePosition;
+        }
+
+        public void Construct(int entity_id, Vector3FP new_position)
+        {
+            m_entity_id = entity_id;
+            m_new_position = new_position;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+            m_new_position.MakeZero();
         }
     }
 
@@ -103,17 +138,44 @@ namespace Combat
         public string m_animation_name;
         public string m_animation_name_2;
         public bool m_loop;
+        public float m_speed;
 
         public PlayAnimationRenderMessage()
         {
             m_type = RenderMessageType.PlayAnimation;
         }
 
-        public void Construct(int entity_id, string animation_name, string animation_name_2 = null, bool loop = false)
+        public void Construct(int entity_id, string animation_name, string animation_name_2 = null, bool loop = false,float speed = -1.0f)
         {
             m_entity_id = entity_id;
             m_animation_name = animation_name;
             m_animation_name_2 = animation_name_2;
+            m_loop = loop;
+            m_speed = speed;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+        }
+    }
+
+    public class InterruptAnimationRenderMessage : RenderMessage
+    {
+        public string m_if_this_animation;
+        public string m_play_this_animation;
+        public bool m_loop;
+
+        public InterruptAnimationRenderMessage()
+        {
+            m_type = RenderMessageType.InterruptAnimation;
+        }
+
+        public void Construct(int entity_id, string if_this_animation, string play_this_animation = null, bool loop = false)
+        {
+            m_entity_id = entity_id;
+            m_if_this_animation = if_this_animation;
+            m_play_this_animation = play_this_animation;
             m_loop = loop;
         }
 
@@ -123,21 +185,112 @@ namespace Combat
         }
     }
 
+    public class PlayRenderEffectMessage : RenderMessage
+    {
+        public int m_effect_cfgid = 0;
+        public FixPoint m_play_time = FixPoint.Zero;
+        public bool m_play = true;
+
+        public PlayRenderEffectMessage()
+        {
+            m_type = RenderMessageType.PlayRenderEffect;
+        }
+
+        public void ConstructAsPlay(int entity_id, int effect_cfgid, FixPoint play_time)
+        {
+            m_entity_id = entity_id;
+            m_effect_cfgid = effect_cfgid;
+            m_play_time = play_time;
+            m_play = true;
+        }
+
+        public void ConstructAsStop(int entity_id, int effect_cfgid)
+        {
+            m_entity_id = entity_id;
+            m_effect_cfgid = effect_cfgid;
+            m_play = false;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+            m_effect_cfgid = 0;
+            m_play_time = FixPoint.Zero;
+            m_play = false;
+        }
+    }
+
+    public class PlaySoundMessage : RenderMessage
+    {
+        public int m_sound_cfgid = 0;
+        public FixPoint m_play_time = FixPoint.Zero;
+
+        public PlaySoundMessage()
+        {
+            m_type = RenderMessageType.PlaySound;
+        }
+
+        public void Construct(int entity_id, int sound_cfgid, FixPoint play_time)
+        {
+            m_entity_id = entity_id;
+            m_sound_cfgid = sound_cfgid;
+            m_play_time = play_time;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+            m_sound_cfgid = 0;
+            m_play_time = FixPoint.Zero;
+        }
+    }
+
     public class TakeDamageRenderMessage : RenderMessage
     {
         public FixPoint m_origina_damage_amount;
         public FixPoint m_final_damage_amount;
+        public int m_damage_render_effect_cfgid;
+        public int m_damage_sound_cfgid;
 
         public TakeDamageRenderMessage()
         {
             m_type = RenderMessageType.TakeDamage;
         }
 
-        public void Construct(int entity_id, FixPoint origina_damage_amount, FixPoint final_damage_amount)
+        public void Construct(int entity_id, FixPoint origina_damage_amount, FixPoint final_damage_amount, int damage_render_effect_cfgid, int damage_sound_cfgid)
         {
             m_entity_id = entity_id;
             m_origina_damage_amount = origina_damage_amount;
             m_final_damage_amount = final_damage_amount;
+            m_damage_render_effect_cfgid = damage_render_effect_cfgid;
+            m_damage_sound_cfgid = damage_sound_cfgid;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+        }
+    }
+
+    public class ChangeCameraPositionRenderMessage : RenderMessage
+    {
+        public bool m_flash_move = false;
+        public int m_before_room_id;
+        public int m_next_room_id;
+        public FixPoint m_x_position;
+        public FixPoint m_z_position;
+        public ChangeCameraPositionRenderMessage()
+        {
+            m_type = RenderMessageType.ChangeCameraPosition;
+        }
+
+        public void Construct(int before_id,int next_id,FixPoint x,FixPoint z,bool flash_move)
+        {
+            m_flash_move = flash_move;
+            m_before_room_id = before_id;
+            m_next_room_id = next_id;
+            m_x_position = x;
+            m_z_position = z;
         }
 
         public override void Reset()

@@ -20,7 +20,7 @@ namespace Combat
             m_target_gathering_param = new TargetGatheringParam();
             m_target_gathering_param.m_type = TargetGatheringType.SurroundingRing;
             m_target_gathering_param.m_param1 = m_guard_range;
-            m_target_gathering_param.m_fation = FactionRelation.Enemy;
+            m_target_gathering_param.m_faction = FactionRelation.Enemy;
             m_targeting_component = ParentObject.GetComponent(TargetingComponent.ID) as TargetingComponent;
             if (m_targeting_component == null)
                 return;
@@ -41,6 +41,16 @@ namespace Combat
             }
             ClearTargets();
             m_current_enemy = null;
+        }
+
+        public override void OnDeletePending()
+        {
+            //ZZWTODO
+        }
+
+        public override void OnResurrect()
+        {
+            //ZZWTODO
         }
 
         void ClearTargets()
@@ -104,7 +114,7 @@ namespace Combat
             manager.BuildTargetList(GetOwnerEntity(), m_target_gathering_param, m_targets);
             if (m_targets.Count == 0)
                 return;
-            Entity new_enemy = m_targets[0].GetEntity();
+            Entity new_enemy = m_targets[0].GetEntity(GetLogicWorld());
             ClearTargets();
             if (new_enemy == m_current_enemy)
                 return;

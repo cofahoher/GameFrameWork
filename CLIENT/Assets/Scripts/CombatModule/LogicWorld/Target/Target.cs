@@ -11,19 +11,16 @@ namespace Combat
 
     public class Target : IRecyclable
     {
-        LogicWorld m_logic_world;
         TargetType m_target_type = TargetType.InvalidType;
         int m_object_id = -1;
         Vector3FP m_position;
 
-        public void Construct(LogicWorld logic_world)
+        public void Construct()
         {
-            m_logic_world = logic_world;
         }
 
         public void Reset()
         {
-            m_logic_world = null;
             m_target_type = TargetType.InvalidType;
             m_object_id = -1;
         }
@@ -59,10 +56,10 @@ namespace Combat
         #endregion
 
         #region Getter
-        public Entity GetEntity()
+        public Entity GetEntity(LogicWorld logic_world)
         {
             if (m_target_type == TargetType.EntityType)
-                return m_logic_world.GetEntityManager().GetObject(m_object_id);
+                return logic_world.GetEntityManager().GetObject(m_object_id);
             else
                 return null;
         }
@@ -73,11 +70,11 @@ namespace Combat
             return 0;
         }
 
-        public Vector3FP GetPosition()
+        public Vector3FP GetPosition(LogicWorld logic_world)
         {
             if (m_target_type == TargetType.EntityType)
             {
-                Entity entity = m_logic_world.GetEntityManager().GetObject(m_object_id);
+                Entity entity = logic_world.GetEntityManager().GetObject(m_object_id);
                 if (entity == null)
                     return new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.Zero);
                 else

@@ -22,6 +22,11 @@ namespace Combat
             return ParentObject.ID;
         }
 
+        public virtual bool CanActivate()
+        {
+            return true;
+        }
+
         public virtual void Activate(FixPoint start_time)
         {
         }
@@ -34,7 +39,7 @@ namespace Combat
         {
         }
 
-        public virtual void Deactivate()
+        public virtual void Deactivate(bool force)
         {
         }
 

@@ -9,8 +9,9 @@ namespace Combat
         int m_die_generator_cfgid = 0;
         int m_killer_generator_cfgid = 0;
         FixPoint m_life_time = FixPoint.Zero;
-        FixPoint m_hide_delay;
-        FixPoint m_delete_delay;
+        FixPoint m_hide_delay = FixPoint.Zero;
+        FixPoint m_delete_delay = FixPoint.Zero;
+        bool m_can_resurrect = false;
 
         //运行数据
         EffectGenerator m_born_generator;
@@ -93,6 +94,14 @@ namespace Combat
                 m_killer_generator = null;
             }
         }
+
+        public override void OnResurrect()
+        {
+            StateComponent state_component = ParentObject.GetComponent(StateComponent.ID) as StateComponent;
+            if (state_component != null)
+                state_component.RemoveState(StateSystem.DEAD_STATE, 0);
+            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Show, GetOwnerEntityID());
+        }
         #endregion
 
         public void SetLifeTime(FixPoint life_time)
@@ -118,11 +127,9 @@ namespace Combat
 
             if (m_die_task != null)
                 m_die_task.Cancel();
+            LogicWorld logic_world = GetLogicWorld();
 
-            Entity killer = GetLogicWorld().GetEntityManager().GetObject(killer_id);
-            SummonedEntityComponent extinfo_component = killer.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
-            if (extinfo_component != null)
-                killer = GetLogicWorld().GetEntityManager().GetObject(extinfo_component.MasterID);
+            Entity killer = logic_world.GetEntityManager().GetObject(killer_id);
 
             if (!DieSilently && killer_id != ParentObject.ID && m_killer_generator != null && killer != null)
             {
@@ -133,10 +140,10 @@ namespace Combat
                 RecyclableObject.Recycle(app_data);
             }
 
-            var schedeler = GetLogicWorld().GetTaskScheduler();
+            var schedeler = logic_world.GetTaskScheduler();
             if (DieSilently)
             {
-                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Hide, ParentObject.ID);
+                logic_world.AddSimpleRenderMessage(RenderMessageType.Hide, ParentObject.ID);
             }
             else
             {
@@ -145,24 +152,22 @@ namespace Combat
                 schedeler.Schedule(hide_task, GetCurrentTime(), m_hide_delay);
             }
 
-            GetOwnerPlayer().OnEntityBeKilled(killer, (Entity)ParentObject);
-            if (killer != null)
-            {
-                Player killer_player = killer.GetOwnerPlayer();
-                killer_player.OnKillEntity(killer, (Entity)ParentObject);
-            }
-
             ParentObject.DeletePending = true;
             ParentObject.SendSignal(SignalType.Die);
-            GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Die, ParentObject.ID);
+            logic_world.AddSimpleRenderMessage(RenderMessageType.Die, ParentObject.ID);
 
             StateComponent state_component = ParentObject.GetComponent(StateComponent.ID) as StateComponent;
             if (state_component != null)
                 state_component.AddState(StateSystem.DEAD_STATE, 0);
 
-            DeleteEntityTask delete_task = LogicTask.Create<DeleteEntityTask>();
-            delete_task.Construct(ParentObject.ID);
-            schedeler.Schedule(delete_task, GetCurrentTime(), m_delete_delay);
+            if (!m_can_resurrect)
+            {
+                DeleteEntityTask delete_task = LogicTask.Create<DeleteEntityTask>();
+                delete_task.Construct(ParentObject.ID);
+                schedeler.Schedule(delete_task, GetCurrentTime(), m_delete_delay);
+            }
+
+            logic_world.OnKillEntity(killer, GetOwnerEntity());
         }
 
         public void OnTaskService(FixPoint delta_time)

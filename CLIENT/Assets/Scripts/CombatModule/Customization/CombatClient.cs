@@ -101,7 +101,7 @@ namespace Combat
             m_combat_factory.RegisterRenderMessages();
 
             m_logic_world = m_combat_factory.CreateLogicWorld();
-            m_logic_world.Initialize(this, true);
+            m_logic_world.Initialize(this, combat_start_info.m_world_seed, true);
             m_render_world = m_combat_factory.CreateRenderWorld();
             m_render_world.Initialize(this, m_logic_world);
             m_logic_world.SetIRenderWorld(m_render_world);
@@ -109,14 +109,19 @@ namespace Combat
             m_sync_client.Init(m_logic_world);
 
             BuildLogicWorld(combat_start_info);
-            ++m_waiting_cnt;
-            m_render_world.LoadScene(m_level_data.m_scene_name);
+            BuildRenderWorld(m_level_data);
         }
 
         protected virtual void BuildLogicWorld(CombatStartInfo combat_start_info)
         {
             WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);
             m_logic_world.BuildLogicWorld(world_context);
+        }
+
+        protected virtual void BuildRenderWorld(LevelData level_data)
+        {
+            ++m_waiting_cnt;
+            m_render_world.BuildRenderWorld(level_data);
         }
 
         public virtual void AddPlayer(long player_pstid)
@@ -137,7 +142,7 @@ namespace Combat
         #endregion
 
         #region RESOURCE，这里只是YY，具体的资源缓存策略具体处理
-        public void OnSceneLoaded()
+        public void OnRenderWorldBuilt()
         {
             CacheResources();
             OnOneResourceCached();
@@ -279,10 +284,10 @@ namespace Combat
             if (m_is_first_frame)
             {
                 m_is_first_frame = false;
-                LogWrapper.LogError("CombatClient.OnUpdateRunning, first delta_ms = ", delta_ms);
+                LogWrapper.LogInfo("CombatClient.OnUpdateRunning, first delta_ms = ", delta_ms);
             }
             if (delta_ms > 100)
-                LogWrapper.LogError("CombatClient.OnUpdateRunning, delta_ms = ", delta_ms);
+                LogWrapper.LogInfo("CombatClient.OnUpdateRunning, delta_ms = ", delta_ms);
 #endif
             m_sync_client.Update(current_time_int);
             m_render_world.OnUpdate(delta_ms, current_time_int);

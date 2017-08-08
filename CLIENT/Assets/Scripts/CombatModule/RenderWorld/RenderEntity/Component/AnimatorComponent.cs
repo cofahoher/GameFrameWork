@@ -10,12 +10,18 @@ namespace Combat
         string m_locomotor_animation_name = AnimationName.RUN;
         //运行数据
         float m_animation_speed = 1.0f;
+        string m_current_animation;
         Animator m_unity_animator_cmp;
 
         public float AniamtionSpeed
         {
             get { return m_animation_speed; }
             set { m_animation_speed = value; }
+        }
+
+        public string CurrentAnimation
+        {
+            get { return m_current_animation; }
         }
 
         public string LocomotorAnimationName
@@ -59,6 +65,7 @@ namespace Combat
         {
             m_unity_animator_cmp.speed = speed > 0 ? speed : m_animation_speed;
             m_unity_animator_cmp.Play(key);
+            m_current_animation = key;
         }
 
         public void SetParameter(string key, bool value)

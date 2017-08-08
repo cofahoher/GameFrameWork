@@ -84,8 +84,11 @@ namespace Combat
                 enumerator.Current.Value.Destruct();
             m_components.Clear();
             m_components = null;
-            m_updateable_component.Clear();
-            m_updateable_component = null;
+            if (m_updateable_component != null)
+            {
+                m_updateable_component.Clear();
+                m_updateable_component = null;
+            }
         }
 
         protected abstract TOwner GetSelf();

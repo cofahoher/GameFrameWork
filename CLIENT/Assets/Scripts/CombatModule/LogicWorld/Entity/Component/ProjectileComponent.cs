@@ -24,8 +24,12 @@ namespace Combat
         //配置数据
         FixPoint m_speed;
         FixPoint m_lifetime = FixPoint.Ten;
+        int m_collision_sound_cfgid = 0;
         int m_collision_faction = FactionRelation.NotAlly;
+        bool m_can_cross_obstacle = true;
 
+        //运行数据
+        bool m_previous_walkable = true;
         ProjectileParameters m_param;
         UpdateProjectileTask m_task;
 
@@ -43,6 +47,8 @@ namespace Combat
                 m_speed = FixPoint.Parse(value);
             if (dic.TryGetValue("lifetime", out value))
                 m_lifetime = FixPoint.Parse(value);
+            if (dic.TryGetValue("collision_sound", out value))
+                m_collision_sound_cfgid = int.Parse(value);
             if (dic.TryGetValue("collision_faction", out value))
                 m_collision_faction = (int)CRC.Calculate(value);
         }
@@ -66,6 +72,11 @@ namespace Combat
         {
             m_param = param;
 
+            PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
+            GridGraph grid_graph = position_component.GetGridGraph();
+            GridNode node = grid_graph.Position2Node(position_component.CurrentPosition);
+            m_previous_walkable = (node != null && node.Walkable);
+
             if (m_task == null)
                 m_task = LogicTask.Create<UpdateProjectileTask>();
             m_task.Construct(this, m_param.m_life_time > FixPoint.Zero ? m_param.m_life_time : m_lifetime);
@@ -84,24 +95,34 @@ namespace Combat
             PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             Vector3FP new_position = position_component.CurrentPosition + m_param.m_facing * (m_speed * delta_time);
             position_component.CurrentPosition = new_position;
-            if (DetectCollision(new_position, position_component.Radius))
+            if (DetectCollision(position_component.GetSpacePartition(), new_position, position_component.Radius))
                 return true;
-            GridGraph grid_graph = GetLogicWorld().GetGridGraph();
+            GridGraph grid_graph = position_component.GetGridGraph();
             if (grid_graph != null)
             {
                 GridNode node = grid_graph.Position2Node(new_position);
-                if (node == null || !node.Walkable)
+                if (node == null)
+                {
                     m_task.LockRemainTime(m_speed);
+                }
+                else if (!node.Walkable && !m_can_cross_obstacle)
+                {
+                    if (m_previous_walkable)
+                        m_task.LockRemainTime(m_speed);
+                }
+                else
+                {
+                    m_previous_walkable = true;
+                }
             }
             return false;
         }
 
-        bool DetectCollision(Vector3FP position, FixPoint radius)
+        bool DetectCollision(ISpacePartition partition, Vector3FP position, FixPoint radius)
         {
-            ISpaceManager space_manager = GetLogicWorld().GetSpaceManager();
-            if (space_manager == null)
+            if (partition == null)
                 return false;
-            List<int> list = space_manager.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, m_param.m_source_entity_id);
+            List<int> list = partition.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, m_param.m_source_entity_id);
             if (list.Count == 0)
                 return false;
             EntityManager entity_manager = GetLogicWorld().GetEntityManager();
@@ -111,7 +132,7 @@ namespace Combat
                 if (entity == null)
                     continue;
                 PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
-                if (position_component.Height <= FixPoint.Zero)
+                if (position_component.Height <= FixPoint.Zero) //ZZWTODO
                     continue;
                 if (!FactionRelation.IsFactionSatisfied(GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()), m_collision_faction))
                     continue;
@@ -127,6 +148,12 @@ namespace Combat
             LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
             msg.ConstructAsStopMoving(ParentObject.ID, true);
             GetLogicWorld().AddRenderMessage(msg);
+            if (m_collision_sound_cfgid > 0)
+            {
+                PlaySoundMessage sound_msg = RenderMessage.Create<PlaySoundMessage>();
+                sound_msg.Construct(GetOwnerEntityID(), m_collision_sound_cfgid, FixPoint.MinusOne);
+                GetLogicWorld().AddRenderMessage(sound_msg);
+            }
 #endif
             if (m_task != null)
             {

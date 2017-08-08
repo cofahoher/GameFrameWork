@@ -5,6 +5,8 @@ namespace Combat
     public partial class SkillManagerComponent : EntityComponent, ISignalListener
     {
         public const int DEFAULT_SKILL_INDEX = 0;
+
+        //运行数据
         LocomotorComponent m_locomotor_cmp;
         SignalListenerContext m_listener_context;
         SortedDictionary<int, int> m_index2id = new SortedDictionary<int, int>();
@@ -12,6 +14,7 @@ namespace Combat
         int m_move_block_count = 0;
         int m_active_block_count = 0;
         List<int> m_active_skill_ids = new List<int>();
+        List<Skill> m_skill_to_interrupt = new List<Skill>();//ZZWTODO C#无法一边遍历一边删除的容器
 
         #region 初始化/销毁
         public void AddSkill(int index, int skill_cfgid)
@@ -70,6 +73,26 @@ namespace Combat
                 skill_manager.DestroyObject(skill_id);
             }
         }
+
+        public override void OnDeletePending()
+        {
+            //StateSystem.DEAD_STATE
+        }
+
+        public override void OnResurrect()
+        {
+            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+            var enumerator = m_index2id.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                int skill_id = enumerator.Current.Value;
+                Skill skill = skill_manager.GetObject(skill_id);
+                if (skill == null)
+                    continue;
+                if (skill.GetDefinitionComponent().StartsActive)
+                    skill.Activate(GetCurrentTime());
+            }
+        }
         #endregion
 
         #region ISignalListener
@@ -88,17 +111,19 @@ namespace Combat
         void OnMovementStart()
         {
             SkillManager skill_manager = GetLogicWorld().GetSkillManager();
-            var enumerator = m_active_skill_ids.GetEnumerator();
-            while(enumerator.MoveNext())
+            for (int  i = 0; i < m_active_skill_ids.Count; ++i)
             {
-                Skill skill = skill_manager.GetObject(enumerator.Current);
+                Skill skill = skill_manager.GetObject(m_active_skill_ids[i]);
                 if(skill != null)
                 {
                     SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
                     if (def_cmp.DeactivateWhenMoving)
-                        skill.Interrupt();
+                        m_skill_to_interrupt.Add(skill);
                 }
             }
+            for (int i = 0; i < m_skill_to_interrupt.Count; ++i)
+                m_skill_to_interrupt[i].Interrupt();
+            m_skill_to_interrupt.Clear();
         }
 
         public void OnGeneratorDestroyed(ISignalGenerator generator)
@@ -141,11 +166,14 @@ namespace Combat
             }
             else
             {
-                if (def_cmp.DeactivateWhenMoving && m_locomotor_cmp != null)
-                    m_locomotor_cmp.StopMoving();
-                if (def_cmp.m_main_animation != null)
+                if (def_cmp.DeactivateWhenMoving)
                 {
                     if (m_locomotor_cmp != null)
+                        m_locomotor_cmp.StopMoving();
+                }
+                else
+                {
+                    if (def_cmp.m_main_animation != null && m_locomotor_cmp != null)
                     {
                         m_locomotor_cmp.StopMoving();
                         m_locomotor_cmp.BlockAnimation();
@@ -171,9 +199,12 @@ namespace Combat
             }
             else
             {
-                if (def_cmp.m_main_animation != null)
+                if (def_cmp.DeactivateWhenMoving)
                 {
-                    if (m_locomotor_cmp != null)
+                }
+                else
+                {
+                    if (def_cmp.m_main_animation != null && m_locomotor_cmp != null)
                     {
                         m_locomotor_cmp.StopMoving();
                         m_locomotor_cmp.UnblockAnimation();
@@ -185,6 +216,14 @@ namespace Combat
             m_active_skill_ids.Remove(skill.ID);
         }
 
+        bool IsSkillActivated(Skill skill)
+        {
+            for (int i = 0; i < m_active_skill_ids.Count; ++i)
+                if (m_active_skill_ids[i] == skill.ID)
+                    return true;
+            return false;
+        }
+
         public bool IsMoveAllowed()
         {
             return m_move_block_count == 0;
@@ -193,13 +232,15 @@ namespace Combat
         protected override void OnDisable()
         {
             SkillManager skill_manager = GetLogicWorld().GetSkillManager();
-            var enumerator = m_active_skill_ids.GetEnumerator();
-            while (enumerator.MoveNext())
+            for (int i = 0; i < m_active_skill_ids.Count; ++i)
             {
-                Skill skill = skill_manager.GetObject(enumerator.Current);
-                if (skill != null)
-                    skill.Interrupt();
+                Skill skill = skill_manager.GetObject(m_active_skill_ids[i]);
+                if (skill != null && !skill.GetDefinitionComponent().StartsActive)
+                    m_skill_to_interrupt.Add(skill);
             }
+            for (int i = 0; i < m_skill_to_interrupt.Count; ++i)
+                m_skill_to_interrupt[i].Interrupt();
+            m_skill_to_interrupt.Clear();
         }
     }
 }

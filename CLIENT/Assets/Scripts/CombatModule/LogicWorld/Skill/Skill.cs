@@ -12,6 +12,7 @@ namespace Combat
         NotEnoughTargets,
         TargetTooNear,
         TargetTooFar,
+        ComponnetUnavailable,
     }
 
     public class Skill : Object
@@ -33,11 +34,11 @@ namespace Combat
         #region 初始化/销毁
         protected override void PreInitializeObject(ObjectCreationContext context)
         {
-            Entity ownerEntity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_owner_id);
-            if(ownerEntity != null)
+            Entity owner_entity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_owner_id);
+            if(owner_entity != null)
             {
-                m_owner_component = ownerEntity.GetComponent(SkillManagerComponent.ID) as SkillManagerComponent;
-                m_mana_component = ownerEntity.GetComponent(ManaComponent.ID) as ManaComponent;
+                m_owner_component = owner_entity.GetComponent(SkillManagerComponent.ID) as SkillManagerComponent;
+                m_mana_component = owner_entity.GetComponent(ManaComponent.ID) as ManaComponent;
             }
         }
 
@@ -55,7 +56,7 @@ namespace Combat
                 m_task = null;
             }
             if (m_is_active)
-                Deactivate();
+                Deactivate(true);
         }
 
         protected override void OnDestruct()
@@ -172,6 +173,14 @@ namespace Combat
                     return CastSkillResult.NotEnoughTargets;
             }
 
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                SkillComponent cmp = enumerator.Current.Value as SkillComponent;
+                if (cmp != null && !cmp.CanActivate())
+                    return CastSkillResult.ComponnetUnavailable;
+            }
+
             return CastSkillResult.Success;
         }
 
@@ -196,7 +205,7 @@ namespace Combat
             Target target = GetMajorTarget();
             if (target == null)
                 return true;
-            Entity entity = target.GetEntity();
+            Entity entity = target.GetEntity(GetLogicWorld());
             if (entity == null)
                 return true;
             return CheckTargetRange(entity) == CastSkillResult.Success;
@@ -205,21 +214,46 @@ namespace Combat
         void AdjustDirection()
         {
             int external_data_type = m_definition_component.ExternalDataType;
-            if (external_data_type == 0)
-                return;
-            Vector3FP vector = m_definition_component.ExternalVector;
-            if (vector.IsAllZero())
-                return;
-            PositionComponent position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
-            if (position_component == null)
-                return;
-            if (external_data_type == SkillDefinitionComponent.NeedExternalDirection)
+            if (external_data_type != 0)
             {
-                position_component.SetAngle(FixPoint.XZToUnityRotationDegree(vector.x, vector.z));
+                Vector3FP vector = m_definition_component.ExternalVector;
+                if (vector.IsAllZero())
+                    return;
+                PositionComponent position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+                if (position_component == null)
+                    return;
+                if (external_data_type == SkillDefinitionComponent.NeedExternalDirection)
+                {
+                    position_component.SetFacing(vector);
+                }
+                else if (external_data_type == SkillDefinitionComponent.NeedExternalOffset)
+                {
+                    position_component.SetFacing(vector);
+                }
             }
-            else if (external_data_type == SkillDefinitionComponent.NeedExternalOffset)
+            else
             {
-                position_component.SetAngle(FixPoint.XZToUnityRotationDegree(vector.x, vector.z));
+                Vector3FP vector = m_definition_component.ExternalVector;
+                if (!vector.IsAllZero())
+                {
+                    Entity owner_entity = GetOwnerEntity();
+                    PositionComponent owner_pos_cmp = owner_entity.GetComponent(PositionComponent.ID) as PositionComponent;
+                    owner_pos_cmp.SetFacing(vector);
+                }
+                else
+                {
+                    int auto_face = m_definition_component.AutoFaceType;
+                    if (auto_face == SkillDefinitionComponent.AutoFaceNearestEnemy)
+                    {
+                        Entity owner_entity = GetOwnerEntity();
+                        PositionComponent target_pos_cmp = GetLogicWorld().GetTargetGatheringManager().GetNearestEnemy(owner_entity);
+                        if (target_pos_cmp == null)
+                            return;
+                        PositionComponent owner_pos_cmp = owner_entity.GetComponent(PositionComponent.ID) as PositionComponent;
+                        Vector3FP offset = target_pos_cmp.CurrentPosition - owner_pos_cmp.CurrentPosition;
+                        owner_pos_cmp.SetFacing(offset);
+                    }
+                }
             }
         }
 
@@ -228,7 +262,7 @@ namespace Combat
             if (!CanActivate())
                 return false;
 
-            Deactivate();
+            Deactivate(false);
             SetSkillActive(true);
 
             AdjustDirection();
@@ -267,7 +301,7 @@ namespace Combat
                 BuildSkillTargets();
                 if (!CheckTargetRange())
                 {
-                    Deactivate();
+                    Deactivate(false);
                     return false;
                 }
             }
@@ -277,7 +311,7 @@ namespace Combat
             {
                 if (!m_mana_component.ChangeMana(m_definition_component.ManaType, -mana_cost))
                 {
-                    Deactivate();
+                    Deactivate(false);
                     return false;
                 }
             }
@@ -307,6 +341,18 @@ namespace Combat
                     msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation, m_definition_component.m_expiration_animation, true);
                 GetLogicWorld().AddRenderMessage(msg);
             }
+            if (m_definition_component.m_main_render_effect_cfgid > 0)
+            {
+                PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
+                msg.ConstructAsPlay(GetOwnerEntityID(), m_definition_component.m_main_render_effect_cfgid, FixPoint.MinusOne);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+            if (m_definition_component.m_main_sound > 0)
+            {
+                PlaySoundMessage msg = RenderMessage.Create<PlaySoundMessage>();
+                msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_sound, FixPoint.MinusOne);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
 #endif
             return true;
         }
@@ -324,11 +370,11 @@ namespace Combat
             if (m_definition_component.ExpirationTime > FixPoint.Zero)
                 m_definition_component.StartExpirationTimer(start_time);
             else
-                Deactivate();
+                Deactivate(false);
             return true;
         }
 
-        public bool Deactivate()
+        public bool Deactivate(bool force)
         {
             if (!m_is_active)
                 return false;
@@ -342,16 +388,25 @@ namespace Combat
             {
                 SkillComponent cmp = enumerator.Current.Value as SkillComponent;
                 if (cmp != null)
-                    cmp.Deactivate();
+                    cmp.Deactivate(force);
             }
 
             SetSkillActive(false);
+
+#if COMBAT_CLIENT
+            if (m_definition_component.m_main_render_effect_cfgid > 0)
+            {
+                PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
+                msg.ConstructAsStop(GetOwnerEntityID(), m_definition_component.m_main_render_effect_cfgid);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
             return true;
         }
 
         public void Interrupt()
         {
-            if (Deactivate())
+            if (Deactivate(true))
                 ScheduleTimers();
         }
 
@@ -429,7 +484,7 @@ namespace Combat
                 if (expiration_timer.GetRemaining(current_time) == FixPoint.Zero)
                 {
                     expiration_timer.Reset();
-                    Deactivate();
+                    Deactivate(false);
                     NotifySkillExpired();
                 }
                 else
@@ -463,9 +518,12 @@ namespace Combat
         void NotifySkillExpired()
         {
 #if COMBAT_CLIENT
-            PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
-            msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true);
-            GetLogicWorld().AddRenderMessage(msg);
+            if (m_definition_component.m_main_animation != null)
+            {
+                PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+                msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
 #endif
         }
         #endregion

@@ -6,6 +6,8 @@ namespace Combat
     {
         public static readonly int NeedExternalDirection = (int)CRC.Calculate("direction");
         public static readonly int NeedExternalOffset = (int)CRC.Calculate("offset");
+        public static readonly int AutoAimNearestEnemy = (int)CRC.Calculate("nearest_enemy");
+        public static readonly int AutoFaceNearestEnemy = (int)CRC.Calculate("nearest_enemy");
 
         //直接对目标生效
         public const int InflictType_Immediately = 1;
@@ -42,15 +44,20 @@ namespace Combat
         int m_targets_min_count_for_activate = 0;
 
         int m_external_data_type = 0;
+        int m_auto_face_type = 0;
 
         int m_inflict_type = 1;
         string m_inflict_missile;
         FixPoint m_inflict_missile_speed;
         FixPoint m_impact_delay;
 
+        public int m_auto_aim_type = 0;
+        public string m_icon;
         public string m_casting_animation;
         public string m_main_animation;
         public string m_expiration_animation;
+        public int m_main_render_effect_cfgid = 0;
+        public int m_main_sound = 0;
         #endregion
 
         //运行数据
@@ -94,7 +101,7 @@ namespace Combat
         #region 初始化/销毁
         public SkillDefinitionComponent()
         {
-            m_target_gathering_param.m_fation = FactionRelation.Enemy;
+            m_target_gathering_param.m_faction = FactionRelation.Enemy;
         }
 
         public override void InitializeComponent()

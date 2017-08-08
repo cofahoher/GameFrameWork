@@ -18,9 +18,10 @@ namespace Combat
         {
             Skill skill = GetOwnerSkill();
             List<Target> targets = skill.GetTargets();
+            LogicWorld logic_world = GetLogicWorld();
             for (int i = 0; i < targets.Count; ++i)
             {
-                m_current_target = targets[i].GetEntity();
+                m_current_target = targets[i].GetEntity(logic_world);
                 if (m_current_target == null)
                     continue;
                 EntityUtil.KillEntity(m_current_target, GetOwnerEntityID());
@@ -28,7 +29,7 @@ namespace Combat
             m_current_target = null;
         }
 
-        public override void Deactivate()
+        public override void Deactivate(bool force)
         {
         }
     }

@@ -51,7 +51,7 @@ namespace Combat
             AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
             m_level_data = GetConfigProvider().GetLevelData(combat_start_info.m_level_id);
             m_logic_world = m_combat_factory.CreateLogicWorld();
-            m_logic_world.Initialize(this, false);
+            m_logic_world.Initialize(this, combat_start_info.m_world_seed, false);
             m_sync_server = m_combat_factory.CreateSyncServer();
             m_sync_server.Init(m_logic_world);
             WorldCreationContext world_context = m_combat_factory.CreateWorldCreationContext(combat_start_info);

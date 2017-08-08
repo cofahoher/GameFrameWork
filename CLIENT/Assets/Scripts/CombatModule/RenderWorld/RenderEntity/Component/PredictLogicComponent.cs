@@ -17,9 +17,9 @@ namespace Combat
         float m_min_threshold = 0.2f;
         float m_max_threshold = 3f;
         //运行数据
-        GridGraph m_grid_graph = null;
         Transform m_interpolation_tr;
         ModelComponent m_model_component;
+        PositionComponent m_position_component;
         LocomotorComponent m_locomotor_component;
         List<MovementPredic> m_movement_predicts = new List<MovementPredic>();
         int m_block_locomotor_predict = 0;
@@ -31,7 +31,6 @@ namespace Combat
         #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
-            m_grid_graph = ParentObject.GetLogicWorld().GetGridGraph();
             m_model_component = ParentObject.GetComponent(ModelComponent.ID) as ModelComponent;
             if (m_model_component == null)
                 return;
@@ -41,6 +40,7 @@ namespace Combat
             m_interpolation_tr = go.transform;
             m_model_component.SetPredictComponent(this);
             Entity entity = GetLogicEntity();
+            m_position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
             m_locomotor_component = entity.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
         }
         #endregion
@@ -349,15 +349,40 @@ namespace Combat
 
         public void AddPredictOffset(Vector3 offset)
         {
-            if (m_grid_graph != null)
+            GridGraph grid_graph = m_position_component.GetGridGraph();
+            if (grid_graph != null)
             {
                 Vector3 interpolation_position = m_interpolation_tr.localPosition + offset;
                 Vector3 entity_position = m_model_component.GetCurrentPosition() + interpolation_position;
-                GridNode node = m_grid_graph.Position2Node(RenderWorld.Vector3_To_Vector3FP(entity_position));
+                Vector3FP entity_position_fp = RenderWorld.Vector3_To_Vector3FP(entity_position);
+                GridNode node = grid_graph.Position2Node(entity_position_fp);
                 if (node == null)
-                    return;
-                if (!node.Walkable && m_locomotor_component.AvoidObstacle())
-                    return;
+                {
+                    if (!GetRenderWorld().OnEntityOutOfEdge(GetRenderEntity()))
+                        return;
+                }
+                else if (!node.Walkable && m_locomotor_component.AvoidObstacle())
+                {
+                    Vector3FP offset_fp = RenderWorld.Vector3_To_Vector3FP(offset);
+                    //try z
+                    entity_position_fp.x -= offset_fp.x;
+                    node = grid_graph.Position2Node(entity_position_fp);
+                    if (node == null || !node.Walkable)
+                    {
+                        //try x
+                        entity_position_fp.x += offset_fp.x;
+                        entity_position_fp.z -= offset_fp.z;
+                        node = grid_graph.Position2Node(entity_position_fp);
+                        if (node == null || !node.Walkable)
+                            return;
+                        else
+                            offset.z = 0;
+                    }
+                    else
+                    {
+                        offset.x = 0;
+                    }
+                }
             }
 
             for (int i = 0; i < m_movement_predicts.Count; ++i)
@@ -408,7 +433,7 @@ namespace Combat
         {
             if (m_locomotor_component.IsAnimationBlocked)
                 return;
-            m_model_component.SetAngle(Mathf.Atan2(-direction.z, direction.x) * 180 / Mathf.PI);
+            m_model_component.SetBaseAngle(Mathf.Atan2(-direction.z, direction.x) * 180 / Mathf.PI);
             AnimationComponent animation_component = ParentObject.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
                 animation_component.PlayerAnimation(animation_component.LocomotorAnimationName, true);

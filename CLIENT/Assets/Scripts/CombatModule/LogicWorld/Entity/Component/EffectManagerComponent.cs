@@ -33,6 +33,12 @@ namespace Combat
             m_effect_registry.Destruct();
             m_effect_registry = null;
         }
+
+        public override void OnDeletePending()
+        {
+            m_generator_registry.OnDeletePending();
+            m_effect_registry.OnDeletePending();
+        }
         #endregion
     }
 }

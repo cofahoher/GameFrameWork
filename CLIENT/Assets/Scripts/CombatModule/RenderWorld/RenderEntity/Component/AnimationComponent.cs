@@ -19,12 +19,18 @@ namespace Combat
         string m_locomotor_animation_name = AnimationName.RUN;
         //运行数据
         float m_animation_speed = 1.0f;
+        string m_current_animation;
         Animation m_unity_animation_cmp;
 
         public float AniamtionSpeed
         {
             get { return m_animation_speed; }
             set { m_animation_speed = value; }
+        }
+
+        public string CurrentAnimation
+        {
+            get { return m_current_animation; }
         }
 
         public string LocomotorAnimationName
@@ -73,6 +79,7 @@ namespace Combat
             state.speed = speed > 0 ? speed : m_animation_speed;
             state.wrapMode = loop ? WrapMode.Loop : WrapMode.Once;
             m_unity_animation_cmp.CrossFade(animation_name, fade_length);
+            m_current_animation = animation_name;
         }
 
         public void QueueAnimation(string animation_name, bool loop = false, float speed = -1.0f, float fade_length = 0.2f)

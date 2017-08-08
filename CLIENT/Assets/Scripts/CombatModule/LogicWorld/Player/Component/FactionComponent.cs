@@ -36,7 +36,10 @@ namespace Combat
                 return;
             string value;
             if (dic.TryGetValue("faction", out value))
+            {
                 m_faction = (int)CRC.Calculate(value);
+                m_faction_index = GetLogicWorld().GetFactionManager().Faction2Index(m_faction);
+            }
         }
         #endregion
 

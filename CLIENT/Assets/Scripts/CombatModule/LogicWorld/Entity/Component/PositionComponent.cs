@@ -12,49 +12,126 @@ namespace Combat
          */
         public Vector3FP m_birth_position;
         public FixPoint m_birth_angle = FixPoint.Zero; //绕Y轴的旋转角度
-        public BirthPositionInfo(FixPoint x, FixPoint y, FixPoint z, FixPoint angle)
+        public SceneSpace m_space = null;
+        public BirthPositionInfo(FixPoint x, FixPoint y, FixPoint z, FixPoint angle, SceneSpace space = null)
         {
             m_birth_position = new Vector3FP(x, y, z);
             m_birth_angle = angle;
+            m_space = space;
         }
         public void CopyFrom(BirthPositionInfo rhs)
         {
             m_birth_position = rhs.m_birth_position;
             m_birth_angle = rhs.m_birth_angle;
+            m_space = rhs.m_space;
         }
     }
 
     public partial class PositionComponent : EntityComponent
     {
-        //需要备份的初始数据
-        BirthPositionInfo m_birth_info = new BirthPositionInfo(FixPoint.Zero, FixPoint.Zero, FixPoint.Zero, FixPoint.Zero);
-        //运行数据
-        Vector3FP m_current_position;
-        FixPoint m_current_angle;  //绕Z轴的转角，注意Unity是左手系
+        //配置数据
         FixPoint m_radius = FixPoint.Zero;
         FixPoint m_height = FixPoint.One;
+        bool m_base_rotatable = true;
         bool m_collision_sender = true;
         bool m_visible = true;
-        ISpaceManager m_space_manager = null;
 
-        #region GETTER
+        //运行数据
+        Vector3FP m_current_position;
+        FixPoint m_base_angle = FixPoint.Zero;  //绕Z轴的转角，注意Unity是左手系
+        FixPoint m_head_angle = FixPoint.Zero;  //头部相对于m_current_angle的旋转
+        SceneSpace m_current_space = null;
+
+        #region GETTER/SETTER
+        public SceneSpace GetCurrentSceneSpace()
+        {
+            return m_current_space;
+        }
+
+        public ISpacePartition GetSpacePartition()
+        {
+            if (m_current_space != null)
+                return m_current_space.m_paitition;
+            return null;
+        }
+
+        public GridGraph GetGridGraph()
+        {
+            if (m_current_space != null)
+                return m_current_space.m_graph;
+            return null;
+        }
+
         public Vector3FP CurrentPosition
         {
             get { return m_current_position; }
             set
             {
-                if (m_space_manager != null)
-                    m_space_manager.UpdateEntity(this, value);
-                m_current_position = value;
+                if (m_collision_sender && m_current_space != null)
+                {
+                    SceneSpace space = m_current_space.GetNeighbourSpace(value);
+                    if (space != m_current_space)
+                    {
+                        m_current_space.m_paitition.RemoveEntity(this);
+                        m_current_position = value;
+                        m_current_space = space;
+                        m_current_space.m_paitition.AddEntiy(this);
+                    }
+                    else
+                    {
+                        m_current_space.m_paitition.UpdateEntity(this, value);
+                        m_current_position = value;
+                    }
+                }
+                else
+                {
+                    m_current_position = value;
+                }
             }
         }
 
-        public FixPoint CurrentAngle
+        public FixPoint BaseAngle
         {
-            get { return m_current_angle; }
+            get { return m_base_angle; }
             set
             {
-                SetAngle(value);
+                if (m_base_rotatable)
+                {
+                    m_base_angle = value;
+                    SendChangeDirectionRenderMessage();
+                }
+            }
+        }
+
+        public FixPoint HeadAngle
+        {
+            get { return m_head_angle; }
+            set
+            {
+                if (!m_base_rotatable)
+                {
+                    m_head_angle = value;
+                    SendChangeDirectionRenderMessage();
+                }
+            }
+        }
+
+        public FixPoint FacingAngle
+        {
+            get
+            {
+                if (m_base_rotatable)
+                {
+                    return m_base_angle;
+                }
+                else
+                {
+                    return m_base_angle + m_head_angle;
+                }
+            }
+            set
+            {
+                SetFacing(value);
             }
         }
 
@@ -62,7 +139,7 @@ namespace Combat
         {
             get
             {
-                FixPoint radian = FixPoint.Degree2Radian(-m_current_angle);
+                FixPoint radian = FixPoint.Degree2Radian(-FacingAngle);
                 return new Vector2FP(FixPoint.Cos(radian), FixPoint.Sin(radian));
             }
         }
@@ -71,7 +148,7 @@ namespace Combat
         {
             get
             {
-                FixPoint radian = FixPoint.Degree2Radian(-m_current_angle);
+                FixPoint radian = FixPoint.Degree2Radian(-FacingAngle);
                 return new Vector3FP(FixPoint.Cos(radian), FixPoint.Zero, FixPoint.Sin(radian));
             }
         }
@@ -83,15 +160,16 @@ namespace Combat
             BirthPositionInfo birth_info = ParentObject.GetCreationContext().m_birth_info;
             if (birth_info != null)
             {
-                m_birth_info.CopyFrom(birth_info);
-                m_current_position = m_birth_info.m_birth_position;
-                m_current_angle = m_birth_info.m_birth_angle;
+                m_current_position = birth_info.m_birth_position;
+                m_base_angle = birth_info.m_birth_angle;
+                m_current_space = birth_info.m_space;
             }
             else
             {
-                m_birth_info.m_birth_position = m_current_position;
-                m_birth_info.m_birth_angle = m_current_angle;
+                ParentObject.GetCreationContext().m_birth_info = new BirthPositionInfo(m_current_position.x, m_current_position.y, m_current_position.z, m_base_angle);
             }
+            if (m_current_space == null)
+                m_current_space = GetLogicWorld().GetDefaultSceneSpace();
 
             ObjectProtoData proto_data = ParentObject.GetCreationContext().m_proto_data;
             if (proto_data != null)
@@ -105,55 +183,92 @@ namespace Combat
                 }
             }
 
-            if (m_collision_sender)
+            if (m_collision_sender && m_current_space != null)
             {
-                m_space_manager = GetLogicWorld().GetSpaceManager();
-                if (m_space_manager != null)
-                    m_space_manager.AddEntiy(this);
+                m_current_space.m_paitition.AddEntiy(this);
             }
         }
 
         public override void OnDeletePending()
         {
-            if (m_collision_sender)
+            if (m_current_space != null)
             {
-                if (m_space_manager != null)
-                    m_space_manager.RemoveEntity(this);
+                m_current_space.OnEntityDestroy(GetOwnerEntity());
+                if (m_collision_sender)
+                    m_current_space.m_paitition.RemoveEntity(this);
             }
+        }
+
+        public void ClearSpace()
+        {
+            m_current_space = null;
         }
 
         protected override void OnDestruct()
         {
-            m_space_manager = null;
+            m_current_space = null;
         }
         #endregion
 
         #region SETTER
-        public void SetPositionXZ(FixPoint x, FixPoint z)
+        public void SetFacing(Vector3FP direction, bool from_command = false)
         {
-            m_current_position.x = x;
-            m_current_position.z = z;
+            FixPoint angle = FixPoint.XZToUnityRotationDegree(direction.x, direction.z);
+            SetFacing(angle, from_command);
         }
 
-        public void SetPositionXY(FixPoint x, FixPoint y)
+        public void SetFacing(FixPoint angle, bool from_command = false)
         {
-            m_current_position.x = x;
-            m_current_position.y = y;
+            if (m_base_rotatable)
+            {
+                m_base_angle = angle;
+            }
+            else
+            {
+                m_head_angle = angle - m_base_angle;
+            }
+            if (!from_command || !GetOwnerPlayer().IsLocal)
+                SendChangeDirectionRenderMessage();
         }
 
-        public void SetAngle(FixPoint new_angle)
+        void SendChangeDirectionRenderMessage()
         {
-            m_current_angle = new_angle;
 #if COMBAT_CLIENT
             ChangeDirectionRenderMessage msg = RenderMessage.Create<ChangeDirectionRenderMessage>();
-            msg.Construct(ParentObject.ID, m_current_angle);
+            msg.Construct(ParentObject.ID, m_base_angle, m_head_angle);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
         }
 
-        public void SetAngle(Vector3FP direction)
+        public void Teleport(SceneSpace space, Vector3FP new_position)
         {
-            SetAngle(FixPoint.XZToUnityRotationDegree(direction.x, direction.z));
+            if (m_collision_sender)
+            {
+                if (space != m_current_space)
+                {
+                    if (m_current_space != null)
+                        m_current_space.m_paitition.RemoveEntity(this);
+                    m_current_position = new_position;
+                    m_current_space = space;
+                    if (m_current_space != null)
+                        m_current_space.m_paitition.AddEntiy(this);
+                }
+                else
+                {
+                    if (m_current_space != null)
+                        m_current_space.m_paitition.UpdateEntity(this, new_position);
+                    m_current_position = new_position;
+                }
+            }
+            else
+            {
+                m_current_position = new_position;
+            }
+#if COMBAT_CLIENT
+            ChangePositionRenderMessage msg = RenderMessage.Create<ChangePositionRenderMessage>();
+            msg.Construct(GetOwnerEntityID(), new_position);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
         }
         #endregion
     }

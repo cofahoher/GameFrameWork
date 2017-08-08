@@ -69,6 +69,14 @@ namespace Combat
                 if (component != null)
                     component.Disable();
             }
+#if COMBAT_CLIENT
+            if (data.m_render_effect_cfgid > 0)
+            {
+                PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
+                msg.ConstructAsPlay(GetOwnerEntityID(), data.m_render_effect_cfgid, FixPoint.MinusOne);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
         }
 
         void DeactivateState(StateData data)
@@ -79,6 +87,14 @@ namespace Combat
                 if (component != null)
                     component.Enable();
             }
+#if COMBAT_CLIENT
+            if (data.m_render_effect_cfgid > 0)
+            {
+                PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
+                msg.ConstructAsStop(GetOwnerEntityID(), data.m_render_effect_cfgid);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
         }
     }
 }

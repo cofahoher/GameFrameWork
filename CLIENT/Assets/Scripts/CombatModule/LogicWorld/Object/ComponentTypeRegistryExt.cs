@@ -15,7 +15,7 @@ namespace Combat
             Register<TurnManagerComponent>(false);
             Register<FactionComponent>(false);
             Register<PlayerAIComponent>(false);
-            Register<PlayerGameplaySpecilaComponent>(false);
+            Register<PlayerGameplaySpecialComponent>(false);
             Register<PlayerTargetingComponent>(false);
             Register<AIComponent>(false);
             Register<AttributeManagerComponent>(false);
@@ -23,6 +23,7 @@ namespace Combat
             Register<DamageModificationComponent>(false);
             Register<DeathComponent>(false);
             Register<EffectManagerComponent>(false);
+            Register<EffectRegionComponent>(false);
             Register<EntityDefinitionComponent>(false);
             Register<EntityGameplaySpecilaComponent>(false);
             Register<LocomotorComponent>(false);
@@ -44,22 +45,25 @@ namespace Combat
             Register<KillTargetSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
             Register<SpurtSkillComponent>(false);
-            Register<ThreePhaseAttackSkillComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<ChangePlayerFactionEffectComponent>(false);
             Register<CreateObjectEffectComponent>(false);
             Register<DamageEffectComponent>(false);
+            Register<DamageOverTimeEffectComponent>(false);
             Register<EffectDefinitionComponent>(false);
             Register<HealEffectComponent>(false);
             Register<KillOwnerEffectComponent>(false);
+            Register<KnockbackEffectComponent>(false);
             Register<ModifyAttributeEffectComponent>(false);
 
 #if COMBAT_CLIENT
             Register<AnimationComponent>(true);
             Register<AnimatorComponent>(true);
+            Register<AimingComponent>(true);
             Register<ModelComponent>(true);
             Register<PredictLogicComponent>(true);
+            Register<RenderEffectManagerComponent>(true);
 #endif
         }
     }
@@ -77,6 +81,12 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
+            if (variables.TryGetValue("be_killed_experience", out value))
+                m_be_killed_experience = int.Parse(value);
+            if (variables.TryGetValue("max_level", out value))
+                m_max_level = int.Parse(value);
+            if (variables.TryGetValue("level_table", out value))
+                m_experience_level_table = value;
             if (variables.TryGetValue("level", out value))
                 CurrentLevel = int.Parse(value);
         }
@@ -105,6 +115,18 @@ namespace Combat
                 return false;
             }
         }
+
+#region GETTER/SETTER
+        public int BeKilledExperience
+        {
+            get { return m_be_killed_experience; }
+        }
+
+        public int MaxLevel
+        {
+            get { return m_max_level; }
+        }
+#endregion
     }
 
     public partial class TurnManagerComponent
@@ -129,9 +151,9 @@ namespace Combat
         public const int ID = -1685636568;
     }
 
-    public partial class PlayerGameplaySpecilaComponent
+    public partial class PlayerGameplaySpecialComponent
     {
-        public const int ID = -896397789;
+        public const int ID = -1911957170;
     }
 
     public partial class PlayerTargetingComponent
@@ -233,12 +255,40 @@ namespace Combat
                 m_hide_delay = FixPoint.Parse(value);
             if (variables.TryGetValue("delete_delay", out value))
                 m_delete_delay = FixPoint.Parse(value);
+            if (variables.TryGetValue("can_resurrect", out value))
+                m_can_resurrect = bool.Parse(value);
         }
     }
 
     public partial class EffectManagerComponent
     {
         public const int ID = 1995518324;
+    }
+
+    public partial class EffectRegionComponent
+    {
+        public const int ID = 1326997351;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("gathering_type", out value))
+                m_target_gathering_param.m_type = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_param1", out value))
+                m_target_gathering_param.m_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("gathering_param2", out value))
+                m_target_gathering_param.m_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("gathering_faction", out value))
+                m_target_gathering_param.m_faction = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_category", out value))
+                m_target_gathering_param.m_category = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("enter_generator", out value))
+                m_enter_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("period_generator", out value))
+                m_period_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("period", out value))
+                m_period = FixPoint.Parse(value);
+        }
     }
 
     public partial class EntityDefinitionComponent
@@ -339,7 +389,7 @@ namespace Combat
         public const int VID_X = -1505763071;
         public const int VID_Y = -1088106432;
         public const int VID_Z = -1811315837;
-        public const int VID_CurrentAngle = 1682267402;
+        public const int VID_BaseAngle = 1682267402;
         public const int VID_Radius = -1373094910;
         public const int VID_Height = 231863489;
 
@@ -348,7 +398,7 @@ namespace Combat
             ComponentTypeRegistry.RegisterVariable(VID_X, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Y, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Z, ID);
-            ComponentTypeRegistry.RegisterVariable(VID_CurrentAngle, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_BaseAngle, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Radius, ID);
             ComponentTypeRegistry.RegisterVariable(VID_Height, ID);
         }
@@ -363,11 +413,13 @@ namespace Combat
             if (variables.TryGetValue("z", out value))
                 m_current_position.z = FixPoint.Parse(value);
             if (variables.TryGetValue("angle", out value))
-                m_current_angle = FixPoint.Parse(value);
+                m_base_angle = FixPoint.Parse(value);
             if (variables.TryGetValue("radius", out value))
                 m_radius = FixPoint.Parse(value);
             if (variables.TryGetValue("height", out value))
                 m_height = FixPoint.Parse(value);
+            if (variables.TryGetValue("base_rotatable", out value))
+                m_base_rotatable = bool.Parse(value);
             if (variables.TryGetValue("collision_sender", out value))
                 m_collision_sender = bool.Parse(value);
             if (variables.TryGetValue("visible", out value))
@@ -387,8 +439,8 @@ namespace Combat
             case VID_Z:
                 value = m_current_position.z;
                 return true;
-            case VID_CurrentAngle:
-                value = m_current_angle;
+            case VID_BaseAngle:
+                value = m_base_angle;
                 return true;
             case VID_Radius:
                 value = m_radius;
@@ -415,8 +467,8 @@ namespace Combat
             case VID_Z:
                 m_current_position.z = value;
                 return true;
-            case VID_CurrentAngle:
-                m_current_angle = value;
+            case VID_BaseAngle:
+                m_base_angle = value;
                 return true;
             case VID_Radius:
                 m_radius = value;
@@ -455,6 +507,11 @@ namespace Combat
             get { return m_height; }
         }
 
+        public bool BaseRotatable
+        {
+            get { return m_base_rotatable; }
+        }
+
         public bool Visible
         {
             get { return m_visible; }
@@ -473,8 +530,12 @@ namespace Combat
                 m_speed = FixPoint.Parse(value);
             if (variables.TryGetValue("lifetime", out value))
                 m_lifetime = FixPoint.Parse(value);
+            if (variables.TryGetValue("collision_sound", out value))
+                m_collision_sound_cfgid = int.Parse(value);
             if (variables.TryGetValue("collision_faction", out value))
                 m_collision_faction = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("can_cross_obstacle", out value))
+                m_can_cross_obstacle = bool.Parse(value);
         }
     }
 
@@ -565,6 +626,8 @@ namespace Combat
                 m_offset.y = FixPoint.Parse(value);
             if (variables.TryGetValue("offset_z", out value))
                 m_offset.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("combo_type", out value))
+                m_combo_type_crc = (int)CRC.Calculate(value);
             if (variables.TryGetValue("combo_attack_cnt", out value))
                 m_combo_attack_cnt = int.Parse(value);
             if (variables.TryGetValue("combo_interval", out value))
@@ -579,14 +642,22 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
+            if (variables.TryGetValue("delay_time", out value))
+                m_delay_time = FixPoint.Parse(value);
             if (variables.TryGetValue("damage_type", out value))
                 m_damage_type_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("damage_amount", out value))
                 m_damage_amount.Compile(value);
+            if (variables.TryGetValue("damage_render_effect", out value))
+                m_damage_render_effect_cfgid = int.Parse(value);
+            if (variables.TryGetValue("damage_sound", out value))
+                m_damage_sound_cfgid = int.Parse(value);
             if (variables.TryGetValue("combo_attack_cnt", out value))
                 m_combo_attack_cnt = int.Parse(value);
             if (variables.TryGetValue("combo_interval", out value))
                 m_combo_interval = FixPoint.Parse(value);
+            if (variables.TryGetValue("render_effect", out value))
+                m_render_effect_cfgid = int.Parse(value);
         }
     }
 
@@ -597,10 +668,14 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
-            if (variables.TryGetValue("generator_id", out value))
-                m_generator_cfgid = int.Parse(value);
             if (variables.TryGetValue("delay_time", out value))
                 m_delay_time = FixPoint.Parse(value);
+            if (variables.TryGetValue("generator_id", out value))
+                m_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("render_effect", out value))
+                m_render_effect_cfgid = int.Parse(value);
+            if (variables.TryGetValue("render_delay_time", out value))
+                m_render_delay_time = FixPoint.Parse(value);
         }
     }
 
@@ -650,8 +725,8 @@ namespace Combat
                 m_target_gathering_param.m_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("gathering_param2", out value))
                 m_target_gathering_param.m_param2 = FixPoint.Parse(value);
-            if (variables.TryGetValue("gathering_fation", out value))
-                m_target_gathering_param.m_fation = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_faction", out value))
+                m_target_gathering_param.m_faction = (int)CRC.Calculate(value);
             if (variables.TryGetValue("gathering_category", out value))
                 m_target_gathering_param.m_category = (int)CRC.Calculate(value);
             if (variables.TryGetValue("need_gather_targets", out value))
@@ -660,6 +735,8 @@ namespace Combat
                 m_targets_min_count_for_activate = int.Parse(value);
             if (variables.TryGetValue("external_data_type", out value))
                 m_external_data_type = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("auto_face", out value))
+                m_auto_face_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("inflict_type", out value))
                 m_inflict_type = int.Parse(value);
             if (variables.TryGetValue("inflict_missile", out value))
@@ -668,12 +745,20 @@ namespace Combat
                 m_inflict_missile_speed = FixPoint.Parse(value);
             if (variables.TryGetValue("impact_delay", out value))
                 m_impact_delay = FixPoint.Parse(value);
+            if (variables.TryGetValue("icon", out value))
+                m_icon = value;
+            if (variables.TryGetValue("auto_aim", out value))
+                m_auto_aim_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("casting_animation", out value))
                 m_casting_animation = value;
             if (variables.TryGetValue("main_animation", out value))
                 m_main_animation = value;
             if (variables.TryGetValue("expiration_animation", out value))
                 m_expiration_animation = value;
+            if (variables.TryGetValue("main_render_effect", out value))
+                m_main_render_effect_cfgid = int.Parse(value);
+            if (variables.TryGetValue("main_sound", out value))
+                m_main_sound = int.Parse(value);
         }
 
 #region GETTER/SETTER
@@ -762,6 +847,11 @@ namespace Combat
             get { return m_external_data_type; }
         }
 
+        public int AutoFaceType
+        {
+            get { return m_auto_face_type; }
+        }
+
         public int InflictType
         {
             get { return m_inflict_type; }
@@ -790,50 +880,10 @@ namespace Combat
                 m_distance = FixPoint.Parse(value);
             if (variables.TryGetValue("time", out value))
                 m_time = FixPoint.Parse(value);
-        }
-    }
-
-    public partial class ThreePhaseAttackSkillComponent
-    {
-        public const int ID = -466972422;
-
-        public override void InitializeVariable(Dictionary<string, string> variables)
-        {
-            string value;
-            if (variables.TryGetValue("damage_type", out value))
-                m_damage_type_id = (int)CRC.Calculate(value);
-            if (variables.TryGetValue("phase1_inflict_time", out value))
-                m_inflict_time[0] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase1_damage_amount", out value))
-                m_damage_amount[0].Compile(value);
-            if (variables.TryGetValue("phase1_generator_id", out value))
-                m_generator_cfg_id[0] = int.Parse(value);
-            if (variables.TryGetValue("phase1_link_time", out value))
-                m_link_time[0] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase2_inflict_time", out value))
-                m_inflict_time[1] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase2_damage_amount", out value))
-                m_damage_amount[1].Compile(value);
-            if (variables.TryGetValue("phase2_generator_id", out value))
-                m_generator_cfg_id[1] = int.Parse(value);
-            if (variables.TryGetValue("phase2_link_time", out value))
-                m_link_time[1] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase3_inflict_time", out value))
-                m_inflict_time[2] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase3_damage_amount", out value))
-                m_damage_amount[2].Compile(value);
-            if (variables.TryGetValue("phase3_generator_id", out value))
-                m_generator_cfg_id[2] = int.Parse(value);
-            if (variables.TryGetValue("phase3_link_time", out value))
-                m_link_time[2] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase4_inflict_time", out value))
-                m_inflict_time[3] = FixPoint.Parse(value);
-            if (variables.TryGetValue("phase4_damage_amount", out value))
-                m_damage_amount[3].Compile(value);
-            if (variables.TryGetValue("phase4_generator_id", out value))
-                m_generator_cfg_id[3] = int.Parse(value);
-            if (variables.TryGetValue("phase4_link_time", out value))
-                m_link_time[3] = FixPoint.Parse(value);
+            if (variables.TryGetValue("collision_target_generator_id", out value))
+                m_collision_target_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("backward", out value))
+                m_backward = bool.Parse(value);
         }
     }
 
@@ -887,6 +937,10 @@ namespace Combat
                 m_offset.y = FixPoint.Parse(value);
             if (variables.TryGetValue("offset_z", out value))
                 m_offset.z = FixPoint.Parse(value);
+            if (variables.TryGetValue("object_count", out value))
+                m_object_count = int.Parse(value);
+            if (variables.TryGetValue("interval", out value))
+                m_interval = FixPoint.Parse(value);
             if (variables.TryGetValue("revert_when_unapply", out value))
                 m_revert_when_unapply = bool.Parse(value);
         }
@@ -903,6 +957,30 @@ namespace Combat
                 m_damage_type_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("damage_amount", out value))
                 m_damage_amount.Compile(value);
+            if (variables.TryGetValue("damage_render_effect", out value))
+                m_damage_render_effect_cfgid = int.Parse(value);
+            if (variables.TryGetValue("damage_sound", out value))
+                m_damage_sound_cfgid = int.Parse(value);
+        }
+    }
+
+    public partial class DamageOverTimeEffectComponent
+    {
+        public const int ID = 1300961956;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("damage_type", out value))
+                m_damage_type_id = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("damage_amount", out value))
+                m_damage_amount.Compile(value);
+            if (variables.TryGetValue("damage_render_effect", out value))
+                m_damage_render_effect_cfgid = int.Parse(value);
+            if (variables.TryGetValue("damage_sound", out value))
+                m_damage_sound_cfgid = int.Parse(value);
+            if (variables.TryGetValue("period", out value))
+                m_period = FixPoint.Parse(value);
         }
     }
 
@@ -949,6 +1027,20 @@ namespace Combat
         public const int ID = 1345354818;
     }
 
+    public partial class KnockbackEffectComponent
+    {
+        public const int ID = 732875937;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("distance", out value))
+                m_distance = FixPoint.Parse(value);
+            if (variables.TryGetValue("time", out value))
+                m_time = FixPoint.Parse(value);
+        }
+    }
+
     public partial class ModifyAttributeEffectComponent
     {
         public const int ID = -107304768;
@@ -988,6 +1080,27 @@ namespace Combat
 #endif
     }
 
+    public partial class AimingComponent
+    {
+        public const int ID = -1191010116;
+
+#if COMBAT_CLIENT
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("root_path", out value))
+                m_root_path = value;
+            if (variables.TryGetValue("aiming_line_parent_path", out value))
+                m_aiming_line_parent_path = value;
+            if (variables.TryGetValue("aiming_line_asset", out value))
+                m_aiming_line_asset = value;
+            if (variables.TryGetValue("rotate_turret_asset", out value))
+                m_rotate_turret_asset = value;
+        }
+#endif
+    }
+
     public partial class ModelComponent
     {
         public const int ID = -1332594716;
@@ -1001,6 +1114,8 @@ namespace Combat
                 m_asset_name = value;
             if (variables.TryGetValue("bodyctrl_path", out value))
                 m_bodyctrl_path = value;
+            if (variables.TryGetValue("headctrl_path", out value))
+                m_headctrl_path = value;
         }
 #endif
     }
@@ -1008,5 +1123,10 @@ namespace Combat
     public partial class PredictLogicComponent
     {
         public const int ID = 1521612208;
+    }
+
+    public partial class RenderEffectManagerComponent
+    {
+        public const int ID = -1117048785;
     }
 }

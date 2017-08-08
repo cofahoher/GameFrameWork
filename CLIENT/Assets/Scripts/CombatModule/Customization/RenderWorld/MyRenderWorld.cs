@@ -19,7 +19,7 @@ namespace Combat
             base.Initialize(combat_client, logic_world);
             m_camera_controller = new CameraController(this);
 #if UNITY_EDITOR
-            m_grid_graph = GetLogicWorld().GetGridGraph();
+            m_grid_graph = GetLogicWorld().GetDefaultSceneSpace().m_graph;
             if (m_grid_graph != null)
             {
                 InitializeDrawGrid();

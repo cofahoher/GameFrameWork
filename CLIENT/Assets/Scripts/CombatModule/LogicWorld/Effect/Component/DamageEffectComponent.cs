@@ -6,6 +6,8 @@ namespace Combat
     {
         int m_damage_type_id = 0;
         Formula m_damage_amount = RecyclableObject.Create<Formula>();
+        int m_damage_render_effect_cfgid = 0;
+        int m_damage_sound_cfgid = 0;
 
         protected override void OnDestruct()
         {
@@ -29,6 +31,8 @@ namespace Combat
             damage.m_damage_type = m_damage_type_id;
             damage.m_damage_amount = m_damage_amount.Evaluate(this);
             damage.m_damage_amount = DamageSystem.Instance.CalculateDamageAmount(m_damage_type_id, damage.m_damage_amount, attacker, target);
+            damage.m_render_effect_cfgid = m_damage_render_effect_cfgid;
+            damage.m_sound_cfgid = m_damage_sound_cfgid;
             damageable_component.TakeDamage(damage);
         }
 

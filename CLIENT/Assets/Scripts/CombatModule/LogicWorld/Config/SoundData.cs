@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public interface IRegion : IRecyclable
+    public class SoundData
     {
+        public int m_cfgid = 0;
+        public string m_sound_path;
     }
 }

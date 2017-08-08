@@ -90,6 +90,10 @@ namespace Combat
         {
         }
 
+        public virtual void OnResurrect()
+        {
+        }
+
         public virtual void Destruct()
         {
 #if ALLOW_UPDATE

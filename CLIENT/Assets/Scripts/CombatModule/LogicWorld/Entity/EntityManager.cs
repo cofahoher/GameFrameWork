@@ -26,6 +26,7 @@ namespace Combat
 
         protected override void PreDestroyObject(Entity entity)
         {
+            entity.DeletePending = true;
             Player player = entity.GetOwnerPlayer();
             player.RemoveEntity(entity);
             m_logic_world.AddSimpleRenderMessage(RenderMessageType.DestroyEntity, entity.ID);

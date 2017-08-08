@@ -52,5 +52,27 @@ namespace Combat
                 return null;
             return cmp.GetEffectRegistry();
         }
+
+        public static bool IsCategory(Entity entity, int category)
+        {
+            EntityDefinitionComponent component = entity.GetComponent(EntityDefinitionComponent.ID) as EntityDefinitionComponent;
+            if (component == null)
+                return false;
+            return component.IsCategory(category);
+        }
+
+        public static Attribute GetAttribute(Entity entity, int attribute_id)
+        {
+            Attribute attribute = null;
+            if (entity != null)
+            {
+                AttributeManagerComponent attribute_manager_component = entity.GetComponent(AttributeManagerComponent.ID) as AttributeManagerComponent;
+                if (attribute_manager_component != null)
+                {
+                    attribute = attribute_manager_component.GetAttributeByID(attribute_id);
+                }
+            }
+            return attribute;
+        }
     }
 }

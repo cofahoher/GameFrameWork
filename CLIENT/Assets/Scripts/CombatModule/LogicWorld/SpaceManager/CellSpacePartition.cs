@@ -7,7 +7,7 @@ namespace Combat
         public List<PositionComponent> m_entities = new List<PositionComponent>();
     }
 
-    public class CellSpaceManager : ISpaceManager
+    public class CellSpacePartition : ISpacePartition
     {
         static readonly FixPoint CELL_SIZE = FixPoint.Ten;
         static readonly FixPoint MAX_ENTITY_RADIUS = FixPoint.One;
@@ -26,7 +26,7 @@ namespace Combat
         int m_min_z;
         int m_max_z;
 
-        public CellSpaceManager(LogicWorld logic_world, FixPoint x_size, FixPoint z_size, Vector3FP left_bottom_position)
+        public CellSpacePartition(LogicWorld logic_world, FixPoint x_size, FixPoint z_size, Vector3FP left_bottom_position)
         {
             m_logic_world = logic_world;
             m_left_bottom_position = left_bottom_position;
@@ -44,6 +44,14 @@ namespace Combat
 
         public void Destruct()
         {
+            for (int x = 0; x <= MAX_X_INDEX; ++x)
+            {
+                for (int z = 0; z <= MAX_Z_INDEX; ++z)
+                {
+                    m_cells[x, z].m_entities.Clear();
+                }
+            }
+            m_logic_world = null;
         }
 
         public void AddEntiy(PositionComponent entity)
@@ -138,6 +146,29 @@ namespace Combat
                 m_max_z = MAX_Z_INDEX;
         }
         #endregion
+
+        public List<int> CollectEntity_All(int exclude_id)
+        {
+            m_collection.Clear();
+            Cell cell;
+            PositionComponent cmp;
+            for (int x = 0; x <= MAX_X_INDEX; ++x)
+            {
+                for (int z = 0; z <= MAX_Z_INDEX; ++z)
+                {
+                    cell = m_cells[x, z];
+                    for (int i = 0; i < cell.m_entities.Count; ++i)
+                    {
+                        cmp = cell.m_entities[i];
+                        int id = cmp.GetOwnerEntityID();
+                        if (id == exclude_id)
+                            continue;
+                        m_collection.Add(id);
+                    }
+                }
+            }
+            return m_collection;
+        }
 
         public List<int> CollectEntity_ForwardRectangle(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
         {

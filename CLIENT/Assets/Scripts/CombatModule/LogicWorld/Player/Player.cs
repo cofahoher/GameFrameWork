@@ -6,8 +6,15 @@ namespace Combat
     {
         SortedDictionary<int, Entity> m_entities = new SortedDictionary<int, Entity>();
 
-        public Player()
+        public void OnWorldBuilt()
         {
+            var enumerator = m_components.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                PlayerComponent player_component = enumerator.Current.Value as PlayerComponent;
+                if (player_component != null)
+                    player_component.OnWorldBuilt();
+            }
         }
 
         protected override void OnDestruct()

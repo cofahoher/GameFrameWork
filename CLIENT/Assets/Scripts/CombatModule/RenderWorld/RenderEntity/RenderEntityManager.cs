@@ -41,6 +41,9 @@ namespace Combat
 
         protected override void PreDestroyObject(RenderEntity entity)
         {
+            RenderEffectManagerComponent render_effect_component = entity.GetComponent(RenderEffectManagerComponent.ID) as RenderEffectManagerComponent;
+            if (render_effect_component != null)
+                render_effect_component.RecycleAllRenderEffects();
         }
     }
 }

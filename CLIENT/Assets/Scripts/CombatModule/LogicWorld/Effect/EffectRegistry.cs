@@ -34,6 +34,15 @@ namespace Combat
 
             m_owner_component = null;
         }
+
+        public void OnDeletePending()
+        {
+            //ZZWTODO 被动技能的effect不可以干掉
+            int[] m_effect_ids = new int[m_effects_by_id.Count];
+            m_effects_by_id.Keys.CopyTo(m_effect_ids, 0);
+            for (int i = 0; i < m_effect_ids.Length; ++i)
+                RemoveEffect(m_effect_ids[i]);
+        }
         #endregion
 
         public bool CanAddEffect()
@@ -81,7 +90,7 @@ namespace Combat
             ClassifiedEffectContainer container;
             if (!m_effects_by_class.TryGetValue(category_id, out container))
             {
-                EffectCategory category = EffectSystem.Instance.GetCategory(category_id);
+                EffectCategoryData category = EffectSystem.Instance.GetCategory(category_id);
                 if (category == null)
                     return null;
                 container = new ClassifiedEffectContainer(this, category);

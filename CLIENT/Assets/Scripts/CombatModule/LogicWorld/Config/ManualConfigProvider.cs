@@ -50,6 +50,20 @@ namespace Combat
             return GetLevelBasedNumber(table_id, level);
         }
 
+        public LevelTableData GetLevelTableData(int table_id)
+        {
+            LevelTableData level_table_data = null;
+            if (!m_leveltable_data.TryGetValue(table_id, out level_table_data))
+                return null;
+            return level_table_data;
+        }
+
+        public LevelTableData GetLevelTableData(string table_name)
+        {
+            int table_id = (int)CRC.Calculate(table_name);
+            return GetLevelTableData(table_name);
+        }
+
         public LevelData GetLevelData(int id)
         {
             LevelData level_data = null;
@@ -513,13 +527,13 @@ namespace Combat
             proto_data = new ObjectProtoData();
             proto_data.m_name = "ssx_legacy";
             proto_data.m_component_variables["asset"] = "Objects/3D/zzw_ssx_legacy";
-            proto_data.m_attributes[(int)CRC.Calculate("测试属性1")] = new FixPoint(1);
-            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute2")] = new FixPoint(2);
-            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute3")] = new FixPoint(3);
-            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute4")] = new FixPoint(4);
-            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute5")] = new FixPoint(5);
-            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute6")] = new FixPoint(6);
-            proto_data.m_attributes[(int)CRC.Calculate("MaxHealth")] = new FixPoint(1000);
+            proto_data.m_attributes[(int)CRC.Calculate("测试属性1")] = "1";
+            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute2")] = "2";
+            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute3")] = "3";
+            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute4")] = "4";
+            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute5")] = "5";
+            proto_data.m_attributes[(int)CRC.Calculate("TestAttribute6")] = "6";
+            proto_data.m_attributes[(int)CRC.Calculate("MaxHealth")] = "1000";
             proto_data.m_skills[0] = 1001;
             m_object_proto_data[111001] = proto_data;
 
@@ -542,7 +556,7 @@ namespace Combat
             cd.m_component_variables["max_range"] = "1";
             cd.m_component_variables["cooldown_time"] = "1";
             cd.m_component_variables["inflict_time"] = "0.5";
-            cd.m_component_variables["target_gathering_type"] = "Default";
+            cd.m_component_variables["gathering_type"] = "Default";
             cd.m_component_variables["main_animation"] = "attack";
             skill_data.m_components_data.Add(cd);
 
@@ -563,7 +577,7 @@ namespace Combat
             cd.m_component_variables = new Dictionary<string, string>();
             cd.m_component_variables["cooldown_time"] = "1";
             cd.m_component_variables["inflict_time"] = "0.5";
-            cd.m_component_variables["target_gathering_type"] = "Default";
+            cd.m_component_variables["gathering_type"] = "Default";
             cd.m_component_variables["main_animation"] = "attack";
             skill_data.m_components_data.Add(cd);
 

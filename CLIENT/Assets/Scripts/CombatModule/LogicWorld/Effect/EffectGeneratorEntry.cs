@@ -66,9 +66,10 @@ namespace Combat
         {
             if (m_data.m_target_gathering_param.m_type == TargetGatheringType.Default || m_data.m_target_gathering_param.m_type == 0)
             {
+                LogicWorld logic_world = m_generator.GetLogicWorld();
                 for (int i = 0; i < default_targets.Count; ++i)
                 {
-                    Entity entity = default_targets[i].GetEntity();
+                    Entity entity = default_targets[i].GetEntity(logic_world);
                     if (entity != null)
                         ActivateOnOneTatget(app_data, entity);
                 }
@@ -98,7 +99,7 @@ namespace Combat
             m_generator.GetLogicWorld().GetTargetGatheringManager().BuildTargetList(source_entity, m_data.m_target_gathering_param, m_targets);
             for (int i = 0; i < m_targets.Count; ++i)
             {
-                Entity entity = m_targets[i].GetEntity();
+                Entity entity = m_targets[i].GetEntity(logic_world);
                 if (entity != null)
                     ActivateOnOneTatget(app_data, entity);
             }
@@ -160,6 +161,21 @@ namespace Combat
 
             temp.Clear();
             m_effect2entity = temp;
+        }
+
+        public void DeactivateOnOneTarget(Entity target)
+        {
+            var enumerator = m_effect2entity.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                if (enumerator.Current.Value != target.ID)
+                    continue;
+                RemoveEffectTask task = LogicTask.Create<RemoveEffectTask>();
+                task.Construct(target.ID, enumerator.Current.Key);
+                LogicWorld logic_world = m_generator.GetLogicWorld();
+                var schedeler = logic_world.GetTaskScheduler();
+                schedeler.Schedule(task, logic_world.GetCurrentTime(), FixPoint.Zero);
+            }
         }
     }
 }

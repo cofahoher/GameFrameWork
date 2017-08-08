@@ -27,6 +27,13 @@ namespace Combat
             m_owner_component = null;
         }
 
+        public void OnDeletePending()
+        {
+            //generator都是自己的，不用删；尚未那种被强制附加又不自销毁的generator
+            //ZZWTODO 是否需要Deactivate()
+            //ZZWTODO 被动技能
+        }
+
         public void AddGenerator(EffectGenerator generator)
         {
             m_generators[generator.ID] = generator;

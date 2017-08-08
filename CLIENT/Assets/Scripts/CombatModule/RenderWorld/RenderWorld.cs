@@ -15,6 +15,17 @@ namespace Combat
             return new Vector3FP(FixPoint.CreateFromFloat(v3.x), FixPoint.CreateFromFloat(v3.y), FixPoint.CreateFromFloat(v3.z));
         }
 
+        public virtual RenderEffectData GetRenderEffectData(int id)
+        {
+            return null;
+        }
+
+        public virtual SoundData GetSoundData(int id)
+        {
+            return null;
+        }
+
+        protected List<string> m_loading_scenes = new List<string>();
         protected FixPoint m_current_time = FixPoint.Zero;
         protected CombatClient m_combat_client;
         protected LogicWorld m_logic_world;
@@ -74,6 +85,11 @@ namespace Combat
         #endregion
 
         #region RESOURCE
+        public virtual void BuildRenderWorld(LevelData level_data)
+        {
+            LoadScene(level_data.m_scene_name);
+        }
+
         public virtual void LoadScene(string scene_name)
         {
             Scene scene = SceneManager.GetSceneByPath(scene_name);
@@ -82,16 +98,35 @@ namespace Combat
                 LogWrapper.LogError("MyRenderWorld LoadScene(), ", scene_name);
                 return;
             }
-            GameGlobal.Instance.m_loadscene_callback += SceneLoadedCallback;
+            m_loading_scenes.Add(scene_name);
+            if (m_loading_scenes.Count == 1)
+            {
+                SceneManager.sceneLoaded += SceneLoadedCallback;
+            }
             SceneManager.LoadScene(scene_name);
         }
 
-        void SceneLoadedCallback(int scene_build_index)
+        void SceneLoadedCallback(Scene scene, LoadSceneMode mod)
         {
-            //假设回调时，就是我需要的场景刚加载完，Unity没有提供方法来查询尚未加载的场景的name和index间的关系
-            GameGlobal.Instance.m_loadscene_callback -= SceneLoadedCallback;
-            OnSceneWasLoaded();
-            m_combat_client.OnSceneLoaded();
+            bool find = true;
+            for (int i = 0; i < m_loading_scenes.Count; ++i)
+            {
+                //ZZWTODO fix me 只匹配最后几个字符并不正确，必要但不充分
+                if (m_loading_scenes[i].EndsWith(scene.name))
+                {
+                    m_loading_scenes.RemoveAt(i);
+                    find = true;
+                    break;
+                }
+            }
+            if (!find)
+                return;
+            if (m_loading_scenes.Count == 0)
+            {
+                SceneManager.sceneLoaded -= SceneLoadedCallback;
+                OnSceneWasLoaded();
+                m_combat_client.OnRenderWorldBuilt();
+            }
         }
 
         protected virtual void OnSceneWasLoaded()
@@ -154,7 +189,6 @@ namespace Combat
         }
         #endregion
 
-
         #region Command
         public void PushLocalCommand(Command cmd)
         {
@@ -185,6 +219,10 @@ namespace Combat
         }
         #endregion
 
+        public virtual bool OnEntityOutOfEdge(RenderEntity render_entity)
+        {
+            return false;
+        }
     }
 
     class RenderTask

@@ -45,6 +45,9 @@ namespace Combat
 
             #region Object
             REGISTER_COMPONENT<LevelComponent>()
+                .REGISTER_VARIABLE<int>("be_killed_experience", "VID_BeKilledExperience", "m_be_killed_experience", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<int>("max_level", "VID_MaxLevel", "m_max_level", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<string>("level_table", null, "m_experience_level_table")
                 .REGISTER_VARIABLE<int>("level", "VID_CurrentLevel", "CurrentLevel", Flag_Variable_GetSet);
             REGISTER_COMPONENT<TurnManagerComponent>();
             #endregion
@@ -53,7 +56,7 @@ namespace Combat
             REGISTER_COMPONENT<FactionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("faction", null, "m_faction");
             REGISTER_COMPONENT<PlayerAIComponent>();
-            REGISTER_COMPONENT<PlayerGameplaySpecilaComponent>();
+            REGISTER_COMPONENT<PlayerGameplaySpecialComponent>();
             REGISTER_COMPONENT<PlayerTargetingComponent>();
             #endregion
 
@@ -70,8 +73,18 @@ namespace Combat
                 .REGISTER_VARIABLE<int>("killer_generator_id", null, "m_killer_generator_cfgid")
                 .REGISTER_VARIABLE<FixPoint>("life_time", null, "m_life_time")
                 .REGISTER_VARIABLE<FixPoint>("hide_delay", null, "m_hide_delay")
-                .REGISTER_VARIABLE<FixPoint>("delete_delay", null, "m_delete_delay");
+                .REGISTER_VARIABLE<FixPoint>("delete_delay", null, "m_delete_delay")
+                .REGISTER_VARIABLE<bool>("can_resurrect", null, "m_can_resurrect");
             REGISTER_COMPONENT<EffectManagerComponent>();
+            REGISTER_COMPONENT<EffectRegionComponent>()
+                .REGISTER_VARIABLE_CRC<int>("gathering_type", null, "m_target_gathering_param.m_type")
+                .REGISTER_VARIABLE<FixPoint>("gathering_param1", null, "m_target_gathering_param.m_param1")
+                .REGISTER_VARIABLE<FixPoint>("gathering_param2", null, "m_target_gathering_param.m_param2")
+                .REGISTER_VARIABLE_CRC<int>("gathering_faction", null, "m_target_gathering_param.m_faction")
+                .REGISTER_VARIABLE_CRC<int>("gathering_category", null, "m_target_gathering_param.m_category")
+                .REGISTER_VARIABLE<int>("enter_generator", null, "m_enter_generator_cfgid")
+                .REGISTER_VARIABLE<int>("period_generator", null, "m_period_generator_cfgid")
+                .REGISTER_VARIABLE<FixPoint>("period", null, "m_period");
             REGISTER_COMPONENT<EntityDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("category1", null, "m_category_1")
                 .REGISTER_VARIABLE_CRC<int>("category2", null, "m_category_2")
@@ -90,15 +103,18 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("x", "VID_X", "m_current_position.x")
                 .REGISTER_VARIABLE<FixPoint>("y", "VID_Y", "m_current_position.y")
                 .REGISTER_VARIABLE<FixPoint>("z", "VID_Z", "m_current_position.z")
-                .REGISTER_VARIABLE<FixPoint>("angle", "VID_CurrentAngle", "m_current_angle", Flag_Variable_GetSet)
+                .REGISTER_VARIABLE<FixPoint>("angle", "VID_BaseAngle", "m_base_angle", Flag_Variable_GetSet)
                 .REGISTER_VARIABLE<FixPoint>("radius", "VID_Radius", "m_radius")
                 .REGISTER_VARIABLE<FixPoint>("height", "VID_Height", "m_height")
+                .REGISTER_VARIABLE<bool>("base_rotatable", "VID_BaseRotatable", "m_base_rotatable", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("collision_sender", null, "m_collision_sender")
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<ProjectileComponent>()
                 .REGISTER_VARIABLE<FixPoint>("speed", null, "m_speed")
                 .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime")
-                .REGISTER_VARIABLE_CRC<int>("collision_faction", null, "m_collision_faction");
+                .REGISTER_VARIABLE<int>("collision_sound", null, "m_collision_sound_cfgid")
+                .REGISTER_VARIABLE_CRC<int>("collision_faction", null, "m_collision_faction")
+                .REGISTER_VARIABLE<bool>("can_cross_obstacle", null, "m_can_cross_obstacle");
             REGISTER_COMPONENT<SimpleAIComponent>()
                 .REGISTER_VARIABLE<FixPoint>("guard_range", null, "m_guard_range");
             REGISTER_COMPONENT<SkillManagerComponent>();
@@ -125,16 +141,23 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("offset_x", null, "m_offset.x")
                 .REGISTER_VARIABLE<FixPoint>("offset_y", null, "m_offset.y")
                 .REGISTER_VARIABLE<FixPoint>("offset_z", null, "m_offset.z")
+                .REGISTER_VARIABLE_CRC<int>("combo_type", null, "m_combo_type_crc")
                 .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
                 .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             REGISTER_COMPONENT<DirectDamageSkillComponent>()
+                .REGISTER_VARIABLE<FixPoint>("delay_time", null, "m_delay_time")
                 .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
                 .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
+                .REGISTER_VARIABLE<int>("damage_render_effect", null, "m_damage_render_effect_cfgid")
+                .REGISTER_VARIABLE<int>("damage_sound", null, "m_damage_sound_cfgid")
                 .REGISTER_VARIABLE<int>("combo_attack_cnt", null, "m_combo_attack_cnt")
-                .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
+                .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval")
+                .REGISTER_VARIABLE<int>("render_effect", null, "m_render_effect_cfgid");
             REGISTER_COMPONENT<EffectGeneratorSkillComponent>()
+                .REGISTER_VARIABLE<FixPoint>("delay_time", null, "m_delay_time")
                 .REGISTER_VARIABLE<int>("generator_id", null, "m_generator_cfgid")
-                .REGISTER_VARIABLE<FixPoint>("delay_time", null, "m_delay_time");
+                .REGISTER_VARIABLE<int>("render_effect", null, "m_render_effect_cfgid")
+                .REGISTER_VARIABLE<FixPoint>("render_delay_time", null, "m_render_delay_time");
             REGISTER_COMPONENT<KillTargetSkillComponent>();
             REGISTER_COMPONENT<SkillDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("mana_type", "VID_ManaType", "m_mana_type", Flag_Attribute_Get)
@@ -154,39 +177,28 @@ namespace Combat
                 .REGISTER_VARIABLE_CRC<int>("gathering_type", null, "m_target_gathering_param.m_type")
                 .REGISTER_VARIABLE<FixPoint>("gathering_param1", null, "m_target_gathering_param.m_param1")
                 .REGISTER_VARIABLE<FixPoint>("gathering_param2", null, "m_target_gathering_param.m_param2")
-                .REGISTER_VARIABLE_CRC<int>("gathering_fation", null, "m_target_gathering_param.m_fation")
+                .REGISTER_VARIABLE_CRC<int>("gathering_faction", null, "m_target_gathering_param.m_faction")
                 .REGISTER_VARIABLE_CRC<int>("gathering_category", null, "m_target_gathering_param.m_category")
                 .REGISTER_VARIABLE<bool>("need_gather_targets", "VID_NeedGatherTargets", "m_need_gather_targets", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<int>("targets_min_count_for_activate", "VID_TargetsMinCountForActivate", "m_targets_min_count_for_activate", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("external_data_type", "VID_ExternalDataType", "m_external_data_type", Flag_Attribute_Get)
+                .REGISTER_VARIABLE_CRC<int>("auto_face", "VID_AutoFaceType", "m_auto_face_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<int>("inflict_type", "VID_InflictType", "m_inflict_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<string>("inflict_missile", null, "m_inflict_missile")
                 .REGISTER_VARIABLE<FixPoint>("inflict_missile_speed", "VID_InflictMissileSpeed", "m_inflict_missile_speed", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("impact_delay", "VID_ImpactDelay", "m_impact_delay", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<string>("icon", null, "m_icon")
+                .REGISTER_VARIABLE_CRC<int>("auto_aim", null, "m_auto_aim_type")
                 .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
                 .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
-                .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation");
+                .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation")
+                .REGISTER_VARIABLE<int>("main_render_effect", null, "m_main_render_effect_cfgid")
+                .REGISTER_VARIABLE<int>("main_sound", null, "m_main_sound");
             REGISTER_COMPONENT<SpurtSkillComponent>()
                 .REGISTER_VARIABLE<FixPoint>("distance", null, "m_distance")
-                .REGISTER_VARIABLE<FixPoint>("time", null, "m_time");
-            REGISTER_COMPONENT<ThreePhaseAttackSkillComponent>()
-                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
-                .REGISTER_VARIABLE<FixPoint>("phase1_inflict_time", null, "m_inflict_time[0]")
-                .REGISTER_VARIABLE<Formula>("phase1_damage_amount", null, "m_damage_amount[0]")
-                .REGISTER_VARIABLE<int>("phase1_generator_id", null, "m_generator_cfg_id[0]")
-                .REGISTER_VARIABLE<FixPoint>("phase1_link_time", null, "m_link_time[0]")
-                .REGISTER_VARIABLE<FixPoint>("phase2_inflict_time", null, "m_inflict_time[1]")
-                .REGISTER_VARIABLE<Formula>("phase2_damage_amount", null, "m_damage_amount[1]")
-                .REGISTER_VARIABLE<int>("phase2_generator_id", null, "m_generator_cfg_id[1]")
-                .REGISTER_VARIABLE<FixPoint>("phase2_link_time", null, "m_link_time[1]")
-                .REGISTER_VARIABLE<FixPoint>("phase3_inflict_time", null, "m_inflict_time[2]")
-                .REGISTER_VARIABLE<Formula>("phase3_damage_amount", null, "m_damage_amount[2]")
-                .REGISTER_VARIABLE<int>("phase3_generator_id", null, "m_generator_cfg_id[2]")
-                .REGISTER_VARIABLE<FixPoint>("phase3_link_time", null, "m_link_time[2]")
-                .REGISTER_VARIABLE<FixPoint>("phase4_inflict_time", null, "m_inflict_time[3]")
-                .REGISTER_VARIABLE<Formula>("phase4_damage_amount", null, "m_damage_amount[3]")
-                .REGISTER_VARIABLE<int>("phase4_generator_id", null, "m_generator_cfg_id[3]")
-                .REGISTER_VARIABLE<FixPoint>("phase4_link_time", null, "m_link_time[3]");
+                .REGISTER_VARIABLE<FixPoint>("time", null, "m_time")
+                .REGISTER_VARIABLE<int>("collision_target_generator_id", null, "m_collision_target_generator_cfgid")
+                .REGISTER_VARIABLE<bool>("backward", null, "m_backward");
             #endregion
 
             #region Effect
@@ -203,16 +215,29 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("offset_x", null, "m_offset.x")
                 .REGISTER_VARIABLE<FixPoint>("offset_y", null, "m_offset.y")
                 .REGISTER_VARIABLE<FixPoint>("offset_z", null, "m_offset.z")
+                .REGISTER_VARIABLE<int>("object_count", null, "m_object_count")
+                .REGISTER_VARIABLE<FixPoint>("interval", null, "m_interval")
                 .REGISTER_VARIABLE<bool>("revert_when_unapply", null, "m_revert_when_unapply");
             REGISTER_COMPONENT<DamageEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
-                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount");
+                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
+                .REGISTER_VARIABLE<int>("damage_render_effect", null, "m_damage_render_effect_cfgid")
+                .REGISTER_VARIABLE<int>("damage_sound", null, "m_damage_sound_cfgid");
+            REGISTER_COMPONENT<DamageOverTimeEffectComponent>()
+                .REGISTER_VARIABLE_CRC<int>("damage_type", null, "m_damage_type_id")
+                .REGISTER_VARIABLE<Formula>("damage_amount", null, "m_damage_amount")
+                .REGISTER_VARIABLE<int>("damage_render_effect", null, "m_damage_render_effect_cfgid")
+                .REGISTER_VARIABLE<int>("damage_sound", null, "m_damage_sound_cfgid")
+                .REGISTER_VARIABLE<FixPoint>("period", null, "m_period");
             REGISTER_COMPONENT<EffectDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("category", "VID_Category", "m_category", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("conflict_id", "VID_ConflictID", "m_conflict_id", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration", Flag_Attribute_Get);
             REGISTER_COMPONENT<HealEffectComponent>();
             REGISTER_COMPONENT<KillOwnerEffectComponent>();
+            REGISTER_COMPONENT<KnockbackEffectComponent>()
+                .REGISTER_VARIABLE<FixPoint>("distance", null, "m_distance")
+                .REGISTER_VARIABLE<FixPoint>("time", null, "m_time");
             REGISTER_COMPONENT<ModifyAttributeEffectComponent>();
             #endregion
         }
@@ -226,10 +251,17 @@ namespace Combat
             REGISTER_COMPONENT<AnimatorComponent>(Flag_RenderComponent)
                 .REGISTER_VARIABLE<string>("animator_path", null, "m_animator_path")
                 .REGISTER_VARIABLE<string>("locomotor_animation_name", null, "m_locomotor_animation_name");
+            REGISTER_COMPONENT<AimingComponent>(Flag_RenderComponent)
+                .REGISTER_VARIABLE<string>("root_path", null, "m_root_path")
+                .REGISTER_VARIABLE<string>("aiming_line_parent_path", null, "m_aiming_line_parent_path")
+                .REGISTER_VARIABLE<string>("aiming_line_asset", null, "m_aiming_line_asset")
+                .REGISTER_VARIABLE<string>("rotate_turret_asset", null, "m_rotate_turret_asset");
             REGISTER_COMPONENT<ModelComponent>(Flag_RenderComponent)
                 .REGISTER_VARIABLE<string>("asset", null, "m_asset_name")
-                .REGISTER_VARIABLE<string>("bodyctrl_path", null, "m_bodyctrl_path");
+                .REGISTER_VARIABLE<string>("bodyctrl_path", null, "m_bodyctrl_path")
+                .REGISTER_VARIABLE<string>("headctrl_path", null, "m_headctrl_path");
             REGISTER_COMPONENT<PredictLogicComponent>(Flag_RenderComponent);
+            REGISTER_COMPONENT<RenderEffectManagerComponent>(Flag_RenderComponent);
         }
 
         static ComponentPaitialGenerator()
@@ -371,10 +403,10 @@ namespace Combat
             return new_cmp;
         }
 
-        [MenuItem("GamePlay/Generate Combat Component Code", false, 999)]
+        [MenuItem("H3D/Generate Combat Component Code", false, 999)]
         public static void GenerateAll()
         {
-            StreamWriter writer = new StreamWriter("Assets/Scripts/CombatModule/LogicWorld/Object/ComponentTypeRegistryExt.cs");
+            StreamWriter writer = new StreamWriter("Assets/Scripts/CoreGame/LogicWorld/Object/ComponentTypeRegistryExt.cs");
             writer.Write(
 @"using System;
 using System.Collections;

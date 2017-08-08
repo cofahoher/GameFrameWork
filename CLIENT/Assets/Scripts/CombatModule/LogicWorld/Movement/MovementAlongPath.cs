@@ -98,7 +98,7 @@ namespace Combat
             m_direction = m_path[m_cur_way_point] - m_path[m_cur_way_point - 1];
             FixPoint distance = m_direction.Normalize();
             m_remain_time = distance / m_max_speed;
-            m_position_component.SetAngle(FixPoint.XZToUnityRotationDegree(m_direction.x, m_direction.z));
+            m_position_component.SetFacing(m_direction);
         }
 
         public void FinishMovementWhenTargetInRange(PositionComponent target, FixPoint range)

@@ -8,6 +8,7 @@ namespace Combat
         public const int EntityMove = 10;
         public const int EntityTarget = 11;
         public const int EntityAttack = 12;
+        public const int EntityChangeFacing = 13;
     }
 
     public class EntityMoveCommand : Command
@@ -74,6 +75,29 @@ namespace Combat
         {
             base.Reset();
             m_target_entity_id = 0;
+        }
+    }
+
+    public class EntityChangeFacingCommand : Command
+    {
+        [ProtoBufAttribute(Index = 1)]
+        public Vector3FP m_facing;
+
+        public EntityChangeFacingCommand()
+        {
+            m_type = CommandType.EntityChangeFacing;
+        }
+
+        public void Construct(int entity_id, Vector3FP facing)
+        {
+            m_entity_id = entity_id;
+            m_facing = facing;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            m_facing.MakeZero();
         }
     }
 }

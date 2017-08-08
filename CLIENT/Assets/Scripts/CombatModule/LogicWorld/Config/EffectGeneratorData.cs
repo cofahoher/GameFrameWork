@@ -13,11 +13,12 @@ namespace Combat
     {
         public TargetGatheringParam m_target_gathering_param = null;
         public int m_effect_id = 0;
+        //public bool m_bidirectional_lookup = false;
 
         public EffectGeneratorEntryData()
         {
             m_target_gathering_param = new TargetGatheringParam();
-            m_target_gathering_param.m_fation = FactionRelation.All;
+            m_target_gathering_param.m_faction = FactionRelation.All;
         }
     }
 }

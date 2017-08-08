@@ -49,6 +49,11 @@ namespace Combat
             m_entity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_object_id);
         }
 
+        protected override bool IsLogicObject()
+        {
+            return false;
+        }
+
         protected override bool IsSuitableComponent(int component_type_id)
         {
             return ComponentTypeRegistry.IsRenderComponent(component_type_id);

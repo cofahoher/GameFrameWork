@@ -5,10 +5,10 @@ namespace Combat
     public class ClassifiedEffectContainer : IDestruct
     {
         EffectRegistry m_registry;
-        EffectCategory m_category;
+        EffectCategoryData m_category;
         List<Effect> m_active_effects = new List<Effect>();
 
-        public ClassifiedEffectContainer(EffectRegistry registry, EffectCategory category)
+        public ClassifiedEffectContainer(EffectRegistry registry, EffectCategoryData category)
         {
             m_registry = registry;
             m_category = category;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class AttributeModifierConfig : IRecyclable
+    class AttributeModifierConfig : IRecyclable
     {
         public int m_attribute_id = 0;
         public int m_attribute_category = 0;
@@ -68,15 +68,54 @@ namespace Combat
             for (int i = 0; i < m_count; ++i)
                 RecyclableObject.Recycle(m_modefier_configs[i]);
             m_modefier_configs = null;
+            m_modifier_ids = null;
         }
         #endregion
 
         public override void Apply()
         {
+            if (m_modefier_configs == null || m_modefier_configs.Length == 0)
+                return;
+            m_modifier_ids = new int[m_modefier_configs.Length];
+            for (int i = 0; i < m_modefier_configs.Length; ++i)
+            {
+                AttributeModifierConfig modifier_config = m_modefier_configs[i];
+                FixPoint formula_value = modifier_config.m_value.Evaluate(this);
+                m_modifier_ids[i] = AddModifier(modifier_config, formula_value);
+            }
         }
 
         public override void Unapply()
         {
+            if (m_modifier_ids == null)
+                return;
+            EffectDefinitionComponent definition_component = ((Effect)ParentObject).GetDefinitionComponent();
+            EntityManager entity_manager = GetLogicWorld().GetEntityManager();
+            Entity owner_entity = entity_manager.GetObject(definition_component.TargetEntityID);
+            for (int i = 0; i < m_modifier_ids.Length; ++i)
+            {
+                Attribute attribute = EntityUtil.GetAttribute(owner_entity, m_modefier_configs[i].m_attribute_id);
+                if (attribute != null)
+                {
+                    attribute.RemoveModifier(m_modifier_ids[i]);
+                    m_modifier_ids[i] = 0;
+                }
+            }
+        }
+
+        int AddModifier(AttributeModifierConfig modifier_config, FixPoint modifier_value)
+        {
+            AttributeModifier attribute_modifier = RecyclableObject.Create<AttributeModifier>();
+            attribute_modifier.Construct(GetLogicWorld().GetAttributeModifierIDGenerator().GenID(), modifier_config.m_attribute_category, modifier_value);
+
+            EffectDefinitionComponent definition_component = ((Effect)ParentObject).GetDefinitionComponent();
+            EntityManager entity_manager = GetLogicWorld().GetEntityManager();
+            Entity owner_entity = entity_manager.GetObject(definition_component.TargetEntityID);
+            Attribute attribute = EntityUtil.GetAttribute(owner_entity, modifier_config.m_attribute_id);
+            if (attribute == null)
+                return 0;
+            attribute.AddModifier(attribute_modifier);
+            return attribute_modifier.ID;
         }
     }
 }
