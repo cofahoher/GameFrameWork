@@ -15,6 +15,12 @@ namespace Combat
             m_data_ext.Clear();
         }
 
+        public LogicWorld GetLogicWorld()
+        {
+            return m_logic_world;
+        }
+
+        #region 数值
         public void SetData(int key, FixPoint value)
         {
             m_data[key] = value;
@@ -42,7 +48,9 @@ namespace Combat
                 return FixPoint.Zero;
             return value;
         }
+        #endregion
 
+        #region 对象
         public void SetData<T>(int key, T value)
         {
             m_data_ext[key] = value;
@@ -70,5 +78,6 @@ namespace Combat
                 return default(T);
             return (T)value;
         }
+        #endregion
     }
 }
