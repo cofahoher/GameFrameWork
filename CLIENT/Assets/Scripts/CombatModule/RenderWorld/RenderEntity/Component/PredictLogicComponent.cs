@@ -21,7 +21,7 @@ namespace Combat
         ModelComponent m_model_component;
         PositionComponent m_position_component;
         LocomotorComponent m_locomotor_component;
-        List<MovementPredic> m_movement_predicts = new List<MovementPredic>();
+        List<MovementPredict> m_movement_predicts = new List<MovementPredict>();
         int m_block_locomotor_predict = 0;
         int m_copy_state = NoCopy;
         Vector3 m_accumulated_offset = Vector3.zero;
@@ -42,6 +42,16 @@ namespace Combat
             Entity entity = GetLogicEntity();
             m_position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
             m_locomotor_component = entity.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
+        }
+
+        protected override void OnDestruct()
+        {
+            for (int i = 0; i < m_movement_predicts.Count; ++i)
+            {
+                MovementPredict predict = m_movement_predicts[i];
+                RecyclableObject.Recycle(predict);
+            }
+            m_movement_predicts.Clear();
         }
         #endregion
 
@@ -105,15 +115,15 @@ namespace Combat
             bool done_offset = false;
             for (int i = 0; i < m_movement_predicts.Count; ++i)
             {
-                MovementPredic predict = m_movement_predicts[i];
+                MovementPredict predict = m_movement_predicts[i];
                 if (!can_interpolate)
                 {
-                    if (predict.m_state == MovementPredic.AccumulateOffsetState || predict.m_state == MovementPredic.FollowLogicState)
+                    if (predict.m_state == MovementPredict.AccumulateOffsetState || predict.m_state == MovementPredict.FollowLogicState)
                         can_interpolate = true;
                 }
                 if (!done_offset)
                 {
-                    if (predict.m_state == MovementPredic.FollowLogicState || predict.m_state == MovementPredic.EliminateOffsetState)
+                    if (predict.m_state == MovementPredict.FollowLogicState || predict.m_state == MovementPredict.EliminateOffsetState)
                     {
                         done_offset = true;
                         predict.m_offset -= offset;
@@ -170,15 +180,15 @@ namespace Combat
                     //LogWrapper.LogDebug("PredictEntityMove, DirectionType, time =", GetCurrentTime(), ", dir = ", cmd.m_vector.ToString(), ", crc = ", crc);
                     for (int i = 0; i < m_movement_predicts.Count; ++i)
                     {
-                        MovementPredic predict = m_movement_predicts[i];
+                        MovementPredict predict = m_movement_predicts[i];
                         if (predict.m_command_crc == crc)
                         {
-                            if (predict.m_state == MovementPredic.AccumulateOffsetState || predict.m_state == MovementPredic.FollowLogicState)
+                            if (predict.m_state == MovementPredict.AccumulateOffsetState || predict.m_state == MovementPredict.FollowLogicState)
                                 exist = true;
                         }
-                        else if (predict.m_state == MovementPredic.AccumulateOffsetState || predict.m_state == MovementPredic.FollowLogicState)
+                        else if (predict.m_state == MovementPredict.AccumulateOffsetState || predict.m_state == MovementPredict.FollowLogicState)
                         {
-                            predict.m_state = MovementPredic.EliminateOffsetState;
+                            predict.m_state = MovementPredict.EliminateOffsetState;
                             predict.m_task.Cancel();
                         }
                     }
@@ -189,8 +199,8 @@ namespace Combat
                         task.Construct(this, direction, m_max_predict_time);
                         var task_scheduler = GetRenderWorld().GetTaskScheduler();
                         task_scheduler.Schedule(task, GetRenderWorld().CurrentTime, FixPoint.PrecisionFP);
-                        MovementPredic predict = RecyclableObject.Create<MovementPredic>();
-                        predict.m_state = MovementPredic.AccumulateOffsetState;
+                        MovementPredict predict = RecyclableObject.Create<MovementPredict>();
+                        predict.m_state = MovementPredict.AccumulateOffsetState;
                         predict.m_command_crc = crc;
                         predict.m_task = task;
                         m_movement_predicts.Add(predict);
@@ -205,15 +215,15 @@ namespace Combat
                     //下面这段代码和EntityMoveCommand.StopMoving差不多
                     for (int i = 0; i < m_movement_predicts.Count; ++i)
                     {
-                        MovementPredic predict = m_movement_predicts[i];
-                        if (predict.m_state == MovementPredic.AccumulateOffsetState || predict.m_state == MovementPredic.FollowLogicState)
+                        MovementPredict predict = m_movement_predicts[i];
+                        if (predict.m_state == MovementPredict.AccumulateOffsetState || predict.m_state == MovementPredict.FollowLogicState)
                         {
-                            predict.m_state = MovementPredic.EliminateOffsetState;
+                            predict.m_state = MovementPredict.EliminateOffsetState;
                             predict.m_task.Cancel();
                         }
                     }
-                    MovementPredic temp = RecyclableObject.Create<MovementPredic>();
-                    temp.m_state = MovementPredic.CopyLogicState;
+                    MovementPredict temp = RecyclableObject.Create<MovementPredict>();
+                    temp.m_state = MovementPredict.CopyLogicState;
                     m_movement_predicts.Add(temp);
                     Vector3 direction = RenderWorld.Vector3FP_To_Vector3(cmd.m_vector) - m_model_component.GetCurrentPosition();
                     PlayMoveAnimation(direction);
@@ -224,15 +234,15 @@ namespace Combat
                     m_copy_state = NoCopy;
                     for (int i = 0; i < m_movement_predicts.Count; ++i)
                     {
-                        MovementPredic predict = m_movement_predicts[i];
-                        if (predict.m_state == MovementPredic.AccumulateOffsetState || predict.m_state == MovementPredic.FollowLogicState)
+                        MovementPredict predict = m_movement_predicts[i];
+                        if (predict.m_state == MovementPredict.AccumulateOffsetState || predict.m_state == MovementPredict.FollowLogicState)
                         {
-                            predict.m_state = MovementPredic.EliminateOffsetState;
+                            predict.m_state = MovementPredict.EliminateOffsetState;
                             predict.m_task.Cancel();
                         }
                     }
-                    MovementPredic temp = RecyclableObject.Create<MovementPredic>();
-                    temp.m_state = MovementPredic.StopState;
+                    MovementPredict temp = RecyclableObject.Create<MovementPredict>();
+                    temp.m_state = MovementPredict.StopState;
                     m_movement_predicts.Add(temp);
                     StopMoveAnimation();
                     //LogWrapper.LogDebug("PredictEntityMove, StopMoving, time =", GetCurrentTime());
@@ -253,11 +263,11 @@ namespace Combat
                     //LogWrapper.LogDebug("ConfirmEntityMove, DirectionType, time =", GetCurrentTime(), ", crc = ", crc);
                     for (int i = 0; i < m_movement_predicts.Count; )
                     {
-                        MovementPredic predict = m_movement_predicts[i];
+                        MovementPredict predict = m_movement_predicts[i];
                         if (predict.m_command_crc != crc)
                         {
                             m_accumulated_offset += predict.m_offset;
-                            if (predict.m_state != MovementPredic.EliminateOffsetState)
+                            if (predict.m_state != MovementPredict.EliminateOffsetState)
                                 LogWrapper.LogError("REMOVE UNCONFIRMED PREDICT ", predict.m_command_crc, ", predict.m_offset = ", predict.m_offset.ToString());
                             ResetOffsetDirection();
                             RecyclableObject.Recycle(predict);
@@ -266,9 +276,9 @@ namespace Combat
                         }
                         else
                         {
-                            if (predict.m_state == MovementPredic.AccumulateOffsetState)
+                            if (predict.m_state == MovementPredict.AccumulateOffsetState)
                             {
-                                predict.m_state = MovementPredic.FollowLogicState;
+                                predict.m_state = MovementPredict.FollowLogicState;
                                 predict.m_task.ResetMaxPredictTime(GetRenderWorld().CurrentTime, m_follow_logic_predict_time);
                             }
                             break;
@@ -285,11 +295,11 @@ namespace Combat
                     //下面这段代码和EntityMoveCommand.StopMoving差不多
                     for (int i = 0; i < m_movement_predicts.Count; )
                     {
-                        MovementPredic predict = m_movement_predicts[i];
-                        if (predict.m_state != MovementPredic.CopyLogicState)
+                        MovementPredict predict = m_movement_predicts[i];
+                        if (predict.m_state != MovementPredict.CopyLogicState)
                         {
                             m_accumulated_offset += predict.m_offset;
-                            if (predict.m_state != MovementPredic.EliminateOffsetState)
+                            if (predict.m_state != MovementPredict.EliminateOffsetState)
                                 LogWrapper.LogError("REMOVE UNCONFIRMED PREDICT ", predict.m_command_crc, ", predict.m_offset = ", predict.m_offset.ToString());
                             ResetOffsetDirection();
                             RecyclableObject.Recycle(predict);
@@ -316,11 +326,11 @@ namespace Combat
                     //LogWrapper.LogDebug("ConfirmEntityMove, STOP, time = ", GetCurrentTime());
                     for (int i = 0; i < m_movement_predicts.Count; )
                     {
-                        MovementPredic predict = m_movement_predicts[i];
-                        if (predict.m_state != MovementPredic.StopState)
+                        MovementPredict predict = m_movement_predicts[i];
+                        if (predict.m_state != MovementPredict.StopState)
                         {
                             m_accumulated_offset += predict.m_offset;
-                            if (predict.m_state != MovementPredic.EliminateOffsetState)
+                            if (predict.m_state != MovementPredict.EliminateOffsetState)
                                 LogWrapper.LogError("REMOVE UNCONFIRMED PREDICT ", predict.m_command_crc, ", predict.m_offset = ", predict.m_offset.ToString());
                             ResetOffsetDirection();
                             RecyclableObject.Recycle(predict);
@@ -387,8 +397,8 @@ namespace Combat
 
             for (int i = 0; i < m_movement_predicts.Count; ++i)
             {
-                MovementPredic predict = m_movement_predicts[i];
-                if (predict.m_state == MovementPredic.AccumulateOffsetState || predict.m_state == MovementPredic.FollowLogicState)
+                MovementPredict predict = m_movement_predicts[i];
+                if (predict.m_state == MovementPredict.AccumulateOffsetState || predict.m_state == MovementPredict.FollowLogicState)
                 {
                     predict.m_offset += offset;
                     m_interpolation_tr.localPosition += offset;
@@ -456,7 +466,7 @@ namespace Combat
         #endregion
     }
 
-    class MovementPredic : IRecyclable
+    class MovementPredict : IRecyclable
     {
         public const int StopState = 0;
         public const int AccumulateOffsetState = 1; //预测，积累offset
