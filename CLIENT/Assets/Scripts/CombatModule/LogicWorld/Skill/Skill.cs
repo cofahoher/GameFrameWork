@@ -336,7 +336,7 @@ namespace Combat
             {
                 PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
                 if (m_definition_component.m_expiration_animation == null)
-                    msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation);
+                    msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation, AnimationName.IDLE, true);
                 else
                     msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation, m_definition_component.m_expiration_animation, true);
                 GetLogicWorld().AddRenderMessage(msg);

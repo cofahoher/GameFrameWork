@@ -42,6 +42,14 @@ namespace Combat
 
         protected override void OnDestruct()
         {
+            var enumerator = m_nodes.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                RenderEffectNode node = enumerator.Current.Value;
+                for (int i = 0; i < node.m_render_effects.Count; ++i)
+                    RecycleRenderEffectInfo(node.m_render_effects[i], null);
+            }
+            m_nodes.Clear();
         }
         #endregion
 
@@ -120,7 +128,12 @@ namespace Combat
             }
             if (info == null)
                 return;
+            RecycleRenderEffectInfo(info, config);
+            node.m_render_effects.RemoveAt(i);
+        }
 
+        void RecycleRenderEffectInfo(RenderEffectInfo info, RenderEffectData config)
+        {
             if (info.m_task != null)
             {
                 RenderTask.Recycle(info.m_task);
@@ -128,11 +141,12 @@ namespace Combat
             }
             if (info.m_go != null)
             {
+                if (config == null)
+                    config = GetRenderWorld().GetRenderEffectData(info.m_render_effect_cfgid);
                 info.m_go.transform.parent = null;
                 UnityResourceManager.Instance.RecycleGameObject(config.m_prefab, info.m_go);
                 info.m_go = null;
             }
-            node.m_render_effects.RemoveAt(i);
             RecyclableObject.Recycle(info);
         }
 
