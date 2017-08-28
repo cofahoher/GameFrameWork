@@ -26,12 +26,14 @@ namespace Combat
         FixPoint m_lifetime = FixPoint.Ten;
         int m_collision_sound_cfgid = 0;
         int m_collision_faction = FactionRelation.NotAlly;
+        bool m_pierce_entity = false;
         bool m_can_cross_obstacle = true;
 
         //运行数据
         bool m_previous_walkable = true;
         ProjectileParameters m_param;
         UpdateProjectileTask m_task;
+        List<int> m_effected_entities;
 
         #region 初始化/销毁
         public override void InitializeComponent()
@@ -51,6 +53,11 @@ namespace Combat
                 m_collision_sound_cfgid = int.Parse(value);
             if (dic.TryGetValue("collision_faction", out value))
                 m_collision_faction = (int)CRC.Calculate(value);
+            if (dic.TryGetValue("pierce_entity", out value))
+                m_pierce_entity = bool.Parse(value);
+
+            if (m_pierce_entity)
+                m_effected_entities = new List<int>();
         }
 
         protected override void OnDestruct()
@@ -128,6 +135,13 @@ namespace Combat
             EntityManager entity_manager = GetLogicWorld().GetEntityManager();
             for (int i = 0; i < list.Count; ++i)
             {
+                if (m_pierce_entity)
+                {
+                    if (m_effected_entities.Contains(list[i]))
+                        continue;
+                    else
+                        m_effected_entities.Add(list[i]);
+                }
                 Entity entity = entity_manager.GetObject(list[i]);
                 if (entity == null)
                     continue;
@@ -137,7 +151,8 @@ namespace Combat
                 if (!FactionRelation.IsFactionSatisfied(GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()), m_collision_faction))
                     continue;
                 Explode(entity);
-                return true;
+                if (!m_pierce_entity)
+                    return true;
             }
             return false;
         }
@@ -145,9 +160,6 @@ namespace Combat
         public void Explode(Entity entity)
         {
 #if COMBAT_CLIENT
-            LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
-            msg.ConstructAsStopMoving(ParentObject.ID, true);
-            GetLogicWorld().AddRenderMessage(msg);
             if (m_collision_sound_cfgid > 0)
             {
                 PlaySoundMessage sound_msg = RenderMessage.Create<PlaySoundMessage>();
@@ -155,15 +167,24 @@ namespace Combat
                 GetLogicWorld().AddRenderMessage(sound_msg);
             }
 #endif
-            if (m_task != null)
-            {
-                m_task.Cancel();
-                LogicTask.Recycle(m_task);
-                m_task = null;
-            }
             if (entity != null)
                 ApplyGenerator(entity);
-            EntityUtil.KillEntity((Entity)ParentObject, ParentObject.ID);
+
+            if (entity == null || !m_pierce_entity)
+            {
+#if COMBAT_CLIENT
+                LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+                msg.ConstructAsStopMoving(ParentObject.ID, true);
+                GetLogicWorld().AddRenderMessage(msg);
+#endif
+                if (m_task != null)
+                {
+                    m_task.Cancel();
+                    LogicTask.Recycle(m_task);
+                    m_task = null;
+                }
+                EntityUtil.KillEntity((Entity)ParentObject, ParentObject.ID);
+            }
         }
 
         void ApplyGenerator(Entity entity)

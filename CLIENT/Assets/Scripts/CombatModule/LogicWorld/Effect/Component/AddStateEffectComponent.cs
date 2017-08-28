@@ -24,8 +24,8 @@ namespace Combat
             Entity target = GetOwnerEntity();
             if (target == null)
                 return;
-            if (ObjectUtil.IsDead(target))
-                return;
+            //if (ObjectUtil.IsDead(target))
+            //    return;
             StateComponent state_component = target.GetComponent(StateComponent.ID) as StateComponent;
             if (state_component == null)
                 return;

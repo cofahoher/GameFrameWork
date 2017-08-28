@@ -114,7 +114,8 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime")
                 .REGISTER_VARIABLE<int>("collision_sound", null, "m_collision_sound_cfgid")
                 .REGISTER_VARIABLE_CRC<int>("collision_faction", null, "m_collision_faction")
-                .REGISTER_VARIABLE<bool>("can_cross_obstacle", null, "m_can_cross_obstacle");
+                .REGISTER_VARIABLE<bool>("can_cross_obstacle", null, "m_can_cross_obstacle")
+                .REGISTER_VARIABLE<bool>("pierce_entity", null, "m_pierce_entity");
             REGISTER_COMPONENT<SimpleAIComponent>()
                 .REGISTER_VARIABLE<FixPoint>("guard_range", null, "m_guard_range");
             REGISTER_COMPONENT<SkillManagerComponent>();

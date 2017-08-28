@@ -536,6 +536,8 @@ namespace Combat
                 m_collision_faction = (int)CRC.Calculate(value);
             if (variables.TryGetValue("can_cross_obstacle", out value))
                 m_can_cross_obstacle = bool.Parse(value);
+            if (variables.TryGetValue("pierce_entity", out value))
+                m_pierce_entity = bool.Parse(value);
         }
     }
 

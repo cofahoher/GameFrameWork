@@ -56,7 +56,8 @@ namespace Combat
 
         public override void Deactivate(bool force)
         {
-            m_task.Cancel();
+            if (m_task != null)
+                m_task.Cancel();
 #if COMBAT_CLIENT
             LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
             msg.ConstructAsStopMoving(GetOwnerEntityID(), false, LocomoteRenderMessage.NotFromCommand);

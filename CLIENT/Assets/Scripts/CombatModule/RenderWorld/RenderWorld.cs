@@ -184,8 +184,13 @@ namespace Combat
 
         protected void UpdateMovingEntities()
         {
-            for (int i = 0; i < m_moving_entities.Count; ++i)
-                m_moving_entities[i].UpdatePosition();
+            for (int i = 0; i < m_moving_entities.Count; )
+            {
+                if (m_moving_entities[i].UpdatePosition())
+                    ++i;
+                else
+                    m_moving_entities.RemoveAt(i);
+            }
         }
         #endregion
 

@@ -106,12 +106,18 @@ namespace Combat
         }
         #endregion
 
-        public void UpdatePosition()
+        public bool UpdatePosition()
         {
+            if (m_unity_go == null)
+            {
+                LogWrapper.LogError("ModelComponent.UpdatePosition, Object has already been destroyed！！！！！！！！！");
+                return false; //ZZWTODO
+            }
             m_last_position = RenderWorld.Vector3FP_To_Vector3(m_position_component.CurrentPosition);
             if (m_predict_component != null)
                 m_predict_component.OnLogicUpdatePosition(m_last_position - m_bodyctrl_tr.localPosition);
             m_bodyctrl_tr.localPosition = m_last_position;
+            return true;
         }
 
         public void UpdateAngle()
