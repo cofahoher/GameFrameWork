@@ -7,6 +7,7 @@ namespace Combat
         LogicWorld m_logic_world;
         Dictionary<int, FixPoint> m_data = new Dictionary<int, FixPoint>();
         Dictionary<int, object> m_data_ext = new Dictionary<int, object>();
+        BTActionBuffer m_action_buffer = new BTActionBuffer();
 
         public void Reset()
         {
@@ -15,9 +16,19 @@ namespace Combat
             m_data_ext.Clear();
         }
 
+        public void SetLogicWorld(LogicWorld logic_world)
+        {
+            m_logic_world = logic_world;
+        }
+
         public LogicWorld GetLogicWorld()
         {
             return m_logic_world;
+        }
+
+        public BTActionBuffer GetActionBuffer()
+        {
+            return m_action_buffer;
         }
 
         #region 数值

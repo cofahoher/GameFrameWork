@@ -52,6 +52,16 @@ namespace Combat
                     m_children[i].ResetNode();
             }
         }
+
+        public void SetContext(BTContext context)
+        {
+            m_context = context;
+            if (m_children != null)
+            {
+                for (int i = 0; i < m_children.Count; ++i)
+                    m_children[i].SetContext(context);
+            }
+        }
         #endregion
 
         #region Getter

@@ -27,6 +27,12 @@ namespace Combat
         {
             base.ResetNode();
             m_active = false;
+            if (m_context != null)
+            {
+                BTContext context = m_context;
+                SetContext(null);
+                RecyclableObject.Recycle(context);
+            }
         }
 
         public void Reset()
@@ -46,13 +52,47 @@ namespace Combat
         {
             get { return m_config_id; }
         }
+
+        public FixPoint UpdateInterval
+        {
+            get { return m_update_interval; }
+        }
         #endregion
+
+        public void Activate(LogicWorld logic_world)
+        {
+            if (m_active)
+                return;
+            if (m_context == null)
+            {
+                BTContext context = RecyclableObject.Create<BTContext>();
+                context.SetLogicWorld(logic_world);
+                SetContext(context);
+            }
+            else
+            {
+            }
+            m_active = true;
+        }
+
+        public void Deactivate()
+        {
+            if (!m_active)
+                return;
+            if (m_context != null)
+            {
+                m_context.GetActionBuffer().ExitAllAction();
+            }
+            m_active = false;
+        }
 
         public override BTNodeStatus OnUpdate()
         {
             if (m_children == null)
                 return BTNodeStatus.False;
-            return m_children[0].OnUpdate();
+            BTNodeStatus status = m_children[0].OnUpdate();
+            m_context.GetActionBuffer().SwapActions();
+            return status;
         }
     }
 }
