@@ -35,6 +35,15 @@ namespace Combat
                 enumerator.Current.ExitAction();
             }
             m_previous_actions.Clear();
+            if (m_current_actions.Count > 0)
+                LogWrapper.LogError("ExitAllAction, m_current_actions isn't empty");
+            m_current_actions.Clear();
+        }
+
+        public void Clear()
+        {
+            m_previous_actions.Clear();
+            m_current_actions.Clear();
         }
     }
 }
