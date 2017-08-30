@@ -27,35 +27,41 @@ namespace Combat
         protected override void PostInitializeComponent()
         {
             LogicWorld logic_world = GetLogicWorld();
-            SkillManager skill_manager = logic_world.GetSkillManager();
-            IConfigProvider config = logic_world.GetConfigProvider();
             var enumerator = m_index2id.GetEnumerator();
             while(enumerator.MoveNext())
             {
                 int skill_index = enumerator.Current.Key;
                 int skill_cfgid = enumerator.Current.Value;
-                ObjectTypeData skill_data = config.GetSkillData(skill_cfgid);
-                if (skill_data == null)
-                {
-                    m_index2id[skill_index] = -1;
-                    continue;
-                }
-                ObjectCreationContext object_context = new ObjectCreationContext();
-                object_context.m_object_type_id = skill_cfgid;
-                object_context.m_type_data = skill_data;
-                object_context.m_logic_world = logic_world;
-                object_context.m_owner_id = ParentObject.ID;
-                Skill skill = skill_manager.CreateObject(object_context);
-                m_index2id[skill_index] = skill.ID;
-                if (skill_index == DEFAULT_SKILL_INDEX)
-                    m_default_skill_id = skill.ID;
-                if (skill.GetDefinitionComponent().StartsActive)
-                    skill.Activate(GetCurrentTime());
+                CreateSkill(skill_index, skill_cfgid);
             }
-
             m_locomotor_cmp = ParentObject.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
             m_listener_context = SignalListenerContext.CreateForEntityComponent(logic_world.GenerateSignalListenerID(), ParentObject.ID, m_component_type_id);
             ParentObject.AddListener(SignalType.StartMoving, m_listener_context);
+        }
+
+        Skill CreateSkill(int skill_index, int skill_cfgid)
+        {
+            LogicWorld logic_world = GetLogicWorld();
+            SkillManager skill_manager = logic_world.GetSkillManager();
+            IConfigProvider config = logic_world.GetConfigProvider();
+            ObjectTypeData skill_data = config.GetSkillData(skill_cfgid);
+            if (skill_data == null)
+            {
+                m_index2id[skill_index] = -1;
+                return null;
+            }
+            ObjectCreationContext object_context = new ObjectCreationContext();
+            object_context.m_object_type_id = skill_cfgid;
+            object_context.m_type_data = skill_data;
+            object_context.m_logic_world = logic_world;
+            object_context.m_owner_id = ParentObject.ID;
+            Skill skill = skill_manager.CreateObject(object_context);
+            m_index2id[skill_index] = skill.ID;
+            if (skill_index == DEFAULT_SKILL_INDEX)
+                m_default_skill_id = skill.ID;
+            if (skill.GetDefinitionComponent().StartsActive)
+                skill.Activate(GetCurrentTime());
+            return skill;
         }
 
         protected override void OnDestruct()
@@ -128,6 +134,18 @@ namespace Combat
 
         public void OnGeneratorDestroyed(ISignalGenerator generator)
         {
+        }
+        #endregion
+
+        #region 技能替换
+        public void ReplaceSkill(int skill_index, int skill_cfgid)
+        {
+            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+            int old_skill_id;
+            if (m_index2id.TryGetValue(skill_index, out old_skill_id))
+                skill_manager.DestroyObject(old_skill_id);
+            m_index2id[skill_index] = -1;
+            CreateSkill(skill_index, skill_cfgid);
         }
         #endregion
 
