@@ -9,6 +9,7 @@ namespace Combat
         NotEnoughMana,
         ObjectIsMoving,
         SkillDisabled,
+        CheatedExternalData,
         NotEnoughTargets,
         TargetTooNear,
         TargetTooFar,
@@ -35,7 +36,7 @@ namespace Combat
         protected override void PreInitializeObject(ObjectCreationContext context)
         {
             Entity owner_entity = context.m_logic_world.GetEntityManager().GetObject(m_context.m_owner_id);
-            if(owner_entity != null)
+            if (owner_entity != null)
             {
                 m_owner_component = owner_entity.GetComponent(SkillManagerComponent.ID) as SkillManagerComponent;
                 m_mana_component = owner_entity.GetComponent(ManaComponent.ID) as ManaComponent;
@@ -108,7 +109,7 @@ namespace Combat
 
         public void AddTarget(Target target)
         {
-            if(target != null)
+            if (target != null)
             {
                 m_skill_targets.Add(target);
             }
@@ -163,6 +164,12 @@ namespace Combat
                 LocomotorComponent locomotor_cmp = GetOwnerEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
                 if (locomotor_cmp != null && locomotor_cmp.IsMoving)
                     return CastSkillResult.ObjectIsMoving;
+            }
+
+            if (m_definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
+            {
+                if (m_definition_component.ExternalVector.Length() > m_definition_component.AimParam1)
+                    return CastSkillResult.CheatedExternalData;
             }
 
             if (m_definition_component.TargetsMinCountForActivate > 0)
@@ -444,7 +451,7 @@ namespace Combat
             if (time_remaining <= FixPoint.Zero)
                 time_remaining = FixPoint.PrecisionFP;
             var task_scheduler = GetLogicWorld().GetTaskScheduler();
-            if(m_task == null)
+            if (m_task == null)
             {
                 m_task = LogicTask.Create<SkillCountdownTask>();
                 m_task.Construct(this);

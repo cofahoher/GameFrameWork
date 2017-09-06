@@ -50,6 +50,7 @@ namespace Combat
             m_is_running = true;
             //如果要实现为状态机，那就override OnActionEnter修改m_status为BTNodeStatus.Running
             OnActionEnter();
+            OnActionUpdate();
         }
 
         void UpdateAction()

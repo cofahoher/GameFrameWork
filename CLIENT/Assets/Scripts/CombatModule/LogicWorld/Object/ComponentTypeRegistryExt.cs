@@ -747,6 +747,10 @@ namespace Combat
                 m_inflict_missile_speed = FixPoint.Parse(value);
             if (variables.TryGetValue("impact_delay", out value))
                 m_impact_delay = FixPoint.Parse(value);
+            if (variables.TryGetValue("aim_param1", out value))
+                m_aim_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("aim_param2", out value))
+                m_aim_param2 = FixPoint.Parse(value);
             if (variables.TryGetValue("icon", out value))
                 m_icon = value;
             if (variables.TryGetValue("auto_aim", out value))
@@ -867,6 +871,16 @@ namespace Combat
         public FixPoint ImpactDelay
         {
             get { return m_impact_delay; }
+        }
+
+        public FixPoint AimParam1
+        {
+            get { return m_aim_param1; }
+        }
+
+        public FixPoint AimParam2
+        {
+            get { return m_aim_param2; }
         }
 #endregion
     }

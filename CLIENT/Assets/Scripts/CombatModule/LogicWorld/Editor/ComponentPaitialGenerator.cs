@@ -188,6 +188,8 @@ namespace Combat
                 .REGISTER_VARIABLE<string>("inflict_missile", null, "m_inflict_missile")
                 .REGISTER_VARIABLE<FixPoint>("inflict_missile_speed", "VID_InflictMissileSpeed", "m_inflict_missile_speed", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("impact_delay", "VID_ImpactDelay", "m_impact_delay", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("aim_param1", "VID_AimParam1", "m_aim_param1", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("aim_param2", "VID_AimParam2", "m_aim_param2", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<string>("icon", null, "m_icon")
                 .REGISTER_VARIABLE_CRC<int>("auto_aim", null, "m_auto_aim_type")
                 .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
@@ -282,8 +284,8 @@ namespace Combat
         {
             public string m_type_name;              //类型名，比如"int"、"FixPoint"
             public string m_config_name;            //配置文件中使用的名字，比如"max_speed"
-            public string m_code_name;              //代码中的变量名，比如"VID_MaxSpeed"，可以是null，表示不支持variable
-            public string m_code_fragment;          //代码中这个值的来源，比如"m_max_speed"，可以是null，表示不支持variable，也不支持CSharp的属性
+            public string m_code_name;              //代码中的VID_名，比如"VID_MaxSpeed"，可以是null，表示不支持variable，也不支持CSharp的属性
+            public string m_code_fragment;          //代码中这个值的代码片段，比如"m_max_speed"、"MaxSpeed"
             public int m_flag = 0;
             public bool CanVariableInit()
             {
@@ -404,7 +406,7 @@ namespace Combat
             return new_cmp;
         }
 
-        [MenuItem("H3D/Generate Combat Component Code", false, 999)]
+        [MenuItem("FrameWork/Generate Combat Component Code", false, 101)]
         public static void GenerateAll()
         {
             StreamWriter writer = new StreamWriter("Assets/Scripts/CoreGame/LogicWorld/Object/ComponentTypeRegistryExt.cs");

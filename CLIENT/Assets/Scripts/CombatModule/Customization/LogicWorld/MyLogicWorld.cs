@@ -32,7 +32,7 @@ namespace Combat
             Vector3FP left_bottom_position = new Vector3FP(new FixPoint(-20), FixPoint.Zero, new FixPoint(-15));
 
             SquareGridGraph grid_graph = new SquareGridGraph();
-            //m_grid_graph = new HexagonGridGraph();
+            //HexagonGridGraph grid_graph = new HexagonGridGraph();
             grid_graph.GenerateAsPlaneMap(grid_size, x_size, z_size, FixPoint.Zero, left_bottom_position, seeker_radius);
             grid_graph.CoverArea(new Vector3FP(FixPoint.Zero, FixPoint.Zero, FixPoint.FixPointDigit[5]), new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Half));
             grid_graph.CoverArea(new Vector3FP(FixPoint.FixPointDigit[7] + FixPoint.Half, FixPoint.Zero, FixPoint.Zero), new Vector3FP(FixPoint.Half, FixPoint.Zero, FixPoint.FixPointDigit[5]));

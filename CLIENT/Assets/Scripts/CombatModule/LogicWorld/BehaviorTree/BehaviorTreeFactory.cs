@@ -11,7 +11,8 @@ namespace Combat
     public class BehaviorTreeFactory : Singleton<BehaviorTreeFactory>
     {
         const int MAX_CACHE_CNT = 30;
-        private Dictionary<int, BehaviorTreeCache> m_pools = new Dictionary<int, BehaviorTreeCache>();
+        IConfigProvider m_config_provider = null;
+        Dictionary<int, BehaviorTreeCache> m_pools = new Dictionary<int, BehaviorTreeCache>();
 
         private BehaviorTreeFactory()
         {
@@ -19,6 +20,11 @@ namespace Combat
 
         public override void Destruct()
         {
+        }
+
+        public void SetConfigProvider(IConfigProvider config_provider)
+        {
+            m_config_provider = config_provider;
         }
 
         public BeahviorTree CreateBehaviorTree(int bt_config_id)
@@ -101,10 +107,33 @@ namespace Combat
 
         BeahviorTree CreateBeahviorTreeFromConfig(int bt_config_id)
         {
-            // ZZWTODO 获取配置解析
-            //BeahviorTree tree = new BeahviorTree(bt_config_id);
-            //return tree;
-            return null;
+            BehaviorTreeData data = m_config_provider.GetBehaviorTreeData(bt_config_id);
+            if (data == null)
+                return null;
+            BeahviorTree tree = new BeahviorTree(bt_config_id, data.m_update_interval);
+            BTNode root_btnode = CreateBTNode(data.m_root_node);
+            if (root_btnode != null)
+                tree.AddChild(root_btnode);
+            return tree;
+        }
+
+        BTNode CreateBTNode(BehaviorTreeNodeData node_data)
+        {
+            BTNode btnode = BehaviorTreeNodeTypeRegistry.CreateBTNode(node_data.m_node_type);
+            if (btnode == null)
+                return null;
+            if (node_data.m_node_variables != null)
+                btnode.InitializeVariable(node_data.m_node_variables);
+            if (node_data.m_sub_nodes != null)
+            {
+                for (int i = 0; i < node_data.m_sub_nodes.Count; ++i)
+                {
+                    BTNode sub_btnode = CreateBTNode(node_data.m_sub_nodes[i]);
+                    if (sub_btnode != null)
+                        btnode.AddChild(sub_btnode);
+                }
+            }
+            return btnode;
         }
     }
 }

@@ -35,6 +35,9 @@ namespace Combat
                 }
             }
         }
+        public virtual void InitializeVariable(Dictionary<string, string> variables)
+        {
+        }
 
         public BTNode Clone()
         {

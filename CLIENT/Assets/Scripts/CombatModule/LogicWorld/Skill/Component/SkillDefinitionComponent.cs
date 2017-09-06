@@ -4,10 +4,13 @@ namespace Combat
 {
     public partial class SkillDefinitionComponent : SkillComponent
     {
+        //A、技能额外数据
         public static readonly int NeedExternalDirection = (int)CRC.Calculate("direction");
         public static readonly int NeedExternalOffset = (int)CRC.Calculate("offset");
-        public static readonly int AutoAimNearestEnemy = (int)CRC.Calculate("nearest_enemy");
+        //B、在没有额外数据时的自动朝向
         public static readonly int AutoFaceNearestEnemy = (int)CRC.Calculate("nearest_enemy");
+        //C、技能施放提示表现上的自动瞄准，默认的A的数据
+        public static readonly int AutoAimNearestEnemy = (int)CRC.Calculate("nearest_enemy");
 
         //直接对目标生效
         public const int InflictType_Immediately = 1;
@@ -51,6 +54,13 @@ namespace Combat
         FixPoint m_inflict_missile_speed;
         FixPoint m_impact_delay;
 
+        //瞄准的参数
+        //NeedExternalDirection：长、宽
+        //NeedExternalOffset：大圆半径，小圆半径
+        FixPoint m_aim_param1 = FixPoint.Zero;
+        FixPoint m_aim_param2 = FixPoint.Zero;
+
+        //以下纯表现
         public int m_auto_aim_type = 0;
         public string m_icon;
         public string m_casting_animation;

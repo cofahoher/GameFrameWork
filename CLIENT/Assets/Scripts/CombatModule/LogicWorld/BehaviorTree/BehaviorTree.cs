@@ -11,9 +11,10 @@ namespace Combat
         bool m_active = false;
 
         #region 创建
-        public BeahviorTree(int config_id)
+        public BeahviorTree(int config_id, FixPoint update_interval)
         {
             m_config_id = config_id;
+            m_update_interval = update_interval;
         }
 
         public BeahviorTree(BeahviorTree prototype)

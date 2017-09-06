@@ -158,6 +158,7 @@
     <Compile Include="Assets\AstarPathfindingProject\Editor\RVOSquareObstacleEditor.cs" />
     <Compile Include="Assets\AstarPathfindingProject\Editor\RecastMeshObjEditor.cs" />
     <Compile Include="Assets\AstarPathfindingProject\Editor\SeekerEditor.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Editor\BehaviorTreeNodePartialGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Editor\ComponentPaitialGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

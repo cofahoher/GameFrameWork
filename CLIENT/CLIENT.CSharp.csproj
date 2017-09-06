@@ -238,7 +238,10 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BTNode.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTree.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTreeFactory.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTreeNodeTypeRegistry.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTreeNodeTypeRegistryExt.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Actions\BTAction.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\BTTestGenerator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTComposite.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTParallelSelector.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTParallelSequence.cs" />
@@ -252,6 +255,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\Command.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Command\ICommandHandler.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\AttributeData.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\BehaviorTreeData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\DamageData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\EffectCategoryData.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Config\EffectGeneratorData.cs" />

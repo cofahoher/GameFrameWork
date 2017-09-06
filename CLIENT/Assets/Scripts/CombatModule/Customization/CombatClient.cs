@@ -100,6 +100,8 @@ namespace Combat
             m_combat_factory.RegisterCommands();
             m_combat_factory.RegisterRenderMessages();
 
+            BehaviorTreeFactory.Instance.SetConfigProvider(m_combat_factory.GetConfigProvider());
+
             m_logic_world = m_combat_factory.CreateLogicWorld();
             m_logic_world.Initialize(this, combat_start_info.m_world_seed, true);
             m_render_world = m_combat_factory.CreateRenderWorld();

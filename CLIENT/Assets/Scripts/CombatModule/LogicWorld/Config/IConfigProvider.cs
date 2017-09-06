@@ -15,5 +15,6 @@ namespace Combat
         ObjectTypeData GetSkillData(int id);
         EffectGeneratorData GetEffectGeneratorData(int id);
         ObjectTypeData GetEffectData(int id);
+        BehaviorTreeData GetBehaviorTreeData(int id);
     }
 }

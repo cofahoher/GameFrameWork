@@ -15,6 +15,7 @@ namespace Combat
         Dictionary<int, ObjectTypeData> m_skill_data = new Dictionary<int, ObjectTypeData>();
         Dictionary<int, EffectGeneratorData> m_effect_generator_data = new Dictionary<int, EffectGeneratorData>();
         Dictionary<int, ObjectTypeData> m_effect_data = new Dictionary<int, ObjectTypeData>();
+        Dictionary<int, BehaviorTreeData> m_behavior_tree_data = new Dictionary<int, BehaviorTreeData>();
 
         private ConfigProvider()
         {
@@ -29,6 +30,7 @@ namespace Combat
             InitSkillData();
             InitEffectGeneratorData();
             InitEffectData();
+            InitBehaviorTreeData();
         }
 
         public override void Destruct()
@@ -118,6 +120,14 @@ namespace Combat
             if (!m_effect_data.TryGetValue(id, out effect_data))
                 return null;
             return effect_data;
+        }
+
+        public BehaviorTreeData GetBehaviorTreeData(int id)
+        {
+            BehaviorTreeData tree_data = null;
+            if (!m_behavior_tree_data.TryGetValue(id, out tree_data))
+                return null;
+            return tree_data;
         }
         #endregion
 
@@ -601,6 +611,10 @@ namespace Combat
         }
 
         void InitEffectData()
+        {
+        }
+
+        void InitBehaviorTreeData()
         {
         }
         #endregion
