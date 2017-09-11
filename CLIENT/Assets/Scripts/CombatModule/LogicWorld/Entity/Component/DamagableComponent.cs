@@ -28,6 +28,17 @@ namespace Combat
         }
         #endregion
 
+        public FixPoint MaxHealth
+        {
+            get { return m_current_max_health; }
+            set
+            {
+                if (value > m_current_max_health && m_current_max_health > FixPoint.Zero)
+                    CurrentHealth = CurrentHealth * value / m_current_max_health;
+                m_current_max_health = value;
+            }
+        }
+
         public FixPoint CurrentHealth
         {
             get { return m_current_health; }

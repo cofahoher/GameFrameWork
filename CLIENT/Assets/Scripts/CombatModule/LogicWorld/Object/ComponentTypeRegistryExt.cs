@@ -187,7 +187,7 @@ namespace Combat
         {
             string value;
             if (variables.TryGetValue("max_health", out value))
-                m_current_max_health = FixPoint.Parse(value);
+                MaxHealth = FixPoint.Parse(value);
             if (variables.TryGetValue("current_health", out value))
                 CurrentHealth = FixPoint.Parse(value);
         }
@@ -197,7 +197,7 @@ namespace Combat
             switch (id)
             {
             case VID_MaxHealth:
-                value = m_current_max_health;
+                value = MaxHealth;
                 return true;
             case VID_CurrentHealth:
                 value = CurrentHealth;
@@ -213,7 +213,7 @@ namespace Combat
             switch (id)
             {
             case VID_MaxHealth:
-                m_current_max_health = value;
+                MaxHealth = value;
                 return true;
             case VID_CurrentHealth:
                 CurrentHealth = value;
@@ -222,13 +222,6 @@ namespace Combat
                 return false;
             }
         }
-
-#region GETTER/SETTER
-        public FixPoint MaxHealth
-        {
-            get { return m_current_max_health; }
-        }
-#endregion
     }
 
     public partial class DamageModificationComponent

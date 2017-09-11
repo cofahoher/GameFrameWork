@@ -64,7 +64,7 @@ namespace Combat
             REGISTER_COMPONENT<AIComponent>();
             REGISTER_COMPONENT<AttributeManagerComponent>();
             REGISTER_COMPONENT<DamagableComponent>()
-                .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "m_current_max_health")
+                .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "MaxHealth", Flag_Variable_GetSet)
                 .REGISTER_VARIABLE<FixPoint>("current_health", "VID_CurrentHealth", "CurrentHealth", Flag_Variable_GetSet);
             REGISTER_COMPONENT<DamageModificationComponent>();
             REGISTER_COMPONENT<DeathComponent>()
