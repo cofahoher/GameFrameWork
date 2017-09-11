@@ -189,7 +189,7 @@ namespace Combat
                     param.m_target_entity_id = 0;
                     FixPoint range = GetOwnerSkill().GetDefinitionComponent().MaxRange;
                     if (range <= 0)
-                        range = FixPoint.FixPointDigit[10];  //ZZWTODO
+                        range = FixPoint.Ten;  //ZZWTODO
                     if (projectile_component.Speed > FixPoint.Zero)
                         param.m_life_time = range / projectile_component.Speed;
                     param.m_target_position = param.m_start_position + param.m_fixed_facing * range;
