@@ -129,7 +129,7 @@ namespace Combat
             {
                 if (m_combo_attack_cnt % 2 == 1)
                 {
-                    FixPoint angle_offset = m_combo_interval * (FixPoint)((index + 1)/2);
+                    FixPoint angle_offset = m_combo_interval * (FixPoint)((index + 1) / 2);
                     if (index % 2 == 0)
                         angle += angle_offset;
                     else
@@ -151,7 +151,8 @@ namespace Combat
             ObjectTypeData type_data = config.GetObjectTypeData(m_object_type_id);
             if (type_data == null)
                 return;
-            BirthPositionInfo birth_info = new BirthPositionInfo(source_pos.x + xz_offset.x, source_pos.y + m_offset.y, source_pos.z + xz_offset.z, angle, owner_position_cmp.GetCurrentSceneSpace());
+            Vector3FP birth_position = new Vector3FP(source_pos.x + xz_offset.x, source_pos.y + m_offset.y, source_pos.z + xz_offset.z);
+            BirthPositionInfo birth_info = new BirthPositionInfo(birth_position.x, birth_position.y, birth_position.z, angle, owner_position_cmp.GetCurrentSceneSpace());
             ObjectCreationContext object_context = new ObjectCreationContext();
             object_context.m_object_proxy_id = owner_player.ProxyID;
             object_context.m_object_type_id = m_object_type_id;
@@ -178,13 +179,26 @@ namespace Combat
             if (projectile_component != null)
             {
                 ProjectileParameters param = RecyclableObject.Create<ProjectileParameters>();
+                param.m_start_time = logic_world.GetCurrentTime();
                 param.m_life_time = m_object_life_time;
                 param.m_source_entity_id = owner_entity.ID;
+                param.m_start_position = birth_position;
+                param.m_fixed_facing = facing;
                 if (target == null)
+                {
                     param.m_target_entity_id = 0;
+                    FixPoint range = GetOwnerSkill().GetDefinitionComponent().MaxRange;
+                    if (range <= 0)
+                        range = FixPoint.FixPointDigit[10];  //ZZWTODO
+                    if (projectile_component.Speed > FixPoint.Zero)
+                        param.m_life_time = range / projectile_component.Speed;
+                    param.m_target_position = param.m_start_position + param.m_fixed_facing * range;
+                }
                 else
+                {
                     param.m_target_entity_id = target.GetEntityID();
-                param.m_facing = facing;
+                    param.m_target_position = target.GetPosition(logic_world);
+                }
                 param.m_generator_id = m_generator == null ? 0 : m_generator.ID;
                 projectile_component.InitParam(param);
             }

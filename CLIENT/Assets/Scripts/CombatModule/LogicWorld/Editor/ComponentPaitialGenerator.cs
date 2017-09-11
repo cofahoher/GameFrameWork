@@ -110,12 +110,15 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("collision_sender", null, "m_collision_sender")
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<ProjectileComponent>()
-                .REGISTER_VARIABLE<FixPoint>("speed", null, "m_speed")
+                .REGISTER_VARIABLE<FixPoint>("speed", "VID_Speed", "m_speed", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime")
-                .REGISTER_VARIABLE<int>("collision_sound", null, "m_collision_sound_cfgid")
-                .REGISTER_VARIABLE_CRC<int>("collision_faction", null, "m_collision_faction")
+                .REGISTER_VARIABLE_CRC<int>("track_mode", "VID_TrackMode", "m_track_mode", Flag_Attribute_Get)
+                .REGISTER_VARIABLE_CRC<int>("trajectory_type", "VID_TrajectoryType", "m_trajectory_type", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<FixPoint>("extra_hight", null, "m_extra_hight")
                 .REGISTER_VARIABLE<bool>("can_cross_obstacle", null, "m_can_cross_obstacle")
-                .REGISTER_VARIABLE<bool>("pierce_entity", null, "m_pierce_entity");
+                .REGISTER_VARIABLE<bool>("pierce_entity", null, "m_pierce_entity")
+                .REGISTER_VARIABLE_CRC<int>("collision_faction", null, "m_collision_faction")
+                .REGISTER_VARIABLE<int>("collision_sound", null, "m_collision_sound_cfgid");
             REGISTER_COMPONENT<SimpleAIComponent>()
                 .REGISTER_VARIABLE<FixPoint>("guard_range", null, "m_guard_range");
             REGISTER_COMPONENT<SkillManagerComponent>();
@@ -129,7 +132,8 @@ namespace Combat
             REGISTER_COMPONENT<StateComponent>();
             REGISTER_COMPONENT<SummonedEntityComponent>()
                 .REGISTER_VARIABLE<bool>("die_with_master", null, "m_die_with_master");
-            REGISTER_COMPONENT<TargetingComponent>();
+            REGISTER_COMPONENT<TargetingComponent>()
+                .REGISTER_VARIABLE<bool>("attack_once", null, "m_attack_once");
             #endregion
 
             #region Skill
@@ -169,6 +173,7 @@ namespace Combat
                 .REGISTER_VARIABLE<Formula>("casting_time", "VID_CastingTime", "m_casting_time", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("inflict_time", "VID_InflictTime", "m_inflict_time", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<Formula>("expiration_time", "VID_ExpirationTime", "m_expiration_time", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("normal_attack", "VID_NormalAttack", "m_normal_attack", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("starts_active", "VID_StartsActive", "m_starts_active", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("blocks_other_skills_when_active", "VID_BlocksOtherSkillsWhenActive", "m_blocks_other_skills_when_active", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("blocks_movement_when_active", "VID_BlocksMovementWhenActive", "m_blocks_movement_when_active", Flag_Attribute_Get)
@@ -184,10 +189,10 @@ namespace Combat
                 .REGISTER_VARIABLE<int>("targets_min_count_for_activate", "VID_TargetsMinCountForActivate", "m_targets_min_count_for_activate", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("external_data_type", "VID_ExternalDataType", "m_external_data_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("auto_face", "VID_AutoFaceType", "m_auto_face_type", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<int>("inflict_type", "VID_InflictType", "m_inflict_type", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<string>("inflict_missile", null, "m_inflict_missile")
-                .REGISTER_VARIABLE<FixPoint>("inflict_missile_speed", "VID_InflictMissileSpeed", "m_inflict_missile_speed", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<FixPoint>("impact_delay", "VID_ImpactDelay", "m_impact_delay", Flag_Attribute_Get)
+                //.REGISTER_VARIABLE<int>("inflict_type", "VID_InflictType", "m_inflict_type", Flag_Attribute_Get)
+                //.REGISTER_VARIABLE<string>("inflict_missile", null, "m_inflict_missile")
+                //.REGISTER_VARIABLE<FixPoint>("inflict_missile_speed", "VID_InflictMissileSpeed", "m_inflict_missile_speed", Flag_Attribute_Get)
+                //.REGISTER_VARIABLE<FixPoint>("impact_delay", "VID_ImpactDelay", "m_impact_delay", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("aim_param1", "VID_AimParam1", "m_aim_param1", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("aim_param2", "VID_AimParam2", "m_aim_param2", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<string>("icon", null, "m_icon")

@@ -96,8 +96,33 @@ namespace Combat
         public void BuildSkillTargets()
         {
             ClearTargets();
-            TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
-            target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.m_target_gathering_param, m_skill_targets);
+            if (m_definition_component.m_target_gathering_param.m_type == TargetGatheringType.SpecifiedTarget)
+            {
+                if (m_definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalTarget)
+                {
+                    int specified_target_id = m_definition_component.SpecifiedTargetID;
+                    if (specified_target_id > 0)
+                    {
+                        Target target = RecyclableObject.Create<Target>();
+                        target.Construct();
+                        target.SetEntityTarget(specified_target_id);
+                        m_skill_targets.Add(target);
+                    }
+                }
+                else if (m_definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
+                {
+                    PositionComponent position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+                    Target target = RecyclableObject.Create<Target>();
+                    target.Construct();
+                    target.SetPositionTarget(position_component.CurrentPosition + m_definition_component.ExternalVector);
+                    m_skill_targets.Add(target);
+                }
+            }
+            else
+            {
+                TargetGatheringManager target_gathering_manager = GetLogicWorld().GetTargetGatheringManager();
+                target_gathering_manager.BuildTargetList(GetOwnerEntity(), m_definition_component.m_target_gathering_param, m_skill_targets);
+            }
         }
 
         public void BuildSkillTargets(TargetGatheringParam target_gathering_param)
@@ -221,7 +246,18 @@ namespace Combat
         void AdjustDirection()
         {
             int external_data_type = m_definition_component.ExternalDataType;
-            if (external_data_type != 0)
+
+            if (external_data_type == SkillDefinitionComponent.NeedExternalTarget)
+            {
+                Entity target = GetLogicWorld().GetEntityManager().GetObject(m_definition_component.SpecifiedTargetID);
+                if (target != null)
+                {
+                    PositionComponent owner_position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+                    PositionComponent target_position_component = target.GetComponent(PositionComponent.ID) as PositionComponent;
+                    owner_position_component.SetFacing(target_position_component.CurrentPosition - owner_position_component.CurrentPosition);
+                }
+            }
+            else if (external_data_type == SkillDefinitionComponent.NeedExternalDirection || external_data_type == SkillDefinitionComponent.NeedExternalOffset)
             {
                 Vector3FP vector = m_definition_component.ExternalVector;
                 if (vector.IsAllZero())
@@ -229,14 +265,7 @@ namespace Combat
                 PositionComponent position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
                 if (position_component == null)
                     return;
-                if (external_data_type == SkillDefinitionComponent.NeedExternalDirection)
-                {
-                    position_component.SetFacing(vector);
-                }
-                else if (external_data_type == SkillDefinitionComponent.NeedExternalOffset)
-                {
-                    position_component.SetFacing(vector);
-                }
+                position_component.SetFacing(vector);
             }
             else
             {

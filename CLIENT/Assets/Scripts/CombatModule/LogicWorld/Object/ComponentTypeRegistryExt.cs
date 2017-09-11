@@ -530,6 +530,10 @@ namespace Combat
                 m_speed = FixPoint.Parse(value);
             if (variables.TryGetValue("lifetime", out value))
                 m_lifetime = FixPoint.Parse(value);
+            if (variables.TryGetValue("track_mode", out value))
+                m_track_mode = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("trajectory_type", out value))
+                m_trajectory_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("collision_sound", out value))
                 m_collision_sound_cfgid = int.Parse(value);
             if (variables.TryGetValue("collision_faction", out value))
@@ -539,6 +543,23 @@ namespace Combat
             if (variables.TryGetValue("pierce_entity", out value))
                 m_pierce_entity = bool.Parse(value);
         }
+
+        #region GETTER/SETTER
+        public FixPoint Speed
+        {
+            get { return m_speed; }
+        }
+
+        public int TrackMode
+        {
+            get { return m_track_mode; }
+        }
+
+        public int TrajectoryType
+        {
+            get { return m_trajectory_type; }
+        }
+        #endregion
     }
 
     public partial class SimpleAIComponent
@@ -600,6 +621,13 @@ namespace Combat
     public partial class TargetingComponent
     {
         public const int ID = -775984024;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("attack_once", out value))
+                m_attack_once = bool.Parse(value);
+        }
     }
 
     public partial class BehaviorTreeSkillComponent
@@ -709,6 +737,8 @@ namespace Combat
                 m_inflict_time.Compile(value);
             if (variables.TryGetValue("expiration_time", out value))
                 m_expiration_time.Compile(value);
+            if (variables.TryGetValue("normal_attack", out value))
+                m_normal_attack = bool.Parse(value);
             if (variables.TryGetValue("starts_active", out value))
                 m_starts_active = bool.Parse(value);
             if (variables.TryGetValue("blocks_other_skills_when_active", out value))
@@ -739,14 +769,6 @@ namespace Combat
                 m_external_data_type = (int)CRC.Calculate(value);
             if (variables.TryGetValue("auto_face", out value))
                 m_auto_face_type = (int)CRC.Calculate(value);
-            if (variables.TryGetValue("inflict_type", out value))
-                m_inflict_type = int.Parse(value);
-            if (variables.TryGetValue("inflict_missile", out value))
-                m_inflict_missile = value;
-            if (variables.TryGetValue("inflict_missile_speed", out value))
-                m_inflict_missile_speed = FixPoint.Parse(value);
-            if (variables.TryGetValue("impact_delay", out value))
-                m_impact_delay = FixPoint.Parse(value);
             if (variables.TryGetValue("aim_param1", out value))
                 m_aim_param1 = FixPoint.Parse(value);
             if (variables.TryGetValue("aim_param2", out value))
@@ -808,6 +830,11 @@ namespace Combat
             get { return m_expiration_time.Evaluate(this); }
         }
 
+        public bool NormalAttack
+        {
+            get { return m_normal_attack; }
+        }
+
         public bool StartsActive
         {
             get { return m_starts_active; }
@@ -856,21 +883,6 @@ namespace Combat
         public int AutoFaceType
         {
             get { return m_auto_face_type; }
-        }
-
-        public int InflictType
-        {
-            get { return m_inflict_type; }
-        }
-
-        public FixPoint InflictMissileSpeed
-        {
-            get { return m_inflict_missile_speed; }
-        }
-
-        public FixPoint ImpactDelay
-        {
-            get { return m_impact_delay; }
         }
 
         public FixPoint AimParam1

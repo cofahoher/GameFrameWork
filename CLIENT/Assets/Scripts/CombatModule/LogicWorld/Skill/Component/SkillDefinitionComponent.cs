@@ -7,21 +7,22 @@ namespace Combat
         //A、技能额外数据
         public static readonly int NeedExternalDirection = (int)CRC.Calculate("direction");
         public static readonly int NeedExternalOffset = (int)CRC.Calculate("offset");
+        public static readonly int NeedExternalTarget = (int)CRC.Calculate("target");
         //B、在没有额外数据时的自动朝向
         public static readonly int AutoFaceNearestEnemy = (int)CRC.Calculate("nearest_enemy");
         //C、技能施放提示表现上的自动瞄准，默认的A的数据
         public static readonly int AutoAimNearestEnemy = (int)CRC.Calculate("nearest_enemy");
 
-        //直接对目标生效
-        public const int InflictType_Immediately = 1;
-        //播放朝向目标的特效，一定延迟后，对目标生效
-        public const int InflictType_TargetOrientedFx = 2;
-        //发射朝向目标的必中飞行物，根据速度，一定延迟后，对目标生效（可以实现为CreateObjectSkillComponent）
-        public const int InflictType_ObjectTrackingMissile = 3;
-        //发射朝向指定位置的飞行物，根据速度，一定延迟后，对周围目标生效（可以实现为CreateObjectSkillComponent）
-        public const int InflictType_PositionTrackingMissile = 4;
-        ////发射独立运行的Object，这种情况变成了CreateObjectSkillComponent，并且其配置是InflictType_Immediately，表示立即发射物体
-        //public const int InflictType_CreateObject = -1;
+        ////直接对目标生效
+        //public const int InflictType_Immediately = 1;
+        ////播放朝向目标的特效，一定延迟后，对目标生效
+        //public const int InflictType_TargetOrientedFx = 2;
+        ////发射朝向目标的必中飞行物，根据速度，一定延迟后，对目标生效（可以实现为CreateObjectSkillComponent）
+        //public const int InflictType_ObjectTrackingMissile = 3;
+        ////发射朝向指定位置的飞行物，根据速度，一定延迟后，对周围目标生效（可以实现为CreateObjectSkillComponent）
+        //public const int InflictType_PositionTrackingMissile = 4;
+        //////发射独立运行的Object，这种情况变成了CreateObjectSkillComponent，并且其配置是InflictType_Immediately，表示立即发射物体
+        ////public const int InflictType_CreateObject = -1;
 
         #region 配置数据
         int m_mana_type = 0;
@@ -35,6 +36,7 @@ namespace Combat
         Formula m_inflict_time = RecyclableObject.Create<Formula>();
         Formula m_expiration_time = RecyclableObject.Create<Formula>();
 
+        bool m_normal_attack = false;
         bool m_starts_active = false;
         bool m_blocks_other_skills_when_active = true;
         bool m_blocks_movement_when_active = true;
@@ -49,10 +51,10 @@ namespace Combat
         int m_external_data_type = 0;
         int m_auto_face_type = 0;
 
-        int m_inflict_type = 1;
-        string m_inflict_missile;
-        FixPoint m_inflict_missile_speed;
-        FixPoint m_impact_delay;
+        //int m_inflict_type = 1;
+        //string m_inflict_missile;
+        //FixPoint m_inflict_missile_speed;
+        //FixPoint m_impact_delay;
 
         //瞄准的参数
         //NeedExternalDirection：长、宽
@@ -73,6 +75,8 @@ namespace Combat
         //运行数据
         List<SkillTimer> m_timers = new List<SkillTimer>();
         Vector3FP m_external_vector;
+        int m_specified_target_id = 0;
+
 
         #region GETTER
         public Vector3FP ExternalVector
@@ -80,6 +84,13 @@ namespace Combat
             get { return m_external_vector; }
             set { m_external_vector = value; }
         }
+
+        public int SpecifiedTargetID
+        {
+            get { return m_specified_target_id; }
+            set { m_specified_target_id = value; }
+        }
+
 
         public static readonly FixPoint MIN_ESTIMATE_TIME = FixPoint.Two / FixPoint.Ten;
         public static readonly FixPoint MAX_ESTIMATE_TIME = FixPoint.One;

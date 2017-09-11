@@ -7,8 +7,12 @@ namespace Combat
         static readonly FixPoint TARGETING_UPDATE_MIN_FREQUENCY = FixPoint.Two / FixPoint.Ten;
         static readonly FixPoint TARGETING_UPDATE_MAX_FREQUENCY = FixPoint.Two;
 
+        //配置数据
+        bool m_attack_once = false;
+        //运行数据
         SignalListenerContext m_listener_context;
         Entity m_current_target;
+        int m_skill_index = 0;
         UpdateTargetingTask m_task;
 
         #region GETTER
@@ -83,7 +87,7 @@ namespace Combat
                 StartTargeting(target);
         }
 
-        public void StartTargeting(Entity target)
+        public void StartTargeting(Entity target, int skill_index = SkillManagerComponent.DEFAULT_SKILL_INDEX)
         {
             if (!IsEnable())
                 return;
@@ -93,6 +97,7 @@ namespace Combat
                 return;
             StopTargeting();
             m_current_target = target;
+            m_skill_index = skill_index;
             target.AddListener(SignalType.Die, m_listener_context);
             ScheduleTargeting(FixPoint.Zero);
         }
@@ -124,9 +129,12 @@ namespace Combat
             PositionComponent position_cmp = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             LocomotorComponent locomotor_cmp = ParentObject.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
             SkillManagerComponent skill_cmp = ParentObject.GetComponent(SkillManagerComponent.ID) as SkillManagerComponent;
-            Skill skill = skill_cmp.GetDefaultSkill();
+            Skill skill = skill_cmp.GetSkill(m_skill_index);
             if (skill == null)
+            {
+                StopTargeting();
                 return;
+            }
 
             if (!skill.IsReady() && locomotor_cmp != null && locomotor_cmp.IsMoving)
             {
@@ -186,7 +194,13 @@ namespace Combat
                 if (skill.CheckActivate() == CastSkillResult.Success)
                 {
                     position_cmp.SetFacing(direction);
+                    skill.GetDefinitionComponent().SpecifiedTargetID = m_current_target.ID;
                     skill.Activate(GetCurrentTime());
+                    if (m_attack_once)
+                    {
+                        StopTargeting();
+                        return;
+                    }
                     FixPoint delay = skill.GetDefinitionComponent().CooldownTime + FixPoint.PrecisionFP;
                     if (delay > TARGETING_UPDATE_MAX_FREQUENCY)
                         delay = TARGETING_UPDATE_MAX_FREQUENCY;

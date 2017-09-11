@@ -11,6 +11,9 @@ namespace Combat
         public static readonly int Default = (int)CRC.Calculate("Default");
         //查找技能是提供的目标Entitiy（技能释放者，或者EffectGeneretor的拥有者）
         public static readonly int Source = (int)CRC.Calculate("Source");
+        //由技能额外数据指定的目标
+        public static readonly int SpecifiedTarget = (int)CRC.Calculate("SpecifiedTarget");
+
 
         //前方矩形范围（param1长，param2宽）
         public static readonly int ForwardRectangle = (int)CRC.Calculate("ForwardRectangle");

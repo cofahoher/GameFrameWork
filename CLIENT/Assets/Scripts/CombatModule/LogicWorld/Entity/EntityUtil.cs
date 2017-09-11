@@ -61,18 +61,40 @@ namespace Combat
             return component.IsCategory(category);
         }
 
+        public static Attribute GetAttribute(Entity entity, string attribute_name)
+        {
+            int attribute_id = (int)CRC.Calculate(attribute_name);
+            return GetAttribute(entity, attribute_id);
+        }
+
         public static Attribute GetAttribute(Entity entity, int attribute_id)
         {
-            Attribute attribute = null;
-            if (entity != null)
-            {
-                AttributeManagerComponent attribute_manager_component = entity.GetComponent(AttributeManagerComponent.ID) as AttributeManagerComponent;
-                if (attribute_manager_component != null)
-                {
-                    attribute = attribute_manager_component.GetAttributeByID(attribute_id);
-                }
-            }
+            if (entity == null)
+                return null;
+            AttributeManagerComponent attribute_manager_component = entity.GetComponent(AttributeManagerComponent.ID) as AttributeManagerComponent;
+            if (attribute_manager_component == null)
+                return null;
+            Attribute attribute = attribute_manager_component.GetAttributeByID(attribute_id);
             return attribute;
+        }
+
+        public static FixPoint GetAttributeValue(Entity entity, string attribute_name)
+        {
+            int attribute_id = (int)CRC.Calculate(attribute_name);
+            return GetAttributeValue(entity, attribute_id);
+        }
+
+        public static FixPoint GetAttributeValue(Entity entity, int attribute_id)
+        {
+            if (entity == null)
+                return FixPoint.Zero;
+            AttributeManagerComponent attribute_manager_component = entity.GetComponent(AttributeManagerComponent.ID) as AttributeManagerComponent;
+            if (attribute_manager_component == null)
+                return FixPoint.Zero;
+            Attribute attribute = attribute_manager_component.GetAttributeByID(attribute_id);
+            if (attribute == null)
+                return FixPoint.Zero;
+            return attribute.Value;
         }
     }
 }
