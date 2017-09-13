@@ -56,6 +56,10 @@ namespace Combat
             }
         }
 
+        public virtual void ClearRunningTrace()
+        {
+        }
+
         public void SetContext(BTContext context)
         {
             m_context = context;

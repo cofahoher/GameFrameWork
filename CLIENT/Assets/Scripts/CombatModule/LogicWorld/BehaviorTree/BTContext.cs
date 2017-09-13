@@ -14,6 +14,7 @@ namespace Combat
             m_logic_world = null;
             m_data.Clear();
             m_data_ext.Clear();
+            m_action_buffer.Clear();
         }
 
         public void SetLogicWorld(LogicWorld logic_world)

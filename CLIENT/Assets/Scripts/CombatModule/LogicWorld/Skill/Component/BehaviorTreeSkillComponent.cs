@@ -4,6 +4,11 @@ namespace Combat
 {
     public partial class BehaviorTreeSkillComponent : SkillComponent
     {
+        public static readonly int BTEntry_Activate = (int)CRC.Calculate("Activate");
+        public static readonly int BTEntry_PostActivate = (int)CRC.Calculate("PostActivate");
+        public static readonly int BTEntry_Inflict = (int)CRC.Calculate("Inflict");
+        public static readonly int BTEntry_Deactivate = (int)CRC.Calculate("Deactivate");
+
         //配置数据
         int m_bahavior_tree_id = 0;
 
@@ -23,16 +28,39 @@ namespace Combat
         }
         #endregion
 
+        public override bool CanActivate()
+        {
+            return true;
+        }
+
+        public override void Activate(FixPoint start_time)
+        {
+            if (m_behavior_tree == null)
+                return;
+            m_behavior_tree.Activate(GetLogicWorld());
+            m_behavior_tree.Run(BTEntry_Activate);
+        }
+
+        public override void PostActivate(FixPoint start_time)
+        {
+            if (m_behavior_tree == null)
+                return;
+            m_behavior_tree.Run(BTEntry_PostActivate);
+        }
+
         public override void Inflict(FixPoint start_time)
         {
-            if (m_behavior_tree != null)
-                m_behavior_tree.Activate(GetLogicWorld());
+            if (m_behavior_tree == null)
+                return;
+            m_behavior_tree.Run(BTEntry_Inflict);
         }
 
         public override void Deactivate(bool force)
         {
-            if (m_behavior_tree != null)
-                m_behavior_tree.Deactivate();
+            if (m_behavior_tree == null)
+                return;
+            m_behavior_tree.Run(BTEntry_Deactivate);
+            m_behavior_tree.Deactivate();
         }
     }
 }

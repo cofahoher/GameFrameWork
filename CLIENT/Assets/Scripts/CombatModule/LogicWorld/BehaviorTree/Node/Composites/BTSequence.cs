@@ -23,6 +23,11 @@ namespace Combat
             m_index = 0;
         }
 
+        public override void ClearRunningTrace()
+        {
+            m_index = 0;
+        }
+
         public override BTNodeStatus OnUpdate()
         {
             m_status = BTNodeStatus.True;

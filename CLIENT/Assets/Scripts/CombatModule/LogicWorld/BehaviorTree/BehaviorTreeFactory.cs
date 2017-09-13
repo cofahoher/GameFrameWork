@@ -12,7 +12,7 @@ namespace Combat
     {
         const int MAX_CACHE_CNT = 30;
         IConfigProvider m_config_provider = null;
-        Dictionary<int, BehaviorTreeCache> m_pools = new Dictionary<int, BehaviorTreeCache>();
+        private Dictionary<int, BehaviorTreeCache> m_pools = new Dictionary<int, BehaviorTreeCache>();
 
         private BehaviorTreeFactory()
         {
@@ -110,10 +110,13 @@ namespace Combat
             BehaviorTreeData data = m_config_provider.GetBehaviorTreeData(bt_config_id);
             if (data == null)
                 return null;
-            BeahviorTree tree = new BeahviorTree(bt_config_id, data.m_update_interval);
-            BTNode root_btnode = CreateBTNode(data.m_root_node);
-            if (root_btnode != null)
-                tree.AddChild(root_btnode);
+            BeahviorTree tree = new BeahviorTree(bt_config_id);
+            for (int i = 0; i > data.m_entry_nodes.Count; ++i)
+            {
+                BTNode entry_node = CreateBTNode(data.m_entry_nodes[i]);
+                if (entry_node != null)
+                    tree.AddEntry(entry_node, data.m_entry_nodes[i].m_extra_data);
+            }
             return tree;
         }
 
