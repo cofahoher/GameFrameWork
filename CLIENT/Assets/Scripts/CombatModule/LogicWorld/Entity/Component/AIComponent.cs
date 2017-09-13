@@ -4,16 +4,40 @@ namespace Combat
 {
     public partial class AIComponent : EntityComponent
     {
-        int m_test = 0;
+        public static readonly int BTEntry_AIMain = (int)CRC.Calculate("AIMain");
+
+        //配置数据
+        int m_bahavior_tree_id = 0;
+
+        //运行数据
+        BeahviorTree m_behavior_tree = null;
+
+        #region 初始化/销毁
+        public override void InitializeComponent()
+        {
+            m_behavior_tree = BehaviorTreeFactory.Instance.CreateBehaviorTree(m_bahavior_tree_id);
+        }
+
+        protected override void OnDestruct()
+        {
+            if (m_behavior_tree != null)
+                BehaviorTreeFactory.Instance.RecycleBehaviorTree(m_behavior_tree);
+        }
+        #endregion
 
         protected override void OnEnable()
         {
-            ++m_test;
+            if (m_behavior_tree == null)
+                return;
+            m_behavior_tree.Activate(GetLogicWorld());
+            m_behavior_tree.Run(BTEntry_AIMain);
         }
 
         protected override void OnDisable()
         {
-            --m_test;
+            if (m_behavior_tree == null)
+                return;
+            m_behavior_tree.Deactivate();
         }
     }
 }
