@@ -129,7 +129,7 @@ namespace Combat
             {
                 if (m_combo_attack_cnt % 2 == 1)
                 {
-                    FixPoint angle_offset = m_combo_interval * (FixPoint)((index + 1) / 2);
+                    FixPoint angle_offset = m_combo_interval * (FixPoint)((index + 1)/2);
                     if (index % 2 == 0)
                         angle += angle_offset;
                     else
@@ -184,20 +184,24 @@ namespace Combat
                 param.m_source_entity_id = owner_entity.ID;
                 param.m_start_position = birth_position;
                 param.m_fixed_facing = facing;
-                if (target == null)
-                {
-                    param.m_target_entity_id = 0;
-                    FixPoint range = GetOwnerSkill().GetDefinitionComponent().MaxRange;
-                    if (range <= 0)
-                        range = FixPoint.Ten;  //ZZWTODO
-                    if (projectile_component.Speed > FixPoint.Zero)
-                        param.m_life_time = range / projectile_component.Speed;
-                    param.m_target_position = param.m_start_position + param.m_fixed_facing * range;
-                }
-                else
+                if (target != null)
                 {
                     param.m_target_entity_id = target.GetEntityID();
                     param.m_target_position = target.GetPosition(logic_world);
+                }
+                else
+                {
+                    Skill owner_skill = GetOwnerSkill();
+                    if (owner_skill.GetDefinitionComponent().ExternalDataType == SkillDefinitionComponent.NeedExternalTarget)
+                    {
+                        param.m_target_entity_id = 0;
+                        FixPoint range = owner_skill.GetDefinitionComponent().MaxRange;
+                        if (range <= 0)
+                            range = FixPoint.Ten;  //ZZWTODO
+                        if (projectile_component.Speed > FixPoint.Zero)
+                            param.m_life_time = range / projectile_component.Speed;
+                        param.m_target_position = param.m_start_position + param.m_fixed_facing * range;
+                    }
                 }
                 param.m_generator_id = m_generator == null ? 0 : m_generator.ID;
                 projectile_component.InitParam(param);

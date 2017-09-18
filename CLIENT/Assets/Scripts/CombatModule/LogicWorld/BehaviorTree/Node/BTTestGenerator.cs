@@ -19,7 +19,7 @@ namespace Combat
         {
         }
 
-        protected override void OnActionUpdate()
+        protected override void OnActionUpdate(FixPoint delta_time)
         {
         }
 
@@ -38,7 +38,7 @@ namespace Combat
         {
         }
 
-        protected override void OnActionUpdate()
+        protected override void OnActionUpdate(FixPoint delta_time)
         {
         }
 

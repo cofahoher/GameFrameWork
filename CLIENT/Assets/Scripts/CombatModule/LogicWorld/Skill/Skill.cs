@@ -16,7 +16,7 @@ namespace Combat
         ComponnetUnavailable,
     }
 
-    public class Skill : Object
+    public class Skill : Object, ISkill
     {
         SkillManagerComponent m_owner_component;
         ManaComponent m_mana_component;
@@ -166,7 +166,7 @@ namespace Combat
             return CheckActivate() == CastSkillResult.Success;
         }
 
-        public CastSkillResult CheckActivate()
+        CastSkillResult CheckActivate()
         {
             if (!IsReady())
                 return CastSkillResult.InCooldown;
@@ -216,7 +216,7 @@ namespace Combat
             return CastSkillResult.Success;
         }
 
-        public CastSkillResult CheckTargetRange(Entity entity)
+        CastSkillResult CheckTargetRange(Entity entity)
         {
             FixPoint min_range = m_definition_component.MinRange;
             FixPoint max_range = m_definition_component.MaxRange;
@@ -330,7 +330,7 @@ namespace Combat
             return true;
         }
 
-        public bool PostActivate(FixPoint start_time)
+        bool PostActivate(FixPoint start_time)
         {
             if (m_definition_component.NeedGatherTargets)
             {
@@ -393,7 +393,7 @@ namespace Combat
             return true;
         }
 
-        public bool Inflict(FixPoint start_time)
+        bool Inflict(FixPoint start_time)
         {
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
@@ -410,7 +410,7 @@ namespace Combat
             return true;
         }
 
-        public bool Deactivate(bool force)
+        bool Deactivate(bool force)
         {
             if (!m_is_active)
                 return false;

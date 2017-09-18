@@ -48,6 +48,17 @@ namespace Combat
             m_sorting_method = 0;
             m_max_count = -1;
         }
+
+        public void CopyFrom(TargetGatheringParam rhs)
+        {
+            m_type = rhs.m_type;
+            m_param1 = rhs.m_param1;
+            m_param2 = rhs.m_param2;
+            m_faction = rhs.m_faction;
+            m_category = rhs.m_category;
+            m_sorting_method = rhs.m_sorting_method;
+            m_max_count = rhs.m_max_count;
+        }
     }
 
     public class TargetGatheringManager : IDestruct

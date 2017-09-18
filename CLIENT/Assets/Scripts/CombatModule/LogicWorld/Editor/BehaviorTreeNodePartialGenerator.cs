@@ -19,6 +19,29 @@ namespace Combat
 
         static void InitAllBTNode()
         {
+            #region 独立的
+            //Actions
+            REGISTER_BTNODE<BTAction_StopTreeUpdate>();
+            REGISTER_BTNODE<BTAction_WaitSomeTime>()
+                .REGISTER_VARIABLE<FixPoint>("time", "m_time");
+            //Composites
+            REGISTER_BTNODE<BTFor>()
+                .REGISTER_VARIABLE<int>("n", "m_n");
+            REGISTER_BTNODE<BTIfElse>();
+            REGISTER_BTNODE<BTParallelSelector>();
+            REGISTER_BTNODE<BTParallelSequence>();
+            REGISTER_BTNODE<BTSelector>();
+            REGISTER_BTNODE<BTSequence>();
+            //Conditions
+            //Decorators
+            REGISTER_BTNODE<BTFalse>();
+            REGISTER_BTNODE<BTNot>();
+            REGISTER_BTNODE<BTPulse>()
+                .REGISTER_VARIABLE<FixPoint>("interval", "m_interval");
+            REGISTER_BTNODE<BTTrue>();
+            //Ext
+            REGISTER_BTNODE<BTReference>();
+            //test
             REGISTER_BTNODE<BTAction_Test>()
                 .REGISTER_VARIABLE<int>("config_int", "m_int")
                 .REGISTER_VARIABLE<FixPoint>("config_fp", "m_fp")
@@ -28,6 +51,56 @@ namespace Combat
                 .REGISTER_VARIABLE<Formula>("config_formula", "m_formula")
                 ;
             REGISTER_BTNODE<BTAction_Test2>();
+            #endregion
+
+            #region 偏游戏无关的
+            //AI Conditions
+            //AI Actions
+            //Skill Conditions
+            //Skill Actions
+            REGISTER_BTNODE<BTSKillAction_ApplyDamageToTargets>()
+                .REGISTER_VARIABLE_CRC<int>("damage_type", "m_damage_type_id")
+                .REGISTER_VARIABLE<Formula>("damage_amount", "m_damage_amount")
+                .REGISTER_VARIABLE<int>("damage_render_effect", "m_damage_render_effect_cfgid")
+                .REGISTER_VARIABLE<int>("damage_sound", "m_damage_sound_cfgid");
+            REGISTER_BTNODE<BTSKillAction_ApplyEffectToTargets>()
+                .REGISTER_VARIABLE<int>("generator_id", "m_generator_cfgid");
+            REGISTER_BTNODE<BTSKillAction_CreateObject>()
+                .REGISTER_VARIABLE<int>("object_type_id", "m_object_type_id")
+                .REGISTER_VARIABLE<int>("object_proto_id", "m_object_proto_id")
+                .REGISTER_VARIABLE<FixPoint>("object_life_time", "m_object_life_time")
+                .REGISTER_VARIABLE<int>("generator_id", "m_generator_cfgid")
+                .REGISTER_VARIABLE<FixPoint>("offset_x", "m_offset.x")
+                .REGISTER_VARIABLE<FixPoint>("offset_y", "m_offset.y")
+                .REGISTER_VARIABLE<FixPoint>("offset_z", "m_offset.z");
+            REGISTER_BTNODE<BTSKillAction_GatherTargets>()
+                .REGISTER_VARIABLE_CRC<int>("gathering_type", "m_target_gathering_param.m_type")
+                .REGISTER_VARIABLE<FixPoint>("gathering_param1", "m_target_gathering_param.m_param1")
+                .REGISTER_VARIABLE<FixPoint>("gathering_param2", "m_target_gathering_param.m_param2")
+                .REGISTER_VARIABLE_CRC<int>("gathering_faction", "m_target_gathering_param.m_faction")
+                .REGISTER_VARIABLE_CRC<int>("gathering_category", "m_target_gathering_param.m_category");
+            REGISTER_BTNODE<BTSKillAction_KillTargets>();
+            REGISTER_BTNODE<BTSKillAction_PlayAction>()
+                .REGISTER_VARIABLE<string>("animation", "m_animation")
+                .REGISTER_VARIABLE<string>("next_animation", "m_next_animation")
+                .REGISTER_VARIABLE<bool>("loop", "m_loop");
+            REGISTER_BTNODE<BTSKillAction_PlayRenderEffect>()
+                .REGISTER_VARIABLE<int>("render_effect_cfgid", "m_render_effect_cfgid");
+            REGISTER_BTNODE<BTSKillAction_PlaySound>()
+                .REGISTER_VARIABLE<int>("sound", "m_sound");
+            REGISTER_BTNODE<BTSKillAction_Spurt>()
+                .REGISTER_VARIABLE<FixPoint>("distance", "m_distance")
+                .REGISTER_VARIABLE<FixPoint>("time", "m_time")
+                .REGISTER_VARIABLE<int>("collision_target_generator_id", "m_collision_target_generator_cfgid")
+                .REGISTER_VARIABLE<bool>("backward", "m_backward");
+            #endregion
+
+            #region 具体游戏
+            //Crawl AI Conditions
+            //Crawl AI Actions
+            //Crawl Skill Conditions
+            //Crawl Skill Actions
+            #endregion
         }
 
         static BehaviorTreeNodePartialGenerator()
@@ -103,7 +176,7 @@ namespace Combat
             return new_cmp;
         }
 
-        [MenuItem("FrameWork/Generate Combat BehaviorTree Code", false, 102)]
+        [MenuItem("H3D/Generate Combat BehaviorTree Code", false, 1002)]
         public static void GenerateAll()
         {
             StreamWriter writer = new StreamWriter("Assets/Scripts/CoreGame/LogicWorld/BehaviorTree/BehaviorTreeNodeTypeRegistryExt.cs");

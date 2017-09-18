@@ -6,7 +6,7 @@ namespace Combat
     {
         protected Entity m_current_target = null;
 
-        protected Entity CurrentTarget
+        public Entity CurrentTarget
         {
             get { return m_current_target; }
             set { m_current_target = value; }

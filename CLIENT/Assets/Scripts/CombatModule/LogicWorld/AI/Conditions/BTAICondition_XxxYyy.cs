@@ -2,5 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    //TEST
+    public partial class BTAICondition_XxxYyy
+    {
+    }
 }

@@ -191,7 +191,7 @@ namespace Combat
             }
             if (!move_required)
             {
-                if (skill.CheckActivate() == CastSkillResult.Success)
+                if (skill.CanActivate())
                 {
                     position_cmp.SetFacing(direction);
                     skill.GetDefinitionComponent().SpecifiedTargetID = m_current_target.ID;

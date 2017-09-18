@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class BTSequence : BTComposite
+    public partial class BTSequence : BTComposite
     {
         //运行数据
         int m_index = 0;
@@ -26,16 +26,17 @@ namespace Combat
         public override void ClearRunningTrace()
         {
             m_index = 0;
+            base.ClearRunningTrace();
         }
 
-        public override BTNodeStatus OnUpdate()
+        public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             m_status = BTNodeStatus.True;
             if (m_children == null)
                 return m_status;
             for (; m_index < m_children.Count; ++m_index)
             {
-                m_status = m_children[m_index].OnUpdate();
+                m_status = m_children[m_index].OnUpdate(delta_time);
                 if (m_status == BTNodeStatus.Running)
                 {
                     break;

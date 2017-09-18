@@ -56,6 +56,8 @@ namespace Combat
 
         public override void Deactivate(bool force)
         {
+            if (m_collision_target_generator != null)
+                m_collision_target_generator.Deactivate();
             if (m_task != null)
                 m_task.Cancel();
 #if COMBAT_CLIENT

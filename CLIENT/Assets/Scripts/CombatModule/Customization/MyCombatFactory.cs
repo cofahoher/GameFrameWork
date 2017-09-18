@@ -58,6 +58,11 @@ namespace Combat
             RenderMessage.Register(RenderMessageType.ChangeHealth, typeof(ChangeHealthRenderMessage));
         }
 
+        public void RegisterBehaviorTreeNode()
+        {
+            BehaviorTreeNodeTypeRegistry.RegisterDefaultNodes();
+        }
+
         public WorldCreationContext CreateWorldCreationContext(CombatStartInfo combat_start_info)
         {
             WorldCreationContext world_context = new WorldCreationContext();

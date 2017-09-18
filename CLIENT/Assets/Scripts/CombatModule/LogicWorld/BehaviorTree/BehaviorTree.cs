@@ -88,7 +88,7 @@ namespace Combat
             if (m_context == null)
             {
                 BTContext context = RecyclableObject.Create<BTContext>();
-                context.SetLogicWorld(logic_world);
+                context.Construct(logic_world, this);
                 SetContext(context);
             }
             if (m_task == null)
@@ -111,6 +111,12 @@ namespace Combat
                 m_children[m_current_running_entry_index].ClearRunningTrace();
             m_current_running_entry_index = -1;
             m_active = false;
+        }
+
+        public void StopUpdate()
+        {
+            if (m_task != null)
+                m_task.Cancel();
         }
 
         public bool HasEntry(int entrty_id)
@@ -142,7 +148,7 @@ namespace Combat
                 var schedeler = logic_world.GetTaskScheduler();
                 schedeler.Schedule(m_task, logic_world.GetCurrentTime(), update_interval, update_interval);
             }
-            OnUpdate();
+            OnUpdate(FixPoint.Zero);
             return true;
         }
 
@@ -156,7 +162,7 @@ namespace Combat
             BTActionBuffer action_buffer = m_context.GetActionBuffer();
             //ZZWTODO m_context的数据
             action_buffer.Backup();
-            BTNodeStatus result = m_children[new_index].OnUpdate();
+            BTNodeStatus result = m_children[new_index].OnUpdate(FixPoint.Zero);
             action_buffer.SwapActions();
             action_buffer.ExitAllAction();
             action_buffer.Restore();
@@ -174,11 +180,11 @@ namespace Combat
             return -1;
         }
 
-        public override BTNodeStatus OnUpdate()
+        public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             if (m_current_running_entry_index < 0)
                 return BTNodeStatus.False;
-            BTNodeStatus status = m_children[m_current_running_entry_index].OnUpdate();
+            BTNodeStatus status = m_children[m_current_running_entry_index].OnUpdate(delta_time);
             m_context.GetActionBuffer().SwapActions();
             return status;
         }
@@ -200,7 +206,7 @@ namespace Combat
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
-            m_behavior_tree.OnUpdate();
+            m_behavior_tree.OnUpdate(delta_time);
         }
     }
 }

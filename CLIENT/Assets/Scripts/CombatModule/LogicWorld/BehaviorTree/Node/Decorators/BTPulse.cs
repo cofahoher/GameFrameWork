@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class BTPulse : BTDecorator
+    public partial class BTPulse : BTDecorator
     {
         //配置数据
         FixPoint m_interval = FixPoint.One;
         //运行数据
         FixPoint m_next_execute_time = FixPoint.Zero;
 
-        public BTPulse(FixPoint interval)
+        public BTPulse()
         {
-            m_interval = interval;
         }
 
         public BTPulse(BTPulse prototype)

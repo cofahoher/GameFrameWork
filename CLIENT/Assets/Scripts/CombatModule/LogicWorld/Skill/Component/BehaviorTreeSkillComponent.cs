@@ -38,6 +38,9 @@ namespace Combat
             if (m_behavior_tree == null)
                 return;
             m_behavior_tree.Activate(GetLogicWorld());
+            BTContext context = m_behavior_tree.Context;
+            context.SetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider, this);
+            context.SetData<SkillComponent>(BTContextKey.OwnerSkillComponent, this);
             m_behavior_tree.Run(BTEntry_Activate);
         }
 

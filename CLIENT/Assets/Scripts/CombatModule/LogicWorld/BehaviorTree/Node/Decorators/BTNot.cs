@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class BTDNot : BTDecorator
+    public partial class BTNot : BTDecorator
     {
-        public BTDNot()
+        public BTNot()
         {
         }
 
-        public BTDNot(BTDNot prototype)
+        public BTNot(BTNot prototype)
             : base(prototype)
         {
         }

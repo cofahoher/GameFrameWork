@@ -21,7 +21,7 @@ namespace Combat
 
         protected abstract void ResetRuntimeData();
 
-        public override BTNodeStatus OnUpdate()
+        public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             if (IsSatisfy())
                 m_status = BTNodeStatus.True;

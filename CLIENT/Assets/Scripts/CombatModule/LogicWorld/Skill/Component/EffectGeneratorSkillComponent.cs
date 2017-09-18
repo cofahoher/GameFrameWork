@@ -86,7 +86,7 @@ namespace Combat
             Skill skill = GetOwnerSkill();
             if (!skill.GetDefinitionComponent().NeedGatherTargets)
                 skill.BuildSkillTargets();
-            List<Target> targets = GetOwnerSkill().GetTargets();
+            List<Target> targets = skill.GetTargets();
             Entity caster = GetOwnerEntity();
             EffectApplicationData app_data = RecyclableObject.Create<EffectApplicationData>();
             app_data.m_original_entity_id = caster.ID;

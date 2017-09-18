@@ -35,6 +35,13 @@ namespace Combat
             m_variable.Clear();
         }
 
+        public void CopyFrom(ExpressionVariable rhs)
+        {
+            m_variable.Clear();
+            for (int i = 0; i < rhs.m_variable.Count; ++i)
+                m_variable.Add(rhs.m_variable[i]);
+        }
+
         public int this[int index]
         {
             get

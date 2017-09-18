@@ -21,13 +21,13 @@ namespace Combat
 
         protected abstract void ResetRuntimeData();
 
-        public override BTNodeStatus OnUpdate()
+        public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             BTNodeStatus status = BTNodeStatus.False;
             if (CanExecute())
             {
                 if (m_children != null)
-                    status = m_children[0].OnUpdate();
+                    status = m_children[0].OnUpdate(delta_time);
                 status = this.Decorate(status);
                 PrepareForNextExecute();
             }

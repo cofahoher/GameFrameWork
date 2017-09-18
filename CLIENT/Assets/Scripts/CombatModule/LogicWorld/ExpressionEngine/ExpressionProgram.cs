@@ -22,6 +22,21 @@ namespace Combat
             m_instructions.Clear();
         }
 
+        public void CopyFrom(ExpressionProgram rhs)
+        {
+            m_error_occurred = rhs.m_error_occurred;
+            RecycleVariable();
+            for (int i = 0; i < rhs.m_variables.Count; ++i)
+            {
+                ExpressionVariable variable = RecyclableObject.Create<ExpressionVariable>();
+                variable.CopyFrom(rhs.m_variables[i]);
+                m_variables.Add(variable);
+            }
+            m_instructions.Clear();
+            for (int i = 0; i < rhs.m_instructions.Count; ++i)
+                m_instructions.Add(rhs.m_instructions[i]);
+        }
+
         void RecycleVariable()
         {
             for (int i = 0; i < m_variables.Count; ++i)

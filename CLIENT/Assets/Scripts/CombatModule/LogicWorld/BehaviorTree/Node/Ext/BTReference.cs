@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class BTReference : BTNode
+    public partial class BTReference : BTNode
     {
         //配置数据
         protected int m_reference_tree_id = -1;
@@ -33,12 +33,12 @@ namespace Combat
             AddChild(m_reference_tree);
         }
 
-        public override BTNodeStatus OnUpdate()
+        public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             if (m_reference_tree == null)
                 m_status = BTNodeStatus.False;
             else
-                m_status = m_reference_tree.OnUpdate();
+                m_status = m_reference_tree.OnUpdate(delta_time);
             return m_status;
         }
     }

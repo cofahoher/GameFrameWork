@@ -31,13 +31,13 @@ namespace Combat
 
         protected abstract void ResetRuntimeData();
 
-        public override BTNodeStatus OnUpdate()
+        public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             m_status = m_status_backup;
             BTActionBuffer action_buffer = m_context.GetActionBuffer();
             action_buffer.AddCurrentActions(this);
             if (m_is_running)
-                UpdateAction();
+                UpdateAction(delta_time);
             else
                 EnterAction();
             m_status_backup = m_status;
@@ -50,12 +50,12 @@ namespace Combat
             m_is_running = true;
             //如果要实现为状态机，那就override OnActionEnter修改m_status为BTNodeStatus.Running
             OnActionEnter();
-            OnActionUpdate();
+            OnActionUpdate(FixPoint.Zero);
         }
 
-        void UpdateAction()
+        void UpdateAction(FixPoint delta_time)
         {
-            OnActionUpdate();
+            OnActionUpdate(delta_time);
         }
 
         public void ExitAction()
@@ -66,7 +66,7 @@ namespace Combat
         }
 
         protected abstract void OnActionEnter();
-        protected abstract void OnActionUpdate();
+        protected abstract void OnActionUpdate(FixPoint delta_time);
         protected abstract void OnActionExit();
     }
 }

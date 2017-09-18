@@ -111,7 +111,7 @@ namespace Combat
             if (data == null)
                 return null;
             BeahviorTree tree = new BeahviorTree(bt_config_id);
-            for (int i = 0; i > data.m_entry_nodes.Count; ++i)
+            for (int i = 0; i < data.m_entry_nodes.Count; ++i)
             {
                 BTNode entry_node = CreateBTNode(data.m_entry_nodes[i]);
                 if (entry_node != null)

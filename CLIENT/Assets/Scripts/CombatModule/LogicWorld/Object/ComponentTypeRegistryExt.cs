@@ -626,6 +626,13 @@ namespace Combat
     public partial class BehaviorTreeSkillComponent
     {
         public const int ID = 777250943;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("bahavior_tree_id", out value))
+                m_bahavior_tree_id = int.Parse(value);
+        }
     }
 
     public partial class CreateObjectSkillComponent
@@ -923,6 +930,13 @@ namespace Combat
     public partial class ApplyGeneratorEffectComponent
     {
         public const int ID = -943248477;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("generator_cfgid", out value))
+                m_generator_cfgid = int.Parse(value);
+        }
     }
 
     public partial class ChangePlayerFactionEffectComponent

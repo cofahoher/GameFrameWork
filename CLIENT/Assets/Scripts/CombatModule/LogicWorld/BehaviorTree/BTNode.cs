@@ -10,8 +10,10 @@ namespace Combat
         Running,
     }
 
-    public abstract class BTNode
+    public abstract class BTNode : IExpressionVariableProvider
     {
+        static public readonly FixPoint LOGIC_UPDATE_INTERVAL = Component.LOGIC_UPDATE_INTERVAL;
+
         //配置数据
         protected List<BTNode> m_children = null;
         //运行数据
@@ -58,6 +60,11 @@ namespace Combat
 
         public virtual void ClearRunningTrace()
         {
+            if (m_children != null)
+            {
+                for (int i = 0; i < m_children.Count; ++i)
+                    m_children[i].ClearRunningTrace();
+            }
         }
 
         public void SetContext(BTContext context)
@@ -86,6 +93,31 @@ namespace Combat
         {
             return m_children;
         }
+
+        public LogicWorld GetLogicWorld()
+        {
+            if (m_context != null)
+                return m_context.GetLogicWorld();
+            else
+                return null;
+        }
+
+        public SkillComponent GetSkillComponent()
+        {
+            if (m_context == null)
+                return null;
+            return m_context.GetData<SkillComponent>(BTContextKey.OwnerSkillComponent);
+        }
+
+        public Skill GetOwnerSkill()
+        {
+            if (m_context == null)
+                return null;
+            SkillComponent skill_component = m_context.GetData<SkillComponent>(BTContextKey.OwnerSkillComponent);
+            if (skill_component == null)
+                return null;
+            return skill_component.GetOwnerSkill();
+        }
         #endregion
 
         public void AddChild(BTNode node)
@@ -97,7 +129,7 @@ namespace Combat
             m_children.Add(node);
         }
 
-        public abstract BTNodeStatus OnUpdate();
+        public abstract BTNodeStatus OnUpdate(FixPoint delta_time);
 
         public virtual void ShutDown()
         {
@@ -107,5 +139,17 @@ namespace Combat
                     m_children[i].ShutDown();
             }
         }
+
+        #region Variable
+        public FixPoint GetVariable(ExpressionVariable variable, int index)
+        {
+            if (m_context == null)
+                return FixPoint.Zero;
+            IExpressionVariableProvider provider = m_context.GetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider);
+            if (provider == null)
+                return FixPoint.Zero;
+            return provider.GetVariable(variable, index);
+        }
+        #endregion
     }
 }

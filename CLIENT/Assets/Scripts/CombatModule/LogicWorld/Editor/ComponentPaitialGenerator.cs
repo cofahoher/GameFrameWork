@@ -137,7 +137,8 @@ namespace Combat
             #endregion
 
             #region Skill
-            REGISTER_COMPONENT<BehaviorTreeSkillComponent>();
+            REGISTER_COMPONENT<BehaviorTreeSkillComponent>()
+                .REGISTER_VARIABLE<int>("bahavior_tree_id", null, "m_bahavior_tree_id");
             REGISTER_COMPONENT<CreateObjectSkillComponent>()
                 .REGISTER_VARIABLE<int>("object_type_id", null, "m_object_type_id")
                 .REGISTER_VARIABLE<int>("object_proto_id", null, "m_object_proto_id")
@@ -212,7 +213,8 @@ namespace Combat
             #region Effect
             REGISTER_COMPONENT<AddStateEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("state", null, "m_state");
-            REGISTER_COMPONENT<ApplyGeneratorEffectComponent>();
+            REGISTER_COMPONENT<ApplyGeneratorEffectComponent>()
+                .REGISTER_VARIABLE<int>("generator_cfgid", null, "m_generator_cfgid");
             REGISTER_COMPONENT<ChangePlayerFactionEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("faction", null, "m_faction")
                 .REGISTER_VARIABLE<bool>("revert_when_unapply", null, "m_revert_when_unapply");
@@ -411,7 +413,7 @@ namespace Combat
             return new_cmp;
         }
 
-        [MenuItem("FrameWork/Generate Combat Component Code", false, 101)]
+        [MenuItem("FrameWork/Generate Combat Component Code", false, 1001)]
         public static void GenerateAll()
         {
             StreamWriter writer = new StreamWriter("Assets/Scripts/CoreGame/LogicWorld/Object/ComponentTypeRegistryExt.cs");

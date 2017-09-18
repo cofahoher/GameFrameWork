@@ -51,7 +51,7 @@ namespace Combat
         int m_external_data_type = 0;
         int m_auto_face_type = 0;
 
-        //int m_inflict_type = 1;
+        //int m_inflict_type = InflictType_Immediately;
         //string m_inflict_missile;
         //FixPoint m_inflict_missile_speed;
         //FixPoint m_impact_delay;
@@ -77,7 +77,6 @@ namespace Combat
         Vector3FP m_external_vector;
         int m_specified_target_id = 0;
 
-
         #region GETTER
         public Vector3FP ExternalVector
         {
@@ -90,7 +89,6 @@ namespace Combat
             get { return m_specified_target_id; }
             set { m_specified_target_id = value; }
         }
-
 
         public static readonly FixPoint MIN_ESTIMATE_TIME = FixPoint.Two / FixPoint.Ten;
         public static readonly FixPoint MAX_ESTIMATE_TIME = FixPoint.One;

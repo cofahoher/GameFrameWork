@@ -17,6 +17,16 @@ namespace Combat
             }
         }
 
+        public void CopyFrom(Formula rhs)
+        {
+            m_constant = rhs.m_constant;
+            if (rhs.m_program != null)
+            {
+                m_program = RecyclableObject.Create<ExpressionProgram>();
+                m_program.CopyFrom(rhs.m_program);
+            }
+        }
+
         public List<ExpressionVariable> GetAllVariables()
         {
             if (m_program != null)
