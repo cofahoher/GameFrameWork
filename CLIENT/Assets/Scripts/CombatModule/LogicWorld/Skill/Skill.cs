@@ -367,14 +367,15 @@ namespace Combat
             else
                 Inflict(start_time);
 
+            string main_animation = m_definition_component.GenerateMainActionNameLogicly();
 #if COMBAT_CLIENT
-            if (m_definition_component.m_main_animation != null)
+            if (main_animation != null)
             {
                 PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
                 if (m_definition_component.m_expiration_animation == null)
-                    msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation, AnimationName.IDLE, true);
+                    msg.Construct(GetOwnerEntityID(), main_animation, AnimationName.IDLE, true);
                 else
-                    msg.Construct(GetOwnerEntityID(), m_definition_component.m_main_animation, m_definition_component.m_expiration_animation, true);
+                    msg.Construct(GetOwnerEntityID(), main_animation, m_definition_component.m_expiration_animation, true);
                 GetLogicWorld().AddRenderMessage(msg);
             }
             if (m_definition_component.m_main_render_effect_cfgid > 0)

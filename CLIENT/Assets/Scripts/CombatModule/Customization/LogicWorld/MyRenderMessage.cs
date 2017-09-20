@@ -10,6 +10,7 @@ namespace Combat
         public const int ChangeMoveSpeed = 103;           //SimpleRenderMessage
         public const int ChangeDirection = 104;           //ChangeDirectionRenderMessage
         public const int ChangePosition = 105;            //ChangePositionRenderMessage
+        public const int ChangeMana = 109;                //ChangeManaRenderMessage
         public const int ChangeHealth = 110;              //ChangeHealthRenderMessage
         public const int Die = 111;                       //SimpleRenderMessage
         public const int Hide = 112;                      //SimpleRenderMessage
@@ -105,6 +106,34 @@ namespace Combat
         {
             m_entity_id = -1;
             m_new_position.MakeZero();
+        }
+    }
+
+    public class ChangeManaRenderMessage : RenderMessage
+    {
+        public int m_mana_type = 0;
+        public FixPoint m_delta_mana = FixPoint.Zero;
+        public FixPoint m_current_mana = FixPoint.Zero;
+
+        public ChangeManaRenderMessage()
+        {
+            m_type = RenderMessageType.ChangeMana;
+        }
+
+        public void Construct(int entity_id, int mana_type, FixPoint delta_mana, FixPoint current_mana)
+        {
+            m_entity_id = entity_id;
+            m_mana_type = mana_type;
+            m_delta_mana = delta_mana;
+            m_current_mana = current_mana;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+            m_mana_type = 0;
+            m_delta_mana = FixPoint.Zero;
+            m_current_mana = FixPoint.Zero;
         }
     }
 

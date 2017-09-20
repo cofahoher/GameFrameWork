@@ -67,6 +67,7 @@ namespace Combat
         public string m_icon;
         public string m_casting_animation;
         public string m_main_animation;
+        public int m_main_action_count = 0;
         public string m_expiration_animation;
         public int m_main_render_effect_cfgid = 0;
         public int m_main_sound = 0;
@@ -76,6 +77,7 @@ namespace Combat
         List<SkillTimer> m_timers = new List<SkillTimer>();
         Vector3FP m_external_vector;
         int m_specified_target_id = 0;
+        public static List<string> m_main_animation_names;
 
         #region GETTER
         public Vector3FP ExternalVector
@@ -88,6 +90,23 @@ namespace Combat
         {
             get { return m_specified_target_id; }
             set { m_specified_target_id = value; }
+        }
+
+        public string GenerateMainActionNameLogicly()
+        {
+            if (m_main_action_count <= 1)
+                return m_main_animation;
+            if (m_main_animation_names == null)
+            {
+                m_main_animation_names = new List<string>();
+                for (int i = 0; i < m_main_action_count; ++i)
+                {
+                    char index = (char)((int)'a' + i);
+                    m_main_animation_names.Add(m_main_animation + index);
+                }
+            }
+            int random_index = GetLogicWorld().GetRandomGeneratorI().RandBetween(1, m_main_action_count);
+            return m_main_animation_names[random_index];
         }
 
         public static readonly FixPoint MIN_ESTIMATE_TIME = FixPoint.Two / FixPoint.Ten;
@@ -208,7 +227,7 @@ namespace Combat
             for (int i = 0; i < SkillTimer.TimerCount; ++i)
             {
                 SkillTimer timer = m_timers[i];
-                if(timer.Active)
+                if (timer.Active)
                 {
                     FixPoint time_left = timer.GetRemaining(current_time);
                     if (time_left < lowest_time)

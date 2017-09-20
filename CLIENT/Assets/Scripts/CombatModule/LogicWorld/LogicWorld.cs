@@ -288,7 +288,7 @@ namespace Combat
             FixPoint delta_time = new FixPoint(delta_ms) / FixPoint.Thousand;
             m_current_time += delta_time;
             ++m_current_frame;
-            m_region_callback_manager.OnUpdate();
+            m_region_callback_manager.OnUpdate(delta_ms);
             m_scheduler.Update(m_current_time);
             UpdateGeneralComponent(delta_time, m_current_time);
             return m_game_over;

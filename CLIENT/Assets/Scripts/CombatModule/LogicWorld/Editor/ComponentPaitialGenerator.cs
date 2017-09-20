@@ -84,7 +84,8 @@ namespace Combat
                 .REGISTER_VARIABLE_CRC<int>("gathering_category", null, "m_target_gathering_param.m_category")
                 .REGISTER_VARIABLE<int>("enter_generator", null, "m_enter_generator_cfgid")
                 .REGISTER_VARIABLE<int>("period_generator", null, "m_period_generator_cfgid")
-                .REGISTER_VARIABLE<FixPoint>("period", null, "m_period");
+                .REGISTER_VARIABLE<FixPoint>("period", null, "m_period")
+                .REGISTER_VARIABLE<FixPoint>("region_update_interval", null, "m_region_update_interval");
             REGISTER_COMPONENT<EntityDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("category1", null, "m_category_1")
                 .REGISTER_VARIABLE_CRC<int>("category2", null, "m_category_2")
@@ -93,7 +94,9 @@ namespace Combat
             REGISTER_COMPONENT<LocomotorComponent>()
                 .REGISTER_VARIABLE<FixPoint>("max_speed", "VID_MaxSpeed", "MaxSpeed", Flag_Variable_GetSet)
                 .REGISTER_VARIABLE<bool>("avoid_obstacle", null, "m_avoid_obstacle");
-            REGISTER_COMPONENT<ManaComponent>();
+            REGISTER_COMPONENT<ManaComponent>()
+                .REGISTER_VARIABLE<FixPoint>("max_mana", null, "m_current_max_mana")
+                .REGISTER_VARIABLE<FixPoint>("current_mana", null, "m_current_mana");
             REGISTER_COMPONENT<ObstacleComponent>()
                 .REGISTER_VARIABLE<FixPoint>("ext_x", null, "m_extents.x")
                 .REGISTER_VARIABLE<FixPoint>("ext_y", null, "m_extents.y")
@@ -200,6 +203,7 @@ namespace Combat
                 .REGISTER_VARIABLE_CRC<int>("auto_aim", null, "m_auto_aim_type")
                 .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
                 .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
+                .REGISTER_VARIABLE<int>("main_action_count", null, "m_main_action_count")
                 .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation")
                 .REGISTER_VARIABLE<int>("main_render_effect", null, "m_main_render_effect_cfgid")
                 .REGISTER_VARIABLE<int>("main_sound", null, "m_main_sound");
@@ -211,6 +215,9 @@ namespace Combat
             #endregion
 
             #region Effect
+            REGISTER_COMPONENT<AddManaComponent>()
+                .REGISTER_VARIABLE_CRC<int>("mana_type", null, "m_mana_type")
+                .REGISTER_VARIABLE<Formula>("mana_amount", null, "m_mana_amount");
             REGISTER_COMPONENT<AddStateEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("state", null, "m_state");
             REGISTER_COMPONENT<ApplyGeneratorEffectComponent>()

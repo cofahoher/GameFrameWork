@@ -45,6 +45,7 @@ namespace Combat
             Register<KillTargetSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
             Register<SpurtSkillComponent>(false);
+            Register<AddManaComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<ChangePlayerFactionEffectComponent>(false);
@@ -281,6 +282,8 @@ namespace Combat
                 m_period_generator_cfgid = int.Parse(value);
             if (variables.TryGetValue("period", out value))
                 m_period = FixPoint.Parse(value);
+            if (variables.TryGetValue("region_update_interval", out value))
+                m_region_update_interval = FixPoint.Parse(value);
         }
     }
 
@@ -353,6 +356,15 @@ namespace Combat
     public partial class ManaComponent
     {
         public const int ID = -1133849163;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("max_mana", out value))
+                m_current_max_mana = FixPoint.Parse(value);
+            if (variables.TryGetValue("current_mana", out value))
+                m_current_mana = FixPoint.Parse(value);
+        }
     }
 
     public partial class ObstacleComponent
@@ -781,6 +793,8 @@ namespace Combat
                 m_casting_animation = value;
             if (variables.TryGetValue("main_animation", out value))
                 m_main_animation = value;
+            if (variables.TryGetValue("main_action_count", out value))
+                m_main_action_count = int.Parse(value);
             if (variables.TryGetValue("expiration_animation", out value))
                 m_expiration_animation = value;
             if (variables.TryGetValue("main_render_effect", out value))
@@ -912,6 +926,20 @@ namespace Combat
                 m_collision_target_generator_cfgid = int.Parse(value);
             if (variables.TryGetValue("backward", out value))
                 m_backward = bool.Parse(value);
+        }
+    }
+
+    public partial class AddManaComponent
+    {
+        public const int ID = -608267555;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("mana_type", out value))
+                m_mana_type = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("mana_amount", out value))
+                m_mana_amount.Compile(value);
         }
     }
 

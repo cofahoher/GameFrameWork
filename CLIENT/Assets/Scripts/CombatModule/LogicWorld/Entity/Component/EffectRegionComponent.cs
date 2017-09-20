@@ -9,13 +9,14 @@ namespace Combat
         int m_enter_generator_cfgid = 0;
         int m_period_generator_cfgid = 0;
         FixPoint m_period = FixPoint.One;
+        FixPoint m_region_update_interval = FixPoint.One;
 
         //运行数据
         EffectGenerator m_enter_generator;
         EffectGenerator m_period_generator;
         EntityGatheringRegion m_region;
         ComponentCommonTask m_task;
-        
+
         #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
@@ -32,6 +33,7 @@ namespace Combat
 
             m_region = GetLogicWorld().GetRegionCallbackManager().CreateRegion();
             m_region.Construct(this, owner);
+            m_region.SetUpdateInterval(m_region_update_interval);
             m_region.SetTargetGatheringParam(m_target_gathering_param);
             m_region.Activate();
 
@@ -74,6 +76,9 @@ namespace Combat
         #region IRegionCallback
         public void OnEntityEnter(int entity_id)
         {
+            Entity owner = GetOwnerEntity();
+            if (ObjectUtil.IsDead(owner))
+                return;
             if (m_enter_generator == null)
                 return;
             Entity entity = GetLogicWorld().GetEntityManager().GetObject(entity_id);
@@ -90,6 +95,9 @@ namespace Combat
 
         public void OnEntityExit(int entity_id)
         {
+            Entity owner = GetOwnerEntity();
+            if (ObjectUtil.IsDead(owner))
+                return;
             if (m_enter_generator == null)
                 return;
             Entity entity = GetLogicWorld().GetEntityManager().GetObject(entity_id);

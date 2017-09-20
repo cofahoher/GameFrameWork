@@ -19,6 +19,7 @@ namespace Combat
         Vector3FP m_fixed_position = Vector3FP.Zero;
         Vector2FP m_fixed_facing = Vector2FP.Zero;
         TargetGatheringParam m_target_gathering_param;
+        int m_update_interval = 1000;
 
         bool m_active = false;
         List<int> m_previous_entered_entities = new List<int>();
@@ -87,9 +88,33 @@ namespace Combat
             get { return m_active; }
         }
 
+        public void SetUpdateInterval(FixPoint update_interval)
+        {
+            if (m_active)
+                return;
+            m_update_interval = (int)(update_interval * FixPoint.Thousand);
+            if (m_update_interval <= SyncParam.FRAME_TIME)
+            {
+                m_update_interval = SyncParam.FRAME_TIME;
+            }
+            else
+            {
+                int a = m_update_interval / SyncParam.FRAME_TIME;
+                int b = m_update_interval % SyncParam.FRAME_TIME;
+                if (b != 0)
+                    ++a;
+                m_update_interval = a * SyncParam.FRAME_TIME;
+            }
+        }
+
         public void SetTargetGatheringParam(TargetGatheringParam param)
         {
             m_target_gathering_param = param;
+        }
+
+        public int UpdateInterval
+        {
+            get { return m_update_interval; }
         }
 
         public int CurrentEnteredCount

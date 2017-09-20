@@ -281,6 +281,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageSystem.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\ClassifiedEffectContainer.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddManaComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddStateEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ApplyGeneratorEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ChangePlayerFactionEffectComponent.cs" />
