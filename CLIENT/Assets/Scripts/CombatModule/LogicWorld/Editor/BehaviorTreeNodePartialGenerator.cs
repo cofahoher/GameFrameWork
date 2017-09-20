@@ -176,10 +176,10 @@ namespace Combat
             return new_cmp;
         }
 
-        [MenuItem("H3D/Generate Combat BehaviorTree Code", false, 1002)]
+        [MenuItem("FrameWork/Generate Combat BehaviorTree Code", false, 1002)]
         public static void GenerateAll()
         {
-            StreamWriter writer = new StreamWriter("Assets/Scripts/CoreGame/LogicWorld/BehaviorTree/BehaviorTreeNodeTypeRegistryExt.cs");
+            StreamWriter writer = new StreamWriter("Assets/Scripts/CombatModule/LogicWorld/BehaviorTree/BehaviorTreeNodeTypeRegistryExt.cs");
             writer.Write(
 @"using System;
 using System.Collections;

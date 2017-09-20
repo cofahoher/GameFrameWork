@@ -539,17 +539,19 @@ namespace Combat
                 m_track_mode = (int)CRC.Calculate(value);
             if (variables.TryGetValue("trajectory_type", out value))
                 m_trajectory_type = (int)CRC.Calculate(value);
-            if (variables.TryGetValue("collision_sound", out value))
-                m_collision_sound_cfgid = int.Parse(value);
-            if (variables.TryGetValue("collision_faction", out value))
-                m_collision_faction = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("extra_hight", out value))
+                m_extra_hight = FixPoint.Parse(value);
             if (variables.TryGetValue("can_cross_obstacle", out value))
                 m_can_cross_obstacle = bool.Parse(value);
             if (variables.TryGetValue("pierce_entity", out value))
                 m_pierce_entity = bool.Parse(value);
+            if (variables.TryGetValue("collision_faction", out value))
+                m_collision_faction = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("collision_sound", out value))
+                m_collision_sound_cfgid = int.Parse(value);
         }
 
-        #region GETTER/SETTER
+#region GETTER/SETTER
         public FixPoint Speed
         {
             get { return m_speed; }
@@ -564,7 +566,7 @@ namespace Combat
         {
             get { return m_trajectory_type; }
         }
-        #endregion
+#endregion
     }
 
     public partial class SimpleAIComponent

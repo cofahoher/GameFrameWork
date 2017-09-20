@@ -423,7 +423,7 @@ namespace Combat
         [MenuItem("FrameWork/Generate Combat Component Code", false, 1001)]
         public static void GenerateAll()
         {
-            StreamWriter writer = new StreamWriter("Assets/Scripts/CoreGame/LogicWorld/Object/ComponentTypeRegistryExt.cs");
+            StreamWriter writer = new StreamWriter("Assets/Scripts/CombatModule/LogicWorld/Object/ComponentTypeRegistryExt.cs");
             writer.Write(
 @"using System;
 using System.Collections;
