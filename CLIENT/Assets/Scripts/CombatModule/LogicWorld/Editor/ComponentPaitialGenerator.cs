@@ -203,7 +203,7 @@ namespace Combat
                 .REGISTER_VARIABLE_CRC<int>("auto_aim", null, "m_auto_aim_type")
                 .REGISTER_VARIABLE<string>("casting_animation", null, "m_casting_animation")
                 .REGISTER_VARIABLE<string>("main_animation", null, "m_main_animation")
-                .REGISTER_VARIABLE<int>("main_action_count", null, "m_main_action_count")
+                .REGISTER_VARIABLE<int>("main_animation_count", null, "m_main_animation_count")
                 .REGISTER_VARIABLE<string>("expiration_animation", null, "m_expiration_animation")
                 .REGISTER_VARIABLE<int>("main_render_effect", null, "m_main_render_effect_cfgid")
                 .REGISTER_VARIABLE<int>("main_sound", null, "m_main_sound");

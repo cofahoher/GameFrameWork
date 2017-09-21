@@ -67,7 +67,7 @@ namespace Combat
         public string m_icon;
         public string m_casting_animation;
         public string m_main_animation;
-        public int m_main_action_count = 0;
+        public int m_main_animation_count = 0;
         public string m_expiration_animation;
         public int m_main_render_effect_cfgid = 0;
         public int m_main_sound = 0;
@@ -94,18 +94,18 @@ namespace Combat
 
         public string GenerateMainActionNameLogicly()
         {
-            if (m_main_action_count <= 1)
+            if (m_main_animation_count <= 1)
                 return m_main_animation;
             if (m_main_animation_names == null)
             {
                 m_main_animation_names = new List<string>();
-                for (int i = 0; i < m_main_action_count; ++i)
+                for (int i = 0; i < m_main_animation_count; ++i)
                 {
                     char index = (char)((int)'a' + i);
                     m_main_animation_names.Add(m_main_animation + index);
                 }
             }
-            int random_index = GetLogicWorld().GetRandomGeneratorI().RandBetween(1, m_main_action_count);
+            int random_index = GetLogicWorld().GetRandomGeneratorI().RandBetween(0, m_main_animation_count - 1);
             return m_main_animation_names[random_index];
         }
 

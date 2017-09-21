@@ -795,8 +795,8 @@ namespace Combat
                 m_casting_animation = value;
             if (variables.TryGetValue("main_animation", out value))
                 m_main_animation = value;
-            if (variables.TryGetValue("main_action_count", out value))
-                m_main_action_count = int.Parse(value);
+            if (variables.TryGetValue("main_animation_count", out value))
+                m_main_animation_count = int.Parse(value);
             if (variables.TryGetValue("expiration_animation", out value))
                 m_expiration_animation = value;
             if (variables.TryGetValue("main_render_effect", out value))
