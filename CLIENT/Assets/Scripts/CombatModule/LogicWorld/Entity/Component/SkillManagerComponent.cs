@@ -28,7 +28,7 @@ namespace Combat
         {
             LogicWorld logic_world = GetLogicWorld();
             var enumerator = m_index2id.GetEnumerator();
-            while(enumerator.MoveNext())
+            while (enumerator.MoveNext())
             {
                 int skill_index = enumerator.Current.Key;
                 int skill_cfgid = enumerator.Current.Value;
@@ -117,10 +117,10 @@ namespace Combat
         void OnMovementStart()
         {
             SkillManager skill_manager = GetLogicWorld().GetSkillManager();
-            for (int  i = 0; i < m_active_skill_ids.Count; ++i)
+            for (int i = 0; i < m_active_skill_ids.Count; ++i)
             {
                 Skill skill = skill_manager.GetObject(m_active_skill_ids[i]);
-                if(skill != null)
+                if (skill != null)
                 {
                     SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
                     if (def_cmp.DeactivateWhenMoving)
@@ -184,6 +184,12 @@ namespace Combat
             }
             else
             {
+                if (def_cmp.BlocksRotatingWhenActive)
+                {
+                    PositionComponent position_component = skill.GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+                    if (position_component != null)
+                        position_component.DisableRotating();
+                }
                 if (def_cmp.DeactivateWhenMoving)
                 {
                     if (m_locomotor_cmp != null)
@@ -217,6 +223,12 @@ namespace Combat
             }
             else
             {
+                if (def_cmp.BlocksRotatingWhenActive)
+                {
+                    PositionComponent position_component = skill.GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
+                    if (position_component != null)
+                        position_component.EnableRotating();
+                }
                 if (def_cmp.DeactivateWhenMoving)
                 {
                 }

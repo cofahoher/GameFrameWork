@@ -40,6 +40,7 @@ namespace Combat
         Vector3FP m_current_position;
         FixPoint m_base_angle = FixPoint.Zero;  //绕Z轴的转角，注意Unity是左手系
         FixPoint m_head_angle = FixPoint.Zero;  //头部相对于m_current_angle的旋转
+        int m_disable_rotate_count = 0;
         SceneSpace m_current_space = null;
 
         #region GETTER/SETTER
@@ -95,6 +96,8 @@ namespace Combat
             get { return m_base_angle; }
             set
             {
+                if (IsRotatingDisabled)
+                    return;
                 if (m_base_rotatable)
                 {
                     m_base_angle = value;
@@ -108,6 +111,8 @@ namespace Combat
             get { return m_head_angle; }
             set
             {
+                if (IsRotatingDisabled)
+                    return;
                 if (!m_base_rotatable)
                 {
                     m_head_angle = value;
@@ -213,12 +218,16 @@ namespace Combat
         #region SETTER
         public void SetFacing(Vector3FP direction, bool from_command = false)
         {
+            if (IsRotatingDisabled)
+                return;
             FixPoint angle = FixPoint.XZToUnityRotationDegree(direction.x, direction.z);
             SetFacing(angle, from_command);
         }
 
         public void SetFacing(FixPoint angle, bool from_command = false)
         {
+            if (IsRotatingDisabled)
+                return;
             if (m_base_rotatable)
             {
                 m_base_angle = angle;
@@ -269,6 +278,23 @@ namespace Combat
             msg.Construct(GetOwnerEntityID(), new_position);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
+        }
+        #endregion
+
+        #region 能否旋转控制
+        public void EnableRotating()
+        {
+            --m_disable_rotate_count;
+        }
+
+        public void DisableRotating()
+        {
+            ++m_disable_rotate_count;
+        }
+
+        public bool IsRotatingDisabled
+        {
+            get { return m_disable_rotate_count > 0; }
         }
         #endregion
     }

@@ -181,6 +181,7 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("starts_active", "VID_StartsActive", "m_starts_active", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("blocks_other_skills_when_active", "VID_BlocksOtherSkillsWhenActive", "m_blocks_other_skills_when_active", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("blocks_movement_when_active", "VID_BlocksMovementWhenActive", "m_blocks_movement_when_active", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("blocks_rotating_when_active", "VID_BlocksRotatingWhenActive", "m_blocks_rotating_when_active", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled", Flag_Attribute_Get)

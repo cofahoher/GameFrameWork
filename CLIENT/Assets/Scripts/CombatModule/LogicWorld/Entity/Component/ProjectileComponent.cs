@@ -277,6 +277,7 @@ namespace Combat
                 GetLogicWorld().AddRenderMessage(sound_msg);
             }
 #endif
+
             ApplyGenerator(entity);
 
             if (entity == null || !m_pierce_entity)
@@ -331,10 +332,12 @@ namespace Combat
 
         public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
         {
+            if (delta_time > m_remain_time)
+                delta_time = m_remain_time;
             if (m_component.UpdateProjectile(delta_time))
                 return;
             m_remain_time -= delta_time;
-            if (m_remain_time < 0)
+            if (m_remain_time <= FixPoint.Zero)
                 m_component.Explode(null);
         }
 

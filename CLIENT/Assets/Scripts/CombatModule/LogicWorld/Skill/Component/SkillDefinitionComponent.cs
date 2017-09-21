@@ -40,6 +40,7 @@ namespace Combat
         bool m_starts_active = false;
         bool m_blocks_other_skills_when_active = true;
         bool m_blocks_movement_when_active = true;
+        bool m_blocks_rotating_when_active = true;
         bool m_deactivate_when_moving = true;
         bool m_can_activate_while_moving = true;
         bool m_can_activate_when_disabled = false;
@@ -102,7 +103,7 @@ namespace Combat
                 for (int i = 0; i < m_main_animation_count; ++i)
                 {
                     char index = (char)((int)'a' + i);
-                    m_main_animation_names.Add(m_main_animation + index);
+                    m_main_animation_names.Add(m_main_animation + '_' + index);
                 }
             }
             int random_index = GetLogicWorld().GetRandomGeneratorI().RandBetween(0, m_main_animation_count - 1);

@@ -4,6 +4,7 @@ namespace Combat
 {
     public partial class EntityUtil
     {
+        static FixPoint ms_death_delay = FixPoint.One / FixPoint.Ten;
         public static void KillEntity(Entity entity, int killer_id)
         {
             DeathComponent death_component = entity.GetComponent(DeathComponent.ID) as DeathComponent;
@@ -29,7 +30,7 @@ namespace Combat
                 var schedeler = entity.GetLogicWorld().GetTaskScheduler();
                 DeleteEntityTask delete_task = LogicTask.Create<DeleteEntityTask>();
                 delete_task.Construct(entity.ID);
-                schedeler.Schedule(delete_task, entity.GetCurrentTime(), FixPoint.PrecisionFP);
+                schedeler.Schedule(delete_task, entity.GetCurrentTime(), ms_death_delay);
             }
         }
 

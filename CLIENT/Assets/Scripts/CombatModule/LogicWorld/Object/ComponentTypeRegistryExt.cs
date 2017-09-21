@@ -759,6 +759,8 @@ namespace Combat
                 m_blocks_other_skills_when_active = bool.Parse(value);
             if (variables.TryGetValue("blocks_movement_when_active", out value))
                 m_blocks_movement_when_active = bool.Parse(value);
+            if (variables.TryGetValue("blocks_rotating_when_active", out value))
+                m_blocks_rotating_when_active = bool.Parse(value);
             if (variables.TryGetValue("deactivate_when_moving", out value))
                 m_deactivate_when_moving = bool.Parse(value);
             if (variables.TryGetValue("can_activate_while_moving", out value))
@@ -864,6 +866,11 @@ namespace Combat
         public bool BlocksMovementWhenActive
         {
             get { return m_blocks_movement_when_active; }
+        }
+
+        public bool BlocksRotatingWhenActive
+        {
+            get { return m_blocks_rotating_when_active; }
         }
 
         public bool DeactivateWhenMoving
