@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class AddManaComponent : EffectComponent
+    public partial class AddManaEffectComponent : EffectComponent
     {
         int m_mana_type = 0;
         Formula m_mana_amount = RecyclableObject.Create<Formula>();

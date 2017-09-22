@@ -216,7 +216,8 @@ namespace Combat
             #endregion
 
             #region Effect
-            REGISTER_COMPONENT<AddManaComponent>()
+            REGISTER_COMPONENT<AddDamageModifierEffectComponent>();
+            REGISTER_COMPONENT<AddManaEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("mana_type", null, "m_mana_type")
                 .REGISTER_VARIABLE<Formula>("mana_amount", null, "m_mana_amount");
             REGISTER_COMPONENT<AddStateEffectComponent>()

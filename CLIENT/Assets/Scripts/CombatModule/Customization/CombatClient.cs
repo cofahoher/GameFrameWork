@@ -100,6 +100,7 @@ namespace Combat
             m_combat_factory.RegisterCommands();
             m_combat_factory.RegisterRenderMessages();
             m_combat_factory.RegisterBehaviorTreeNode();
+            DamageModifier.RegisterDefaultModifiers();
 
             BehaviorTreeFactory.Instance.SetConfigProvider(m_combat_factory.GetConfigProvider());
 
