@@ -102,11 +102,25 @@ namespace Combat
                 return null;
         }
 
+        public AIComponent GetAIComponent()
+        {
+            if (m_context == null)
+                return null;
+            return m_context.GetData<AIComponent>(BTContextKey.OwnerAIComponent);
+        }
+
         public SkillComponent GetSkillComponent()
         {
             if (m_context == null)
                 return null;
             return m_context.GetData<SkillComponent>(BTContextKey.OwnerSkillComponent);
+        }
+
+        public EffectComponent GetEffectComponent()
+        {
+            if (m_context == null)
+                return null;
+            return m_context.GetData<EffectComponent>(BTContextKey.OwnerEffectComponent);
         }
 
         public Skill GetOwnerSkill()

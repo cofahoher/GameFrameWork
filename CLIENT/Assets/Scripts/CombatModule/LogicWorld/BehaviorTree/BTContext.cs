@@ -103,5 +103,9 @@ namespace Combat
     public partial class BTContextKey
     {
         public static readonly int ExpressionVariableProvider = (int)CRC.Calculate("ExpressionVariableProvider");
+        public static readonly int OwnerEntity = (int)CRC.Calculate("OwnerEntity");
+        public static readonly int OwnerAIComponent = (int)CRC.Calculate("OwnerAIComponent");
+        public static readonly int OwnerSkillComponent = (int)CRC.Calculate("OwnerSkillComponent");
+        public static readonly int OwnerEffectComponent = (int)CRC.Calculate("OwnerEffectComponent");
     }
 }

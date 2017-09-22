@@ -280,6 +280,9 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\Damage.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageModifier.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Damage\DamageSystem.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\BTNode\Actions\BTEffectAcition_XxxYyy.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\BTNode\BTEffectContextKey.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\BTNode\Conditions\BTEffectCondition_XxxYyy.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\ClassifiedEffectContainer.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddDamageModifierEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddManaEffectComponent.cs" />

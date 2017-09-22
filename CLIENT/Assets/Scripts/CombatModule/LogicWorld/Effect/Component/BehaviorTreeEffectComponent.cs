@@ -21,6 +21,8 @@ namespace Combat
                 m_behavior_tree.Construct(GetLogicWorld());
                 BTContext context = m_behavior_tree.Context;
                 context.SetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider, this);
+                context.SetData<Entity>(BTContextKey.OwnerEntity, GetOwnerEntity());
+                context.SetData<EffectComponent>(BTContextKey.OwnerEffectComponent, this);
             }
         }
 

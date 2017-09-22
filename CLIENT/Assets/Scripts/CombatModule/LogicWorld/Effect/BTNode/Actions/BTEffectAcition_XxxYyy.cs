@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class BTContextKey
+    public partial class BTEffectAcition_XxxYyy
     {
     }
 }
