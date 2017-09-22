@@ -96,11 +96,10 @@ namespace Combat
 #endif
 
             AttributeSystem.Instance.InitializeAllDefinition(m_combat_factory.GetConfigProvider());
-            m_combat_factory.RegisterComponents();
-            m_combat_factory.RegisterCommands();
-            m_combat_factory.RegisterRenderMessages();
-            m_combat_factory.RegisterBehaviorTreeNode();
+            ComponentTypeRegistry.RegisterDefaultComponents();
+            BehaviorTreeNodeTypeRegistry.RegisterDefaultNodes();
             DamageModifier.RegisterDefaultModifiers();
+            m_combat_factory.RegisterCommands();
 
             BehaviorTreeFactory.Instance.SetConfigProvider(m_combat_factory.GetConfigProvider());
 

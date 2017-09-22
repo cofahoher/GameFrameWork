@@ -9,10 +9,7 @@ namespace Combat
         RenderWorld CreateRenderWorld();
         ISyncClient CreateSyncClient();
         ISyncServer CreateSyncServer();
-        void RegisterComponents();
         void RegisterCommands();
-        void RegisterRenderMessages();
-        void RegisterBehaviorTreeNode();
         WorldCreationContext CreateWorldCreationContext(CombatStartInfo combat_start_info);
     }
 }

@@ -30,14 +30,6 @@ namespace Combat
             return new SPSyncServer();
         }
 
-        public void RegisterComponents()
-        {
-            ComponentTypeRegistry.RegisterDefaultComponents();
-//#if COMBAT_CLIENT
-//            ComponentTypeRegistry.Register(typeof(ModelComponent), false);
-//#endif
-        }
-
         public void RegisterCommands()
         {
             if (!Command.Registered)
@@ -45,22 +37,6 @@ namespace Combat
             Command.Register(CommandType.SyncTurnDone, typeof(SyncTurnDoneCommand));
             Command.Register(CommandType.EntityMove, typeof(EntityMoveCommand));
             Command.Register(CommandType.EntityTarget, typeof(EntityTargetCommand));
-        }
-
-        public void RegisterRenderMessages()
-        {
-            if (!RenderMessage.Registered)
-                RenderMessage.Registered = true;
-            RenderMessage.Register(RenderMessageType.CreateEntity, typeof(SimpleRenderMessage));
-            RenderMessage.Register(RenderMessageType.DestroyEntity, typeof(SimpleRenderMessage));
-            RenderMessage.Register(RenderMessageType.StartMoving, typeof(SimpleRenderMessage));
-            RenderMessage.Register(RenderMessageType.StopMoving, typeof(SimpleRenderMessage));
-            RenderMessage.Register(RenderMessageType.ChangeHealth, typeof(ChangeHealthRenderMessage));
-        }
-
-        public void RegisterBehaviorTreeNode()
-        {
-            BehaviorTreeNodeTypeRegistry.RegisterDefaultNodes();
         }
 
         public WorldCreationContext CreateWorldCreationContext(CombatStartInfo combat_start_info)
