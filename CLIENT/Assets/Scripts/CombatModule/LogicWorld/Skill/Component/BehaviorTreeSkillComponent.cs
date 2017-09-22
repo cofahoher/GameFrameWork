@@ -4,6 +4,7 @@ namespace Combat
 {
     public partial class BehaviorTreeSkillComponent : SkillComponent
     {
+        public static readonly int BTEntry_CanActivate = (int)CRC.Calculate("CanActivate");
         public static readonly int BTEntry_Activate = (int)CRC.Calculate("Activate");
         public static readonly int BTEntry_PostActivate = (int)CRC.Calculate("PostActivate");
         public static readonly int BTEntry_Inflict = (int)CRC.Calculate("Inflict");
@@ -19,28 +20,37 @@ namespace Combat
         public override void InitializeComponent()
         {
             m_behavior_tree = BehaviorTreeFactory.Instance.CreateBehaviorTree(m_bahavior_tree_id);
+            if (m_behavior_tree != null)
+            {
+                m_behavior_tree.Construct(GetLogicWorld());
+                BTContext context = m_behavior_tree.Context;
+                context.SetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider, this);
+                context.SetData<SkillComponent>(BTContextKey.OwnerSkillComponent, this);
+            }
         }
 
         protected override void OnDestruct()
         {
             if (m_behavior_tree != null)
                 BehaviorTreeFactory.Instance.RecycleBehaviorTree(m_behavior_tree);
+            m_behavior_tree = null;
         }
         #endregion
 
         public override bool CanActivate()
         {
-            return true;
+            if (m_behavior_tree == null)
+                return false;
+            if (!m_behavior_tree.HasEntry(BTEntry_CanActivate))
+                return true;
+            BTNodeStatus bt_status = m_behavior_tree.RunOnce(BTEntry_CanActivate);
+            return bt_status == BTNodeStatus.True;
         }
 
         public override void Activate(FixPoint start_time)
         {
             if (m_behavior_tree == null)
                 return;
-            m_behavior_tree.Activate(GetLogicWorld());
-            BTContext context = m_behavior_tree.Context;
-            context.SetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider, this);
-            context.SetData<SkillComponent>(BTContextKey.OwnerSkillComponent, this);
             m_behavior_tree.Run(BTEntry_Activate);
         }
 
@@ -63,7 +73,7 @@ namespace Combat
             if (m_behavior_tree == null)
                 return;
             m_behavior_tree.Run(BTEntry_Deactivate);
-            m_behavior_tree.Deactivate();
+            m_behavior_tree.ClearRunningTrace();
         }
     }
 }

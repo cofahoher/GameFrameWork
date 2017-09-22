@@ -49,6 +49,7 @@ namespace Combat
             Register<AddManaEffectComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
+            Register<BehaviorTreeEffectComponent>(false);
             Register<ChangePlayerFactionEffectComponent>(false);
             Register<CreateObjectEffectComponent>(false);
             Register<DamageEffectComponent>(false);
@@ -166,6 +167,13 @@ namespace Combat
     public partial class AIComponent
     {
         public const int ID = 1842924899;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("bahavior_tree_id", out value))
+                m_bahavior_tree_id = int.Parse(value);
+        }
     }
 
     public partial class AttributeManagerComponent
@@ -979,6 +987,18 @@ namespace Combat
             string value;
             if (variables.TryGetValue("generator_cfgid", out value))
                 m_generator_cfgid = int.Parse(value);
+        }
+    }
+
+    public partial class BehaviorTreeEffectComponent
+    {
+        public const int ID = 1755953363;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("bahavior_tree_id", out value))
+                m_bahavior_tree_id = int.Parse(value);
         }
     }
 

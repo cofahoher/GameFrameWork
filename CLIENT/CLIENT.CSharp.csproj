@@ -285,6 +285,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddManaEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\AddStateEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ApplyGeneratorEffectComponent.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\BehaviorTreeEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\ChangePlayerFactionEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\CreateObjectEffectComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Effect\Component\DamageEffectComponent.cs" />

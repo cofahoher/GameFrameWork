@@ -8,7 +8,6 @@ namespace Combat
         int m_config_id = 0;
         List<BehaviorTreeEntryNodeExtraData> m_entries = new List<BehaviorTreeEntryNodeExtraData>();
         //运行数据
-        bool m_active = false;
         int m_current_running_entry_index = -1;
         BeahviorTreeTask m_task = null;
 
@@ -26,9 +25,35 @@ namespace Combat
                 m_entries.Add(prototype.m_entries[i]);
         }
 
+        public void Construct(LogicWorld logic_world)
+        {
+            if (m_context == null)
+            {
+                BTContext context = RecyclableObject.Create<BTContext>();
+                context.Construct(logic_world, this);
+                SetContext(context);
+            }
+            if (m_task == null)
+            {
+                m_task = LogicTask.Create<BeahviorTreeTask>();
+                m_task.Construct(this);
+            }
+        }
+
+        public override void ClearRunningTrace()
+        {
+            if (m_context != null)
+                m_context.GetActionBuffer().ExitAllAction();
+            if (m_task != null)
+                m_task.Cancel();
+            if (m_current_running_entry_index >= 0)
+                m_children[m_current_running_entry_index].ClearRunningTrace();
+            m_current_running_entry_index = -1;
+        }
+
         public override void ResetNode()
         {
-            Deactivate();
+            ClearRunningTrace();
             base.ResetNode();
             if (m_context != null)
             {
@@ -36,7 +61,6 @@ namespace Combat
                 SetContext(null);
                 RecyclableObject.Recycle(context);
             }
-            m_active = false;
             m_current_running_entry_index = -1;
             if (m_task != null)
             {
@@ -81,38 +105,6 @@ namespace Combat
         }
         #endregion
 
-        public void Activate(LogicWorld logic_world)
-        {
-            if (m_active)
-                return;
-            if (m_context == null)
-            {
-                BTContext context = RecyclableObject.Create<BTContext>();
-                context.Construct(logic_world, this);
-                SetContext(context);
-            }
-            if (m_task == null)
-            {
-                m_task = LogicTask.Create<BeahviorTreeTask>();
-                m_task.Construct(this);
-            }
-            m_active = true;
-        }
-
-        public void Deactivate()
-        {
-            if (!m_active)
-                return;
-            if (m_context != null)
-                m_context.GetActionBuffer().ExitAllAction();
-            if (m_task != null)
-                m_task.Cancel();
-            if (m_current_running_entry_index >= 0)
-                m_children[m_current_running_entry_index].ClearRunningTrace();
-            m_current_running_entry_index = -1;
-            m_active = false;
-        }
-
         public void StopUpdate()
         {
             if (m_task != null)
@@ -129,8 +121,6 @@ namespace Combat
 
         public bool Run(int entrty_id = 0)
         {
-            if (!m_active)
-                return false;
             int new_index = EntryID2Index(entrty_id);
             if (new_index == -1)
                 return false;
@@ -154,8 +144,6 @@ namespace Combat
 
         public BTNodeStatus RunOnce(int entrty_id)
         {
-            if (!m_active)
-                return BTNodeStatus.False;
             int new_index = EntryID2Index(entrty_id);
             if (new_index == -1)
                 return BTNodeStatus.True;
@@ -183,10 +171,15 @@ namespace Combat
         public override BTNodeStatus OnUpdate(FixPoint delta_time)
         {
             if (m_current_running_entry_index < 0)
-                return BTNodeStatus.False;
-            BTNodeStatus status = m_children[m_current_running_entry_index].OnUpdate(delta_time);
-            m_context.GetActionBuffer().SwapActions();
-            return status;
+            {
+                m_status = BTNodeStatus.Unreach;
+            }
+            else
+            {
+                m_status = m_children[m_current_running_entry_index].OnUpdate(delta_time);
+                m_context.GetActionBuffer().SwapActions();
+            }
+            return m_status;
         }
     }
 

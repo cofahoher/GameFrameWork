@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class AIComponent : EntityComponent
+    public partial class BehaviorTreeEffectComponent : EffectComponent
     {
-        public static readonly int BTEntry_AIMain = (int)CRC.Calculate("AIMain");
+        public static readonly int BTEntry_Apply = (int)CRC.Calculate("Apply");
+        public static readonly int BTEntry_Unapply = (int)CRC.Calculate("Unapply");
 
         //配置数据
         int m_bahavior_tree_id = 0;
@@ -12,7 +13,6 @@ namespace Combat
         //运行数据
         BeahviorTree m_behavior_tree = null;
 
-        #region 初始化/销毁
         public override void InitializeComponent()
         {
             m_behavior_tree = BehaviorTreeFactory.Instance.CreateBehaviorTree(m_bahavior_tree_id);
@@ -30,20 +30,19 @@ namespace Combat
                 BehaviorTreeFactory.Instance.RecycleBehaviorTree(m_behavior_tree);
             m_behavior_tree = null;
         }
-        #endregion
 
-        protected override void OnEnable()
+        public override void Apply()
         {
             if (m_behavior_tree == null)
                 return;
-            m_behavior_tree.Run(BTEntry_AIMain);
+            m_behavior_tree.Run(BTEntry_Apply);
         }
 
-        protected override void OnDisable()
+        public override void Unapply()
         {
             if (m_behavior_tree == null)
                 return;
-            m_behavior_tree.ClearRunningTrace();
+            m_behavior_tree.Run(BTEntry_Unapply);
         }
     }
 }
