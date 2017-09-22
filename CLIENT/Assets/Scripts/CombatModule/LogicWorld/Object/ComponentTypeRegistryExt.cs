@@ -45,7 +45,8 @@ namespace Combat
             Register<KillTargetSkillComponent>(false);
             Register<SkillDefinitionComponent>(false);
             Register<SpurtSkillComponent>(false);
-            Register<AddManaComponent>(false);
+            Register<AddDamageModifierEffectComponent>(false);
+            Register<AddManaEffectComponent>(false);
             Register<AddStateEffectComponent>(false);
             Register<ApplyGeneratorEffectComponent>(false);
             Register<ChangePlayerFactionEffectComponent>(false);
@@ -938,9 +939,14 @@ namespace Combat
         }
     }
 
-    public partial class AddManaComponent
+    public partial class AddDamageModifierEffectComponent
     {
-        public const int ID = -608267555;
+        public const int ID = 907970244;
+    }
+
+    public partial class AddManaEffectComponent
+    {
+        public const int ID = -445783062;
 
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
