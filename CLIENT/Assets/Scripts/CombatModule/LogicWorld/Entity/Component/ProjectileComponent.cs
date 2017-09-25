@@ -32,6 +32,7 @@ namespace Combat
         public static readonly int TrackModeNone = (int)CRC.Calculate("none");
         public static readonly int TrackModeLockTarget = (int)CRC.Calculate("lock");
 
+        public static readonly int TrajectoryTypeHorizontalLine = (int)CRC.Calculate("HorizontalLine");
         public static readonly int TrajectoryTypeLine = (int)CRC.Calculate("Line");
         public static readonly int TrajectoryTypeBezier = (int)CRC.Calculate("bezier");
         //public static readonly int TrajectoryTypeArc = (int)CRC.Calculate("arc");
@@ -62,7 +63,7 @@ namespace Combat
             else if (m_track_mode == TrackModeLockTarget)
                 m_pierce_entity = false;
             if (m_trajectory_type == 0)
-                m_trajectory_type = TrajectoryTypeLine;
+                m_trajectory_type = TrajectoryTypeHorizontalLine;
             ObjectProtoData proto_data = ParentObject.GetCreationContext().m_proto_data;
             if (proto_data == null)
                 return;
@@ -182,7 +183,8 @@ namespace Combat
                 else
                 {
                     m_param.m_fixed_facing = m_param.m_target_position - position_component.CurrentPosition;
-                    m_param.m_fixed_facing.y = FixPoint.Zero;
+                    if (m_trajectory_type == TrajectoryTypeHorizontalLine)
+                        m_param.m_fixed_facing.y = FixPoint.Zero;
                     FixPoint distance = m_param.m_fixed_facing.Normalize();
                     FixPoint delta_distance = m_speed * delta_time;
                     Vector3FP new_position = position_component.CurrentPosition + m_param.m_fixed_facing * delta_distance;
