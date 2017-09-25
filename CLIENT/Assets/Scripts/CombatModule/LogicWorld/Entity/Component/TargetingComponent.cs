@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class TargetingComponent : EntityComponent, ISignalListener
+    public partial class TargetingComponent : EntityComponent, ISignalListener, INeedTaskService
     {
         static readonly FixPoint TARGETING_UPDATE_MIN_FREQUENCY = FixPoint.Two / FixPoint.Ten;
         static readonly FixPoint TARGETING_UPDATE_MAX_FREQUENCY = FixPoint.Two;
@@ -13,7 +13,7 @@ namespace Combat
         SignalListenerContext m_listener_context;
         Entity m_current_target;
         int m_skill_index = 0;
-        UpdateTargetingTask m_task;
+        ComponentCommonTask m_task;
 
         #region GETTER
         public Entity GetCurrentTarget()
@@ -116,7 +116,7 @@ namespace Combat
         {
             if (m_task == null)
             {
-                m_task = LogicTask.Create<UpdateTargetingTask>();
+                m_task = LogicTask.Create<ComponentCommonTask>();
                 m_task.Construct(this);
             }
             LogicWorld logic_world = GetLogicWorld();
@@ -124,7 +124,7 @@ namespace Combat
             task_scheduler.Schedule(m_task, logic_world.GetCurrentTime(), delay);
         }
 
-        public void UpdateTargeting()
+        public void OnTaskService(FixPoint delta_time)
         {
             PositionComponent position_cmp = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             LocomotorComponent locomotor_cmp = ParentObject.GetComponent(LocomotorComponent.ID) as LocomotorComponent;
@@ -219,26 +219,6 @@ namespace Combat
         protected override void OnDisable()
         {
             StopTargeting();
-        }
-    }
-
-    class UpdateTargetingTask : Task<LogicWorld>
-    {
-        TargetingComponent m_component;
-
-        public void Construct(TargetingComponent component)
-        {
-            m_component = component;
-        }
-
-        public override void OnReset()
-        {
-            m_component = null;
-        }
-
-        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
-        {
-            m_component.UpdateTargeting();
         }
     }
 }

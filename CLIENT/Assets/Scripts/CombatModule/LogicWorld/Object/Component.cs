@@ -228,4 +228,32 @@ namespace Combat
             m_component.OnTaskService(delta_time);
         }
     }
+
+    public class ComponentCommonTaskWithLastingTime : Task<LogicWorld>
+    {
+        INeedTaskService m_component;
+        FixPoint m_remain_time = FixPoint.Zero;
+
+        public void Construct(INeedTaskService component, FixPoint lasting_time)
+        {
+            m_component = component;
+            m_remain_time = lasting_time;
+        }
+
+        public override void OnReset()
+        {
+            m_component = null;
+            m_remain_time = FixPoint.Zero;
+        }
+
+        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
+        {
+            if (delta_time > m_remain_time)
+                delta_time = m_remain_time;
+            m_component.OnTaskService(delta_time);
+            m_remain_time -= delta_time;
+            if (m_remain_time <= FixPoint.Zero)
+                Cancel();
+        }
+    }
 }

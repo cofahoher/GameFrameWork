@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class KnockbackEffectComponent : EffectComponent
+    public partial class KnockbackEffectComponent : EffectComponent, INeedTaskService
     {
         //配置数据
         FixPoint m_distance = FixPoint.Zero;
@@ -10,12 +10,12 @@ namespace Combat
 
         //运行数据
         Vector3FP m_direction = new Vector3FP();
-        UpdateKnockbackTask m_task;
+        ComponentCommonTaskWithLastingTime m_task;
 
         public override void Apply()
         {
             if (m_task == null)
-                m_task = LogicTask.Create<UpdateKnockbackTask>();
+                m_task = LogicTask.Create<ComponentCommonTaskWithLastingTime>();
 
             EffectDefinitionComponent definition_component = ((Effect)ParentObject).GetDefinitionComponent();
             Entity entity = GetLogicWorld().GetEntityManager().GetObject(definition_component.SourceEntityID);
@@ -38,6 +38,8 @@ namespace Combat
         public override void Unapply()
         {
             m_task.Cancel();
+            LogicTask.Recycle(m_task);
+            m_task = null;
 #if COMBAT_CLIENT
             LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
             msg.ConstructAsStopMoving(GetOwnerEntityID(), false, LocomoteRenderMessage.NotFromCommand);
@@ -45,7 +47,7 @@ namespace Combat
 #endif
         }
 
-        public void UpdateKnockback(FixPoint delta_time)
+        public void OnTaskService(FixPoint delta_time)
         {
             Entity owner_entity = GetOwnerEntity();
             PositionComponent position_component = owner_entity.GetComponent(PositionComponent.ID) as PositionComponent;
@@ -62,32 +64,6 @@ namespace Combat
                 }
             }
             position_component.CurrentPosition = new_position;
-        }
-    }
-
-    public class UpdateKnockbackTask : Task<LogicWorld>
-    {
-        KnockbackEffectComponent m_component = null;
-        FixPoint m_remain_time = FixPoint.Zero;
-
-        public void Construct(KnockbackEffectComponent component, FixPoint lasting_time)
-        {
-            m_component = component;
-            m_remain_time = lasting_time;
-        }
-
-        public override void OnReset()
-        {
-            m_component = null;
-            m_remain_time = FixPoint.Zero;
-        }
-
-        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
-        {
-            m_component.UpdateKnockback(delta_time);
-            m_remain_time -= delta_time;
-            if (m_remain_time < 0)
-                Cancel();
         }
     }
 }

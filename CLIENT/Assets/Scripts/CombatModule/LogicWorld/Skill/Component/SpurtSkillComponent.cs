@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class SpurtSkillComponent : SkillComponent
+    public partial class SpurtSkillComponent : SkillComponent, INeedTaskService
     {
         //配置数据
         FixPoint m_distance = FixPoint.Zero;
@@ -13,7 +13,7 @@ namespace Combat
         //运行数据
         EffectGenerator m_collision_target_generator;
         List<int> m_collided_targets;
-        UpdateSpurtTask m_task;
+        ComponentCommonTaskWithLastingTime m_task;
 
         #region 初始化/销毁
         public override void InitializeComponent()
@@ -43,7 +43,7 @@ namespace Combat
         public override void Inflict(FixPoint start_time)
         {
             if (m_task == null)
-                m_task = LogicTask.Create<UpdateSpurtTask>();
+                m_task = LogicTask.Create<ComponentCommonTaskWithLastingTime>();
             m_task.Construct(this, m_time);
             var schedeler = GetLogicWorld().GetTaskScheduler();
             schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
@@ -69,7 +69,7 @@ namespace Combat
                 m_collided_targets.Clear();
         }
 
-        public void UpdateSpurt(FixPoint delta_time)
+        public void OnTaskService(FixPoint delta_time)
         {
             Entity owner_entity = GetOwnerEntity();
             PositionComponent position_component = owner_entity.GetComponent(PositionComponent.ID) as PositionComponent;
@@ -121,32 +121,6 @@ namespace Combat
                 RecyclableObject.Recycle(app_data);
             }
             m_current_target = null;
-        }
-    }
-
-    public class UpdateSpurtTask : Task<LogicWorld>
-    {
-        SpurtSkillComponent m_component = null;
-        FixPoint m_remain_time = FixPoint.Zero;
-
-        public void Construct(SpurtSkillComponent component, FixPoint lasting_time)
-        {
-            m_component = component;
-            m_remain_time = lasting_time;
-        }
-
-        public override void OnReset()
-        {
-            m_component = null;
-            m_remain_time = FixPoint.Zero;
-        }
-
-        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
-        {
-            m_component.UpdateSpurt(delta_time);
-            m_remain_time -= delta_time;
-            if (m_remain_time < 0)
-                Cancel();
         }
     }
 }

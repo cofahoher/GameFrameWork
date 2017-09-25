@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public partial class LocomotorComponent : EntityComponent, IMovementCallback
+    public partial class LocomotorComponent : EntityComponent, IMovementCallback, INeedTaskService
     {
         //需要备份的初始数据
         bool m_avoid_obstacle = true;
@@ -11,7 +11,7 @@ namespace Combat
         IMovementProvider m_movement_provider = null;
         bool m_is_moving = false;
         int m_animation_block_cnt = 0;
-        LocomoterTask m_task;
+        ComponentCommonTask m_task;
 
         #region GETTER
         public bool IsMoving
@@ -137,7 +137,7 @@ namespace Combat
         {
             if (m_task == null)
             {
-                m_task = LogicTask.Create<LocomoterTask>();
+                m_task = LogicTask.Create<ComponentCommonTask>();
                 m_task.Construct(this);
             }
             var schedeler = GetLogicWorld().GetTaskScheduler();
@@ -169,7 +169,7 @@ namespace Combat
 #endif
         }
 
-        public void UpdatePosition(FixPoint delta_time)
+        public void OnTaskService(FixPoint delta_time)
         {
             m_movement_provider.Update(delta_time);
         }
@@ -191,25 +191,5 @@ namespace Combat
             --m_animation_block_cnt;
         }
         #endregion
-    }
-
-    class LocomoterTask : Task<LogicWorld>
-    {
-        LocomotorComponent m_component;
-
-        public void Construct(LocomotorComponent component)
-        {
-            m_component = component;
-        }
-
-        public override void OnReset()
-        {
-            m_component = null;
-        }
-
-        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
-        {
-            m_component.UpdatePosition(delta_time);
-        }
     }
 }
