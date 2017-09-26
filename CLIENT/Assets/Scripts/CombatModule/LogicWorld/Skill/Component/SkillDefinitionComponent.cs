@@ -78,7 +78,7 @@ namespace Combat
         List<SkillTimer> m_timers = new List<SkillTimer>();
         Vector3FP m_external_vector;
         int m_specified_target_id = 0;
-        public static List<string> m_main_animation_names;
+        public List<string> m_main_animation_names;
 
         #region GETTER
         public Vector3FP ExternalVector
