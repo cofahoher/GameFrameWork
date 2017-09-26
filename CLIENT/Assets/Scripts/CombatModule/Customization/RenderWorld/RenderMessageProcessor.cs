@@ -32,6 +32,9 @@ namespace Combat
                 case RenderMessageType.StopMoving:
                     ProcessRenderMessage_StopMoving(msg as LocomoteRenderMessage);
                     break;
+                case RenderMessageType.ChangeLocomotorSpeed:
+                    ProcessRenderMessage_ChangeLocomotorSpeed(msg as ChangeLocomotorSpeedRenderMessage);
+                    break;
                 case RenderMessageType.ChangeDirection:
                     ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
                     break;
@@ -133,6 +136,23 @@ namespace Combat
             if (msg.m_reason == LocomoteRenderMessage.NotFromCommand || predic_component == null || !predic_component.HasMovementPredict)
             {
                 PlayIdleAnimation(render_entity);
+            }
+        }
+
+        void ProcessRenderMessage_ChangeLocomotorSpeed(ChangeLocomotorSpeedRenderMessage msg)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+            AnimationComponent animation_component = render_entity.GetComponent<AnimationComponent>();
+            if (animation_component != null)
+            {
+                animation_component.LocomotorAnimationSpeed = (float)msg.m_animation_rate;
+            }
+            AnimatorComponent animator_component = render_entity.GetComponent<AnimatorComponent>();
+            if (animator_component != null)
+            {
+                animator_component.LocomotorAnimationSpeed = (float)msg.m_animation_rate;
             }
         }
 

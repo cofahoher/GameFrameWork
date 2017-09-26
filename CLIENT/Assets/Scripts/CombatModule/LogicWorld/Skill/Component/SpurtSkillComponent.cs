@@ -56,17 +56,25 @@ namespace Combat
 
         public override void Deactivate(bool force)
         {
+            StopSpurt();
             if (m_collision_target_generator != null)
                 m_collision_target_generator.Deactivate();
-            if (m_task != null)
-                m_task.Cancel();
+            if (m_collided_targets != null)
+                m_collided_targets.Clear();
+        }
+
+        void StopSpurt()
+        {
+            if (m_task == null)
+                return;
+            m_task.Cancel();
+            LogicTask.Recycle(m_task);
+            m_task = null;
 #if COMBAT_CLIENT
             LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
             msg.ConstructAsStopMoving(GetOwnerEntityID(), false, LocomoteRenderMessage.NotFromCommand);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
-            if (m_collided_targets != null)
-                m_collided_targets.Clear();
         }
 
         public void OnTaskService(FixPoint delta_time)
@@ -83,7 +91,7 @@ namespace Combat
                 GridNode node = grid_graph.Position2Node(new_position);
                 if (node == null || !node.Walkable)
                 {
-                    Deactivate(false);
+                    StopSpurt();
                     return;
                 }
             }

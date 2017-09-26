@@ -7,7 +7,7 @@ namespace Combat
         //命名是：做（什么）
         public const int StartMoving = 101;               //LocomoteRenderMessage
         public const int StopMoving = 102;                //LocomoteRenderMessage
-        public const int ChangeMoveSpeed = 103;           //SimpleRenderMessage
+        public const int ChangeLocomotorSpeed = 103;      //ChangeLocomotorSpeedRenderMessage
         public const int ChangeDirection = 104;           //ChangeDirectionRenderMessage
         public const int ChangePosition = 105;            //ChangePositionRenderMessage
         public const int ChangeMana = 109;                //ChangeManaRenderMessage
@@ -59,6 +59,28 @@ namespace Combat
             m_entity_id = -1;
             m_block_animation = false;
             m_reason = 0;
+        }
+    }
+
+    public class ChangeLocomotorSpeedRenderMessage : RenderMessage
+    {
+        public FixPoint m_animation_rate = FixPoint.Zero;
+
+        public ChangeLocomotorSpeedRenderMessage()
+        {
+            m_type = RenderMessageType.ChangeLocomotorSpeed;
+        }
+
+        public void Construct(int entity_id, FixPoint animation_rate)
+        {
+            m_entity_id = entity_id;
+            m_animation_rate = animation_rate;
+        }
+
+        public override void Reset()
+        {
+            m_entity_id = -1;
+            m_animation_rate = FixPoint.Zero;
         }
     }
 

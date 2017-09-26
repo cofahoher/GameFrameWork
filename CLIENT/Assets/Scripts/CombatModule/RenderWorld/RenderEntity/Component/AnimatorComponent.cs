@@ -9,15 +9,9 @@ namespace Combat
         string m_animator_path;
         string m_locomotor_animation_name = AnimationName.RUN;
         //运行数据
-        float m_animation_speed = 1.0f;
+        float m_locomotor_animation_speed = 1.0f;
         string m_current_animation;
         Animator m_unity_animator_cmp;
-
-        public float AniamtionSpeed
-        {
-            get { return m_animation_speed; }
-            set { m_animation_speed = value; }
-        }
 
         public string CurrentAnimation
         {
@@ -28,6 +22,20 @@ namespace Combat
         {
             get { return m_locomotor_animation_name; }
             set { m_locomotor_animation_name = value; }
+        }
+
+        public float LocomotorAnimationSpeed
+        {
+            get { return m_locomotor_animation_speed; }
+            set
+            {
+                m_locomotor_animation_speed = value;
+                if (m_current_animation == m_locomotor_animation_name)
+                {
+                    if (m_unity_animator_cmp != null)
+                        m_unity_animator_cmp.speed = m_locomotor_animation_speed;
+                }
+            }
         }
 
         public bool LocomotorAnimationNameChanged
@@ -53,6 +61,10 @@ namespace Combat
             if (child == null)
                 return;
             m_unity_animator_cmp = child.GetComponent<Animator>();
+
+            LocomotorComponent locomotor_componnet = GetLogicEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
+            if (locomotor_componnet != null)
+                m_locomotor_animation_speed = (float)locomotor_componnet.LocomotorSpeedRate;
         }
 
         protected override void OnDestruct()
@@ -61,16 +73,19 @@ namespace Combat
         }
         #endregion
 
-        public void PlayAnimation(string key, float speed = -1.0f)
+        public void PlayAnimation(string key, float speed = 1.0f)
         {
-            m_unity_animator_cmp.speed = speed > 0 ? speed : m_animation_speed;
+            if (key == m_locomotor_animation_name)
+                m_unity_animator_cmp.speed = m_locomotor_animation_speed;
+            else
+                m_unity_animator_cmp.speed = speed;
             m_unity_animator_cmp.Play(key);
             m_current_animation = key;
         }
 
         public void SetParameter(string key, bool value)
         {
-            m_unity_animator_cmp.SetBool(key, value); 
+            m_unity_animator_cmp.SetBool(key, value);
         }
 
         public void SetParameter(string key, int value)

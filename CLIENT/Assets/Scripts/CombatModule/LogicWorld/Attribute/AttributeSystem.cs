@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 namespace Combat
 {
+    public partial class PredefinedAttribute
+    {
+        public static readonly int MaxSpeed = (int)CRC.Calculate("MaxSpeed");
+    }
+
     public class AttributeSystem : Singleton<AttributeSystem>
     {
         static SortedDictionary<int, string> ms_all_ids = new SortedDictionary<int, string>();

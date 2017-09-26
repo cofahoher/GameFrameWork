@@ -12,6 +12,9 @@ namespace Combat
         bool m_is_moving = false;
         int m_animation_block_cnt = 0;
         ComponentCommonTask m_task;
+        FixPoint m_previous_max_speed = FixPoint.MinusOne;
+        FixPoint m_locomotor_speed_rate = FixPoint.One;
+        UpdateLocomotorSpeedRateTask m_update_locomotor_speed_rate_task = null;
 
         #region GETTER
         public bool IsMoving
@@ -27,11 +30,14 @@ namespace Combat
                 m_current_max_speed = value;
                 if (m_movement_provider != null)
                     m_movement_provider.SetMaxSpeed(m_current_max_speed);
-#if COMBAT_CLIENT
-                if (m_is_moving)
-                    GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.ChangeMoveSpeed, GetOwnerEntityID());
-#endif
+                if (m_previous_max_speed >= FixPoint.Zero)
+                    StartLocomotorSpeedRateTask();
             }
+        }
+
+        public FixPoint LocomotorSpeedRate
+        {
+            get { return m_locomotor_speed_rate; }
         }
 
         public IMovementProvider GetMovementProvider()
@@ -46,6 +52,11 @@ namespace Combat
         #endregion
 
         #region 初始化/销毁
+        protected override void PostInitializeComponent()
+        {
+            CalculateLocomotorSpeedrate();
+        }
+
         public override void OnDeletePending()
         {
             StopMoving();
@@ -53,6 +64,7 @@ namespace Combat
 
         protected override void OnDestruct()
         {
+            DeleteLocomotorSpeedRateTask();
             if (m_task != null)
             {
                 m_task.Cancel();
@@ -191,5 +203,69 @@ namespace Combat
             --m_animation_block_cnt;
         }
         #endregion
+
+        #region 速度对动作的影响
+        void StartLocomotorSpeedRateTask()
+        {
+            if (m_update_locomotor_speed_rate_task != null)
+                return;
+            m_update_locomotor_speed_rate_task = LogicTask.Create<UpdateLocomotorSpeedRateTask>();
+            m_update_locomotor_speed_rate_task.Construct(this);
+            var schedeler = GetLogicWorld().GetTaskScheduler();
+            schedeler.Schedule(m_update_locomotor_speed_rate_task, GetCurrentTime(), FixPoint.PrecisionFP);
+        }
+
+        void DeleteLocomotorSpeedRateTask()
+        {
+            if (m_update_locomotor_speed_rate_task == null)
+                return;
+            m_update_locomotor_speed_rate_task.Cancel();
+            LogicTask.Recycle(m_update_locomotor_speed_rate_task);
+            m_update_locomotor_speed_rate_task = null;
+        }
+
+        public void UpdateLocomotorSpeedRate()
+        {
+            DeleteLocomotorSpeedRateTask();
+            if (m_previous_max_speed == m_current_max_speed)
+                return;
+            m_previous_max_speed = m_current_max_speed;
+            CalculateLocomotorSpeedrate();
+#if COMBAT_CLIENT
+            ChangeLocomotorSpeedRenderMessage msg = RenderMessage.Create<ChangeLocomotorSpeedRenderMessage>();
+            msg.Construct(ParentObject.ID, m_locomotor_speed_rate);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
+        }
+
+        void CalculateLocomotorSpeedrate()
+        {
+            Entity owner_entity = GetOwnerEntity();
+            Attribute attribute = EntityUtil.GetAttribute(owner_entity, PredefinedAttribute.MaxSpeed);
+            if (attribute == null)
+                return;
+            m_locomotor_speed_rate = m_current_max_speed / attribute.BaseValue;
+        }
+        #endregion
+    }
+
+    public class UpdateLocomotorSpeedRateTask : Task<LogicWorld>
+    {
+        LocomotorComponent m_component;
+
+        public void Construct(LocomotorComponent component)
+        {
+            m_component = component;
+        }
+
+        public override void OnReset()
+        {
+            m_component = null;
+        }
+
+        public override void Run(LogicWorld logic_world, FixPoint current_time, FixPoint delta_time)
+        {
+            m_component.UpdateLocomotorSpeedRate();
+        }
     }
 }

@@ -18,15 +18,9 @@ namespace Combat
         string m_animation_path;
         string m_locomotor_animation_name = AnimationName.RUN;
         //运行数据
-        float m_animation_speed = 1.0f;
+        float m_locomotor_animation_speed = 1.0f;
         string m_current_animation;
         Animation m_unity_animation_cmp;
-
-        public float AniamtionSpeed
-        {
-            get { return m_animation_speed; }
-            set { m_animation_speed = value; }
-        }
 
         public string CurrentAnimation
         {
@@ -37,6 +31,22 @@ namespace Combat
         {
             get { return m_locomotor_animation_name; }
             set { m_locomotor_animation_name = value; }
+        }
+
+        public float LocomotorAnimationSpeed
+        {
+            get { return m_locomotor_animation_speed; }
+            set
+            {
+                m_locomotor_animation_speed = value;
+                if (m_current_animation == m_locomotor_animation_name)
+                {
+                    AnimationState state = m_unity_animation_cmp[m_current_animation];
+                    if (state == null)
+                        return;
+                    state.speed = m_locomotor_animation_speed;
+                }
+            }
         }
 
         public bool LocomotorAnimationNameChanged
@@ -63,6 +73,10 @@ namespace Combat
                 return;
             m_unity_animation_cmp = child.GetComponent<Animation>();
             PlayerAnimation(AnimationName.IDLE, true);
+
+            LocomotorComponent locomotor_componnet = GetLogicEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
+            if (locomotor_componnet != null)
+                m_locomotor_animation_speed = (float)locomotor_componnet.LocomotorSpeedRate;
         }
 
         protected override void OnDestruct()
@@ -71,24 +85,30 @@ namespace Combat
         }
         #endregion
 
-        public void PlayerAnimation(string animation_name, bool loop = false, float speed = -1.0f, float fade_length = 0.2f)
+        public void PlayerAnimation(string animation_name, bool loop = false, float speed = 1.0f, float fade_length = 0.2f)
         {
             AnimationState state = m_unity_animation_cmp[animation_name];
             if (state == null)
                 return;
-            state.speed = speed > 0 ? speed : m_animation_speed;
+            if (animation_name == m_locomotor_animation_name)
+                state.speed = m_locomotor_animation_speed;
+            else
+                state.speed = speed;
             state.wrapMode = loop ? WrapMode.Loop : WrapMode.Once;
             m_unity_animation_cmp.CrossFade(animation_name, fade_length);
             m_current_animation = animation_name;
         }
 
-        public void QueueAnimation(string animation_name, bool loop = false, float speed = -1.0f, float fade_length = 0.2f)
+        public void QueueAnimation(string animation_name, bool loop = false, float speed = 1.0f, float fade_length = 0.2f)
         {
             AnimationState state = m_unity_animation_cmp.CrossFadeQueued(animation_name, fade_length, QueueMode.CompleteOthers);
             if (state == null)
                 return;
             state.wrapMode = loop ? WrapMode.Loop : WrapMode.Once;
-            state.speed = speed > 0 ? speed : m_animation_speed;
+            if (animation_name == m_locomotor_animation_name)
+                state.speed = m_locomotor_animation_speed;
+            else
+                state.speed = speed;
         }
     }
 }
