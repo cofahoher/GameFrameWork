@@ -125,7 +125,9 @@ namespace Combat
                 .REGISTER_VARIABLE<int>("collision_sound", null, "m_collision_sound_cfgid");
             REGISTER_COMPONENT<SimpleAIComponent>()
                 .REGISTER_VARIABLE<FixPoint>("guard_range", null, "m_guard_range");
-            REGISTER_COMPONENT<SkillManagerComponent>();
+            REGISTER_COMPONENT<SkillManagerComponent>()
+                .REGISTER_VARIABLE<FixPoint>("attack_speed_rate", "VID_AttackSpeedRate", "AttackSpeedRate", Flag_Variable_GetSet)
+                .REGISTER_VARIABLE<FixPoint>("cooldown_reduce_rate", "VID_CooldownReduceRate", "CooldownReduceRate", Flag_Variable_GetSet);
             REGISTER_COMPONENT<SpawnObjectComponent>()
                 .REGISTER_VARIABLE<int>("object_type_id", null, "m_object_type_id")
                 .REGISTER_VARIABLE<int>("object_proto_id", null, "m_object_proto_id")

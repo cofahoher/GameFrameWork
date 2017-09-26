@@ -313,7 +313,7 @@ namespace Combat
 
             m_definition_component.ClearTimer(SkillTimer.ExpirationTimer);
             if (m_definition_component.CastingTime > FixPoint.Zero)
-                m_definition_component.StartCastingTimer(start_time);
+                m_definition_component.StartCastingTimer(start_time, m_owner_component);
             else
                 PostActivate(start_time);
 
@@ -323,7 +323,8 @@ namespace Combat
             if (m_definition_component.m_casting_animation != null)
             {
                 PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
-                msg.Construct(GetOwnerEntityID(), m_definition_component.m_casting_animation, null, true);
+                FixPoint speed = m_definition_component.NormalAttack ? m_owner_component.AttackSpeedRate : FixPoint.One;
+                msg.Construct(GetOwnerEntityID(), m_definition_component.m_casting_animation, null, true, speed);
                 GetLogicWorld().AddRenderMessage(msg);
             }
 #endif
@@ -360,10 +361,10 @@ namespace Combat
                     cmp.PostActivate(start_time);
             }
 
-            m_definition_component.StartCooldownTimer(start_time);
+            m_definition_component.StartCooldownTimer(start_time, m_owner_component);
 
             if (m_definition_component.InflictTime > FixPoint.Zero)
-                m_definition_component.StartInflictingTimer(start_time);
+                m_definition_component.StartInflictingTimer(start_time, m_owner_component);
             else
                 Inflict(start_time);
 
@@ -372,10 +373,11 @@ namespace Combat
             if (main_animation != null)
             {
                 PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+                FixPoint speed = m_definition_component.NormalAttack ? m_owner_component.AttackSpeedRate : FixPoint.One;
                 if (m_definition_component.m_expiration_animation == null)
-                    msg.Construct(GetOwnerEntityID(), main_animation, AnimationName.IDLE, true);
+                    msg.Construct(GetOwnerEntityID(), main_animation, AnimationName.IDLE, true, speed);
                 else
-                    msg.Construct(GetOwnerEntityID(), main_animation, m_definition_component.m_expiration_animation, true);
+                    msg.Construct(GetOwnerEntityID(), main_animation, m_definition_component.m_expiration_animation, true, speed);
                 GetLogicWorld().AddRenderMessage(msg);
             }
             if (m_definition_component.m_main_render_effect_cfgid > 0)
@@ -405,7 +407,7 @@ namespace Combat
             }
 
             if (m_definition_component.ExpirationTime > FixPoint.Zero)
-                m_definition_component.StartExpirationTimer(start_time);
+                m_definition_component.StartExpirationTimer(start_time, m_owner_component);
             else
                 Deactivate(false);
             return true;
@@ -558,7 +560,7 @@ namespace Combat
             if (m_definition_component.m_main_animation != null)
             {
                 PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
-                msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true);
+                msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true, FixPoint.One);
                 GetLogicWorld().AddRenderMessage(msg);
             }
 #endif

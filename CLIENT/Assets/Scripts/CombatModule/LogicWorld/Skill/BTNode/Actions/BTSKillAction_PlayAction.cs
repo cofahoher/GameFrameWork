@@ -40,7 +40,7 @@ namespace Combat
 #if COMBAT_CLIENT
             Skill skill = GetOwnerSkill();
             PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
-            msg.Construct(skill.GetOwnerEntityID(), m_animation, m_next_animation, m_loop);
+            msg.Construct(skill.GetOwnerEntityID(), m_animation, m_next_animation, m_loop, FixPoint.One);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
         }

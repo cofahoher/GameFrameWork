@@ -593,6 +593,54 @@ namespace Combat
     public partial class SkillManagerComponent
     {
         public const int ID = 2066148607;
+        public const int VID_AttackSpeedRate = -1123623710;
+        public const int VID_CooldownReduceRate = 1277043480;
+
+        static SkillManagerComponent()
+        {
+            ComponentTypeRegistry.RegisterVariable(VID_AttackSpeedRate, ID);
+            ComponentTypeRegistry.RegisterVariable(VID_CooldownReduceRate, ID);
+        }
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("attack_speed_rate", out value))
+                AttackSpeedRate = FixPoint.Parse(value);
+            if (variables.TryGetValue("cooldown_reduce_rate", out value))
+                CooldownReduceRate = FixPoint.Parse(value);
+        }
+
+        public override bool GetVariable(int id, out FixPoint value)
+        {
+            switch (id)
+            {
+            case VID_AttackSpeedRate:
+                value = AttackSpeedRate;
+                return true;
+            case VID_CooldownReduceRate:
+                value = CooldownReduceRate;
+                return true;
+            default:
+                value = FixPoint.Zero;
+                return false;
+            }
+        }
+
+        public override bool SetVariable(int id, FixPoint value)
+        {
+            switch (id)
+            {
+            case VID_AttackSpeedRate:
+                AttackSpeedRate = value;
+                return true;
+            case VID_CooldownReduceRate:
+                CooldownReduceRate = value;
+                return true;
+            default:
+                return false;
+            }
+        }
     }
 
     public partial class SpawnObjectComponent

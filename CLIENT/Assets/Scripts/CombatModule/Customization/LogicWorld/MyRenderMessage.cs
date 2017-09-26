@@ -22,6 +22,8 @@ namespace Combat
         public const int TakeDamage = 140;                //TakeDamageRenderMessage
         public const int ChangeLevel = 150;               //SimpleRenderMessage
         public const int AddExperience = 151;             //SimpleRenderMessage
+        public const int ChangeAttackSpeed = 160;         //SimpleRenderMessage
+        public const int ChangeCooldDownReduce = 161;     //SimpleRenderMessage
 
         public const int PlayerChangeFaction = 1001;      //SimpleRenderMessage
         public const int ChangeCameraPosition = 1002;     //ChangeCameraPositionRenderMessage
@@ -189,14 +191,14 @@ namespace Combat
         public string m_animation_name;
         public string m_animation_name_2;
         public bool m_loop;
-        public float m_speed;
+        public FixPoint m_speed;
 
         public PlayAnimationRenderMessage()
         {
             m_type = RenderMessageType.PlayAnimation;
         }
 
-        public void Construct(int entity_id, string animation_name, string animation_name_2 = null, bool loop = false,float speed = -1.0f)
+        public void Construct(int entity_id, string animation_name, string animation_name_2, bool loop, FixPoint speed)
         {
             m_entity_id = entity_id;
             m_animation_name = animation_name;

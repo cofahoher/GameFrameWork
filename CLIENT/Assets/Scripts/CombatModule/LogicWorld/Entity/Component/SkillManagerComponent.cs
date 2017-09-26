@@ -7,6 +7,8 @@ namespace Combat
         public const int DEFAULT_SKILL_INDEX = 0;
 
         //运行数据
+        FixPoint m_attack_speed_rate = FixPoint.One;
+        FixPoint m_cooldown_reduce_rate = FixPoint.Zero;
         LocomotorComponent m_locomotor_cmp;
         SignalListenerContext m_listener_context;
         SortedDictionary<int, int> m_index2id = new SortedDictionary<int, int>();
@@ -15,6 +17,72 @@ namespace Combat
         int m_active_block_count = 0;
         List<int> m_active_skill_ids = new List<int>();
         List<Skill> m_skill_to_interrupt = new List<Skill>();//ZZWTODO C#无法一边遍历一边删除的容器
+
+        #region GETTER/SETTER
+        public FixPoint AttackSpeedRate
+        {
+            get { return m_attack_speed_rate; }
+            set
+            {
+                if (m_attack_speed_rate == value)
+                    return;
+                m_attack_speed_rate = value;
+                SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+                for (int i = 0; i < m_active_skill_ids.Count; ++i)
+                {
+                    Skill skill = skill_manager.GetObject(m_active_skill_ids[i]);
+                    if (skill == null)
+                        continue;
+                    SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
+                    if (!def_cmp.NormalAttack)
+                        continue;
+                    FixPoint current_time = GetLogicWorld().GetCurrentTime();
+                    SkillTimer timer = def_cmp.GetTimer(SkillTimer.CooldownTimer);
+                    timer.ChangeUpdateRate(current_time, m_attack_speed_rate);
+                    timer = def_cmp.GetTimer(SkillTimer.CastingTimer);
+                    timer.ChangeUpdateRate(current_time, m_attack_speed_rate);
+                    timer = def_cmp.GetTimer(SkillTimer.InflictingTimer);
+                    timer.ChangeUpdateRate(current_time, m_attack_speed_rate);
+                    timer = def_cmp.GetTimer(SkillTimer.ExpirationTimer);
+                    timer.ChangeUpdateRate(current_time, m_attack_speed_rate);
+                }
+                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.ChangeAttackSpeed, GetOwnerEntityID());
+            }
+        }
+
+        public FixPoint CooldownReduceRate
+        {
+            get { return m_cooldown_reduce_rate; }
+            set
+            {
+                if (m_cooldown_reduce_rate == value)
+                    return;
+                m_cooldown_reduce_rate = value;
+
+                SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+                for (int i = 0; i < m_active_skill_ids.Count; ++i)
+                {
+                    Skill skill = skill_manager.GetObject(m_active_skill_ids[i]);
+                    if (skill == null)
+                        continue;
+                    SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
+                    if (def_cmp.NormalAttack)
+                        continue;
+                    SkillTimer timer = def_cmp.GetTimer(SkillTimer.CooldownTimer);
+                    timer.ChangeUpdateRate(GetCurrentTime(), CoolDownSpeedUpRate);
+                }
+                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.ChangeCooldDownReduce, GetOwnerEntityID());
+            }
+        }
+
+        public FixPoint CoolDownSpeedUpRate
+        {
+            get
+            {
+                return FixPoint.One / (FixPoint.One - m_cooldown_reduce_rate);
+            }
+        }
+        #endregion
 
         #region 初始化/销毁
         public void AddSkill(int index, int skill_cfgid)

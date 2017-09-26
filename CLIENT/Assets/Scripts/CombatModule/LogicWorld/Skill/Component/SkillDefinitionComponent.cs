@@ -197,28 +197,42 @@ namespace Combat
             return m_timers[skill_timer_type].Active;
         }
 
-        public void StartCooldownTimer(FixPoint start_time)
+        public void StartCooldownTimer(FixPoint start_time, SkillManagerComponent manager)
         {
             SkillTimer timer = m_timers[SkillTimer.CooldownTimer];
-            timer.Start(start_time, CooldownTime);
+            FixPoint update_rate;
+            if (m_normal_attack)
+                update_rate = manager.AttackSpeedRate;
+            else
+                update_rate = manager.CoolDownSpeedUpRate;
+            timer.Start(start_time, CooldownTime, update_rate);
         }
 
-        public void StartCastingTimer(FixPoint start_time)
+        public void StartCastingTimer(FixPoint start_time, SkillManagerComponent manager)
         {
             SkillTimer timer = m_timers[SkillTimer.CastingTimer];
-            timer.Start(start_time, CastingTime);
+            FixPoint update_rate = FixPoint.One;
+            if (m_normal_attack)
+                update_rate = manager.AttackSpeedRate;
+            timer.Start(start_time, CastingTime, update_rate);
         }
 
-        public void StartInflictingTimer(FixPoint start_time)
+        public void StartInflictingTimer(FixPoint start_time, SkillManagerComponent manager)
         {
             SkillTimer timer = m_timers[SkillTimer.InflictingTimer];
-            timer.Start(start_time, InflictTime);
+            FixPoint update_rate = FixPoint.One;
+            if (m_normal_attack)
+                update_rate = manager.AttackSpeedRate;
+            timer.Start(start_time, InflictTime, update_rate);
         }
 
-        public void StartExpirationTimer(FixPoint start_time)
+        public void StartExpirationTimer(FixPoint start_time, SkillManagerComponent manager)
         {
             SkillTimer timer = m_timers[SkillTimer.ExpirationTimer];
-            timer.Start(start_time, ExpirationTime);
+            FixPoint update_rate = FixPoint.One;
+            if (m_normal_attack)
+                update_rate = manager.AttackSpeedRate;
+            timer.Start(start_time, ExpirationTime, update_rate);
         }
 
         public FixPoint GetLowestCountdownTimerRemaining()
