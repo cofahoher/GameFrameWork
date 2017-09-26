@@ -54,6 +54,7 @@ namespace Combat
         #region 初始化/销毁
         protected override void PostInitializeComponent()
         {
+            m_previous_max_speed = m_current_max_speed;
             CalculateLocomotorSpeedrate();
         }
 
@@ -209,9 +210,11 @@ namespace Combat
         {
             if (m_update_locomotor_speed_rate_task != null)
                 return;
+            var schedeler = GetLogicWorld().GetTaskScheduler();
+            if (schedeler == null)
+                return; //ZZWTOOD 世界销毁的时候
             m_update_locomotor_speed_rate_task = LogicTask.Create<UpdateLocomotorSpeedRateTask>();
             m_update_locomotor_speed_rate_task.Construct(this);
-            var schedeler = GetLogicWorld().GetTaskScheduler();
             schedeler.Schedule(m_update_locomotor_speed_rate_task, GetCurrentTime(), FixPoint.PrecisionFP);
         }
 

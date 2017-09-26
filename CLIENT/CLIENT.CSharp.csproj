@@ -17,7 +17,8 @@
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>Android:13</UnityBuildTarget>
     <UnityVersion>5.5.2p3</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -491,7 +492,9 @@
     <None Include="Assets\AstarPathfindingProject\Readme_upgrading.txt" />
     <None Include="Assets\AstarPathfindingProject\link.xml" />
     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
-    <None Include="Assets\Resources\Config\AttributeConfig.xml" />
+    <None Include="Assets\Resources\Config\AttributeConfig.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Assets\Resources\Config\DamageConfig.xml" />
     <None Include="Assets\Resources\Config\EffectCategoryConfig.xml" />
     <None Include="Assets\Resources\Config\EffectConfig.xml" />
