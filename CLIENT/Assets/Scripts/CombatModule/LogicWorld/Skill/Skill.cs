@@ -299,9 +299,10 @@ namespace Combat
                 return false;
 
             Deactivate(false);
-            SetSkillActive(true);
 
             AdjustDirection();
+            
+            SetSkillActive(true);
 
             var enumerator = m_components.GetEnumerator();
             while (enumerator.MoveNext())
