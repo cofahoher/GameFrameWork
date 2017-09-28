@@ -151,6 +151,17 @@ namespace Combat
         public override void OnDeletePending()
         {
             //StateSystem.DEAD_STATE
+
+            SkillManager skill_manager = GetLogicWorld().GetSkillManager();
+            var enumerator = m_index2id.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Skill skill = skill_manager.GetObject(enumerator.Current.Value);
+                if (skill == null)
+                    continue;
+                if (skill.GetDefinitionComponent().StartsActive)
+                    skill.Interrupt();
+            }
         }
 
         public override void OnResurrect()
@@ -241,6 +252,8 @@ namespace Combat
         public void OnSkillActivated(Skill skill)
         {
             SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
+            if (def_cmp.StartsActive)
+                return;
             if (def_cmp.BlocksMovementWhenActive)
             {
                 ++m_move_block_count;
@@ -280,6 +293,8 @@ namespace Combat
         public void OnSkillDeactivated(Skill skill)
         {
             SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
+            if (def_cmp.StartsActive)
+                return;
             if (def_cmp.BlocksMovementWhenActive)
             {
                 --m_move_block_count;
