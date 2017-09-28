@@ -19,6 +19,7 @@ namespace Combat
             Register<BTParallelSequence>();
             Register<BTSelector>();
             Register<BTSequence>();
+            Register<BTConditionRandom>();
             Register<BTFalse>();
             Register<BTNot>();
             Register<BTPulse>();
@@ -90,6 +91,18 @@ namespace Combat
     public partial class BTSequence
     {
         public const int ID = -1293308154;
+    }
+
+    public partial class BTConditionRandom
+    {
+        public const int ID = -1875971325;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("pass_rate", out value))
+                m_pass_rate = FixPoint.Parse(value);
+        }
     }
 
     public partial class BTFalse

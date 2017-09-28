@@ -33,6 +33,8 @@ namespace Combat
             REGISTER_BTNODE<BTSelector>();
             REGISTER_BTNODE<BTSequence>();
             //Conditions
+            REGISTER_BTNODE<BTConditionRandom>()
+                .REGISTER_VARIABLE<FixPoint>("pass_rate", "m_pass_rate");
             //Decorators
             REGISTER_BTNODE<BTFalse>();
             REGISTER_BTNODE<BTNot>();
