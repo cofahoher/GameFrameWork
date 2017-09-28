@@ -140,6 +140,10 @@ namespace Combat
         #endregion
 
         #region GETTER/SETTER
+        public int SourceEntityID
+        {
+            get { return m_param.m_source_entity_id; }
+        }
         #endregion
 
         public bool UpdateProjectile(FixPoint delta_time)

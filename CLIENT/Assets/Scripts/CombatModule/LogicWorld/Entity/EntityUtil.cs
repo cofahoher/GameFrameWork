@@ -145,6 +145,14 @@ namespace Combat
             Vector3FP birth_position = new Vector3FP(source_pos.x + xz_offset.x, source_pos.y + position_offset.y, source_pos.z + xz_offset.z);
             BirthPositionInfo birth_info = new BirthPositionInfo(birth_position.x, birth_position.y, birth_position.z, angle, owner_position_cmp.GetCurrentSceneSpace());
 
+            ProjectileComponent owner_entity_projectile_component = owner_entity.GetComponent(ProjectileComponent.ID) as ProjectileComponent;
+            if (owner_entity_projectile_component != null)
+            {
+                Entity original_owner = logic_world.GetEntityManager().GetObject(owner_entity_projectile_component.SourceEntityID);
+                if (original_owner != null)
+                    owner_entity = original_owner;
+            }
+
             Player owner_player = owner_entity.GetOwnerPlayer();
             ObjectCreationContext object_context = new ObjectCreationContext();
             object_context.m_object_proxy_id = owner_player.ProxyID;

@@ -48,7 +48,13 @@ namespace Combat
         {
             --m_remain_count;
             Entity owner_entity = GetOwnerEntity();
-            EntityUtil.CreateEntityForSkillAndEffect(this, owner_entity, null, m_offset, FixPoint.Zero, m_object_type_id, m_object_proto_id, m_object_life_time, null);
+            Entity created = EntityUtil.CreateEntityForSkillAndEffect(this, owner_entity, null, m_offset, FixPoint.Zero, m_object_type_id, m_object_proto_id, m_object_life_time, null);
+            if (created != null && m_revert_when_unapply)
+            {
+                if (m_objects_id == null)
+                    m_objects_id = new List<int>();
+                m_objects_id.Add(created.ID);
+            }
         }
 
         public override void Unapply()
