@@ -5,7 +5,7 @@ namespace Combat
     public class BTContext : IRecyclable
     {
         LogicWorld m_logic_world;
-        BeahviorTree m_tree;
+        BehaviorTree m_tree;
         Dictionary<int, FixPoint> m_data = new Dictionary<int, FixPoint>();
         Dictionary<int, object> m_data_ext = new Dictionary<int, object>();
         BTActionBuffer m_action_buffer = new BTActionBuffer();
@@ -18,7 +18,7 @@ namespace Combat
             m_action_buffer.Clear();
         }
 
-        public void Construct(LogicWorld logic_world, BeahviorTree tree)
+        public void Construct(LogicWorld logic_world, BehaviorTree tree)
         {
             m_logic_world = logic_world;
             m_tree = tree;
@@ -29,7 +29,7 @@ namespace Combat
             return m_logic_world;
         }
 
-        public BeahviorTree GetBeahviorTree()
+        public BehaviorTree GetBeahviorTree()
         {
             return m_tree;
         }

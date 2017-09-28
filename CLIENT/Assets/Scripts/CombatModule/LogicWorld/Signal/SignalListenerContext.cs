@@ -8,6 +8,7 @@ namespace Combat
         PlayerComponent,
         EntityComponent,
         EffectComponent,
+        BehaviorTree,
     }
 
     public class SignalListenerContext : IRecyclable
@@ -62,6 +63,15 @@ namespace Combat
             return context;
         }
 
+        public static SignalListenerContext CreateForBehaviorTree(int listener_id, int tree_id)
+        {
+            SignalListenerContext context = RecyclableObject.Create<SignalListenerContext>();
+            context.m_context_type = SignalListenerContextType.BehaviorTree;
+            context.m_listener_id = listener_id;
+            context.m_object_id = tree_id;
+            return context;
+        }
+
         public static void Recycle(SignalListenerContext instance)
         {
             RecyclableObject.Recycle(instance);
@@ -100,6 +110,13 @@ namespace Combat
                     if (component == null)
                         return null;
                     return component as ISignalListener;
+                }
+            case SignalListenerContextType.BehaviorTree:
+                {
+                    BehaviorTree tree = logic_world.GetBehaviorTree(m_object_id);
+                    if (tree == null)
+                        return null;
+                    return tree;
                 }
             default:
                 return null;

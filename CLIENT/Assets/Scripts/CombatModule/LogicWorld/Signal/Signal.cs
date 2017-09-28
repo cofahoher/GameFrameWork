@@ -18,6 +18,8 @@ namespace Combat
         public const int TakeDamage = 1003;
         public const int Die = 1004;
         public const int ChangeLevel = 1005;
+        public const int CastNormalAttack = 1006;
+        public const int CastSkill = 1007;
 
     }
 

@@ -54,6 +54,7 @@ namespace Combat
         protected IDGenerator m_signal_listener_id_generator;
         protected IDGenerator m_attribute_modifier_id_generator;
         protected IDGenerator m_damage_modifier_id_generator;
+        protected IDGenerator m_behavior_tree_id_generator;
 
         protected PlayerManager m_player_manager;
         protected EntityManager m_entity_manager;
@@ -65,6 +66,8 @@ namespace Combat
         protected RegionCallbackManager m_region_callback_manager;
 
         protected ICommandHandler m_command_handler;
+
+        protected Dictionary<int, BehaviorTree> m_active_behavior_trees = new Dictionary<int, BehaviorTree>();
 
         public LogicWorld()
         {
@@ -89,6 +92,7 @@ namespace Combat
             m_signal_listener_id_generator = new IDGenerator(IDGenerator.SIGNAL_LISTENER_FIRST_ID);
             m_attribute_modifier_id_generator = new IDGenerator(IDGenerator.ATTRIBUTE_MODIFIER_FIRST_ID);
             m_damage_modifier_id_generator = new IDGenerator(IDGenerator.DAMAGE_MODIFIER_FIRST_ID);
+            m_behavior_tree_id_generator = new IDGenerator(IDGenerator.BEHAVIOR_TREE_FIRST_ID);
 
             m_player_manager = new PlayerManager(this);
             m_entity_manager = new EntityManager(this);
@@ -162,6 +166,8 @@ namespace Combat
             m_attribute_modifier_id_generator = null;
             m_damage_modifier_id_generator.Destruct();
             m_damage_modifier_id_generator = null;
+            m_behavior_tree_id_generator.Destruct();
+            m_behavior_tree_id_generator = null;
 
             m_entity_manager.Destruct();
             m_entity_manager = null;
@@ -182,6 +188,8 @@ namespace Combat
 
             m_command_handler.Destruct();
             m_command_handler = null;
+            
+            m_active_behavior_trees.Clear();
 
             DestroyAllGeneralComponent();
         }
@@ -413,6 +421,26 @@ namespace Combat
         public int GenerateDamageModifierID()
         {
             return m_damage_modifier_id_generator.GenID();
+        }
+        #endregion
+
+        #region BehaviorTree
+        public void RegisterBehaviorTree(BehaviorTree tree)
+        {
+            tree.RegisterID = m_behavior_tree_id_generator.GenID();
+            m_active_behavior_trees[tree.RegisterID] = tree;
+        }
+
+        public void UnregisterBehaviorTree(BehaviorTree tree)
+        {
+            m_active_behavior_trees.Remove(tree.RegisterID);
+        }
+
+        public BehaviorTree GetBehaviorTree(int id)
+        {
+            BehaviorTree tree;
+            m_active_behavior_trees.TryGetValue(id, out tree);
+            return tree;
         }
         #endregion
 

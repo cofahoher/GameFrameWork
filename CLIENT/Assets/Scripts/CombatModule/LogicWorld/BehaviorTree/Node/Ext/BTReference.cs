@@ -8,7 +8,7 @@ namespace Combat
         protected int m_reference_tree_id = -1;
 
         //运行数据
-        private BeahviorTree m_reference_tree = null;
+        private BehaviorTree m_reference_tree = null;
 
         public BTReference(int reference_tree_id)
         {

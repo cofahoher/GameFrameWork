@@ -37,6 +37,7 @@ namespace Combat
                 }
             }
         }
+
         public virtual void InitializeVariable(Dictionary<string, string> variables)
         {
         }
@@ -100,6 +101,13 @@ namespace Combat
                 return m_context.GetLogicWorld();
             else
                 return null;
+        }
+
+        public Entity GetOwnerEntity()
+        {
+            if (m_context == null)
+                return null;
+            return m_context.GetData<Entity>(BTContextKey.OwnerEntity);
         }
 
         public AIComponent GetAIComponent()

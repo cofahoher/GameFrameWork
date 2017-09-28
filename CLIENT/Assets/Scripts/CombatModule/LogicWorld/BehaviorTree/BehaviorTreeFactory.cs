@@ -4,8 +4,8 @@ namespace Combat
 {
     class BehaviorTreeCache
     {
-        public BeahviorTree m_proto = null;
-        public List<BeahviorTree> m_cache = new List<BeahviorTree>();
+        public BehaviorTree m_proto = null;
+        public List<BehaviorTree> m_cache = new List<BehaviorTree>();
     }
 
     public class BehaviorTreeFactory : Singleton<BehaviorTreeFactory>
@@ -27,13 +27,13 @@ namespace Combat
             m_config_provider = config_provider;
         }
 
-        public BeahviorTree CreateBehaviorTree(int bt_config_id)
+        public BehaviorTree CreateBehaviorTree(int bt_config_id)
         {
             bool is_new = false;
             BehaviorTreeCache pool = GetPool(bt_config_id, out is_new);
             if (pool == null || pool.m_proto == null)
                 return null;
-            BeahviorTree instance = null;
+            BehaviorTree instance = null;
             int cache_count = pool.m_cache.Count;
             if (cache_count > 0)
             {
@@ -47,7 +47,7 @@ namespace Combat
             return instance;
         }
 
-        public void RecycleBehaviorTree(BeahviorTree instance)
+        public void RecycleBehaviorTree(BehaviorTree instance)
         {
             if (instance == null)
                 return;
@@ -77,7 +77,7 @@ namespace Combat
             }
             for (int i = 0; i < cache_cnt; ++i)
             {
-                BeahviorTree instance = pool.m_proto.CloneBehaviorTree();
+                BehaviorTree instance = pool.m_proto.CloneBehaviorTree();
                 pool.m_cache.Add(instance);
             }
         }
@@ -90,7 +90,7 @@ namespace Combat
             {
                 is_new = true;
                 pool = new BehaviorTreeCache();
-                BeahviorTree instance = CreateBeahviorTreeFromConfig(bt_config_id);
+                BehaviorTree instance = CreateBeahviorTreeFromConfig(bt_config_id);
                 if (instance == null)
                 {
                     LogWrapper.LogError("BehaviorTreeFactory, INVALID ID, ", bt_config_id);
@@ -105,18 +105,20 @@ namespace Combat
             return pool;
         }
 
-        BeahviorTree CreateBeahviorTreeFromConfig(int bt_config_id)
+        BehaviorTree CreateBeahviorTreeFromConfig(int bt_config_id)
         {
             BehaviorTreeData data = m_config_provider.GetBehaviorTreeData(bt_config_id);
             if (data == null)
                 return null;
-            BeahviorTree tree = new BeahviorTree(bt_config_id);
+            BehaviorTree tree = new BehaviorTree(bt_config_id);
             for (int i = 0; i < data.m_entry_nodes.Count; ++i)
             {
                 BTNode entry_node = CreateBTNode(data.m_entry_nodes[i]);
                 if (entry_node != null)
                     tree.AddEntry(entry_node, data.m_entry_nodes[i].m_extra_data);
             }
+            tree.SetSignalData(data.m_signal_datas);
+            tree.SetEventData(data.m_event_datas);
             return tree;
         }
 

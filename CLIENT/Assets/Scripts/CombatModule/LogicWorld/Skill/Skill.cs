@@ -369,6 +369,11 @@ namespace Combat
             else
                 Inflict(start_time);
 
+            if (m_definition_component.NormalAttack)
+                GetOwnerEntity().SendSignal(SignalType.CastNormalAttack);
+            else if (!m_definition_component.StartsActive)
+                GetOwnerEntity().SendSignal(SignalType.CastSkill);
+
             string main_animation = m_definition_component.GenerateMainActionNameLogicly();
 #if COMBAT_CLIENT
             if (main_animation != null)

@@ -146,6 +146,8 @@ namespace Combat
             REGISTER_COMPONENT<BehaviorTreeSkillComponent>()
                 .REGISTER_VARIABLE<int>("bahavior_tree_id", null, "m_bahavior_tree_id");
             REGISTER_COMPONENT<CreateObjectSkillComponent>()
+                .REGISTER_VARIABLE<FixPoint>("delay_time", null, "m_delay_time")
+                .REGISTER_VARIABLE<int>("render_effect", null, "m_render_effect_cfgid")
                 .REGISTER_VARIABLE<int>("object_type_id", null, "m_object_type_id")
                 .REGISTER_VARIABLE<int>("object_proto_id", null, "m_object_proto_id")
                 .REGISTER_VARIABLE<FixPoint>("object_life_time", null, "m_object_life_time")

@@ -2,22 +2,26 @@
 using System.Collections.Generic;
 namespace Combat
 {
-    public class BeahviorTree : BTNode, IRecyclable
+    public class BehaviorTree : BTNode, IRecyclable, ISignalListener
     {
         //配置数据
         int m_config_id = 0;
         List<BehaviorTreeEntryNodeExtraData> m_entries = new List<BehaviorTreeEntryNodeExtraData>();
+        List<BehaviorTreeSignalData> m_signal_datas = null; //ZZWTODO
+        List<BehaviorTreeEventData> m_event_datas = null; //ZZWTODO
         //运行数据
         int m_current_running_entry_index = -1;
-        BeahviorTreeTask m_task = null;
+        BehaviorTreeTask m_task = null;
+        int m_register_id = 0;
+        SignalListenerContext m_listener_context;
 
         #region 创建
-        public BeahviorTree(int config_id)
+        public BehaviorTree(int config_id)
         {
             m_config_id = config_id;
         }
 
-        public BeahviorTree(BeahviorTree prototype)
+        public BehaviorTree(BehaviorTree prototype)
             : base(prototype)
         {
             m_config_id = prototype.m_config_id;
@@ -35,9 +39,24 @@ namespace Combat
             }
             if (m_task == null)
             {
-                m_task = LogicTask.Create<BeahviorTreeTask>();
+                m_task = LogicTask.Create<BehaviorTreeTask>();
                 m_task.Construct(this);
             }
+        }
+
+        public void Active()
+        {
+            if (m_signal_datas == null || m_signal_datas.Count == 0)
+                return;
+            if (m_context == null)
+                return;
+            Entity owner = m_context.GetData<Entity>(BTContextKey.OwnerEntity);
+            if (owner == null)
+                return;
+            m_context.GetLogicWorld().RegisterBehaviorTree(this);
+            m_listener_context = SignalListenerContext.CreateForBehaviorTree(GetLogicWorld().GenerateSignalListenerID(), m_register_id);
+            for (int i = 0; i < m_signal_datas.Count; ++i)
+                owner.AddListener(m_signal_datas[i].m_signal_id, m_listener_context);
         }
 
         public override void ClearRunningTrace()
@@ -53,6 +72,16 @@ namespace Combat
 
         public override void ResetNode()
         {
+            if (m_listener_context != null)
+            {
+                Entity owner = m_context.GetData<Entity>(BTContextKey.OwnerEntity);
+                for (int i = 0; i < m_signal_datas.Count; ++i)
+                    owner.RemoveListener(m_signal_datas[i].m_signal_id, m_listener_context.ID);
+                SignalListenerContext.Recycle(m_listener_context);
+                m_listener_context = null;
+                m_context.GetLogicWorld().UnregisterBehaviorTree(this);
+                m_register_id = 0;
+            }
             ClearRunningTrace();
             base.ResetNode();
             if (m_context != null)
@@ -75,9 +104,9 @@ namespace Combat
             ResetNode();
         }
 
-        public BeahviorTree CloneBehaviorTree()
+        public BehaviorTree CloneBehaviorTree()
         {
-            BeahviorTree clone = Clone() as BeahviorTree;
+            BehaviorTree clone = Clone() as BehaviorTree;
             return clone;
         }
 
@@ -85,6 +114,16 @@ namespace Combat
         {
             m_entries.Add(entry_data);
             AddChild(node);
+        }
+
+        public void SetSignalData(List<BehaviorTreeSignalData> signal_datas)
+        {
+            m_signal_datas = signal_datas;
+        }
+
+        public void SetEventData(List<BehaviorTreeEventData> event_datas)
+        {
+            m_event_datas = event_datas;
         }
         #endregion
 
@@ -102,6 +141,26 @@ namespace Combat
                     return FixPoint.MinusOne;
                 return m_entries[m_current_running_entry_index].m_update_interval;
             }
+        }
+        public int RegisterID
+        {
+            get { return m_register_id; }
+            set { m_register_id = value; }
+        }
+        #endregion
+
+        #region ISignalListener
+        public void ReceiveSignal(ISignalGenerator generator, int signal_type, System.Object signal = null)
+        {
+            for (int i = 0; i < m_signal_datas.Count; ++i)
+            {
+                if (m_signal_datas[i].m_signal_id == signal_type)
+                    RunOnce(m_signal_datas[i].m_signal_handler);
+            }
+        }
+
+        public void OnGeneratorDestroyed(ISignalGenerator generator)
+        {
         }
         #endregion
 
@@ -183,11 +242,11 @@ namespace Combat
         }
     }
 
-    public class BeahviorTreeTask : Task<LogicWorld>
+    public class BehaviorTreeTask : Task<LogicWorld>
     {
-        BeahviorTree m_behavior_tree;
+        BehaviorTree m_behavior_tree;
 
-        public void Construct(BeahviorTree behavior_tree)
+        public void Construct(BehaviorTree behavior_tree)
         {
             m_behavior_tree = behavior_tree;
         }

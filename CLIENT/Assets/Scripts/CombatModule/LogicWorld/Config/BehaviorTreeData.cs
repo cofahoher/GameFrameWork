@@ -7,6 +7,8 @@ namespace Combat
         public int m_id = 0;
         public string m_description;
         public List<BehaviorTreeEntryNodeData> m_entry_nodes = new List<BehaviorTreeEntryNodeData>();
+        public List<BehaviorTreeSignalData> m_signal_datas;
+        public List<BehaviorTreeEventData> m_event_datas;
     }
 
     public class BehaviorTreeNodeData
@@ -26,5 +28,17 @@ namespace Combat
     {
         public BehaviorTreeEntryNodeExtraData m_extra_data = new BehaviorTreeEntryNodeExtraData();
         public string m_description;
+    }
+
+    public class BehaviorTreeSignalData
+    {
+        public int m_signal_id = 0;
+        public int m_signal_handler = 0;
+    }
+
+    public class BehaviorTreeEventData
+    {
+        public int m_event_id = 0;
+        public int m_event_handler = 0;
     }
 }

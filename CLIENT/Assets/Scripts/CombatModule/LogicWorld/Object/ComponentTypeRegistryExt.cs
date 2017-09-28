@@ -713,6 +713,10 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
+            if (variables.TryGetValue("delay_time", out value))
+                m_delay_time = FixPoint.Parse(value);
+            if (variables.TryGetValue("render_effect", out value))
+                m_render_effect_cfgid = int.Parse(value);
             if (variables.TryGetValue("object_type_id", out value))
                 m_object_type_id = int.Parse(value);
             if (variables.TryGetValue("object_proto_id", out value))

@@ -11,7 +11,7 @@ namespace Combat
         int m_bahavior_tree_id = 0;
 
         //运行数据
-        BeahviorTree m_behavior_tree = null;
+        BehaviorTree m_behavior_tree = null;
 
         public override void InitializeComponent()
         {
@@ -23,6 +23,7 @@ namespace Combat
                 context.SetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider, this);
                 context.SetData<Entity>(BTContextKey.OwnerEntity, GetOwnerEntity());
                 context.SetData<EffectComponent>(BTContextKey.OwnerEffectComponent, this);
+                m_behavior_tree.Active();
             }
         }
 
