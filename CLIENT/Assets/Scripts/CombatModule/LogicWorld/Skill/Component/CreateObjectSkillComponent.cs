@@ -161,9 +161,12 @@ namespace Combat
                         angle_offset = -angle_offset;
                 }
             }
-            SkillDefinitionComponent definition_component = owner_skill.GetDefinitionComponent();
-            if (definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
-                m_offset.z = definition_component.ExternalVector.Length();
+            if (projectile_target == null)
+            {
+                SkillDefinitionComponent definition_component = owner_skill.GetDefinitionComponent();
+                if (definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
+                    m_offset.z = definition_component.ExternalVector.Length();
+            }
             EntityUtil.CreateEntityForSkillAndEffect(this, owner_entity, projectile_target, m_offset, angle_offset, m_object_type_id, m_object_proto_id, m_object_life_time, m_generator);
         }
     }
