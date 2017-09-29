@@ -1039,6 +1039,10 @@ namespace Combat
             string value;
             if (variables.TryGetValue("generator_cfgid", out value))
                 m_generator_cfgid = int.Parse(value);
+            if (variables.TryGetValue("combo_count", out value))
+                m_combo_count = int.Parse(value);
+            if (variables.TryGetValue("combo_interval", out value))
+                m_combo_interval = FixPoint.Parse(value);
         }
     }
 

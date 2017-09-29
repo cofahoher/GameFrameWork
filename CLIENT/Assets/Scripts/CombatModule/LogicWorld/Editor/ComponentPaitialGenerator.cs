@@ -228,7 +228,9 @@ namespace Combat
             REGISTER_COMPONENT<AddStateEffectComponent>()
                 .REGISTER_VARIABLE_CRC<int>("state", null, "m_state");
             REGISTER_COMPONENT<ApplyGeneratorEffectComponent>()
-                .REGISTER_VARIABLE<int>("generator_cfgid", null, "m_generator_cfgid");
+                .REGISTER_VARIABLE<int>("generator_cfgid", null, "m_generator_cfgid")
+                .REGISTER_VARIABLE<int>("combo_count", null, "m_combo_count")
+                .REGISTER_VARIABLE<FixPoint>("combo_interval", null, "m_combo_interval");
             REGISTER_COMPONENT<BehaviorTreeEffectComponent>()
                 .REGISTER_VARIABLE<int>("bahavior_tree_id", null, "m_bahavior_tree_id");
             REGISTER_COMPONENT<ChangePlayerFactionEffectComponent>()
