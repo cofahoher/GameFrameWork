@@ -260,7 +260,8 @@ namespace Combat
             REGISTER_COMPONENT<EffectDefinitionComponent>()
                 .REGISTER_VARIABLE_CRC<int>("category", "VID_Category", "m_category", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("conflict_id", "VID_ConflictID", "m_conflict_id", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration", Flag_Attribute_Get);
+                .REGISTER_VARIABLE<Formula>("duration", "VID_Duration", "m_duration", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<int>("render_effect", null, "m_render_effect_cfgid");
             REGISTER_COMPONENT<HealEffectComponent>();
             REGISTER_COMPONENT<KillOwnerEffectComponent>();
             REGISTER_COMPONENT<KnockbackEffectComponent>()

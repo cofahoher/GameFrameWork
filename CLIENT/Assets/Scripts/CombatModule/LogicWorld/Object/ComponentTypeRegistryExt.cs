@@ -1151,6 +1151,8 @@ namespace Combat
                 m_conflict_id = (int)CRC.Calculate(value);
             if (variables.TryGetValue("duration", out value))
                 m_duration.Compile(value);
+            if (variables.TryGetValue("render_effect", out value))
+                m_render_effect_cfgid = int.Parse(value);
         }
 
 #region GETTER/SETTER

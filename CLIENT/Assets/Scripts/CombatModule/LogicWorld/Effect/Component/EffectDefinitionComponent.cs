@@ -8,6 +8,7 @@ namespace Combat
         int m_category = 0;
         int m_conflict_id = 0;
         Formula m_duration = RecyclableObject.Create<Formula>(); //0非持续，-1永远有效
+        int m_render_effect_cfgid = 0;
         //运行数据
         int m_original_entity_id = 0;
         int m_source_entity_id = 0;
@@ -92,6 +93,30 @@ namespace Combat
             var schedeler = GetLogicWorld().GetTaskScheduler();
             FixPoint delay = m_expiration_time - current_time;
             schedeler.Schedule(m_task, current_time, delay);
+        }
+
+        public override void Apply()
+        {
+#if COMBAT_CLIENT
+            if (m_render_effect_cfgid > 0)
+            {
+                PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
+                msg.ConstructAsPlay(GetOwnerEntityID(), m_render_effect_cfgid, FixPoint.MinusOne);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
+        }
+
+        public override void Unapply()
+        {
+#if COMBAT_CLIENT
+            if (m_render_effect_cfgid > 0)
+            {
+                PlayRenderEffectMessage stop_msg = RenderMessage.Create<PlayRenderEffectMessage>();
+                stop_msg.ConstructAsStop(GetOwnerEntityID(), m_render_effect_cfgid);
+                GetLogicWorld().AddRenderMessage(stop_msg);
+            }
+#endif
         }
     }
 }
