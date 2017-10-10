@@ -62,7 +62,7 @@ namespace Combat
 
             #region Entity
             REGISTER_COMPONENT<AIComponent>()
-                .REGISTER_VARIABLE<int>("bahavior_tree_id", null, "m_bahavior_tree_id");
+                .REGISTER_VARIABLE<int>("ai_tree_id", null, "m_bahavior_tree_id");
             REGISTER_COMPONENT<AttributeManagerComponent>();
             REGISTER_COMPONENT<DamagableComponent>()
                 .REGISTER_VARIABLE<FixPoint>("max_health", "VID_MaxHealth", "MaxHealth", Flag_Variable_GetSet)

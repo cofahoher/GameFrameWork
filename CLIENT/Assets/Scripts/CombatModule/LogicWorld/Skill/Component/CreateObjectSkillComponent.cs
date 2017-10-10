@@ -5,7 +5,7 @@ namespace Combat
     public partial class CreateObjectSkillComponent : SkillComponent, INeedTaskService
     {
         public static readonly int ComboType_Time = (int)CRC.Calculate("Time");
-        public static readonly int ComboType_Angle = (int)CRC.Calculate("Angle");
+        public static readonly int ComboType_Angle = (int)CRC.Calculate("Angle"); //以m_offset为中心，根据当前朝向，散射多个物体
 
         //配置数据
         FixPoint m_delay_time = FixPoint.Zero;
@@ -87,7 +87,7 @@ namespace Combat
                     schedeler.Schedule(m_task, GetCurrentTime(), m_combo_interval, m_combo_interval);
                 }
             }
-            else if (m_combo_type_crc == ComboType_Angle)
+            else if (m_combo_type_crc == ComboType_Angle || m_combo_type_crc == ComboType_Circle)
             {
                 for (int i = 0; i < m_combo_attack_cnt; ++i)
                     CreateOneObject(i);
@@ -145,7 +145,9 @@ namespace Combat
             Entity owner_entity = GetOwnerEntity();
             Skill owner_skill = GetOwnerSkill();
             Target projectile_target = owner_skill.GetMajorTarget();
+            Vector3FP position_offset = m_offset;
             FixPoint angle_offset = FixPoint.Zero;
+
             if (m_combo_type_crc == ComboType_Angle)
             {
                 if (m_combo_attack_cnt % 2 == 1)
@@ -161,13 +163,41 @@ namespace Combat
                         angle_offset = -angle_offset;
                 }
             }
+            else if (m_combo_type_crc == ComboType_Circle)
+            {
+                if (m_combo_interval == FixPoint.Zero)
+                {
+                    FixPoint rotate_radian = FixPoint.TwoPi / (FixPoint)m_combo_attack_cnt * (FixPoint)index;
+                    position_offset = position_offset.YRotate(rotate_radian);
+                }
+                else
+                {
+                    if (m_combo_attack_cnt % 2 == 1)
+                    {
+                        angle_offset = m_combo_interval * (FixPoint)((index + 1) / 2);
+                        if (index % 2 != 0)
+                            angle_offset = -angle_offset;
+                    }
+                    else
+                    {
+                        angle_offset = m_combo_interval * ((FixPoint)(index / 2) + FixPoint.One / FixPoint.Two);
+                        if (index % 2 != 0)
+                            angle_offset = -angle_offset;
+                    }
+                    FixPoint rotate_radian = FixPoint.Degree2Radian(angle_offset);
+                    position_offset = position_offset.YRotate(rotate_radian);
+                    angle_offset = FixPoint.Zero;
+                }
+            }
+
             if (projectile_target == null)
             {
                 SkillDefinitionComponent definition_component = owner_skill.GetDefinitionComponent();
                 if (definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
-                    m_offset.z = definition_component.ExternalVector.Length();
+                    position_offset.z = definition_component.ExternalVector.Length();
             }
-            EntityUtil.CreateEntityForSkillAndEffect(this, owner_entity, projectile_target, m_offset, angle_offset, m_object_type_id, m_object_proto_id, m_object_life_time, m_generator);
+
+            EntityUtil.CreateEntityForSkillAndEffect(this, owner_entity, projectile_target, position_offset, angle_offset, m_object_type_id, m_object_proto_id, m_object_life_time, m_generator);
         }
     }
 }

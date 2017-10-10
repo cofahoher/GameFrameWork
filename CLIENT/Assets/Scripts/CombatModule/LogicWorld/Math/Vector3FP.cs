@@ -225,6 +225,13 @@ namespace Combat
             return x == FixPoint.Zero && y == FixPoint.Zero && z == FixPoint.Zero;
         }
 
+        public Vector3FP YRotate(FixPoint radian)
+        {
+            FixPoint sin_v = FixPoint.Sin(radian);
+            FixPoint cos_v = FixPoint.Cos(radian);
+            return new Vector3FP(cos_v * x - sin_v * z, y, sin_v * x + cos_v * z);
+        }
+
         public static Vector3FP Reflect(ref Vector3FP I, ref Vector3FP N)
         {
             return I - I.Dot(ref N) * N * FixPoint.Two;

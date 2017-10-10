@@ -15,6 +15,18 @@ namespace Combat
         #region 初始化/销毁
         public override void InitializeComponent()
         {
+            ObjectProtoData proto_data = ParentObject.GetCreationContext().m_proto_data;
+            if (proto_data != null)
+            {
+                var variables = proto_data.m_component_variables;
+                if (variables != null)
+                {
+                    string value;
+                    if (variables.TryGetValue("ai_tree_id", out value))
+                        m_bahavior_tree_id = int.Parse(value);
+                }
+            }
+
             m_behavior_tree = BehaviorTreeFactory.Instance.CreateBehaviorTree(m_bahavior_tree_id);
             if (m_behavior_tree != null)
             {

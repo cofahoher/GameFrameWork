@@ -227,6 +227,13 @@ namespace Combat
             return I - I.Dot(ref N) * N * FixPoint.Two;
         }
 
+        public Vector2FP YRotate(FixPoint radian)
+        {
+            FixPoint sin_v = FixPoint.Sin(radian);
+            FixPoint cos_v = FixPoint.Cos(radian);
+            return new Vector2FP(cos_v * x - sin_v * z, sin_v * x + cos_v * z);
+        }
+
         public FixPoint ToDegree()
         {
             //返回绕Y轴的旋转角度

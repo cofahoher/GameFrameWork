@@ -171,7 +171,7 @@ namespace Combat
         public override void InitializeVariable(Dictionary<string, string> variables)
         {
             string value;
-            if (variables.TryGetValue("bahavior_tree_id", out value))
+            if (variables.TryGetValue("ai_tree_id", out value))
                 m_bahavior_tree_id = int.Parse(value);
         }
     }
