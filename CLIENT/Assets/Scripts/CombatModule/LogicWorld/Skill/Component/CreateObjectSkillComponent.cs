@@ -6,6 +6,7 @@ namespace Combat
     {
         public static readonly int ComboType_Time = (int)CRC.Calculate("Time");
         public static readonly int ComboType_Angle = (int)CRC.Calculate("Angle"); //以m_offset为中心，根据当前朝向，散射多个物体
+        public static readonly int ComboType_Circle = (int)CRC.Calculate("Circle");  //以m_offset为对称轴，创建多个物体环绕主体，没有m_combo_interval是均匀环绕
 
         //配置数据
         FixPoint m_delay_time = FixPoint.Zero;
