@@ -9,7 +9,7 @@ namespace Combat
         int m_object_proto_id = 0;
         FixPoint m_object_life_time = FixPoint.Zero;
         Vector3FP m_offset;
-        int m_object_count = 1;
+        int m_object_count = 1;  //-1表示无限
         FixPoint m_interval = FixPoint.Zero;
         bool m_revert_when_unapply = true;
 
@@ -32,7 +32,7 @@ namespace Combat
         {
             m_remain_count = m_object_count;
             CreateOneObject();
-            if (m_object_count > 1)
+            if (m_object_count > 1 || m_object_count == -1)
             {
                 if (m_task == null)
                 {
@@ -46,7 +46,8 @@ namespace Combat
 
         public void CreateOneObject()
         {
-            --m_remain_count;
+            if (m_remain_count > 0)
+                --m_remain_count;
             Entity owner_entity = GetOwnerEntity();
             Entity created = EntityUtil.CreateEntityForSkillAndEffect(this, owner_entity, null, m_offset, FixPoint.Zero, m_object_type_id, m_object_proto_id, m_object_life_time, null);
             if (created != null && m_revert_when_unapply)
@@ -68,7 +69,7 @@ namespace Combat
         public void OnTaskService(FixPoint delta_time)
         {
             CreateOneObject();
-            if (m_remain_count <= 0)
+            if (m_remain_count == 0)
             {
                 if (m_task != null)
                     m_task.Cancel();

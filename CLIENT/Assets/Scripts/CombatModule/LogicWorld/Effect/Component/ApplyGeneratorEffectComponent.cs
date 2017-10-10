@@ -6,7 +6,7 @@ namespace Combat
     {
         //配置数据
         int m_generator_cfgid = 0;
-        int m_combo_count = 1;
+        int m_combo_count = 1;  //-1表示无限
         FixPoint m_combo_interval = FixPoint.One;
 
         //运行数据
@@ -46,7 +46,7 @@ namespace Combat
                 return;
             m_remain_count = m_combo_count;
             ApplyOnce();
-            if (m_combo_count > 1)
+            if (m_combo_count > 1 || m_combo_count == -1)
             {
                 if (m_combo_task == null)
                 {
@@ -60,7 +60,8 @@ namespace Combat
 
         void ApplyOnce()
         {
-            --m_remain_count;
+            if (m_remain_count > 0)
+                --m_remain_count;
             if (m_remain_count == 0)
                 CancelTask();
             Entity owner = GetOwnerEntity();
