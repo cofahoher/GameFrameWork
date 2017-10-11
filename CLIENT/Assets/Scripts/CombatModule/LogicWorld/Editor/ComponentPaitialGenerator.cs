@@ -115,7 +115,7 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<ProjectileComponent>()
                 .REGISTER_VARIABLE<FixPoint>("speed", "VID_Speed", "m_speed", Flag_Attribute_Get)
-                .REGISTER_VARIABLE<FixPoint>("lifetime", null, "m_lifetime")
+                .REGISTER_VARIABLE<FixPoint>("life_time", null, "m_life_time")
                 .REGISTER_VARIABLE_CRC<int>("track_mode", "VID_TrackMode", "m_track_mode", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("trajectory_type", "VID_TrajectoryType", "m_trajectory_type", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<FixPoint>("extra_hight", null, "m_extra_hight")

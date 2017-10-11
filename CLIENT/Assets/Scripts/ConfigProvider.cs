@@ -530,7 +530,7 @@ namespace Combat
             proto_data = new ObjectProtoData();
             proto_data.m_name = "missile_entity";
             proto_data.m_component_variables["speed"] = "15";
-            proto_data.m_component_variables["lifetime"] = "10";
+            proto_data.m_component_variables["life_time"] = "10";
             proto_data.m_component_variables["asset"] = "Objects/3D/zzw_missile_entity";
             m_object_proto_data[103001] = proto_data;
 

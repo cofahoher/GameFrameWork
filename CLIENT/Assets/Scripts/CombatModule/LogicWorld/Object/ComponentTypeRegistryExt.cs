@@ -542,8 +542,8 @@ namespace Combat
             string value;
             if (variables.TryGetValue("speed", out value))
                 m_speed = FixPoint.Parse(value);
-            if (variables.TryGetValue("lifetime", out value))
-                m_lifetime = FixPoint.Parse(value);
+            if (variables.TryGetValue("life_time", out value))
+                m_life_time = FixPoint.Parse(value);
             if (variables.TryGetValue("track_mode", out value))
                 m_track_mode = (int)CRC.Calculate(value);
             if (variables.TryGetValue("trajectory_type", out value))

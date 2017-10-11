@@ -40,7 +40,7 @@ namespace Combat
 
         //配置数据
         FixPoint m_speed;  //有速度按速度飞行，没速度是固定时间到达目标
-        FixPoint m_lifetime = FixPoint.Ten;
+        FixPoint m_life_time = FixPoint.Ten;
         int m_track_mode = 0;
         int m_trajectory_type = 0;
         FixPoint m_extra_hight = FixPoint.Zero;
@@ -73,8 +73,8 @@ namespace Combat
             string value;
             if (variables.TryGetValue("speed", out value))
                 m_speed = FixPoint.Parse(value);
-            if (variables.TryGetValue("lifetime", out value))
-                m_lifetime = FixPoint.Parse(value);
+            if (variables.TryGetValue("life_time", out value))
+                m_life_time = FixPoint.Parse(value);
             if (variables.TryGetValue("track_mode", out value))
                 m_track_mode = (int)CRC.Calculate(value);
             if (variables.TryGetValue("trajectory_type", out value))
@@ -118,7 +118,7 @@ namespace Combat
                 m_param.m_bezier_b.y += m_extra_hight;
             }
             if (m_param.m_life_time <= FixPoint.Zero)
-                m_param.m_life_time = m_lifetime;
+                m_param.m_life_time = m_life_time;
 
             PositionComponent position_component = ParentObject.GetComponent(PositionComponent.ID) as PositionComponent;
             GridGraph grid_graph = position_component.GetGridGraph();
@@ -323,10 +323,10 @@ namespace Combat
         FixPoint m_remain_time;
         bool m_lock = false;
 
-        public void Construct(ProjectileComponent component, FixPoint lifetime)
+        public void Construct(ProjectileComponent component, FixPoint life_time)
         {
             m_component = component;
-            m_remain_time = lifetime;
+            m_remain_time = life_time;
         }
 
         public override void OnReset()
