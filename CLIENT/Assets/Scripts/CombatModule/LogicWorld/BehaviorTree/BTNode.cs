@@ -10,6 +10,25 @@ namespace Combat
         Running,
     }
 
+    /*
+     * ClearRunningTrace
+     * ResetRuntimeData
+     */
+
+    /*
+     * 写一个行为树节点的注意点
+     * 
+     * 1、严格区分配置的数据和运行的数据，从配置得来的数据，不可以修改
+     * 
+     * 2、除了实现默认构造函数，还需要实现拷贝构造函数，并且保证这两种构造函数是等价的
+     * 
+     * 3、各主要节点类型都在ResetNode()是调用了ResetRuntimeData()，需要实现这个函数，清理所有运行数据到初始状态，这是行为树回收重用是调用的
+     * 
+     * 4、实现ClearRunningTrace()，这是行为树切换运行entry时调用的
+     * 
+     * 总结：两个构造函数，一个ResetRuntimeData()，一个ClearRunningTrace()
+     * 
+     * */
     public abstract class BTNode : IExpressionVariableProvider
     {
         static public readonly FixPoint LOGIC_UPDATE_INTERVAL = Component.LOGIC_UPDATE_INTERVAL;

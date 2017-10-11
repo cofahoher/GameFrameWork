@@ -159,7 +159,7 @@ namespace Combat
                 }
                 else
                 {
-                    angle_offset = m_combo_interval * ((FixPoint)(index / 2) + FixPoint.One / FixPoint.Two);
+                    angle_offset = m_combo_interval * ((FixPoint)(index / 2) + FixPoint.Half);
                     if (index % 2 != 0)
                         angle_offset = -angle_offset;
                 }
@@ -181,7 +181,7 @@ namespace Combat
                     }
                     else
                     {
-                        angle_offset = m_combo_interval * ((FixPoint)(index / 2) + FixPoint.One / FixPoint.Two);
+                        angle_offset = m_combo_interval * ((FixPoint)(index / 2) + FixPoint.Half);
                         if (index % 2 != 0)
                             angle_offset = -angle_offset;
                     }

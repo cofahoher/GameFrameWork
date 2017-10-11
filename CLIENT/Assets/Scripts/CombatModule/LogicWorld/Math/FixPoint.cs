@@ -95,6 +95,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     public static readonly FixPoint MinusOne = new FixPoint(-ONE);
     public static readonly FixPoint Two = new FixPoint(ONE * 2L);
     public static readonly FixPoint Half = One / Two;
+    public static readonly FixPoint Quarter = Half / Two;
     public static readonly FixPoint Ten = new FixPoint(ONE * 10L);
     public static readonly FixPoint Hundred = new FixPoint(ONE * 100L);
     public static readonly FixPoint Thousand = new FixPoint(ONE * 1000L);
