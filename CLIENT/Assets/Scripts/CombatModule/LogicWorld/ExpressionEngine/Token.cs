@@ -19,6 +19,20 @@ namespace Combat
         RIGHT_BRACKET,
         PERIOD,
         COMMA,
+
+        EQUAL,
+        EQUAL_EQUAL,
+        NOT_EQUAL,
+        GREATER,
+        GREATER_EQUAL,
+        LESS,
+        LESS_EQUAL,
+
+        NOT,
+        AND,
+        OR,
+        AND_BITWISE,
+        OR_BITWISE,
 	    
 	    SINE,
 	    COSINE,
@@ -158,6 +172,60 @@ namespace Combat
             case ',':
                 m_type = TokenType.COMMA;
                 text_buffer.NextChar();
+                break;
+            case '=':
+                m_type = TokenType.EQUAL;
+                ch = text_buffer.NextChar();
+                if (ch == '=')
+                {
+                    m_type = TokenType.EQUAL_EQUAL;
+                    text_buffer.NextChar();
+                }
+                break;
+            case '!':
+                m_type = TokenType.NOT;
+                ch = text_buffer.NextChar();
+                if (ch == '=')
+                {
+                    m_type = TokenType.NOT_EQUAL;
+                    text_buffer.NextChar();
+                }
+                break;
+            case '>':
+                m_type = TokenType.GREATER;
+                ch = text_buffer.NextChar();
+                if (ch == '=')
+                {
+                    m_type = TokenType.GREATER_EQUAL;
+                    text_buffer.NextChar();
+                }
+                break;
+            case '<':
+                m_type = TokenType.LESS;
+                ch = text_buffer.NextChar();
+                if (ch == '=')
+                {
+                    m_type = TokenType.LESS_EQUAL;
+                    text_buffer.NextChar();
+                }
+                break;
+            case '&':
+                m_type = TokenType.AND_BITWISE;
+                ch = text_buffer.NextChar();
+                if (ch == '&')
+                {
+                    m_type = TokenType.AND;
+                    text_buffer.NextChar();
+                }
+                break;
+            case '|':
+                m_type = TokenType.OR_BITWISE;
+                ch = text_buffer.NextChar();
+                if (ch == '|')
+                {
+                    m_type = TokenType.OR;
+                    text_buffer.NextChar();
+                }
                 break;
             default:
                 LogWrapper.LogError("Expression: SymbolToken.Get(), illegal symbol, index = ", text_buffer.CurrentIndex, ", char = ", text_buffer.Char());

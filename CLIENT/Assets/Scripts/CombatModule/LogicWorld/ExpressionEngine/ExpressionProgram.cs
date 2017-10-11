@@ -155,6 +155,87 @@ namespace Combat
                     var1 = stack.Pop();
                     stack.Push(FixPoint.Clamp(var1, var2, var3));
                     break;
+                case OperationCode.EQUAL:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 == var2)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.NOT_EQUAL:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 != var2)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.GREATER:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 > var2)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.GREATER_EQUAL:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 >= var2)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.LESS:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 < var2)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.LESS_EQUAL:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 <= var2)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.AND:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 != FixPoint.Zero && var2 != FixPoint.Zero)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.OR:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 != FixPoint.Zero || var2 != FixPoint.Zero)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.NOT:
+                    var1 = stack.Pop();
+                    if (var1 == FixPoint.Zero)
+                        stack.Push(FixPoint.One);
+                    else
+                        stack.Push(FixPoint.Zero);
+                    break;
+                case OperationCode.AND_BITWISE:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    stack.Push(var1 & var2);
+                    break;
+                case OperationCode.OR_BITWISE:
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    stack.Push(var1 | var2);
+                    break;
                 default:
                     break;
                 }
@@ -171,6 +252,19 @@ namespace Combat
             SUBTRACT,
             MULTIPLY,
             DIVIDE,
+
+            EQUAL,
+            NOT_EQUAL,
+            GREATER,
+            GREATER_EQUAL,
+            LESS,
+            LESS_EQUAL,
+
+            NOT,   
+            AND,
+            OR,
+            AND_BITWISE,
+            OR_BITWISE,
 
             SIN,
             COS,
@@ -194,6 +288,42 @@ namespace Combat
 
         void ParseExpression()
         {
+            ParseSimpleExpression();
+            OperationCode comparison_op = OperationCode.END;
+            switch (m_token_type)
+            {
+            case TokenType.EQUAL:
+            case TokenType.EQUAL_EQUAL:
+                comparison_op = OperationCode.EQUAL;
+                break;
+            case TokenType.NOT_EQUAL:
+                comparison_op = OperationCode.NOT_EQUAL;
+                break;
+            case TokenType.GREATER:
+                comparison_op = OperationCode.GREATER;
+                break;
+            case TokenType.GREATER_EQUAL:
+                comparison_op = OperationCode.GREATER_EQUAL;
+                break;
+            case TokenType.LESS:
+                comparison_op = OperationCode.LESS;
+                break;
+            case TokenType.LESS_EQUAL:
+                comparison_op = OperationCode.LESS_EQUAL;
+                break;
+            default:
+                break;
+            }
+            if (comparison_op != OperationCode.END)
+            {
+                GetToken();
+                ParseSimpleExpression();
+                AppendOperation(comparison_op);
+            }
+        }
+
+        void ParseSimpleExpression()
+        {
             OperationCode unary_op = OperationCode.END;
             if (m_token_type == TokenType.PLUS)
             {
@@ -207,11 +337,29 @@ namespace Combat
             ParseTerm();
             if (unary_op != OperationCode.END)
                 AppendOperation(unary_op);
-            while (m_token_type == TokenType.PLUS || m_token_type == TokenType.MINUS)
+
+            while (true)
             {
-                OperationCode op_code = OperationCode.ADD;
-                if (m_token_type == TokenType.MINUS)
+                OperationCode op_code = OperationCode.END;
+                switch (m_token_type)
+                {
+                case TokenType.PLUS:
+                    op_code = OperationCode.ADD;
+                    break;
+                case TokenType.MINUS:
                     op_code = OperationCode.SUBTRACT;
+                    break;
+                case TokenType.OR:
+                    op_code = OperationCode.OR;
+                    break;
+                case TokenType.OR_BITWISE:
+                    op_code = OperationCode.OR_BITWISE;
+                    break;
+                default:
+                    break;
+                }
+                if (op_code == OperationCode.END)
+                    break;
                 GetToken();
                 ParseTerm();
                 AppendOperation(op_code);
@@ -221,11 +369,28 @@ namespace Combat
         void ParseTerm()
         {
             ParseFactor();
-            while (m_token_type == TokenType.STAR || m_token_type == TokenType.SLASH)
+            while (true)
             {
-                OperationCode op_code = OperationCode.MULTIPLY;
-                if (m_token_type == TokenType.SLASH)
+                OperationCode op_code = OperationCode.END;
+                switch (m_token_type)
+                {
+                case TokenType.STAR:
+                    op_code = OperationCode.MULTIPLY;
+                    break;
+                case TokenType.SLASH:
                     op_code = OperationCode.DIVIDE;
+                    break;
+                case TokenType.AND:
+                    op_code = OperationCode.AND;
+                    break;
+                case TokenType.AND_BITWISE:
+                    op_code = OperationCode.AND_BITWISE;
+                    break;
+                default:
+                    break;
+                }
+                if (op_code == OperationCode.END)
+                    break;
                 GetToken();
                 ParseFactor();
                 AppendOperation(op_code);
@@ -269,6 +434,11 @@ namespace Combat
                 }
                 AppendVariable(m_raw_variable);
                 m_raw_variable.Clear();
+                break;
+            case TokenType.NOT:
+		        GetToken();
+		        ParseFactor();
+                AppendOperation(OperationCode.NOT);
                 break;
             case TokenType.SINE:
                 ParseBuildInFunction(OperationCode.SIN, 1);

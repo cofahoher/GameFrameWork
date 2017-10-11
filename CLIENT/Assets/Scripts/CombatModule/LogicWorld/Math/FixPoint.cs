@@ -218,6 +218,14 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         return new FixPoint(x.m_raw_value % y.m_raw_value);
     }
+    public static FixPoint operator &(FixPoint x, FixPoint y)
+    {
+        return new FixPoint(x.m_raw_value & y.m_raw_value);
+    }
+    public static FixPoint operator |(FixPoint x, FixPoint y)
+    {
+        return new FixPoint(x.m_raw_value | y.m_raw_value);
+    }
 
     public static FixPoint operator <<(FixPoint fp, int bits)
     {
