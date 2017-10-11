@@ -59,6 +59,8 @@ namespace Combat
                 Object owner_entity = GetOwnerEntity();
                 if (owner_entity != null)
                     return owner_entity.GetVariable(variable, index + 1);
+                else
+                    return FixPoint.Zero;
             }
             return base.GetVariable(variable, index);
         }

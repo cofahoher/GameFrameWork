@@ -33,6 +33,8 @@ namespace Combat
             REGISTER_BTNODE<BTSelector>();
             REGISTER_BTNODE<BTSequence>();
             //Conditions
+            REGISTER_BTNODE<BTConditionExpression>()
+                .REGISTER_VARIABLE<string>("expression", "m_expression");
             REGISTER_BTNODE<BTConditionRandom>()
                 .REGISTER_VARIABLE<FixPoint>("pass_rate", "m_pass_rate");
             //Decorators
@@ -57,7 +59,16 @@ namespace Combat
 
             #region 偏游戏无关的
             //AI Conditions
+            REGISTER_BTNODE<BTAICondition_HasTarget>();
             //AI Actions
+            REGISTER_BTNODE<BTAIAction_GatherTarget>()
+                .REGISTER_VARIABLE_CRC<int>("gathering_type", "m_target_gathering_param.m_type")
+                .REGISTER_VARIABLE<FixPoint>("gathering_param1", "m_target_gathering_param.m_param1")
+                .REGISTER_VARIABLE<FixPoint>("gathering_param2", "m_target_gathering_param.m_param2")
+                .REGISTER_VARIABLE_CRC<int>("gathering_faction", "m_target_gathering_param.m_faction")
+                .REGISTER_VARIABLE_CRC<int>("gathering_category", "m_target_gathering_param.m_category");
+            REGISTER_BTNODE<BTAIAction_MoveToTarget>()
+                .REGISTER_VARIABLE<FixPoint>("range", "m_range");
             //Skill Conditions
             //Skill Actions
             REGISTER_BTNODE<BTSKillAction_ApplyDamageToTargets>()

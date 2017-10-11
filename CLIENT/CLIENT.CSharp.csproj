@@ -228,9 +228,10 @@
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\MyRenderWorld.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Customization\RenderWorld\RenderMessageProcessor.cs" />
     <Compile Include="Assets\Scripts\CombatModule\Empty.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\Actions\BTAIAction_XxxYyy.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\Actions\BTAIAction_GatherTarget.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\Actions\BTAIAction_MoveToTarget.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\BTAIContextKey.cs" />
-    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\Conditions\BTAICondition_XxxYyy.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\AI\Conditions\BTAICondition_HasTarget.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\Attribute.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeDefinition.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Attribute\AttributeModifier.cs" />
@@ -254,6 +255,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTSelector.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Composites\BTSequence.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Conditions\BTCondition.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Conditions\BTConditionExpression.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Conditions\BTConditionRandom.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Decorators\BTDecorator.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Decorators\BTFalse.cs" />

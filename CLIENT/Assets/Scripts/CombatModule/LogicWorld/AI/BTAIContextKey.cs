@@ -4,5 +4,6 @@ namespace Combat
 {
     public partial class BTContextKey
     {
+        public static readonly int CurrentTargetID = (int)CRC.Calculate("CurrentTargetID");
     }
 }

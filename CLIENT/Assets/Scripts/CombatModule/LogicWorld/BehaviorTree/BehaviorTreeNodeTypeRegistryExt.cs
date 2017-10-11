@@ -19,6 +19,7 @@ namespace Combat
             Register<BTParallelSequence>();
             Register<BTSelector>();
             Register<BTSequence>();
+            Register<BTConditionExpression>();
             Register<BTConditionRandom>();
             Register<BTFalse>();
             Register<BTNot>();
@@ -27,6 +28,9 @@ namespace Combat
             Register<BTReference>();
             Register<BTAction_Test>();
             Register<BTAction_Test2>();
+            Register<BTAICondition_HasTarget>();
+            Register<BTAIAction_GatherTarget>();
+            Register<BTAIAction_MoveToTarget>();
             Register<BTSKillAction_ApplyDamageToTargets>();
             Register<BTSKillAction_ApplyEffectToTargets>();
             Register<BTSKillAction_CreateObject>();
@@ -91,6 +95,18 @@ namespace Combat
     public partial class BTSequence
     {
         public const int ID = -1293308154;
+    }
+
+    public partial class BTConditionExpression
+    {
+        public const int ID = -1692172909;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("expression", out value))
+                m_expression = value;
+        }
     }
 
     public partial class BTConditionRandom
@@ -162,6 +178,43 @@ namespace Combat
     public partial class BTAction_Test2
     {
         public const int ID = -89988531;
+    }
+
+    public partial class BTAICondition_HasTarget
+    {
+        public const int ID = 464427932;
+    }
+
+    public partial class BTAIAction_GatherTarget
+    {
+        public const int ID = 698100534;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("gathering_type", out value))
+                m_target_gathering_param.m_type = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_param1", out value))
+                m_target_gathering_param.m_param1 = FixPoint.Parse(value);
+            if (variables.TryGetValue("gathering_param2", out value))
+                m_target_gathering_param.m_param2 = FixPoint.Parse(value);
+            if (variables.TryGetValue("gathering_faction", out value))
+                m_target_gathering_param.m_faction = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("gathering_category", out value))
+                m_target_gathering_param.m_category = (int)CRC.Calculate(value);
+        }
+    }
+
+    public partial class BTAIAction_MoveToTarget
+    {
+        public const int ID = 1581614629;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("range", out value))
+                m_range = FixPoint.Parse(value);
+        }
     }
 
     public partial class BTSKillAction_ApplyDamageToTargets

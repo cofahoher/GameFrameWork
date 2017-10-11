@@ -60,5 +60,28 @@ namespace Combat
                 return;
             m_behavior_tree.ClearRunningTrace();
         }
+
+        #region Variable
+        public override FixPoint GetVariable(ExpressionVariable variable, int index)
+        {
+            int vid = variable[index];
+            if (vid == ExpressionVariable.VID_Target)
+            {
+                if (m_behavior_tree == null)
+                    return FixPoint.Zero;
+                BTContext context = m_behavior_tree.Context;
+                if (context == null)
+                    return FixPoint.Zero;
+                int current_target_id = (int)(context.GetData(BTContextKey.CurrentTargetID));
+                if (current_target_id <= 0)
+                    return FixPoint.Zero;
+                Entity current_target = GetLogicWorld().GetEntityManager().GetObject(current_target_id);
+                if (current_target == null)
+                    return FixPoint.Zero;
+                return current_target.GetVariable(variable, index + 1);
+            }
+            return base.GetVariable(variable, index);
+        }
+        #endregion
     }
 }
