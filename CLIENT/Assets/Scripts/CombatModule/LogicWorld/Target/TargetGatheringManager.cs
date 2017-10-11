@@ -34,7 +34,7 @@ namespace Combat
         public FixPoint m_param2 = FixPoint.Zero;
         public int m_faction = FactionRelation.Enemy;
         public int m_category = 0;
-        //ZZWTODO 还需要别的条件：比如距离最近，血量最低；数量；是否包括自己；附近的某个友方和自己（如果有友方）
+        //ZZWTODO 还需要别的条件：比如距离最近，血量最低；数量；是否包括自己；附近的某个友方和自己（如果有友方）；还有隐身是否盖被选取的问题
         public int m_sorting_method = 0;
         public int m_max_count = -1;
 
