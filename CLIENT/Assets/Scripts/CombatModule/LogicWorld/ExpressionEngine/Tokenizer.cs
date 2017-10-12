@@ -26,8 +26,8 @@ namespace Combat
             /* 20*/Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,Error_____,/* 20*/
             /* 30*/Error_____,Error_____,WhiteSpace,Symbol____,Quote_____,Error_____,Error_____,Error_____,Symbol____,Error_____,/* 30*/
             /* 40*/Symbol____,Symbol____,Symbol____,Symbol____,Symbol____,Symbol____,Symbol____,Symbol____,Digit_____,Digit_____,/* 40*/
-            /* 50*/Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Error_____,Error_____,/* 50*/
-            /* 60*/Symbol____,Symbol____,Symbol____,Error_____,Error_____,Letter____,Letter____,Letter____,Letter____,Letter____,/* 60*/
+            /* 50*/Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Digit_____,Symbol____,Error_____,/* 50*/
+            /* 60*/Symbol____,Symbol____,Symbol____,Symbol____,Error_____,Letter____,Letter____,Letter____,Letter____,Letter____,/* 60*/
             /* 70*/Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,/* 70*/
             /* 80*/Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,Letter____,/* 80*/
             /* 90*/Letter____,Symbol____,Error_____,Symbol____,Error_____,Letter____,Error_____,Letter____,Letter____,Letter____,/* 90*/

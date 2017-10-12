@@ -54,6 +54,12 @@ public class GameGlobal : MonoBehaviour
 
     void InitializeSyncModelTest()
     {
+        string expression = "(2 > 3) ? (2 + 5) : (1 + 2)";
+        Combat.ExpressionProgram program = new Combat.ExpressionProgram();
+        program.Compile(expression);
+        FixPoint result = program.Evaluate(null);
+        LogWrapper.LogError(expression, ", EVALUATES ", result);
+
         if (m_combat_tester != null)
             return;
         //m_sync_tester = new Combat.SyncTester(this);

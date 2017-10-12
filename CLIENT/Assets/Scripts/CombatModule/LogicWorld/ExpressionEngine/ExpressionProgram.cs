@@ -236,6 +236,15 @@ namespace Combat
                     var1 = stack.Pop();
                     stack.Push(var1 | var2);
                     break;
+                case OperationCode.CONDITIONAL_EXPRESSION:
+                    var3 = stack.Pop();
+                    var2 = stack.Pop();
+                    var1 = stack.Pop();
+                    if (var1 != FixPoint.Zero)
+                        stack.Push(var2);
+                    else
+                        stack.Push(var3);
+                    break;
                 default:
                     break;
                 }
@@ -265,6 +274,8 @@ namespace Combat
             OR,
             AND_BITWISE,
             OR_BITWISE,
+
+            CONDITIONAL_EXPRESSION,
 
             SIN,
             COS,
@@ -394,6 +405,17 @@ namespace Combat
                 GetToken();
                 ParseFactor();
                 AppendOperation(op_code);
+            }
+
+            if (m_token_type == TokenType.QUESTION)
+            {
+                GetToken();
+                ParseFactor();
+                if (m_token_type != TokenType.SEMICOLON)
+                    LogWrapper.LogError("Expression: ParseTerm(), TokenType.SEMICOLON expected");
+                GetToken();
+                ParseFactor();
+                AppendOperation(OperationCode.CONDITIONAL_EXPRESSION);
             }
         }
 

@@ -19,6 +19,8 @@ namespace Combat
         RIGHT_BRACKET,
         PERIOD,
         COMMA,
+        QUESTION,
+        SEMICOLON,
 
         EQUAL,
         EQUAL_EQUAL,
@@ -171,6 +173,14 @@ namespace Combat
                 break;
             case ',':
                 m_type = TokenType.COMMA;
+                text_buffer.NextChar();
+                break;
+            case '?':
+                m_type = TokenType.QUESTION;
+                text_buffer.NextChar();
+                break;
+            case ':':
+                m_type = TokenType.SEMICOLON;
                 text_buffer.NextChar();
                 break;
             case '=':
