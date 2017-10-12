@@ -4,6 +4,7 @@ using BaseUtil;
 
 public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 {
+    public static FixPoint StringParsingPrecisionCompensation = FixPoint.Zero;
 
     [ProtoBufAttribute(Index = 1)]
     public long m_raw_value;  //ZZWTODO 为了ProtoBuf，必须public
@@ -72,6 +73,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             else
                 break;
         }
+        result += StringParsingPrecisionCompensation;
         if (sign < 0)
             result = -result;
         return result;
