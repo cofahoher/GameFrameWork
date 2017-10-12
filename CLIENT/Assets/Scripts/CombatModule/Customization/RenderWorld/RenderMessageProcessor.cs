@@ -100,18 +100,18 @@ namespace Combat
             else if (msg.m_reason == LocomoteRenderMessage.NotFromCommand)
             {
                 model_component.UpdateAngle();
-                PlayerLocomotorAnimation(render_entity);
+                PlayLocomotorAnimation(render_entity);
                 if (predic_component != null)
                     predic_component.OnLogicMove();
             }
             else if (predic_component == null || !predic_component.HasMovementPredict)
             {
                 model_component.UpdateAngle();
-                PlayerLocomotorAnimation(render_entity);
+                PlayLocomotorAnimation(render_entity);
             }
         }
 
-        void PlayerLocomotorAnimation(RenderEntity render_entity)
+        void PlayLocomotorAnimation(RenderEntity render_entity)
         {
             AnimationComponent animation_component = render_entity.GetComponent(AnimationComponent.ID) as AnimationComponent;
             if (animation_component != null)
