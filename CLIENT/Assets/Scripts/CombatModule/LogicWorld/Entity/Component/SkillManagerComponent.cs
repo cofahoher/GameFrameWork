@@ -280,7 +280,6 @@ namespace Combat
                 {
                     if (def_cmp.m_main_animation != null && m_locomotor_cmp != null)
                     {
-                        m_locomotor_cmp.StopMoving();
                         m_locomotor_cmp.BlockAnimation();
                     }
                 }
@@ -295,6 +294,7 @@ namespace Combat
             SkillDefinitionComponent def_cmp = skill.GetDefinitionComponent();
             if (def_cmp.StartsActive)
                 return;
+            bool play_idle_animation = true;
             if (def_cmp.BlocksMovementWhenActive)
             {
                 --m_move_block_count;
@@ -311,6 +311,8 @@ namespace Combat
                     PositionComponent position_component = skill.GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
                     if (position_component != null)
                         position_component.EnableRotating();
+                    if (m_locomotor_cmp != null && m_locomotor_cmp.IsMoving)
+                        position_component.SetFacing(m_locomotor_cmp.GetMovementProvider().GetCurrentDirection());
                 }
                 if (def_cmp.DeactivateWhenMoving)
                 {
@@ -319,14 +321,23 @@ namespace Combat
                 {
                     if (def_cmp.m_main_animation != null && m_locomotor_cmp != null)
                     {
-                        m_locomotor_cmp.StopMoving();
                         m_locomotor_cmp.UnblockAnimation();
+                        play_idle_animation = false;
                     }
                 }
             }
             if (def_cmp.BlocksOtherSkillsWhenActive)
                 --m_active_block_count;
             m_active_skill_ids.Remove(skill.ID);
+
+#if COMBAT_CLIENT
+            if (play_idle_animation && def_cmp.m_main_animation != null)
+            {
+                PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
+                msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true, FixPoint.One);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
         }
 
         bool IsSkillActivated(Skill skill)

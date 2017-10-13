@@ -106,5 +106,10 @@ namespace Combat
             m_target = target;
             m_range = range;
         }
+
+        public Vector3FP GetCurrentDirection()
+        {
+            return m_direction;
+        }
     }
 }

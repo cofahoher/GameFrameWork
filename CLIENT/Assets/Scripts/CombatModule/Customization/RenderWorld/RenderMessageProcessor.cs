@@ -104,6 +104,11 @@ namespace Combat
                 if (predic_component != null)
                     predic_component.OnLogicMove();
             }
+            else if (msg.m_reason == LocomoteRenderMessage.UnblockAnimation)
+            {
+                model_component.UpdateAngle();
+                PlayLocomotorAnimation(render_entity);
+            }
             else if (predic_component == null || !predic_component.HasMovementPredict)
             {
                 model_component.UpdateAngle();

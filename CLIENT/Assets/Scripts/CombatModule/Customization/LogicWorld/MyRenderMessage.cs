@@ -35,6 +35,7 @@ namespace Combat
     {
         public const int NotFromCommand = 1;
         public const int NotLocomotion = 2;
+        public const int UnblockAnimation = 3
 
         public bool m_block_animation = false;
         public int m_reason = 0;

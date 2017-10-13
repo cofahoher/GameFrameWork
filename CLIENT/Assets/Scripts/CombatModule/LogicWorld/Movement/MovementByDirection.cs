@@ -70,5 +70,10 @@ namespace Combat
         }
 
         public void FinishMovementWhenTargetInRange(PositionComponent target, FixPoint range) { }
+
+        public Vector3FP GetCurrentDirection()
+        {
+            return m_direction;
+        }
     }
 }

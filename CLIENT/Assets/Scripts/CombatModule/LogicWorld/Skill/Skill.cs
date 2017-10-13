@@ -562,14 +562,6 @@ namespace Combat
 
         void NotifySkillExpired()
         {
-#if COMBAT_CLIENT
-            if (m_definition_component.m_main_animation != null)
-            {
-                PlayAnimationRenderMessage msg = RenderMessage.Create<PlayAnimationRenderMessage>();
-                msg.Construct(GetOwnerEntityID(), AnimationName.IDLE, null, true, FixPoint.One);
-                GetLogicWorld().AddRenderMessage(msg);
-            }
-#endif
         }
         #endregion
 

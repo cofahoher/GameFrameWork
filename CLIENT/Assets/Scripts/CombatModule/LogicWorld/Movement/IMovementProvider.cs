@@ -10,6 +10,7 @@ namespace Combat
         void MoveAlongPath(List<Vector3FP> path);
         void Update(FixPoint delta_time);
         void FinishMovementWhenTargetInRange(PositionComponent target, FixPoint range);
+        Vector3FP GetCurrentDirection();
     }
 
     public interface IMovementCallback

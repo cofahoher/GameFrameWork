@@ -202,6 +202,14 @@ namespace Combat
         public void UnblockAnimation()
         {
             --m_animation_block_cnt;
+#if COMBAT_CLIENT
+            if (m_animation_block_cnt == 0 && m_is_moving)
+            {
+                LocomoteRenderMessage msg = RenderMessage.Create<LocomoteRenderMessage>();
+                msg.ConstructAsStartMoving(ParentObject.ID, IsAnimationBlocked, LocomoteRenderMessage.UnblockAnimation);
+                GetLogicWorld().AddRenderMessage(msg);
+            }
+#endif
         }
         #endregion
 
