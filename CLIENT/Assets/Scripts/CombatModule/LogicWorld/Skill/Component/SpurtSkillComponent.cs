@@ -16,6 +16,7 @@ namespace Combat
         List<int> m_collided_targets;
         ComponentCommonTaskWithLastingTime m_task;
         FixPoint m_actual_distance = FixPoint.Zero;
+        FixPoint m_actual_time = FixPoint.Zero;
 
         #region 初始化/销毁
         public override void InitializeComponent()
@@ -44,16 +45,21 @@ namespace Combat
 
         public override void Inflict(FixPoint start_time)
         {
+            Skill owner_skill = GetOwnerSkill();
+            SkillDefinitionComponent definition_component = owner_skill.GetDefinitionComponent();
             m_actual_distance = m_distance;
             if (m_distance == FixPoint.Zero)
             {
-                SkillDefinitionComponent definition_component = GetOwnerSkill().GetDefinitionComponent();
                 if (definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
                     m_actual_distance = definition_component.ExternalVector.Length();
             }
+            m_actual_time = m_time;
+            if (definition_component.NormalAttack)
+                m_actual_time = m_time / owner_skill.GetSkillManagerComponent().AttackSpeedRate;
+
             if (m_task == null)
                 m_task = LogicTask.Create<ComponentCommonTaskWithLastingTime>();
-            m_task.Construct(this, m_time);
+            m_task.Construct(this, m_actual_time);
             var schedeler = GetLogicWorld().GetTaskScheduler();
             schedeler.Schedule(m_task, GetCurrentTime(), LOGIC_UPDATE_INTERVAL, LOGIC_UPDATE_INTERVAL);
 #if COMBAT_CLIENT
@@ -101,7 +107,7 @@ namespace Combat
         {
             Entity owner_entity = GetOwnerEntity();
             PositionComponent position_component = owner_entity.GetComponent(PositionComponent.ID) as PositionComponent;
-            Vector3FP offset = position_component.Facing3D * (m_actual_distance * delta_time / m_time);
+            Vector3FP offset = position_component.Facing3D * (m_actual_distance * delta_time / m_actual_time);
             if (m_backward)
                 offset = -offset;
             Vector3FP new_position = position_component.CurrentPosition + offset;

@@ -30,6 +30,11 @@ namespace Combat
         {
             return m_definition_component;
         }
+
+        public SkillManagerComponent GetSkillManagerComponent()
+        {
+            return m_owner_component;
+        }
         #endregion
 
         #region 初始化/销毁
