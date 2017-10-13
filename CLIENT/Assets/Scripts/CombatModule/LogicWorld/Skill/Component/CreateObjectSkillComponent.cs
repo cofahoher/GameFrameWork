@@ -19,6 +19,7 @@ namespace Combat
         int m_combo_type_crc = 0;
         int m_combo_attack_cnt = 1;
         FixPoint m_combo_interval = FixPoint.Zero;
+        bool m_ignore_target = false;
 
         //运行数据
         EffectGenerator m_generator;
@@ -145,7 +146,9 @@ namespace Combat
             --m_remain_attack_cnt;
             Entity owner_entity = GetOwnerEntity();
             Skill owner_skill = GetOwnerSkill();
-            Target projectile_target = owner_skill.GetMajorTarget();
+            Target projectile_target = null;
+            if (!m_ignore_target)
+                projectile_target = owner_skill.GetMajorTarget();
             Vector3FP position_offset = m_offset;
             FixPoint angle_offset = FixPoint.Zero;
 
@@ -191,7 +194,7 @@ namespace Combat
                 }
             }
 
-            if (projectile_target == null)
+            if (projectile_target == null && !m_ignore_target)
             {
                 SkillDefinitionComponent definition_component = owner_skill.GetDefinitionComponent();
                 if (definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
