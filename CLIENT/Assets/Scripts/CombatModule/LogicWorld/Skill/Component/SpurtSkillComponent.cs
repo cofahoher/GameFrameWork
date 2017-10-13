@@ -9,11 +9,13 @@ namespace Combat
         FixPoint m_time = FixPoint.Zero;
         int m_collision_target_generator_cfgid = 0;
         bool m_backward = false;
+        bool m_enable_hide = false;
 
         //运行数据
         EffectGenerator m_collision_target_generator;
         List<int> m_collided_targets;
         ComponentCommonTaskWithLastingTime m_task;
+        FixPoint m_actual_distance = FixPoint.Zero;
 
         #region 初始化/销毁
         public override void InitializeComponent()
@@ -42,6 +44,13 @@ namespace Combat
 
         public override void Inflict(FixPoint start_time)
         {
+            m_actual_distance = m_distance;
+            if (m_distance == FixPoint.Zero)
+            {
+                SkillDefinitionComponent definition_component = GetOwnerSkill().GetDefinitionComponent();
+                if (definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
+                    m_actual_distance = definition_component.ExternalVector.Length();
+            }
             if (m_task == null)
                 m_task = LogicTask.Create<ComponentCommonTaskWithLastingTime>();
             m_task.Construct(this, m_time);
@@ -52,6 +61,12 @@ namespace Combat
             msg.ConstructAsStartMoving(GetOwnerEntityID(), true, LocomoteRenderMessage.NotLocomotion);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
+
+            if (m_enable_hide)
+            {
+                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Hide, GetOwnerEntityID());
+            }
+
         }
 
         public override void Deactivate(bool force)
@@ -61,6 +76,11 @@ namespace Combat
                 m_collision_target_generator.Deactivate();
             if (m_collided_targets != null)
                 m_collided_targets.Clear();
+
+            if (m_enable_hide)
+            {
+                GetLogicWorld().AddSimpleRenderMessage(RenderMessageType.Show, GetOwnerEntityID());
+            }
         }
 
         void StopSpurt()
@@ -81,7 +101,7 @@ namespace Combat
         {
             Entity owner_entity = GetOwnerEntity();
             PositionComponent position_component = owner_entity.GetComponent(PositionComponent.ID) as PositionComponent;
-            Vector3FP offset = position_component.Facing3D * (m_distance * delta_time / m_time);
+            Vector3FP offset = position_component.Facing3D * (m_actual_distance * delta_time / m_time);
             if (m_backward)
                 offset = -offset;
             Vector3FP new_position = position_component.CurrentPosition + offset;
