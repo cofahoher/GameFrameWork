@@ -84,7 +84,7 @@ namespace Combat
                 switch (op_code)
                 {
                 case OperationCode.PUSH_NUMBER:
-                    stack.Push(FixPoint.FromRaw(m_instructions[index]));
+                    stack.Push(FixPoint.CreateFromRaw(m_instructions[index]));
                     ++index;
                     break;
                 case OperationCode.PUSH_VARIABLE:

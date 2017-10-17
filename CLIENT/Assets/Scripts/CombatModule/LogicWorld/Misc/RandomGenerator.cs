@@ -61,7 +61,7 @@ namespace Combat
         public FixPoint Rand()
         {
             long rand = (long)(m_mt64.ExtractNumber() & MASK);
-            return FixPoint.FromRaw(rand);
+            return FixPoint.CreateFromRaw(rand);
         }
 
         public FixPoint RandBetween(FixPoint min_value, FixPoint max_value)

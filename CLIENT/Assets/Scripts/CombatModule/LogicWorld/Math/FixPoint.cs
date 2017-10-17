@@ -19,7 +19,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return new FixPoint((long)(value * ONE));
     }
 
-    public static FixPoint FromRaw(long raw_value)
+    public static FixPoint CreateFromRaw(long raw_value)
     {
         return new FixPoint(raw_value);
     }
