@@ -386,6 +386,32 @@ namespace Combat
                 if (owner_player != null)
                     return owner_player.GetVariable(variable, index + 1);
             }
+            else if (vid == ExpressionVariable.VID_Master)
+            {
+                Object master = GetOwnerEntity();
+                SummonedEntityComponent summoned_component = GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+                if (summoned_component != null)
+                {
+                    Entity entity = GetLogicWorld().GetEntityManager().GetObject(summoned_component.MasterID);
+                    if (entity != null)
+                        master = entity;
+                }
+                return master.GetVariable(variable, index + 1);
+            }
+            else if (vid == ExpressionVariable.VID_UltimateMaster)
+            {
+                Object master = GetOwnerEntity();
+                SummonedEntityComponent summoned_component = GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+                while (summoned_component != null)
+                {
+                    Entity entity = GetLogicWorld().GetEntityManager().GetObject(summoned_component.MasterID);
+                    if (entity == null)
+                        break;
+                    master = entity;
+                    summoned_component = entity.GetComponent(SummonedEntityComponent.ID) as SummonedEntityComponent;
+                }
+                return master.GetVariable(variable, index + 1);
+            }
             Object owner = GetOwnerObject();
             if (owner != null)
                 return owner.GetVariable(variable, index);

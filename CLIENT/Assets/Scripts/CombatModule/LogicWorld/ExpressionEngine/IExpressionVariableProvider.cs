@@ -7,6 +7,8 @@ namespace Combat
         public static readonly int VID_Object = (int)CRC.Calculate("Object");                   //最好别用，可能你说不清楚是下面四个中的哪个
         public static readonly int VID_Player = (int)CRC.Calculate("Player");                   //所属Player
         public static readonly int VID_Entity = (int)CRC.Calculate("Entity");                   //所属Entity
+        public static readonly int VID_Master = (int)CRC.Calculate("Master");                   //归属
+        public static readonly int VID_UltimateMaster = (int)CRC.Calculate("UltimateMaster");   //归属
         //public static readonly int VID_Skill = (int)CRC.Calculate("Skill");                     //所属Skill
         //public static readonly int VID_Effect = (int)CRC.Calculate("Effect");                   //所属Effect
         public static readonly int VID_LevelTable = (int)CRC.Calculate("LevelTable");           //等级数值表
