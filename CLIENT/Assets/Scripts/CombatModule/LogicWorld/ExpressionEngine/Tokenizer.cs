@@ -51,7 +51,7 @@ namespace Combat
         ErrorToken m_error_token = new ErrorToken();
         EofToken m_eof_token = new EofToken();
         NumberToken m_number_token = new NumberToken();
-        SymbolToken m_special_token = new SymbolToken();
+        SymbolToken m_symbol_token = new SymbolToken();
         WordToken m_word_token = new WordToken();
         StringToken m_string_token = new StringToken();
 
@@ -104,7 +104,7 @@ namespace Combat
                         m_current_token = m_number_token;
                         break;
                     case Symbol:
-                        m_current_token = m_special_token;
+                        m_current_token = m_symbol_token;
                         break;
                     case Letter:
                         m_current_token = m_word_token;
