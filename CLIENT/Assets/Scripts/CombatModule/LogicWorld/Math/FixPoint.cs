@@ -35,6 +35,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         bool fractional = false;
         FixPoint fractional_base = FixPoint.One;
         FixPoint result = FixPoint.Zero;
+        FixPoint fractional_part = FixPoint.Zero;
         for (int i = 0; i < str.Length; ++i)
         {
             char ch = str[i];
@@ -45,7 +46,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
                 if (fractional)
                 {
                     fractional_base *= FixPoint.Ten;
-                    result += FixPointDigit[num] / fractional_base;
+                    fractional_part += FixPointDigit[num] * StringParsingMagnification / fractional_base;
                 }
                 else
                 {
@@ -73,6 +74,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             else
                 break;
         }
+        result += fractional_part / StringParsingMagnification;
         result += StringParsingPrecisionCompensation;
         if (sign < 0)
             result = -result;
@@ -117,6 +119,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static readonly FixPoint RadianPerDegree = new FixPoint(1144L);
     public static readonly FixPoint DegreePerRadian = new FixPoint(3754936L);
+
+    public static FixPoint StringParsingMagnification = new FixPoint(100000000);
 
     public static explicit operator FixPoint(int value)
     {
@@ -425,6 +429,15 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         bool has_fractional_part = (value.m_raw_value & 0x000000000000FFFF) != 0;
         return has_fractional_part ? Floor(value) + One : value;
+    }
+
+    public static FixPoint Round(FixPoint value)
+    {
+        long fractional_part = value.m_raw_value & 0x000000000000FFFF;
+        if (fractional_part >= Half.m_raw_value)
+            return Floor(value) + One;
+        else
+            return Floor(value);
     }
 
     public static FixPoint Sqrt(FixPoint value)
