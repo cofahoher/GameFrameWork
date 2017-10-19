@@ -117,8 +117,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     public static readonly FixPoint TwoPi = new FixPoint(TWO_PI);
     public static readonly FixPoint InvPi = new FixPoint(INV_PI);
 
-    public static readonly FixPoint RadianPerDegree = new FixPoint(1144L);
-    public static readonly FixPoint DegreePerRadian = new FixPoint(3754936L);
+    public static readonly FixPoint RadianPerDegree = new FixPoint(RADIAN_PER_DEGREE);
+    public static readonly FixPoint DegreePerRadian = new FixPoint(DEGREE_PER_RADIAN);
 
     public static FixPoint StringParsingMagnification = new FixPoint(100000000);
 
@@ -422,18 +422,18 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static FixPoint Floor(FixPoint value)
     {
-        return new FixPoint((long)((ulong)value.m_raw_value & 0xFFFFFFFFFFFF0000));
+        return new FixPoint((long)((ulong)value.m_raw_value & INTEGER_PART_MASK));
     }
 
     public static FixPoint Ceiling(FixPoint value)
     {
-        bool has_fractional_part = (value.m_raw_value & 0x000000000000FFFF) != 0;
+        bool has_fractional_part = (value.m_raw_value & FRACTIANAL_PART_MAST) != 0;
         return has_fractional_part ? Floor(value) + One : value;
     }
 
     public static FixPoint Round(FixPoint value)
     {
-        long fractional_part = value.m_raw_value & 0x000000000000FFFF;
+        long fractional_part = value.m_raw_value & FRACTIANAL_PART_MAST;
         if (fractional_part >= Half.m_raw_value)
             return Floor(value) + One;
         else
@@ -641,6 +641,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long ONE = 1L << FRACTIONAL_PLACES;
     const long MAX_VALUE = long.MaxValue;
     const long MIN_VALUE = long.MinValue;
+    const ulong INTEGER_PART_MASK = 0xFFFFFFFFFFFF0000;
+    const long FRACTIANAL_PART_MAST = 0x000000000000FFFF;
     //3.14159265358979323846264338327950288419716939937510
     const long QUARTER_PI = 51471L;
     const long HALF_PI = 102942L;
@@ -648,6 +650,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long ONE_AND_HALF_PI = 308826L;
     const long TWO_PI = 411768L;
     const long INV_PI = 20860L;
+    const long RADIAN_PER_DEGREE = 1144L;
+    const long DEGREE_PER_RADIAN = 3754936L;
 
     internal static void GenerateSinTable()
     {
