@@ -279,6 +279,36 @@ namespace Combat
             GetLogicWorld().AddRenderMessage(msg);
 #endif
         }
+
+        public void AdjustPosition2Walkable()
+        {
+            GridGraph graph = null;
+            if (m_current_space != null)
+                graph = m_current_space.m_graph;
+            else
+                graph = GetLogicWorld().GetDefaultSceneSpace().m_graph;
+            if (graph == null)
+                return;
+            CurrentPosition = graph.AdjustPosition2Walkable(m_current_position);
+
+#if COMBAT_CLIENT
+            ChangePositionRenderMessage msg = RenderMessage.Create<ChangePositionRenderMessage>();
+            msg.Construct(GetOwnerEntityID(), m_current_position);
+            GetLogicWorld().AddRenderMessage(msg);
+#endif
+        }
+
+        public Vector3FP AdjustPosition2Walkable(Vector3FP position)
+        {
+            GridGraph graph = null;
+            if (m_current_space != null)
+                graph = m_current_space.m_graph;
+            else
+                graph = GetLogicWorld().GetDefaultSceneSpace().m_graph;
+            if (graph == null)
+                return position;
+            return graph.AdjustPosition2Walkable(position);
+        }
         #endregion
 
         #region 能否旋转控制
