@@ -2,6 +2,11 @@
 using System.IO;
 using BaseUtil;
 
+/*
+ * FIXPOINT_IMPLICT_SUPPORTING_FLOAT：隐式支持浮点数
+ * FIXPOINT_32BITS_FRACTIONAL：小数含32位精度
+ * FIXPOINT_CHECK_OVERFLOW：检测溢出
+ */
 public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 {
     public static FixPoint StringParsingPrecisionCompensation = FixPoint.Zero;
@@ -15,6 +20,16 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     }
 
     public static FixPoint CreateFromFloat(float value)
+    {
+        return new FixPoint((long)(value * ONE));
+    }
+
+    public static FixPoint CreateFromFloat(double value)
+    {
+        return new FixPoint((long)(value * ONE));
+    }
+
+    public static FixPoint CreateFromFloat(decimal value)
     {
         return new FixPoint((long)(value * ONE));
     }
@@ -138,6 +153,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             return FixPoint.Zero;
     }
     #region 正式的时候不开放这几个
+#if FIXPOINT_IMPLICT_SUPPORTING_FLOAT
     public static explicit operator FixPoint(float value)
     {
         return new FixPoint((long)(value * ONE));
@@ -150,6 +166,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         return new FixPoint((long)(value * ONE));
     }
+#endif
     #endregion
 
     public static explicit operator int(FixPoint value)
@@ -205,22 +222,109 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static FixPoint operator +(FixPoint x, FixPoint y)
     {
+#if FIXPOINT_CHECK_OVERFLOW
+        long x_raw = x.m_raw_value;
+        long y_raw = y.m_raw_value;
+        long z = x_raw + y_raw;
+        if (((~(x_raw ^ y_raw) & (x_raw ^ z)) & MIN_VALUE) != 0)
+            return x_raw > 0 ? MaxValue : MinValue;
+        else
+            return new FixPoint(z);
+#else
         return new FixPoint(x.m_raw_value + y.m_raw_value);
+#endif
     }
+
     public static FixPoint operator -(FixPoint x, FixPoint y)
     {
+#if FIXPOINT_CHECK_OVERFLOW
+        long x_raw = x.m_raw_value;
+        long y_raw = y.m_raw_value;
+        long z = x_raw - y_raw;
+        if ((((x_raw ^ y_raw) & (x_raw ^ z)) & MIN_VALUE) != 0)
+            return x_raw < 0 ? MinValue : MaxValue;
+        else
+            return new FixPoint(z);
+#else
         return new FixPoint(x.m_raw_value - y.m_raw_value);
+#endif
     }
+
     public static FixPoint operator *(FixPoint x, FixPoint y)
     {
-        //误差 < 0.002%
+#if FIXPOINT_32BITS_FRACTIONAL
+        long x_raw = x.m_raw_value;
+        long y_raw = y.m_raw_value;
+#if FIXPOINT_CHECK_OVERFLOW
+#else
+        long x_high = x_raw >> FRACTIONAL_PLACES;
+        long x_low = x_raw & FRACTIANAL_PART_MASK;
+        long y_high = y_raw >> FRACTIONAL_PLACES;
+        long y_low = y_raw & FRACTIANAL_PART_MASK;
+        long high_high = x_high * y_high;
+        long high_low = x_high * y_low;
+        long low_high = x_low * y_high;
+        long low_low = x_low * y_low;
+        long z = (high_high << FRACTIONAL_PLACES) + high_low + low_high + (low_low >> FRACTIONAL_PLACES);
+#endif
+        return new FixPoint(z);
+#else
+        //误差 < 0.02%
         return new FixPoint((x.m_raw_value * y.m_raw_value) >> FRACTIONAL_PLACES);
+#endif
     }
+
     public static FixPoint operator /(FixPoint x, FixPoint y)
     {
+#if FIXPOINT_32BITS_FRACTIONAL
+        long x_raw = x.m_raw_value;
+        long y_raw = y.m_raw_value;
+        if (y_raw == 0)
+        {
+            if (x_raw > 0)
+                return MaxValue;
+            else if (x_raw < 0)
+                return MinValue;
+            else
+                return Zero;
+        }
+        ulong remainder = (ulong)(x_raw >= 0 ? x_raw : -x_raw);
+        ulong divider = (ulong)(y_raw >= 0 ? y_raw : -y_raw);
+        ulong quotient = 0UL;
+        int magic_number = FRACTIONAL_PLACES + 1;//[
+        while ((divider & 0xF) == 0 && magic_number >= 4)
+        {
+            divider >>= 4;
+            magic_number -= 4;
+        }
+        while (remainder != 0 && magic_number >= 0)
+        {
+            int shift = CountLeadingZeroes(remainder);
+            if (shift > magic_number)
+                shift = magic_number;
+            remainder <<= shift;
+            magic_number -= shift;
+            ulong div = remainder / divider;
+#if FIXPOINT_CHECK_OVERFLOW
+            if ((div & ~(0xFFFFFFFFFFFFFFFF >> magic_number)) != 0)
+                return ((x_raw ^ y_raw) & MIN_VALUE) == 0 ? MaxValue : MinValue;
+#endif
+            remainder = remainder % divider;
+            quotient += div << magic_number;
+            remainder <<= 1;
+            --magic_number;
+        }
+        ++quotient; // rounding
+        long z = (long)(quotient >> 1);//]
+        if (((x_raw ^ y_raw) & MIN_VALUE) != 0)
+            z = -z;
+        return new FixPoint(z);
+#else
         //误差 < 0.0000001%
         return new FixPoint((x.m_raw_value << FRACTIONAL_PLACES) / y.m_raw_value);
+#endif
     }
+
     public static FixPoint operator %(FixPoint x, FixPoint y)
     {
         return new FixPoint(x.m_raw_value % y.m_raw_value);
@@ -323,7 +427,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     #endregion
 
     #region float
-#if FP_FLOAT
+#if FIXPOINT_IMPLICT_SUPPORTING_FLOAT
     public static bool operator ==(FixPoint x, float y)
     {
         return x.m_raw_value == (long)(y * ONE);
@@ -352,7 +456,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     #endregion
 
     #region double
-#if FP_FLOAT
+#if FIXPOINT_IMPLICT_SUPPORTING_FLOAT
     public static bool operator ==(FixPoint x, double y)
     {
         return x.m_raw_value == (long)(y * ONE);
@@ -381,7 +485,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     #endregion
 
     #region decimal
-#if FP_FLOAT
+#if FIXPOINT_IMPLICT_SUPPORTING_FLOAT
     public static bool operator ==(FixPoint x, decimal y)
     {
         return x.m_raw_value == (long)(y * ONE);
@@ -416,6 +520,10 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static FixPoint Abs(FixPoint value)
     {
+#if FIXPOINT_CHECK_OVERFLOW
+        if (value.m_raw_value == MIN_VALUE)
+            return MaxValue;
+#endif
         long mask = value.m_raw_value >> 63;
         return new FixPoint((value.m_raw_value + mask) ^ mask);
     }
@@ -427,17 +535,20 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static FixPoint Ceiling(FixPoint value)
     {
-        bool has_fractional_part = (value.m_raw_value & FRACTIANAL_PART_MAST) != 0;
+        bool has_fractional_part = (value.m_raw_value & FRACTIANAL_PART_MASK) != 0;
         return has_fractional_part ? Floor(value) + One : value;
     }
 
     public static FixPoint Round(FixPoint value)
     {
-        long fractional_part = value.m_raw_value & FRACTIANAL_PART_MAST;
-        if (fractional_part >= Half.m_raw_value)
-            return Floor(value) + One;
+        FixPoint integer_part = Floor(value);
+        long fractional_part = value.m_raw_value & FRACTIANAL_PART_MASK;
+        if (fractional_part > Half.m_raw_value)
+            return integer_part + One;
+        else if (fractional_part < Half.m_raw_value)
+            return integer_part;
         else
-            return Floor(value);
+            return (integer_part.m_raw_value & ONE) == 0 ? integer_part : integer_part + One;
     }
 
     public static FixPoint Sqrt(FixPoint value)
@@ -637,12 +748,25 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     #region 内部
     const int NUM_BITS = 64;
+#if FIXPOINT_32BITS_FRACTIONAL
+    const int FRACTIONAL_PLACES = 32;
+    const ulong INTEGER_PART_MASK = 0xFFFFFFFF00000000;
+    const long FRACTIANAL_PART_MASK = 0x00000000FFFFFFFF;
+    const long OVERFLOW_MASK = 0x7FFFFFFF00000000;
+    //3.14159265358979323846264338327950288419716939937510  4294967296
+    const long QUARTER_PI = 3373259426L;
+    const long HALF_PI = 6746518852L;
+    const long PI = 13493037704L;
+    const long ONE_AND_HALF_PI = 20239556556L;
+    const long TWO_PI = 26986075408L;
+    const long INV_PI = 1367130551L;
+    const long RADIAN_PER_DEGREE = 74961321L;
+    const long DEGREE_PER_RADIAN = 246083499208L;
+#else
     const int FRACTIONAL_PLACES = 16;
-    const long ONE = 1L << FRACTIONAL_PLACES;
-    const long MAX_VALUE = long.MaxValue;
-    const long MIN_VALUE = long.MinValue;
     const ulong INTEGER_PART_MASK = 0xFFFFFFFFFFFF0000;
-    const long FRACTIANAL_PART_MAST = 0x000000000000FFFF;
+    const long FRACTIANAL_PART_MASK = 0x000000000000FFFF;
+    const long OVERFLOW_MASK = 0x7FFFFFFFFFFF0000;
     //3.14159265358979323846264338327950288419716939937510
     const long QUARTER_PI = 51471L;
     const long HALF_PI = 102942L;
@@ -652,6 +776,34 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long INV_PI = 20860L;
     const long RADIAN_PER_DEGREE = 1144L;
     const long DEGREE_PER_RADIAN = 3754936L;
+#endif
+    const long ONE = 1L << FRACTIONAL_PLACES;
+    const long MAX_VALUE = long.MaxValue;
+    const long MIN_VALUE = long.MinValue;
+
+    static long AddWithCheckingOverflow(long x, long y, ref bool overflow)
+    {
+        long z = x + y;
+        if (((~(x ^ y) & (x ^ z)) & MIN_VALUE) != 0)
+            overflow = true;
+        return z;
+    }
+
+    static int CountLeadingZeroes(ulong x)
+    {
+        int count = 0;
+        while ((x & 0xF000000000000000) == 0)
+        {
+            count += 4;
+            x <<= 4;
+        }
+        while ((x & 0x8000000000000000) == 0)
+        {
+            count += 1;
+            x <<= 1;
+        }
+        return count;
+    }
 
     internal static void GenerateSinTable()
     {
