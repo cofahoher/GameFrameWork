@@ -253,42 +253,27 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 #if FIXPOINT_32BITS_FRACTIONAL
         long x_raw = x.m_raw_value;
         long y_raw = y.m_raw_value;
-#if FIXPOINT_CHECK_OVERFLOW
         bool signs_equal = ((x_raw ^ y_raw) & MIN_VALUE) == 0;
         long mask = x_raw >> 63;
         x_raw = ((x_raw + mask) ^ mask);
         mask = y_raw >> 63;
         y_raw = ((y_raw + mask) ^ mask);
-        long x_high = x_raw >> FRACTIONAL_BITS;
-        long x_low = x_raw & FRACTIANAL_PART_MASK;
-        long y_high = y_raw >> FRACTIONAL_BITS;
-        long y_low = y_raw & FRACTIANAL_PART_MASK;
-        long high_high = x_high * y_high;
+        ulong x_high = (ulong)x_raw >> FRACTIONAL_BITS;
+        ulong x_low = (ulong)x_raw & FRACTIANAL_PART_MASK;
+        ulong y_high = (ulong)y_raw >> FRACTIONAL_BITS;
+        ulong y_low = (ulong)y_raw & FRACTIANAL_PART_MASK;
+        ulong high_high = x_high * y_high;
+#if FIXPOINT_CHECK_OVERFLOW
         if ((high_high >> INTEGER_BITS) != 0)
             return signs_equal ? MaxValue : MinValue;
-        high_high <<= FRACTIONAL_BITS;
-        long high_low = x_high * y_low;
-        long low_high = x_low * y_high;
-        long low_low = (x_low * y_low) >> FRACTIONAL_BITS;
-        bool overflow = false;
-        long z = AddWithCheckingOverflow(high_high, high_low, ref overflow);
-        z = AddWithCheckingOverflow(z, low_high, ref overflow);
-        z = AddWithCheckingOverflow(z, low_low, ref overflow);
-        if (overflow || z < 0)
-            return signs_equal ? MaxValue : MinValue;
-        if (!signs_equal)
-            z = -z;
-#else
-        long x_high = x_raw >> FRACTIONAL_BITS;
-        long x_low = x_raw & FRACTIANAL_PART_MASK;
-        long y_high = y_raw >> FRACTIONAL_BITS;
-        long y_low = y_raw & FRACTIANAL_PART_MASK;
-        long high_high = x_high * y_high;
-        long high_low = x_high * y_low;
-        long low_high = x_low * y_high;
-        long low_low = x_low * y_low;
-        long z = (high_high << FRACTIONAL_BITS) + high_low + low_high + (low_low >> FRACTIONAL_BITS);
 #endif
+        high_high <<= FRACTIONAL_BITS;
+        ulong uz = high_high + x_high * y_low + x_low * y_high + ((x_low * y_low) >> FRACTIONAL_BITS);
+#if FIXPOINT_CHECK_OVERFLOW
+        if (uz < high_high || (uz >> 63) != 0)
+            return signs_equal ? MaxValue : MinValue;
+#endif
+        long z = signs_equal ? (long)uz : -(long)uz;
         return new FixPoint(z);
 #else
         //误差 < 0.02%
