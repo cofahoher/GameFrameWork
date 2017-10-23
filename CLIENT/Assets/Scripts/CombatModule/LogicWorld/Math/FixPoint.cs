@@ -9,8 +9,6 @@ using BaseUtil;
  */
 public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 {
-    public static FixPoint StringParsingPrecisionCompensation = FixPoint.Zero;
-
     [ProtoBufAttribute(Index = 1)]
     public long m_raw_value;  //ZZWTODO 为了ProtoBuf，必须public
 
@@ -48,9 +46,9 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     {
         int sign = 0;
         bool fractional = false;
-        FixPoint fractional_base = FixPoint.One;
-        FixPoint result = FixPoint.Zero;
-        FixPoint fractional_part = FixPoint.Zero;
+        int integer_part = 0;
+        int fractional_part = 0;
+        int fractional_base = 1;
         for (int i = 0; i < str.Length; ++i)
         {
             char ch = str[i];
@@ -60,13 +58,14 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
                 int num = ch - '0';
                 if (fractional)
                 {
-                    fractional_base *= FixPoint.Ten;
-                    fractional_part += FixPointDigit[num] * StringParsingMagnification / fractional_base;
+                    fractional_part *= 10;
+                    fractional_part += num;
+                    fractional_base *= 10;
                 }
                 else
                 {
-                    result *= FixPoint.Ten;
-                    result += FixPointDigit[num];
+                    integer_part *= 10;
+                    integer_part += num;
                 }
             }
             else if (code == Point_____)
@@ -77,7 +76,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             }
             else if (code == Sign______)
             {
-                if (sign != 0 || result.RawValue != 0 || fractional)
+                if (sign != 0 || integer_part != 0 || fractional)
                     break;
                 if (ch == '-')
                     sign = -1;
@@ -89,11 +88,12 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             else
                 break;
         }
-        result += fractional_part / StringParsingMagnification;
-        result += StringParsingPrecisionCompensation;
+        long result = ((long)integer_part << FRACTIONAL_PLACES);
+        if (fractional_part != 0)
+            result += (((long)fractional_part << (FRACTIONAL_PLACES + 1)) / (long)fractional_base + 1) >> 1;
         if (sign < 0)
             result = -result;
-        return result;
+        return new FixPoint(result);
     }
 
     public static bool TryParse(string str, out FixPoint result)
@@ -134,8 +134,6 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static readonly FixPoint RadianPerDegree = new FixPoint(RADIAN_PER_DEGREE);
     public static readonly FixPoint DegreePerRadian = new FixPoint(DEGREE_PER_RADIAN);
-
-    public static FixPoint StringParsingMagnification = new FixPoint(100000000);
 
     public static explicit operator FixPoint(int value)
     {
