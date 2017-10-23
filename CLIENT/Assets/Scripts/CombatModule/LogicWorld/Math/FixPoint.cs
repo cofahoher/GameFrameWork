@@ -604,16 +604,16 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         long raw = radian.m_raw_value % TWO_PI;
         if (raw < 0)
             raw += TWO_PI;
-        long p1 = raw % HALF_PI;
-        long p2 = raw / HALF_PI;
+        long p1 = raw % SIN_TABLE_SIZE;
+        long p2 = raw / SIN_TABLE_SIZE;
         if (p2 == 0)
             return new FixPoint(SinTable[p1]);
         else if (p2 == 1)
-            return new FixPoint(SinTable[HALF_PI - 1 - p1]);
+            return new FixPoint(SinTable[SIN_TABLE_SIZE - 1 - p1]);
         else if (p2 == 2)
             return new FixPoint(-SinTable[p1]);
         else
-            return new FixPoint(-SinTable[HALF_PI - 1 - p1]);
+            return new FixPoint(-SinTable[SIN_TABLE_SIZE - 1 - p1]);
     }
 
     public static FixPoint Cos(FixPoint radian)
@@ -622,14 +622,14 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         long raw = radian.m_raw_value % TWO_PI;
         if (raw < 0)
             raw += TWO_PI;
-        long p1 = raw % HALF_PI;
-        long p2 = raw / HALF_PI;
+        long p1 = raw % SIN_TABLE_SIZE;
+        long p2 = raw / SIN_TABLE_SIZE;
         if (p2 == 0)
-            return new FixPoint(SinTable[HALF_PI - 1 - p1]);
+            return new FixPoint(SinTable[SIN_TABLE_SIZE - 1 - p1]);
         else if (p2 == 1)
             return new FixPoint(-SinTable[p1]);
         else if (p2 == 2)
-            return new FixPoint(-SinTable[HALF_PI - 1 - p1]);
+            return new FixPoint(-SinTable[SIN_TABLE_SIZE - 1 - p1]);
         else
             return new FixPoint(SinTable[p1]);
     }
@@ -788,6 +788,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long ONE = 1L << FRACTIONAL_BITS;
     const long MAX_VALUE = long.MaxValue;
     const long MIN_VALUE = long.MinValue;
+    const int SIN_TABLE_SIZE = 102942;
+    const int ATAN2_TABLE_SIZE = (1 << 16) + 1;
 
     static long AddWithCheckingOverflow(long x, long y, ref bool overflow)
     {
@@ -819,22 +821,42 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         {
             writer.Write(
 @"partial struct FixPoint {
-    public static readonly long[] SinTable = new[] {");
+    public static readonly long[] SinTable = new[] {
+#if FIXPOINT_32BITS_FRACTIONAL");
+            long one = 1L << 32;
             int line_counter = 0;
-            for (long i = 0; i < HALF_PI; ++i)
+            for (long i = 0; i < SIN_TABLE_SIZE; ++i)
             {
-                double angle = i * Math.PI * 0.5 / (HALF_PI - 1);
+                double angle = i * Math.PI * 0.5 / (SIN_TABLE_SIZE - 1);
                 if (line_counter++ % 8 == 0)
                 {
                     writer.WriteLine();
                     writer.Write("        ");
                 }
                 double sin = Math.Sin(angle);
-                long raw_value = ((FixPoint)sin).m_raw_value;
+                long raw_value = (long)(sin * one);
                 writer.Write(string.Format("0x{0:X}L, ", raw_value));
             }
             writer.Write(
 @"
+#else");
+            one = 1L << 16;
+            line_counter = 0;
+            for (long i = 0; i < SIN_TABLE_SIZE; ++i)
+            {
+                double angle = i * Math.PI * 0.5 / (SIN_TABLE_SIZE - 1);
+                if (line_counter++ % 8 == 0)
+                {
+                    writer.WriteLine();
+                    writer.Write("        ");
+                }
+                double sin = Math.Sin(angle);
+                long raw_value = (long)(sin * one);
+                writer.Write(string.Format("0x{0:X}L, ", raw_value));
+            }
+            writer.Write(
+@"
+#endif
     };
 }");
         }
@@ -846,9 +868,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         {
             writer.Write(
 @"partial struct FixPoint {
-    public static readonly long[] Atan2Table = new[] {");
+    public static readonly long[] Atan2Table = new[] {
+#if FIXPOINT_32BITS_FRACTIONAL");
+            long one = 1L << 32;
             int line_counter = 0;
-            int atan2_table_size = (1 << FRACTIONAL_BITS) + 1;
+            int atan2_table_size = ATAN2_TABLE_SIZE;
             double x = (double)(atan2_table_size);
             for (int i = 0; i < atan2_table_size; ++i)
             {
@@ -859,11 +883,31 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
                 }
                 double y = (double)i;
                 double radian = Math.Atan2(y, x);
-                long raw_value = ((FixPoint)radian).m_raw_value;
+                long raw_value = (long)(radian * one);
                 writer.Write(string.Format("0x{0:X}L, ", raw_value));
             }
             writer.Write(
 @"
+#else");
+            one = 1L << 16;
+            line_counter = 0;
+            atan2_table_size = ATAN2_TABLE_SIZE;
+            x = (double)(atan2_table_size);
+            for (int i = 0; i < atan2_table_size; ++i)
+            {
+                if (line_counter++ % 8 == 0)
+                {
+                    writer.WriteLine();
+                    writer.Write("        ");
+                }
+                double y = (double)i;
+                double radian = Math.Atan2(y, x);
+                long raw_value = (long)(radian * one);
+                writer.Write(string.Format("0x{0:X}L, ", raw_value));
+            }
+            writer.Write(
+@"
+#endif
     };
 }");
         }
