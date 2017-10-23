@@ -14,7 +14,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public FixPoint(int value = 0)
     {
-        m_raw_value = ((long)value) << FRACTIONAL_PLACES;
+        m_raw_value = ((long)value) << FRACTIONAL_BITS;
     }
 
     public static FixPoint CreateFromFloat(float value)
@@ -88,9 +88,9 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             else
                 break;
         }
-        long result = ((long)integer_part << FRACTIONAL_PLACES);
+        long result = ((long)integer_part << FRACTIONAL_BITS);
         if (fractional_part != 0)
-            result += (((long)fractional_part << (FRACTIONAL_PLACES + 1)) / (long)fractional_base + 1) >> 1;
+            result += (((long)fractional_part << (FRACTIONAL_BITS + 1)) / (long)fractional_base + 1) >> 1;
         if (sign < 0)
             result = -result;
         return new FixPoint(result);
@@ -137,11 +137,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static explicit operator FixPoint(int value)
     {
-        return new FixPoint(((long)value) << FRACTIONAL_PLACES);
+        return new FixPoint(((long)value) << FRACTIONAL_BITS);
     }
     public static explicit operator FixPoint(long value)
     {
-        return new FixPoint(value << FRACTIONAL_PLACES);
+        return new FixPoint(value << FRACTIONAL_BITS);
     }
     public static explicit operator FixPoint(bool value)
     {
@@ -169,11 +169,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static explicit operator int(FixPoint value)
     {
-        return (int)(value.m_raw_value >> FRACTIONAL_PLACES);
+        return (int)(value.m_raw_value >> FRACTIONAL_BITS);
     }
     public static explicit operator long(FixPoint value)
     {
-        return value.m_raw_value >> FRACTIONAL_PLACES;
+        return value.m_raw_value >> FRACTIONAL_BITS;
     }
     public static explicit operator bool(FixPoint value)
     {
@@ -254,21 +254,45 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         long x_raw = x.m_raw_value;
         long y_raw = y.m_raw_value;
 #if FIXPOINT_CHECK_OVERFLOW
-#else
-        long x_high = x_raw >> FRACTIONAL_PLACES;
+        bool signs_equal = ((x_raw ^ y_raw) & MIN_VALUE) == 0;
+        long mask = x_raw >> 63;
+        x_raw = ((x_raw + mask) ^ mask);
+        mask = y_raw >> 63;
+        y_raw = ((y_raw + mask) ^ mask);
+        long x_high = x_raw >> FRACTIONAL_BITS;
         long x_low = x_raw & FRACTIANAL_PART_MASK;
-        long y_high = y_raw >> FRACTIONAL_PLACES;
+        long y_high = y_raw >> FRACTIONAL_BITS;
+        long y_low = y_raw & FRACTIANAL_PART_MASK;
+        long high_high = x_high * y_high;
+        if ((high_high >> INTEGER_BITS) != 0)
+            return signs_equal ? MaxValue : MinValue;
+        high_high <<= FRACTIONAL_BITS;
+        long high_low = x_high * y_low;
+        long low_high = x_low * y_high;
+        long low_low = (x_low * y_low) >> FRACTIONAL_BITS;
+        bool overflow = false;
+        long z = AddWithCheckingOverflow(high_high, high_low, ref overflow);
+        z = AddWithCheckingOverflow(z, low_high, ref overflow);
+        z = AddWithCheckingOverflow(z, low_low, ref overflow);
+        if (overflow || z < 0)
+            return signs_equal ? MaxValue : MinValue;
+        if (!signs_equal)
+            z = -z;
+#else
+        long x_high = x_raw >> FRACTIONAL_BITS;
+        long x_low = x_raw & FRACTIANAL_PART_MASK;
+        long y_high = y_raw >> FRACTIONAL_BITS;
         long y_low = y_raw & FRACTIANAL_PART_MASK;
         long high_high = x_high * y_high;
         long high_low = x_high * y_low;
         long low_high = x_low * y_high;
         long low_low = x_low * y_low;
-        long z = (high_high << FRACTIONAL_PLACES) + high_low + low_high + (low_low >> FRACTIONAL_PLACES);
+        long z = (high_high << FRACTIONAL_BITS) + high_low + low_high + (low_low >> FRACTIONAL_BITS);
 #endif
         return new FixPoint(z);
 #else
         //误差 < 0.02%
-        return new FixPoint((x.m_raw_value * y.m_raw_value) >> FRACTIONAL_PLACES);
+        return new FixPoint((x.m_raw_value * y.m_raw_value) >> FRACTIONAL_BITS);
 #endif
     }
 
@@ -289,7 +313,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         ulong remainder = (ulong)(x_raw >= 0 ? x_raw : -x_raw);
         ulong divider = (ulong)(y_raw >= 0 ? y_raw : -y_raw);
         ulong quotient = 0UL;
-        int magic_number = FRACTIONAL_PLACES + 1;//[
+        int magic_number = FRACTIONAL_BITS + 1;//[
         while ((divider & 0xF) == 0 && magic_number >= 4)
         {
             divider >>= 4;
@@ -319,7 +343,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return new FixPoint(z);
 #else
         //误差 < 0.0000001%
-        return new FixPoint((x.m_raw_value << FRACTIONAL_PLACES) / y.m_raw_value);
+        return new FixPoint((x.m_raw_value << FRACTIONAL_BITS) / y.m_raw_value);
 #endif
     }
 
@@ -373,54 +397,54 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     #region int
     public static bool operator ==(FixPoint x, int y)
     {
-        return x.m_raw_value == ((long)y) << FRACTIONAL_PLACES;
+        return x.m_raw_value == ((long)y) << FRACTIONAL_BITS;
     }
     public static bool operator !=(FixPoint x, int y)
     {
-        return x.m_raw_value != ((long)y) << FRACTIONAL_PLACES;
+        return x.m_raw_value != ((long)y) << FRACTIONAL_BITS;
     }
     public static bool operator >(FixPoint x, int y)
     {
-        return x.m_raw_value > ((long)y) << FRACTIONAL_PLACES;
+        return x.m_raw_value > ((long)y) << FRACTIONAL_BITS;
     }
     public static bool operator <(FixPoint x, int y)
     {
-        return x.m_raw_value < ((long)y) << FRACTIONAL_PLACES;
+        return x.m_raw_value < ((long)y) << FRACTIONAL_BITS;
     }
     public static bool operator >=(FixPoint x, int y)
     {
-        return x.m_raw_value >= ((long)y) << FRACTIONAL_PLACES;
+        return x.m_raw_value >= ((long)y) << FRACTIONAL_BITS;
     }
     public static bool operator <=(FixPoint x, int y)
     {
-        return x.m_raw_value <= ((long)y) << FRACTIONAL_PLACES;
+        return x.m_raw_value <= ((long)y) << FRACTIONAL_BITS;
     }
     #endregion
 
     #region long
     public static bool operator ==(FixPoint x, long y)
     {
-        return x.m_raw_value == y << FRACTIONAL_PLACES;
+        return x.m_raw_value == y << FRACTIONAL_BITS;
     }
     public static bool operator !=(FixPoint x, long y)
     {
-        return x.m_raw_value != y << FRACTIONAL_PLACES;
+        return x.m_raw_value != y << FRACTIONAL_BITS;
     }
     public static bool operator >(FixPoint x, long y)
     {
-        return x.m_raw_value > y << FRACTIONAL_PLACES;
+        return x.m_raw_value > y << FRACTIONAL_BITS;
     }
     public static bool operator <(FixPoint x, long y)
     {
-        return x.m_raw_value < y << FRACTIONAL_PLACES;
+        return x.m_raw_value < y << FRACTIONAL_BITS;
     }
     public static bool operator >=(FixPoint x, long y)
     {
-        return x.m_raw_value >= y << FRACTIONAL_PLACES;
+        return x.m_raw_value >= y << FRACTIONAL_BITS;
     }
     public static bool operator <=(FixPoint x, long y)
     {
-        return x.m_raw_value <= y << FRACTIONAL_PLACES;
+        return x.m_raw_value <= y << FRACTIONAL_BITS;
     }
     #endregion
 
@@ -551,7 +575,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static FixPoint Sqrt(FixPoint value)
     {
-        long x = value.m_raw_value << FRACTIONAL_PLACES;
+        long x = value.m_raw_value << FRACTIONAL_BITS;
         if (x <= 1)
             return value;
         int s = 1;
@@ -645,16 +669,16 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             if (y1 > 0)
             {
                 if (y1 > x1)
-                    return new FixPoint(HALF_PI - Atan2Table[(x1 << FRACTIONAL_PLACES) / y1]);
+                    return new FixPoint(HALF_PI - Atan2Table[(x1 << FRACTIONAL_BITS) / y1]);
                 else
-                    return new FixPoint(Atan2Table[(y1 << FRACTIONAL_PLACES) / x1]);
+                    return new FixPoint(Atan2Table[(y1 << FRACTIONAL_BITS) / x1]);
             }
             else if (y1 < 0)
             {
                 if (-y1 > x1)
-                    return new FixPoint(ONE_AND_HALF_PI + Atan2Table[(x1 << FRACTIONAL_PLACES) / (-y1)]);
+                    return new FixPoint(ONE_AND_HALF_PI + Atan2Table[(x1 << FRACTIONAL_BITS) / (-y1)]);
                 else
-                    return new FixPoint(TWO_PI - Atan2Table[((-y1) << FRACTIONAL_PLACES) / x1]);
+                    return new FixPoint(TWO_PI - Atan2Table[((-y1) << FRACTIONAL_BITS) / x1]);
             }
             else
             {
@@ -666,16 +690,16 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             if (y1 > 0)
             {
                 if (y1 > -x1)
-                    return new FixPoint(HALF_PI + Atan2Table[((-x1) << FRACTIONAL_PLACES) / y1]);
+                    return new FixPoint(HALF_PI + Atan2Table[((-x1) << FRACTIONAL_BITS) / y1]);
                 else
-                    return new FixPoint(PI - Atan2Table[(y1 << FRACTIONAL_PLACES) / (-x1)]);
+                    return new FixPoint(PI - Atan2Table[(y1 << FRACTIONAL_BITS) / (-x1)]);
             }
             else if (y1 < 0)
             {
                 if (-y1 < -x1)
-                    return new FixPoint(PI + Atan2Table[((-y1) << FRACTIONAL_PLACES) / (-x1)]);
+                    return new FixPoint(PI + Atan2Table[((-y1) << FRACTIONAL_BITS) / (-x1)]);
                 else
-                    return new FixPoint(ONE_AND_HALF_PI - Atan2Table[((-x1) << FRACTIONAL_PLACES) / (-y1)]);
+                    return new FixPoint(ONE_AND_HALF_PI - Atan2Table[((-x1) << FRACTIONAL_BITS) / (-y1)]);
             }
             else
             {
@@ -747,7 +771,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     #region 内部
     const int NUM_BITS = 64;
 #if FIXPOINT_32BITS_FRACTIONAL
-    const int FRACTIONAL_PLACES = 32;
+    const int FRACTIONAL_BITS = 32;
     const ulong INTEGER_PART_MASK = 0xFFFFFFFF00000000;
     const long FRACTIANAL_PART_MASK = 0x00000000FFFFFFFF;
     const long OVERFLOW_MASK = 0x7FFFFFFF00000000;
@@ -761,7 +785,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long RADIAN_PER_DEGREE = 74961321L;
     const long DEGREE_PER_RADIAN = 246083499208L;
 #else
-    const int FRACTIONAL_PLACES = 16;
+    const int FRACTIONAL_BITS = 16;
     const ulong INTEGER_PART_MASK = 0xFFFFFFFFFFFF0000;
     const long FRACTIANAL_PART_MASK = 0x000000000000FFFF;
     const long OVERFLOW_MASK = 0x7FFFFFFFFFFF0000;
@@ -775,7 +799,8 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long RADIAN_PER_DEGREE = 1144L;
     const long DEGREE_PER_RADIAN = 3754936L;
 #endif
-    const long ONE = 1L << FRACTIONAL_PLACES;
+    const int INTEGER_BITS = NUM_BITS - FRACTIONAL_BITS;
+    const long ONE = 1L << FRACTIONAL_BITS;
     const long MAX_VALUE = long.MaxValue;
     const long MIN_VALUE = long.MinValue;
 
@@ -838,7 +863,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 @"partial struct FixPoint {
     public static readonly long[] Atan2Table = new[] {");
             int line_counter = 0;
-            int atan2_table_size = (1 << FRACTIONAL_PLACES) + 1;
+            int atan2_table_size = (1 << FRACTIONAL_BITS) + 1;
             double x = (double)(atan2_table_size);
             for (int i = 0; i < atan2_table_size; ++i)
             {
