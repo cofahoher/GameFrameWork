@@ -107,7 +107,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         return true;
     }
 
-    public static readonly decimal Precision = (decimal)(new FixPoint(1L));//0.0000152587890625m
+    public static readonly decimal Precision = (decimal)(new FixPoint(1L));
     public static readonly FixPoint MaxValue = new FixPoint(MAX_VALUE);
     public static readonly FixPoint MinValue = new FixPoint(MIN_VALUE);
     public static readonly FixPoint Zero = new FixPoint(0L);
@@ -215,7 +215,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
 
     public static FixPoint operator -(FixPoint x)
     {
+#if FIXPOINT_CHECK_OVERFLOW
         return x.m_raw_value == MIN_VALUE ? MaxValue : new FixPoint(-x.m_raw_value);
+#else
+        return new FixPoint(-x.m_raw_value);
+#endif
     }
 
     public static FixPoint operator +(FixPoint x, FixPoint y)
@@ -604,8 +608,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         long raw = radian.m_raw_value % TWO_PI;
         if (raw < 0)
             raw += TWO_PI;
-        long p1 = raw % SIN_TABLE_SIZE;
-        long p2 = raw / SIN_TABLE_SIZE;
+        long p1 = raw % HALF_PI;
+#if FIXPOINT_32BITS_FRACTIONAL
+        p1 = p1 * SIN_TABLE_SIZE / HALF_PI;
+#endif
+        long p2 = raw / HALF_PI;
         if (p2 == 0)
             return new FixPoint(SinTable[p1]);
         else if (p2 == 1)
@@ -622,8 +629,11 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         long raw = radian.m_raw_value % TWO_PI;
         if (raw < 0)
             raw += TWO_PI;
-        long p1 = raw % SIN_TABLE_SIZE;
-        long p2 = raw / SIN_TABLE_SIZE;
+        long p1 = raw % HALF_PI;
+#if FIXPOINT_32BITS_FRACTIONAL
+        p1 = p1 * SIN_TABLE_SIZE / HALF_PI;
+#endif
+        long p2 = raw / HALF_PI;
         if (p2 == 0)
             return new FixPoint(SinTable[SIN_TABLE_SIZE - 1 - p1]);
         else if (p2 == 1)
@@ -654,16 +664,45 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
             if (y1 > 0)
             {
                 if (y1 > x1)
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (x1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(HALF_PI - Atan2Table[x1 / (y1 >> 16)]);
+                    else
+                        return new FixPoint(HALF_PI - Atan2Table[(x1 << 16) / y1]);
+#else
                     return new FixPoint(HALF_PI - Atan2Table[(x1 << FRACTIONAL_BITS) / y1]);
+#endif
                 else
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (y1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(Atan2Table[y1 / (x1 >> 16)]);
+                    else
+                        return new FixPoint(Atan2Table[(y1 << 16) / x1]);
+#else
                     return new FixPoint(Atan2Table[(y1 << FRACTIONAL_BITS) / x1]);
+#endif
             }
             else if (y1 < 0)
             {
-                if (-y1 > x1)
-                    return new FixPoint(ONE_AND_HALF_PI + Atan2Table[(x1 << FRACTIONAL_BITS) / (-y1)]);
+                y1 = -y1;
+                if (y1 > x1)
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (x1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(ONE_AND_HALF_PI + Atan2Table[x1 / (y1 >> 16)]);
+                    else
+                        return new FixPoint(ONE_AND_HALF_PI + Atan2Table[(x1 << 16) / y1]);
+#else
+                    return new FixPoint(ONE_AND_HALF_PI + Atan2Table[(x1 << FRACTIONAL_BITS) / y1]);
+#endif
                 else
-                    return new FixPoint(TWO_PI - Atan2Table[((-y1) << FRACTIONAL_BITS) / x1]);
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (y1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(TWO_PI - Atan2Table[y1 / (x1 >> 16)]);
+                    else
+                        return new FixPoint(TWO_PI - Atan2Table[(y1 << 16) / x1]);
+#else
+                    return new FixPoint(TWO_PI - Atan2Table[(y1 << FRACTIONAL_BITS) / x1]);
+#endif
             }
             else
             {
@@ -672,19 +711,49 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
         }
         else if (x1 < 0)
         {
+            x1 = -x1;
             if (y1 > 0)
             {
-                if (y1 > -x1)
-                    return new FixPoint(HALF_PI + Atan2Table[((-x1) << FRACTIONAL_BITS) / y1]);
+                if (y1 > x1)
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (x1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(HALF_PI + Atan2Table[x1 / (y1 >> 16)]);
+                    else
+                        return new FixPoint(HALF_PI + Atan2Table[(x1 << 16) / y1]);
+#else
+                    return new FixPoint(HALF_PI + Atan2Table[(x1 << FRACTIONAL_BITS) / y1]);
+#endif
                 else
-                    return new FixPoint(PI - Atan2Table[(y1 << FRACTIONAL_BITS) / (-x1)]);
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (y1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(PI - Atan2Table[y1 / (x1 >> 16)]);
+                    else
+                        return new FixPoint(PI - Atan2Table[(y1 << 16) / x1]);
+#else
+                    return new FixPoint(PI - Atan2Table[(y1 << FRACTIONAL_BITS) / x1]);
+#endif
             }
             else if (y1 < 0)
             {
-                if (-y1 < -x1)
-                    return new FixPoint(PI + Atan2Table[((-y1) << FRACTIONAL_BITS) / (-x1)]);
+                y1 = -y1;
+                if (y1 < x1)
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (y1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(PI + Atan2Table[y1 / (x1 >> 16)]);
+                    else
+                        return new FixPoint(PI + Atan2Table[(y1 << 16) / x1]);
+#else
+                    return new FixPoint(PI + Atan2Table[(y1 << FRACTIONAL_BITS) / x1]);
+#endif
                 else
-                    return new FixPoint(ONE_AND_HALF_PI - Atan2Table[((-x1) << FRACTIONAL_BITS) / (-y1)]);
+#if FIXPOINT_32BITS_FRACTIONAL
+                    if (x1 > ATAN2_HELPER_NUMBER)
+                        return new FixPoint(ONE_AND_HALF_PI - Atan2Table[x1 / (y1 >> 16)]);
+                    else
+                        return new FixPoint(ONE_AND_HALF_PI - Atan2Table[(x1 << 16) / y1]);
+#else
+                    return new FixPoint(ONE_AND_HALF_PI - Atan2Table[(x1 << FRACTIONAL_BITS) / y1]);
+#endif
             }
             else
             {
@@ -769,6 +838,7 @@ public partial struct FixPoint : IEquatable<FixPoint>, IComparable<FixPoint>
     const long INV_PI = 1367130551L;
     const long RADIAN_PER_DEGREE = 74961321L;
     const long DEGREE_PER_RADIAN = 246083499208L;
+    const long ATAN2_HELPER_NUMBER = 0x00007FFFFFFFFFFF;
 #else
     const int FRACTIONAL_BITS = 16;
     const ulong INTEGER_PART_MASK = 0xFFFFFFFFFFFF0000;
