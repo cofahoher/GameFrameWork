@@ -47,7 +47,7 @@ namespace Combat
                 GridNode node = grid_graph.Position2Node(new_position);
                 if (node == null)
                 {
-                    if (!m_position_component.GetLogicWorld().OnEntityOutOfEdge(m_position_component.GetOwnerEntity(), new_position))
+                    if (!m_position_component.GetLogicWorld().OnEntityOutOfEdge(m_position_component.GetOwnerEntity(), ref new_position))
                         return;
                 }
                 else if (!node.Walkable && m_callback.AvoidObstacle())

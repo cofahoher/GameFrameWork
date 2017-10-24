@@ -383,7 +383,7 @@ namespace Combat
         {
         }
 
-        public virtual bool OnEntityOutOfEdge(Entity entity, Vector3FP position)
+        public virtual bool OnEntityOutOfEdge(Entity entity, ref Vector3FP position)
         {
             return false;
         }
