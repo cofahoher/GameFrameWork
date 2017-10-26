@@ -94,6 +94,14 @@ namespace Combat
             return 0L;
         }
 
+        public void Suspend(FixPoint suspending_time)
+        {
+        }
+
+        public void Resume()
+        {
+        }
+
         #region RESOURCE
         public void OnSceneLoaded()
         {

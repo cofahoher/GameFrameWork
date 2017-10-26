@@ -16,5 +16,9 @@ namespace Combat
         void OnGameOver(GameResult game_result);
         // 获取本地玩家
         long GetLocalPlayerPstid();
+        //暂停
+        void Suspend(FixPoint suspending_time);
+        //恢复
+        void Resume();
     }
 }
