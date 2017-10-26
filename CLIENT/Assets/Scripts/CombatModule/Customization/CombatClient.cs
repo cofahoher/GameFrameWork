@@ -10,7 +10,6 @@ namespace Combat
         Loaded,
         WaitingForStart,
         Running,
-        Suspending,
         GameOver,
         Ending,
     }
@@ -24,12 +23,8 @@ namespace Combat
 
         protected CombatClientState m_state = CombatClientState.None;
         protected int m_state_frame_cnt = 0;
-        protected int m_state_start_time = -1;              //进入m_state的时刻【Suspending记录在m_current_suspend_start_time】
-        protected int m_last_render_update_time = -1;       //渲染世界上次更新的时刻
-        protected int m_total_suspend_time = 0;             //累计暂停时间
-        protected int m_current_suspend_start_time = 0;     //本次暂停的起始时间
-        protected int m_next_resume_time = 0;               //本次暂停的起始恢复时间
-        protected int m_last_suspending_update_time = 0;    //暂停期间的的上次更新时刻
+        protected int m_state_start_time = -1;
+        protected int m_last_update_time = -1;
         protected int m_waiting_cnt = 0;
 #if UNITY_EDITOR
         protected bool m_is_first_frame = true;
@@ -48,15 +43,14 @@ namespace Combat
 
         public virtual void Destruct()
         {
+            m_combat_factory = null;
+            m_level_data = null;
             m_sync_client.Destruct();
             m_sync_client = null;
             m_render_world.Destruct();
             m_render_world = null;
             m_logic_world.Destruct();
             m_logic_world = null;
-
-            m_combat_factory = null;
-            m_level_data = null;
         }
 
         #region GETTER
@@ -95,7 +89,7 @@ namespace Combat
             m_state = CombatClientState.Loading;
             m_state_frame_cnt = 0;
             m_state_start_time = -1;
-            m_last_render_update_time = -1;
+            m_last_update_time = -1;
             m_waiting_cnt = 0;
 #if UNITY_EDITOR
             m_is_first_frame = true;
@@ -143,7 +137,7 @@ namespace Combat
             m_state = CombatClientState.Running;
             m_state_frame_cnt = 0;
             m_state_start_time = current_time_int;
-            m_last_render_update_time = 0;
+            m_last_update_time = 0;
             m_sync_client.Start(0, m_local_player_pstid, 200);
             if (Statistics.Instance != null)
                 Statistics.Instance.Enabled = true;
@@ -174,7 +168,7 @@ namespace Combat
             m_state = CombatClientState.Loaded;
             m_state_frame_cnt = 0;
             m_state_start_time = -1;
-            m_last_render_update_time = -1;
+            m_last_update_time = -1;
         }
         #endregion
 
@@ -216,24 +210,9 @@ namespace Combat
             return m_local_player_pstid;
         }
 
-        public void Suspend(FixPoint suspending_time)
-        {
-            //ZZWTODO 可能有问题 在一个长渲染帧中的某个逻辑帧触发了暂停
-            m_state = CombatClientState.Suspending;
-            m_current_suspend_start_time = m_last_render_update_time + m_total_suspend_time;
-            m_last_suspending_update_time = m_current_suspend_start_time;
-            int suspending_ms = (int)(suspending_time * FixPoint.Thousand);
-            m_total_suspend_time += suspending_ms;
-            m_next_resume_time = m_current_suspend_start_time + suspending_ms;
-            OnSuspend();
-        }
-
-        public void Resume()
-        {
-        }
-
         public virtual void OnDisconnected()
         {
+
         }
         #endregion
 
@@ -256,9 +235,6 @@ namespace Combat
                 break;
             case CombatClientState.Running:
                 OnUpdateRunning(current_time_int);
-                break;
-            case CombatClientState.Suspending:
-                OnUpdateSuspending(current_time_int);
                 break;
             case CombatClientState.GameOver:
                 OnUpdateGameOver(current_time_int);
@@ -291,20 +267,20 @@ namespace Combat
                 m_state = CombatClientState.WaitingForStart;
                 m_state_frame_cnt = 0;
                 m_state_start_time = current_time_int;
-                m_last_render_update_time = current_time_int;
+                m_last_update_time = current_time_int;
                 ProcessReadyForStart();
             }
         }
 
         protected void OnUpdateWaitingForStart(int current_time_int)
         {
-            m_last_render_update_time = current_time_int;
+            m_last_update_time = current_time_int;
         }
 
         protected void OnUpdateRunning(int current_time_int)
         {
-            current_time_int -= m_state_start_time + m_total_suspend_time;
-            int delta_ms = current_time_int - m_last_render_update_time;
+            current_time_int -= m_state_start_time;
+            int delta_ms = current_time_int - m_last_update_time;
             if (delta_ms < 0)
                 return;
 #if UNITY_EDITOR
@@ -324,26 +300,7 @@ namespace Combat
                 SendCommands(commands);
                 m_sync_client.ClearOutputCommand();
             }
-            m_last_render_update_time = current_time_int;
-        }
-
-        protected void OnUpdateSuspending(int current_time_int)
-        {
-            current_time_int -= m_state_start_time;
-            if (current_time_int < m_next_resume_time)
-            {
-                int delta_ms = current_time_int - m_last_suspending_update_time;
-                if (delta_ms < 0)
-                    return;
-                m_render_world.OnUpdateSuspending(delta_ms, current_time_int - m_current_suspend_start_time);
-                m_last_suspending_update_time = current_time_int;
-            }
-            else
-            {
-                m_state = CombatClientState.Running;
-                OnResume();
-                OnUpdate(current_time_int + m_state_start_time);
-            }
+            m_last_update_time = current_time_int;
         }
 
         protected void OnUpdateGameOver(int current_time_int)
@@ -363,18 +320,6 @@ namespace Combat
 
         protected virtual void OnUpdateEnding(int current_time_int)
         {
-        }
-        #endregion
-
-        #region 暂停
-        protected virtual void OnSuspend()
-        {
-            m_render_world.OnSuspend();
-        }
-
-        protected virtual void OnResume()
-        {
-            m_render_world.OnResume();
         }
         #endregion
 

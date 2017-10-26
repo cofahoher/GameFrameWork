@@ -87,14 +87,6 @@ namespace Combat
             return 0L;
         }
 
-        public void Suspend(FixPoint suspending_time)
-        {
-        }
-
-        public void Resume()
-        {
-        }
-
         public void OnGameOver(GameResult game_result)
         {
             UnityEngine.Debug.LogError("测试同步模型：Server GameOver, CRC = " + m_logic_world.GetCRC());

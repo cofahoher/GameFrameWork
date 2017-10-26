@@ -163,22 +163,6 @@ namespace Combat
         }
         #endregion
 
-        #region 暂停
-        public virtual void OnSuspend()
-        {
-            UnityEngine.Time.timeScale = 0f;
-        }
-
-        public virtual void OnResume()
-        {
-            UnityEngine.Time.timeScale = 1f;
-        }
-
-        public virtual void OnUpdateSuspending(int delta_ms, int current_time_ms)
-        {
-        }
-        #endregion
-
         #region GeneralComposableObject
         protected override RenderWorld GetSelf()
         {

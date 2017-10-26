@@ -102,14 +102,6 @@ namespace Combat
         {
             return 0L;
         }
-
-        public void Suspend(FixPoint suspending_time)
-        {
-        }
-
-        public void Resume()
-        {
-        }
         #endregion
 
         public void OnUpdate(int current_time_int)
