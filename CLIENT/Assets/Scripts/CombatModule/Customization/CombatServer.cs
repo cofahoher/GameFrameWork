@@ -102,6 +102,14 @@ namespace Combat
         {
             return 0L;
         }
+
+        public void Suspend()
+        {
+        }
+
+        public void Resume()
+        {
+        }
         #endregion
 
         public void OnUpdate(int current_time_int)

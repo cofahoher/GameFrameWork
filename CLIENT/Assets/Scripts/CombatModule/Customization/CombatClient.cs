@@ -43,14 +43,15 @@ namespace Combat
 
         public virtual void Destruct()
         {
-            m_combat_factory = null;
-            m_level_data = null;
             m_sync_client.Destruct();
             m_sync_client = null;
             m_render_world.Destruct();
             m_render_world = null;
             m_logic_world.Destruct();
             m_logic_world = null;
+
+            m_combat_factory = null;
+            m_level_data = null;
         }
 
         #region GETTER
@@ -208,6 +209,16 @@ namespace Combat
         public long GetLocalPlayerPstid()
         {
             return m_local_player_pstid;
+        }
+
+        public void Suspend()
+        {
+            m_render_world.OnSuspend();
+        }
+
+        public void Resume()
+        {
+            m_render_world.OnResume();
         }
 
         public virtual void OnDisconnected()

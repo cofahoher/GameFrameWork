@@ -332,6 +332,13 @@ namespace Combat
         }
         #endregion
 
+        #region 暂停
+        public void Suspend(FixPoint suspending_time)
+        {
+            m_outside_world.Suspend();
+        }
+        #endregion
+
         #region RenderMessage
         public bool CanGenerateRenderMessage()
         {
