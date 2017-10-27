@@ -332,6 +332,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\SummonedEntityComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Component\TargetingComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\Entity.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityCategorySystem.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityComponent.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityManager.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\Entity\EntityUtil.cs" />
