@@ -165,7 +165,7 @@ namespace Combat
 
         protected virtual void OnAllResourceCached()
         {
-            m_render_world.OnUpdate(0, 0);
+            m_render_world.OnUpdate(0);
             m_state = CombatClientState.Loaded;
             m_state_frame_cnt = 0;
             m_state_start_time = -1;
@@ -271,7 +271,7 @@ namespace Combat
         {
             if (m_state_frame_cnt == 0)
             {
-                m_render_world.OnUpdate(0, 0);
+                m_render_world.OnUpdate(0);
             }
             else if (m_state_frame_cnt == 1)
             {
@@ -304,7 +304,7 @@ namespace Combat
                 LogWrapper.LogInfo("CombatClient.OnUpdateRunning, delta_ms = ", delta_ms);
 #endif
             m_sync_client.Update(current_time_int);
-            m_render_world.OnUpdate(delta_ms, current_time_int);
+            m_render_world.OnUpdate(current_time_int);
             List<Command> commands = m_sync_client.GetOutputCommands();
             if (commands.Count > 0)
             {

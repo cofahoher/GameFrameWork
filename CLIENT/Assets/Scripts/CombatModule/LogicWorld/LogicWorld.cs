@@ -217,6 +217,10 @@ namespace Combat
         {
             get { return m_current_frame; }
         }
+        public int TotalUpdateTime
+        {
+            get { return (int)(m_total_update_time * FixPoint.Thousand); }
+        }
         public bool IsSuspending
         {
             get { return m_next_resume_time > m_total_update_time; }
@@ -319,14 +323,17 @@ namespace Combat
         public virtual bool OnUpdate(int delta_ms)
         {
             FixPoint delta_time = new FixPoint(delta_ms) / FixPoint.Thousand;
+            bool previous_suspending = IsSuspending;
             m_total_update_time += delta_time;
-            if (m_total_update_time < m_next_resume_time)
+            if (IsSuspending)
             {
             }
             else
             {
                 m_current_time += delta_time;
                 ++m_current_frame;
+                if (previous_suspending)
+                    m_outside_world.Resume();
                 m_region_callback_manager.OnUpdate(delta_ms);
                 m_scheduler.Update(m_current_time);
                 UpdateGeneralComponent(delta_time, m_current_time);
@@ -367,10 +374,10 @@ namespace Combat
         #region 暂停
         public void Suspend(FixPoint suspending_time)
         {
+            m_outside_world.Suspend();
             m_current_suspending_start_time = m_total_update_time;
             m_next_resume_time = m_current_suspending_start_time + suspending_time;
             m_total_suspending_time += suspending_time;
-            m_outside_world.Suspend();
         }
         #endregion
 

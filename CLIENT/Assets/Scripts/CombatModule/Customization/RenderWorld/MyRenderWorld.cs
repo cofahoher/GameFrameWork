@@ -58,7 +58,7 @@ namespace Combat
         }
         #endregion
 
-        public override void OnUpdate(int delta_ms, int current_time)
+        public override void OnUpdate(int current_time)
         {
 #if UNITY_EDITOR
             MousePick();
@@ -66,7 +66,7 @@ namespace Combat
 #else
             MobilePick();
 #endif
-            base.OnUpdate(delta_ms, current_time);
+            base.OnUpdate(current_time);
         }
 
         #region 测试操作：点选Entity和键盘控制

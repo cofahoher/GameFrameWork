@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 namespace Combat
 {
-    public class RenderWorld : GeneralComposableObject<RenderWorld, int>, IRenderWorld, IDestruct
+    public class RenderWorld : GeneralComposableObject<RenderWorld, FixPoint>, IRenderWorld, IDestruct
     {
         public static Vector3 Vector3FP_To_Vector3(Vector3FP v3fp)
         {
@@ -27,6 +27,7 @@ namespace Combat
 
         protected List<string> m_loading_scenes = new List<string>();
         protected FixPoint m_current_time = FixPoint.Zero;
+        FixPoint m_total_update_time = FixPoint.Zero;
         protected CombatClient m_combat_client;
         protected LogicWorld m_logic_world;
         protected RenderEntityManager m_render_entity_manager;
@@ -140,19 +141,36 @@ namespace Combat
             m_current_time = FixPoint.Zero;
         }
 
-        public virtual void OnUpdate(int delta_ms, int current_time_ms)
+        public virtual void OnUpdate(int current_time_ms)
         {
-            m_current_time = new FixPoint(current_time_ms) / FixPoint.Thousand;
-            UpdateMovingEntities();
-            ProcessRenderMessages();
-            m_scheduler.Update(m_current_time);
-            UpdateGeneralComponent(delta_ms, current_time_ms);
+            FixPoint current_time = new FixPoint(current_time_ms) / FixPoint.Thousand;
+            if (m_logic_world.IsSuspending)
+            {
+                FixPoint delta_time = current_time - m_total_update_time;
+                if (delta_time < FixPoint.Zero)
+                    return;
+                m_total_update_time = current_time;
+                OnUpdateSuspending(delta_time);
+            }
+            else
+            {
+                m_total_update_time = current_time;
+                current_time -= m_logic_world.SuspendedTime;
+                FixPoint delta_time = current_time - m_current_time;
+                if (delta_time < FixPoint.Zero)
+                    return;
+                m_current_time = current_time;
+                UpdateMovingEntities();
+                ProcessRenderMessages();
+                m_scheduler.Update(m_current_time);
+                UpdateGeneralComponent(delta_time, current_time);
+            }
         }
 
         protected void ProcessRenderMessages()
         {
             List<RenderMessage> msgs = m_logic_world.GetAllRenderMessages();
-            if(msgs == null)
+            if (msgs == null)
                 return;
             int count = msgs.Count;
             if (count == 0)
@@ -166,6 +184,7 @@ namespace Combat
         #region 暂停
         public virtual void OnSuspend()
         {
+            OnUpdate(m_logic_world.TotalUpdateTime);
             UnityEngine.Time.timeScale = 0f;
         }
 
@@ -174,7 +193,7 @@ namespace Combat
             UnityEngine.Time.timeScale = 1f;
         }
 
-        public virtual void OnUpdateSuspending(int delta_ms, int current_time_ms)
+        public virtual void OnUpdateSuspending(FixPoint delta_time)
         {
         }
         #endregion
@@ -185,7 +204,7 @@ namespace Combat
             return this;
         }
         #endregion
-        
+
         #region 移动物体
         protected List<ModelComponent> m_moving_entities = new List<ModelComponent>();
         public void RegisterMovingEntity(ModelComponent model_component)
