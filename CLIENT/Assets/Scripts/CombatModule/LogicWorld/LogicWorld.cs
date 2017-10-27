@@ -51,6 +51,11 @@ namespace Combat
         protected bool m_collapsing = false;
         protected TaskScheduler<LogicWorld> m_scheduler;
 
+        FixPoint m_total_update_time = FixPoint.Zero;
+        FixPoint m_total_suspending_time = FixPoint.Zero;
+        FixPoint m_current_suspending_start_time = FixPoint.Zero;
+        FixPoint m_next_resume_time = FixPoint.Zero;
+
         protected IDGenerator m_signal_listener_id_generator;
         protected IDGenerator m_attribute_modifier_id_generator;
         protected IDGenerator m_damage_modifier_id_generator;
@@ -188,7 +193,7 @@ namespace Combat
 
             m_command_handler.Destruct();
             m_command_handler = null;
-            
+
             m_active_behavior_trees.Clear();
 
             DestroyAllGeneralComponent();
@@ -211,6 +216,25 @@ namespace Combat
         public int CurrentFrame
         {
             get { return m_current_frame; }
+        }
+        public bool IsSuspending
+        {
+            get { return m_next_resume_time > m_total_update_time; }
+        }
+        public FixPoint CurrentSuspendingStartTime
+        {
+            get { return m_current_suspending_start_time; }
+        }
+        public FixPoint SuspendedTime
+        {
+            get
+            {
+                FixPoint delta = m_next_resume_time - m_total_update_time;
+                if (delta > FixPoint.Zero)
+                    return m_total_suspending_time - delta;
+                else
+                    return m_total_suspending_time;
+            }
         }
         public FixPoint GetCurrentTime()
         {
@@ -268,6 +292,7 @@ namespace Combat
         {
             return m_faction_manager;
         }
+
         public TargetGatheringManager GetTargetGatheringManager()
         {
             return m_target_gathering_manager;
@@ -294,11 +319,18 @@ namespace Combat
         public virtual bool OnUpdate(int delta_ms)
         {
             FixPoint delta_time = new FixPoint(delta_ms) / FixPoint.Thousand;
-            m_current_time += delta_time;
-            ++m_current_frame;
-            m_region_callback_manager.OnUpdate(delta_ms);
-            m_scheduler.Update(m_current_time);
-            UpdateGeneralComponent(delta_time, m_current_time);
+            m_total_update_time += delta_time;
+            if (m_total_update_time < m_next_resume_time)
+            {
+            }
+            else
+            {
+                m_current_time += delta_time;
+                ++m_current_frame;
+                m_region_callback_manager.OnUpdate(delta_ms);
+                m_scheduler.Update(m_current_time);
+                UpdateGeneralComponent(delta_time, m_current_time);
+            }
             return m_game_over;
         }
 
@@ -335,6 +367,9 @@ namespace Combat
         #region 暂停
         public void Suspend(FixPoint suspending_time)
         {
+            m_current_suspending_start_time = m_total_update_time;
+            m_next_resume_time = m_current_suspending_start_time + suspending_time;
+            m_total_suspending_time += suspending_time;
             m_outside_world.Suspend();
         }
         #endregion
