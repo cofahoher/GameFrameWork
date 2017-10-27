@@ -154,12 +154,18 @@ namespace Combat
             }
             else
             {
-                m_total_update_time = current_time;
+                FixPoint backup = current_time;
                 current_time -= m_logic_world.SuspendedTime;
                 FixPoint delta_time = current_time - m_current_time;
                 if (delta_time < FixPoint.Zero)
-                    return;
-                m_current_time = current_time;
+                {
+                    delta_time = FixPoint.Zero;
+                }
+                else
+                {
+                    m_current_time = current_time;
+                    m_total_update_time = backup;
+                }
                 UpdateMovingEntities();
                 ProcessRenderMessages();
                 m_scheduler.Update(m_current_time);

@@ -30,8 +30,16 @@ namespace Combat
 
         public bool IsCategory(int category)
         {
-            if (m_category_1 == category || m_category_2 == category || m_category_3 == category)
-                return true;
+            EntityCategorySystem category_system = EntityCategorySystem.Instance;
+            if (m_category_1 != 0)
+                if (category_system.IsCategory(m_category_1, category))
+                    return true;
+            if (m_category_2 != 0)
+                if (category_system.IsCategory(m_category_2, category))
+                    return true;
+            if (m_category_3 != 0)
+                if (category_system.IsCategory(m_category_3, category))
+                    return true;
             return false;
         }
     }
