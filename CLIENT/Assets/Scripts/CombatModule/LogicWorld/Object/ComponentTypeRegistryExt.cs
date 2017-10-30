@@ -434,6 +434,8 @@ namespace Combat
                 m_height = FixPoint.Parse(value);
             if (variables.TryGetValue("base_rotatable", out value))
                 m_base_rotatable = bool.Parse(value);
+            if (variables.TryGetValue("head_rotatable", out value))
+                m_head_rotatable = bool.Parse(value);
             if (variables.TryGetValue("collision_sender", out value))
                 m_collision_sender = bool.Parse(value);
             if (variables.TryGetValue("visible", out value))
@@ -524,6 +526,11 @@ namespace Combat
         public bool BaseRotatable
         {
             get { return m_base_rotatable; }
+        }
+
+        public bool HeadRotatable
+        {
+            get { return m_head_rotatable; }
         }
 
         public bool Visible

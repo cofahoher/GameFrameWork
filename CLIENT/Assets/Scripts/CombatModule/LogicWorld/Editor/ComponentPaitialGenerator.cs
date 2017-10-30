@@ -111,6 +111,7 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("radius", "VID_Radius", "m_radius")
                 .REGISTER_VARIABLE<FixPoint>("height", "VID_Height", "m_height")
                 .REGISTER_VARIABLE<bool>("base_rotatable", "VID_BaseRotatable", "m_base_rotatable", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("head_rotatable", "VID_HeadRotatable", "m_head_rotatable", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("collision_sender", null, "m_collision_sender")
                 .REGISTER_VARIABLE<bool>("visible", "VID_Visible", "m_visible", Flag_Attribute_Get);
             REGISTER_COMPONENT<ProjectileComponent>()

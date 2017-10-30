@@ -33,6 +33,7 @@ namespace Combat
         FixPoint m_radius = FixPoint.Zero;
         FixPoint m_height = FixPoint.One;
         bool m_base_rotatable = true;
+        bool m_head_rotatable = false;
         bool m_collision_sender = true;
         bool m_visible = true;
 
@@ -113,7 +114,7 @@ namespace Combat
             {
                 if (IsRotatingDisabled)
                     return;
-                if (!m_base_rotatable)
+                if (m_head_rotatable)
                 {
                     m_head_angle = value;
                     SendChangeDirectionRenderMessage();
@@ -125,14 +126,7 @@ namespace Combat
         {
             get
             {
-                if (m_base_rotatable)
-                {
-                    return m_base_angle;
-                }
-                else
-                {
-                    return m_base_angle + m_head_angle;
-                }
+                return m_base_angle + m_head_angle;
             }
             set
             {
@@ -229,13 +223,11 @@ namespace Combat
             if (IsRotatingDisabled)
                 return;
             if (m_base_rotatable)
-            {
                 m_base_angle = angle;
-            }
-            else
-            {
+            else if (m_head_rotatable)
                 m_head_angle = angle - m_base_angle;
-            }
+            else
+                return;
             if (!from_command || !GetOwnerPlayer().IsLocal)
                 SendChangeDirectionRenderMessage();
         }
