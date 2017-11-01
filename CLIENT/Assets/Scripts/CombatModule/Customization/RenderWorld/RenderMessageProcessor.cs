@@ -38,6 +38,9 @@ namespace Combat
                 case RenderMessageType.ChangeDirection:
                     ProcessRenderMessage_ChangeDirection(msg as ChangeDirectionRenderMessage);
                     break;
+                case RenderMessageType.ChangePosition:
+                    ProcessRenderMessage_ChangePosition(msg as ChangePositionRenderMessage);
+                    break;
                 case RenderMessageType.CreateEntity:
                     ProcessRenderMessage_CreateEntity(msg.EntityID);
                     break;
@@ -186,6 +189,25 @@ namespace Combat
             model_component.UpdateAngle();
         }
 
+        void ProcessRenderMessage_ChangePosition(ChangePositionRenderMessage msg)
+        {
+            RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
+            if (render_entity == null)
+                return;
+            PredictLogicComponent predic_component = render_entity.GetComponent(PredictLogicComponent.ID) as PredictLogicComponent;
+            if (predic_component != null)
+            {
+                if (msg.m_micro_adjusting && predic_component.HasMovementPredict)
+                    return;
+                else
+                    predic_component.ClearAllPrediction();
+            }
+            ModelComponent model_component = render_entity.GetComponent<ModelComponent>();
+            if (model_component == null)
+                return;
+            model_component.UpdatePosition();
+        }
+
         void ProcessRenderMessage_ChangeHealth(ChangeHealthRenderMessage msg)
         {
             RenderEntity render_entity = m_render_entity_manager.GetObject(msg.EntityID);
@@ -209,6 +231,9 @@ namespace Combat
             if (render_entity == null)
                 return;
             render_entity.Hide = true;
+            PredictLogicComponent predict_component = render_entity.GetComponent<PredictLogicComponent>();
+            if (predict_component != null)
+                predict_component.ClearAllPrediction();
         }
 
         void ProcessRenderMessage_Show(int entity_id)

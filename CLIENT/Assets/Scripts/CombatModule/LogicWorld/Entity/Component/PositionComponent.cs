@@ -285,7 +285,7 @@ namespace Combat
 
 #if COMBAT_CLIENT
             ChangePositionRenderMessage msg = RenderMessage.Create<ChangePositionRenderMessage>();
-            msg.Construct(GetOwnerEntityID(), m_current_position);
+            msg.Construct(GetOwnerEntityID(), m_current_position, true);
             GetLogicWorld().AddRenderMessage(msg);
 #endif
         }

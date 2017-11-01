@@ -12,10 +12,10 @@ namespace Combat
         public const int WaitCopy = 1;
         public const int DoCopy = 2;
         //配置数据
-        float m_max_predict_time = 0.5f;
-        float m_interpolation_speed = 0.5f;
-        float m_min_threshold = 0.2f;
-        float m_max_threshold = 3f;
+        const float m_max_predict_time = 0.5f;
+        const float m_interpolation_speed = 0.5f;
+        const float m_min_threshold = 0.2f;
+        const float m_max_threshold = 3f;
         //运行数据
         Transform m_interpolation_tr;
         ModelComponent m_model_component;
@@ -46,6 +46,21 @@ namespace Combat
 
         protected override void OnDestruct()
         {
+            for (int i = 0; i < m_movement_predicts.Count; ++i)
+            {
+                MovementPredict predict = m_movement_predicts[i];
+                RecyclableObject.Recycle(predict);
+            }
+            m_movement_predicts.Clear();
+        }
+
+        public void ClearAllPrediction()
+        {
+            m_interpolation_tr.localPosition = Vector3.zero;
+            m_copy_state = NoCopy;
+            m_accumulated_offset = Vector3.zero;
+            m_offset_dir = Vector3.zero;
+            m_interpolation_time = -1f;
             for (int i = 0; i < m_movement_predicts.Count; ++i)
             {
                 MovementPredict predict = m_movement_predicts[i];

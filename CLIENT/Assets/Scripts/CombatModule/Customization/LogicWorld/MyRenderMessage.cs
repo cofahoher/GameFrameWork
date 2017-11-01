@@ -115,22 +115,25 @@ namespace Combat
     public class ChangePositionRenderMessage : RenderMessage
     {
         public Vector3FP m_new_position;
+        public bool m_micro_adjusting = false;
 
         public ChangePositionRenderMessage()
         {
             m_type = RenderMessageType.ChangePosition;
         }
 
-        public void Construct(int entity_id, Vector3FP new_position)
+        public void Construct(int entity_id, Vector3FP new_position, bool micro_adjusting = false)
         {
             m_entity_id = entity_id;
             m_new_position = new_position;
+            m_micro_adjusting = micro_adjusting;
         }
 
         public override void Reset()
         {
             m_entity_id = -1;
             m_new_position.MakeZero();
+            m_micro_adjusting = false;
         }
     }
 
