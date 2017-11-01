@@ -20,7 +20,7 @@ namespace Combat
         int MAX_X_INDEX = 0;
         int MAX_Z_INDEX = 0;
 
-        List<int> m_collection = new List<int>();
+        List<PositionComponent> m_collection = new List<PositionComponent>();
         int m_min_x;
         int m_max_x;
         int m_min_z;
@@ -44,6 +44,7 @@ namespace Combat
 
         public void Destruct()
         {
+            m_collection.Clear();
             for (int x = 0; x <= MAX_X_INDEX; ++x)
             {
                 for (int z = 0; z <= MAX_Z_INDEX; ++z)
@@ -147,7 +148,7 @@ namespace Combat
         }
         #endregion
 
-        public List<int> CollectEntity_All(int exclude_id)
+        public List<PositionComponent> CollectEntity_All(int exclude_id)
         {
             m_collection.Clear();
             Cell cell;
@@ -163,14 +164,14 @@ namespace Combat
                         int id = cmp.GetOwnerEntityID();
                         if (id == exclude_id)
                             continue;
-                        m_collection.Add(id);
+                        m_collection.Add(cmp);
                     }
                 }
             }
             return m_collection;
         }
 
-        public List<int> CollectEntity_ForwardRectangle(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
+        public List<PositionComponent> CollectEntity_ForwardRectangle(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
         {
             m_collection.Clear();
             Vector2FP start_position = new Vector2FP(position);
@@ -202,14 +203,14 @@ namespace Combat
                             component = -component;
                         if (component > width + radius)
                             continue;
-                        m_collection.Add(cmp.GetOwnerEntityID());
+                        m_collection.Add(cmp);
                     }
                 }
             }
             return m_collection;
         }
 
-        public List<int> CollectEntity_SurroundingRing(Vector3FP position, FixPoint outer_radius, FixPoint inner_radius, int exclude_id)
+        public List<PositionComponent> CollectEntity_SurroundingRing(Vector3FP position, FixPoint outer_radius, FixPoint inner_radius, int exclude_id)
         {
             m_collection.Clear();
             Vector2FP start_position = new Vector2FP(position.x - outer_radius, position.z - outer_radius);
@@ -233,14 +234,14 @@ namespace Combat
                             continue;
                         if (inner_radius > FixPoint.Zero && distance <= (inner_radius - cmp.Radius))
                             continue;
-                        m_collection.Add(cmp.GetOwnerEntityID());
+                        m_collection.Add(cmp);
                     }
                 }
             }
             return m_collection;
         }
 
-        public List<int> CollectEntity_ForwardSector(Vector3FP position, Vector2FP facing, FixPoint radius, FixPoint degree, int exclude_id)
+        public List<PositionComponent> CollectEntity_ForwardSector(Vector3FP position, Vector2FP facing, FixPoint radius, FixPoint degree, int exclude_id)
         {
             FixPoint cos = FixPoint.Cos(FixPoint.Degree2Radian(degree >> 1));
             m_collection.Clear();
@@ -269,7 +270,7 @@ namespace Combat
                             continue;
                         if (to_target.Dot(ref facing) < cos)
                             continue;
-                        m_collection.Add(cmp.GetOwnerEntityID());
+                        m_collection.Add(cmp);
                     }
                 }
             }

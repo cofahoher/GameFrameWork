@@ -7,7 +7,7 @@ namespace Combat
     {
         LogicWorld m_logic_world;
         public List<PositionComponent> m_entities = new List<PositionComponent>();
-        List<int> m_collection = new List<int>();
+        List<PositionComponent> m_collection = new List<PositionComponent>();
 
         public SpaceWithoutPartition(LogicWorld logic_world)
         {
@@ -16,6 +16,7 @@ namespace Combat
 
         public void Destruct()
         {
+            m_collection.Clear();
             m_entities.Clear();
             m_logic_world = null;
         }
@@ -34,7 +35,7 @@ namespace Combat
         {
         }
 
-        public List<int> CollectEntity_All(int exclude_id)
+        public List<PositionComponent> CollectEntity_All(int exclude_id)
         {
             m_collection.Clear();
             PositionComponent cmp;
@@ -44,12 +45,12 @@ namespace Combat
                 int id = cmp.GetOwnerEntityID();
                 if (id == exclude_id)
                     continue;
-                m_collection.Add(id);
+                m_collection.Add(cmp);
             }
             return m_collection;
         }
 
-        public List<int> CollectEntity_ForwardRectangle(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
+        public List<PositionComponent> CollectEntity_ForwardRectangle(Vector3FP position, Vector2FP direction, FixPoint length, FixPoint width, int exclude_id)
         {
             m_collection.Clear();
             Vector2FP side = direction.Perpendicular();
@@ -72,12 +73,12 @@ namespace Combat
                     component = -component;
                 if (component > width + radius)
                     continue;
-                m_collection.Add(cmp.GetOwnerEntityID());
+                m_collection.Add(cmp);
             }
             return m_collection;
         }
 
-        public List<int> CollectEntity_SurroundingRing(Vector3FP position, FixPoint outer_radius, FixPoint inner_radius, int exclude_id)
+        public List<PositionComponent> CollectEntity_SurroundingRing(Vector3FP position, FixPoint outer_radius, FixPoint inner_radius, int exclude_id)
         {
             m_collection.Clear();
             PositionComponent cmp;
@@ -92,12 +93,12 @@ namespace Combat
                     continue;
                 if (inner_radius > FixPoint.Zero && distance <= (inner_radius - cmp.Radius))
                     continue;
-                m_collection.Add(cmp.GetOwnerEntityID());
+                m_collection.Add(cmp);
             }
             return m_collection;
         }
 
-        public List<int> CollectEntity_ForwardSector(Vector3FP position, Vector2FP facing, FixPoint radius, FixPoint degree, int exclude_id)
+        public List<PositionComponent> CollectEntity_ForwardSector(Vector3FP position, Vector2FP facing, FixPoint radius, FixPoint degree, int exclude_id)
         {
             FixPoint cos = FixPoint.Cos(FixPoint.Degree2Radian(degree >> 1));
             m_collection.Clear();
@@ -117,7 +118,7 @@ namespace Combat
                     continue;
                 if (to_target.Dot(ref facing) < cos)
                     continue;
-                m_collection.Add(cmp.GetOwnerEntityID());
+                m_collection.Add(cmp);
             }
             return m_collection;
         }

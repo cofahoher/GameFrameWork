@@ -130,19 +130,16 @@ namespace Combat
         {
             if (partition == null)
                 return;
-            List<int> list = partition.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, GetOwnerEntityID());
+            List<PositionComponent> list = partition.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, GetOwnerEntityID());
             if (list.Count == 0)
                 return;
-            EntityManager entity_manager = GetLogicWorld().GetEntityManager();
             for (int i = 0; i < list.Count; ++i)
             {
-                if (m_collided_targets.Contains(list[i]))
+                PositionComponent position_component = list[i];
+                Entity entity = position_component.GetOwnerEntity();
+                if (m_collided_targets.Contains(entity.ID))
                     continue;
-                m_collided_targets.Add(list[i]);
-                Entity entity = entity_manager.GetObject(list[i]);
-                if (entity == null)
-                    continue;
-                PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
+                m_collided_targets.Add(entity.ID);
                 if (position_component.Height <= FixPoint.Zero) //ZZWTODO
                     continue;
                 if (!FactionRelation.IsFactionSatisfied(GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()), FactionRelation.NotAlly))

@@ -245,23 +245,20 @@ namespace Combat
         {
             if (partition == null)
                 return false;
-            List<int> list = partition.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, m_param.m_source_entity_id);
+            List<PositionComponent> list = partition.CollectEntity_SurroundingRing(position, radius, FixPoint.Zero, m_param.m_source_entity_id);
             if (list.Count == 0)
                 return false;
-            EntityManager entity_manager = GetLogicWorld().GetEntityManager();
             for (int i = 0; i < list.Count; ++i)
             {
+                PositionComponent position_component = list[i];
+                Entity entity = position_component.GetOwnerEntity();
                 if (m_pierce_entity)
                 {
-                    if (m_effected_entities.Contains(list[i]))
+                    if (m_effected_entities.Contains(entity.ID))
                         continue;
                     else
-                        m_effected_entities.Add(list[i]);
+                        m_effected_entities.Add(entity.ID);
                 }
-                Entity entity = entity_manager.GetObject(list[i]);
-                if (entity == null)
-                    continue;
-                PositionComponent position_component = entity.GetComponent(PositionComponent.ID) as PositionComponent;
                 if (position_component.Height <= FixPoint.Zero) //ZZWTODO
                     continue;
                 if (!FactionRelation.IsFactionSatisfied(GetOwnerPlayer().GetFaction(entity.GetOwnerPlayerID()), m_collision_faction))
