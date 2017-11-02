@@ -105,7 +105,7 @@ namespace Combat
             {
                 if (m_definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalTarget)
                 {
-                    int specified_target_id = m_definition_component.SpecifiedTargetID;
+                    int specified_target_id = m_definition_component.ExternalID;
                     if (specified_target_id > 0)
                     {
                         Target target = RecyclableObject.Create<Target>();
@@ -166,12 +166,12 @@ namespace Combat
         #endregion
 
         #region 技能流程
-        public bool CanActivate()
+        public bool CanActivate(bool just_test = true)
         {
-            return CheckActivate() == CastSkillResult.Success;
+            return CheckActivate(just_test) == CastSkillResult.Success;
         }
 
-        CastSkillResult CheckActivate()
+        CastSkillResult CheckActivate(bool just_test)
         {
             if (!IsReady())
                 return CastSkillResult.InCooldown;
@@ -189,11 +189,24 @@ namespace Combat
                     return CastSkillResult.NotEnoughMana;
             }
 
-            if (!m_definition_component.CanActivateWhileMoving)
+            bool built_targets = false;
+
+            LocomotorComponent locomotor_cmp = m_owner_component.GetLocomotorComponent();
+            if (locomotor_cmp != null && locomotor_cmp.IsMoving)
             {
-                LocomotorComponent locomotor_cmp = GetOwnerEntity().GetComponent(LocomotorComponent.ID) as LocomotorComponent;
-                if (locomotor_cmp != null && locomotor_cmp.IsMoving)
+                if (!m_definition_component.CanActivateWhileMoving)
                     return CastSkillResult.ObjectIsMoving;
+                if (just_test && m_definition_component.MovingActivatingMustHaveTarget)
+                {
+                    if (!built_targets)
+                    {
+                        BuildSkillTargets();
+                        built_targets = true;
+                    }
+                    if (m_skill_targets.Count == 0)
+                        return CastSkillResult.NotEnoughTargets;
+                }
+
             }
 
             if (m_definition_component.ExternalDataType == SkillDefinitionComponent.NeedExternalOffset)
@@ -204,8 +217,11 @@ namespace Combat
 
             if (m_definition_component.TargetsMinCountForActivate > 0)
             {
-                BuildSkillTargets();
-                //ZZWTODO clear targets?
+                if (!built_targets)
+                {
+                    BuildSkillTargets();
+                    built_targets = true;
+                }
                 if (m_skill_targets.Count < m_definition_component.TargetsMinCountForActivate)
                     return CastSkillResult.NotEnoughTargets;
             }
@@ -254,7 +270,7 @@ namespace Combat
 
             if (external_data_type == SkillDefinitionComponent.NeedExternalTarget)
             {
-                Entity target = GetLogicWorld().GetEntityManager().GetObject(m_definition_component.SpecifiedTargetID);
+                Entity target = GetLogicWorld().GetEntityManager().GetObject(m_definition_component.ExternalID);
                 if (target != null)
                 {
                     PositionComponent owner_position_component = GetOwnerEntity().GetComponent(PositionComponent.ID) as PositionComponent;
@@ -300,13 +316,13 @@ namespace Combat
 
         public bool Activate(FixPoint start_time)
         {
-            if (!CanActivate())
+            if (!CanActivate(false))
                 return false;
 
             Deactivate(false);
 
             AdjustDirection();
-            
+
             SetSkillActive(true);
 
             var enumerator = m_components.GetEnumerator();
@@ -391,10 +407,11 @@ namespace Combat
                     msg.Construct(GetOwnerEntityID(), main_animation, m_definition_component.m_expiration_animation, true, speed);
                 GetLogicWorld().AddRenderMessage(msg);
             }
-            if (m_definition_component.m_main_render_effect_cfgid > 0)
+            int render_effect_cfgid = m_definition_component.GetMainRenderEffectConfigID();
+            if (render_effect_cfgid > 0)
             {
                 PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
-                msg.ConstructAsPlay(GetOwnerEntityID(), m_definition_component.m_main_render_effect_cfgid, FixPoint.MinusOne);
+                msg.ConstructAsPlay(GetOwnerEntityID(), render_effect_cfgid, FixPoint.MinusOne);
                 GetLogicWorld().AddRenderMessage(msg);
             }
             if (m_definition_component.m_main_sound > 0)
@@ -444,10 +461,11 @@ namespace Combat
             SetSkillActive(false);
 
 #if COMBAT_CLIENT
-            if (m_definition_component.m_main_render_effect_cfgid > 0)
+            int render_effect_cfgid = m_definition_component.GetMainRenderEffectConfigID();
+            if (render_effect_cfgid > 0)
             {
                 PlayRenderEffectMessage msg = RenderMessage.Create<PlayRenderEffectMessage>();
-                msg.ConstructAsStop(GetOwnerEntityID(), m_definition_component.m_main_render_effect_cfgid);
+                msg.ConstructAsStop(GetOwnerEntityID(), render_effect_cfgid);
                 GetLogicWorld().AddRenderMessage(msg);
             }
 #endif

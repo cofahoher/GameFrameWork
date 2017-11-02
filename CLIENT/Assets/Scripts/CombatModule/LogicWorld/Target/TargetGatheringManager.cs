@@ -24,6 +24,9 @@ namespace Combat
         public static readonly int All = (int)CRC.Calculate("All");
 
         //随机排序
+        public static readonly int SortByRandom = (int)CRC.Calculate("Random");
+        public static readonly int SortByHealth = (int)CRC.Calculate("Health");
+        public static readonly int SortByDistance = (int)CRC.Calculate("Distance");
     }
 
     public class TargetGatheringParam

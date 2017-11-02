@@ -43,6 +43,7 @@ namespace Combat
         bool m_blocks_rotating_when_active = true;
         bool m_deactivate_when_moving = true;
         bool m_can_activate_while_moving = true;
+        bool m_moving_activating_must_have_target = false;
         bool m_can_activate_when_disabled = false;
 
         public TargetGatheringParam m_target_gathering_param = new TargetGatheringParam();
@@ -77,8 +78,9 @@ namespace Combat
         //运行数据
         List<SkillTimer> m_timers = new List<SkillTimer>();
         Vector3FP m_external_vector;
-        int m_specified_target_id = 0;
+        int m_external_id = 0;
         public List<string> m_main_animation_names;
+        int m_random_index = 0;
 
         #region GETTER
         public Vector3FP ExternalVector
@@ -87,10 +89,10 @@ namespace Combat
             set { m_external_vector = value; }
         }
 
-        public int SpecifiedTargetID
+        public int ExternalID
         {
-            get { return m_specified_target_id; }
-            set { m_specified_target_id = value; }
+            get { return m_external_id; }
+            set { m_external_id = value; }
         }
 
         public string GenerateMainActionNameLogicly()
@@ -106,8 +108,16 @@ namespace Combat
                     m_main_animation_names.Add(m_main_animation + '_' + index);
                 }
             }
-            int random_index = GetLogicWorld().GetRandomGeneratorI().RandBetween(0, m_main_animation_count - 1);
-            return m_main_animation_names[random_index];
+            m_random_index = GetLogicWorld().GetRandomGeneratorI().RandBetween(0, m_main_animation_count - 1);
+            return m_main_animation_names[m_random_index];
+        }
+
+        public int GetMainRenderEffectConfigID()
+        {
+            if (m_main_render_effect_cfgid != 0)
+                return m_main_render_effect_cfgid + m_random_index;
+            else
+                return 0;
         }
 
         public static readonly FixPoint MIN_ESTIMATE_TIME = FixPoint.Two / FixPoint.Ten;

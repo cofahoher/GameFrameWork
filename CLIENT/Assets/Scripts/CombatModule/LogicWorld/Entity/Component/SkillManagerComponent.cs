@@ -82,6 +82,11 @@ namespace Combat
                 return FixPoint.One / (FixPoint.One - m_cooldown_reduce_rate);
             }
         }
+
+        public LocomotorComponent GetLocomotorComponent()
+        {
+            return m_locomotor_cmp;
+        }
         #endregion
 
         #region 初始化/销毁

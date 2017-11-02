@@ -191,10 +191,10 @@ namespace Combat
             }
             if (!move_required)
             {
-                if (skill.CanActivate())
+                if (skill.CanActivate(false))
                 {
                     position_cmp.SetFacing(direction);
-                    skill.GetDefinitionComponent().SpecifiedTargetID = m_current_target.ID;
+                    skill.GetDefinitionComponent().ExternalID = m_current_target.ID;
                     skill.Activate(GetCurrentTime());
                     if (m_attack_once)
                     {

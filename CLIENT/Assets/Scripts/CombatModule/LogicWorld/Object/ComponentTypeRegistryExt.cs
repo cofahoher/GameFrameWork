@@ -833,6 +833,8 @@ namespace Combat
                 m_deactivate_when_moving = bool.Parse(value);
             if (variables.TryGetValue("can_activate_while_moving", out value))
                 m_can_activate_while_moving = bool.Parse(value);
+            if (variables.TryGetValue("moving_activating_must_have_target", out value))
+                m_moving_activating_must_have_target = bool.Parse(value);
             if (variables.TryGetValue("can_activate_when_disabled", out value))
                 m_can_activate_when_disabled = bool.Parse(value);
             if (variables.TryGetValue("gathering_type", out value))
@@ -949,6 +951,11 @@ namespace Combat
         public bool CanActivateWhileMoving
         {
             get { return m_can_activate_while_moving; }
+        }
+
+        public bool MovingActivatingMustHaveTarget
+        {
+            get { return m_moving_activating_must_have_target; }
         }
 
         public bool CanActivateWhenDisabled

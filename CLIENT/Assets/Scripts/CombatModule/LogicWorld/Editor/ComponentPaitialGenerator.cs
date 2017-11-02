@@ -190,6 +190,7 @@ namespace Combat
                 .REGISTER_VARIABLE<bool>("blocks_rotating_when_active", "VID_BlocksRotatingWhenActive", "m_blocks_rotating_when_active", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("deactivate_when_moving", "VID_DeactivateWhenMoving", "m_deactivate_when_moving", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("can_activate_while_moving", "VID_CanActivateWhileMoving", "m_can_activate_while_moving", Flag_Attribute_Get)
+                .REGISTER_VARIABLE<bool>("moving_activating_must_have_target", "VID_MovingActivatingMustHaveTarget", "m_moving_activating_must_have_target", Flag_Attribute_Get)
                 .REGISTER_VARIABLE<bool>("can_activate_when_disabled", "VID_CanActivateWhenDisabled", "m_can_activate_when_disabled", Flag_Attribute_Get)
                 .REGISTER_VARIABLE_CRC<int>("gathering_type", null, "m_target_gathering_param.m_type")
                 .REGISTER_VARIABLE<FixPoint>("gathering_param1", null, "m_target_gathering_param.m_param1")
