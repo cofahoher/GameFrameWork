@@ -149,16 +149,17 @@
     <None Include="Assets\AstarPathfindingProject\Readme_upgrading.txt" />
     <None Include="Assets\AstarPathfindingProject\link.xml" />
     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
-    <None Include="Assets\Resources\Config\AttributeConfig.xml" />
-    <None Include="Assets\Resources\Config\DamageConfig.xml" />
-    <None Include="Assets\Resources\Config\EffectCategoryConfig.xml" />
-    <None Include="Assets\Resources\Config\EffectConfig.xml" />
-    <None Include="Assets\Resources\Config\EffectGeneratorConfig.xml" />
-    <None Include="Assets\Resources\Config\LevelConfig.xml" />
-    <None Include="Assets\Resources\Config\ObjectProtoConfig.xml" />
-    <None Include="Assets\Resources\Config\ObjectTypeConfig.xml" />
-    <None Include="Assets\Resources\Config\SkillConfig.xml" />
-    <None Include="Assets\Resources\Config\StateConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\AttributeConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\DamageConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\EffectCategoryConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\EffectConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\EffectGeneratorConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\LevelConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\ObjectProtoConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\ObjectTypeConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\SkillConfig.xml" />
+    <None Include="Assets\Resources\Config\CombatModule\StateConfig.xml" />
+    <None Include="Assets\Resources\Config\ConfigContents.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

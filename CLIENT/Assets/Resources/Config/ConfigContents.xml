@@ -1,0 +1,14 @@
+<ConfigSystem>
+	<ConfigContents>
+		<ConfigItem>
+			<Name>ObjectTypeConfig</Name>
+			<Ext>.xml</Ext>
+			<Path>CombatModule</Path>
+		</ConfigItem>
+		<ConfigItem>
+			<Name>ObjectProtoConfig</Name>
+			<Ext>.xml</Ext>
+			<Path>CombatModule</Path>
+		</ConfigItem>
+	</ConfigContents>
+</ConfigSystem>
