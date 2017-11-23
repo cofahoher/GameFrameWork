@@ -22,6 +22,7 @@ namespace Combat
         public static readonly int VID_Attacker = (int)CRC.Calculate("Attacker");               //当前攻击来源
         public static readonly int VID_Defender = (int)CRC.Calculate("Defender");               //当前攻击目标
         public static readonly int VID_BaseDamage = (int)CRC.Calculate("BaseDamage");           //当前攻击初始伤害
+        public static readonly int VID_BTContext = (int)CRC.Calculate("BTContext");             //行为树
 
         public List<int> m_variable = new List<int>();
 

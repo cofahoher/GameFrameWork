@@ -26,7 +26,8 @@ namespace Combat
                 .REGISTER_VARIABLE<FixPoint>("time", "m_time");
             //Composites
             REGISTER_BTNODE<BTFor>()
-                .REGISTER_VARIABLE<int>("n", "m_n");
+                .REGISTER_VARIABLE<int>("n", "m_n")
+                .REGISTER_VARIABLE_CRC<int>("variable_id", "m_variable_id");
             REGISTER_BTNODE<BTIfElse>();
             REGISTER_BTNODE<BTParallelSelector>();
             REGISTER_BTNODE<BTParallelSequence>();

@@ -69,6 +69,8 @@ namespace Combat
             string value;
             if (variables.TryGetValue("n", out value))
                 m_n = int.Parse(value);
+            if (variables.TryGetValue("variable_id", out value))
+                m_variable_id = (int)CRC.Calculate(value);
         }
     }
 

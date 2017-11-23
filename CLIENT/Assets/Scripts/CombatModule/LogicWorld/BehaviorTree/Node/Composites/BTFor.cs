@@ -6,6 +6,7 @@ namespace Combat
     {
         //配置数据
         int m_n = 1;
+        int m_variable_id = -1;
 
         //运行数据
         int m_i = 0;
@@ -18,6 +19,7 @@ namespace Combat
             : base(prototype)
         {
             m_n = prototype.m_n;
+            m_variable_id = prototype.m_variable_id;
         }
 
         protected override void ResetRuntimeData()
@@ -38,6 +40,8 @@ namespace Combat
                 return m_status;
             }
             m_status = BTNodeStatus.Running;
+            if (m_variable_id != -1)
+                m_context.SetData(m_variable_id, (FixPoint)m_i);
             BTNodeStatus child_status = m_children[0].OnUpdate(delta_time);
             if (child_status != BTNodeStatus.Running)
             {

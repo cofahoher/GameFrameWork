@@ -13,6 +13,7 @@ namespace Combat
         public void Reset()
         {
             m_logic_world = null;
+            m_tree = null;
             m_data.Clear();
             m_data_ext.Clear();
             m_action_buffer.Clear();

@@ -186,10 +186,19 @@ namespace Combat
         {
             if (m_context == null)
                 return FixPoint.Zero;
-            IExpressionVariableProvider provider = m_context.GetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider);
-            if (provider == null)
-                return FixPoint.Zero;
-            return provider.GetVariable(variable, index);
+            int vid = variable[index];
+            if (vid == ExpressionVariable.VID_BTContext)
+            {
+                if (index + 1 == variable.MaxIndex)
+                    return m_context.GetData(variable[index + 1]);
+            }
+            else
+            {
+                IExpressionVariableProvider provider = m_context.GetData<IExpressionVariableProvider>(BTContextKey.ExpressionVariableProvider);
+                if (provider != null)
+                    return provider.GetVariable(variable, index);
+            }
+            return FixPoint.Zero;
         }
         #endregion
     }
