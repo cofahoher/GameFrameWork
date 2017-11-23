@@ -244,6 +244,7 @@
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTreeNodeTypeRegistry.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\BehaviorTreeNodeTypeRegistryExt.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Actions\BTAction.cs" />
+    <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Actions\BTAction_SetContextValue.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Actions\BTAction_StopTreeUpdate.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\Actions\BTAction_WaitSomeTime.cs" />
     <Compile Include="Assets\Scripts\CombatModule\LogicWorld\BehaviorTree\Node\BTTestGenerator.cs" />

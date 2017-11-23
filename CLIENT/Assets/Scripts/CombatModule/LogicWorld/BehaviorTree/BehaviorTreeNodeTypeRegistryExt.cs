@@ -11,6 +11,7 @@ namespace Combat
                 return;
             ms_default_btnodes_registered = true;
 
+            Register<BTAction_SetContextValue>();
             Register<BTAction_StopTreeUpdate>();
             Register<BTAction_WaitSomeTime>();
             Register<BTFor>();
@@ -40,6 +41,20 @@ namespace Combat
             Register<BTSKillAction_PlayRenderEffect>();
             Register<BTSKillAction_PlaySound>();
             Register<BTSKillAction_Spurt>();
+        }
+    }
+
+    public partial class BTAction_SetContextValue
+    {
+        public const int ID = -2050514135;
+
+        public override void InitializeVariable(Dictionary<string, string> variables)
+        {
+            string value;
+            if (variables.TryGetValue("context_key", out value))
+                m_context_key = (int)CRC.Calculate(value);
+            if (variables.TryGetValue("context_value", out value))
+                m_context_value_expression = value;
         }
     }
 
