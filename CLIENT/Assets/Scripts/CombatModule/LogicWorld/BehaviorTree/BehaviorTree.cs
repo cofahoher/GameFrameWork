@@ -25,7 +25,7 @@ namespace Combat
             : base(prototype)
         {
             m_config_id = prototype.m_config_id;
-            for (int i = 0; i > prototype.m_entries.Count; ++i)
+            for (int i = 0; i < prototype.m_entries.Count; ++i)
                 m_entries.Add(prototype.m_entries[i]);
             m_signal_datas = prototype.m_signal_datas;
             m_event_datas = prototype.m_event_datas;

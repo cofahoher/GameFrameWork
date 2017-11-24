@@ -99,6 +99,22 @@ namespace Combat
             return (T)value;
         }
         #endregion
+
+        #region 删除
+
+        public void RemoveData(int key)
+        {
+            m_data.Remove(key);
+            m_data_ext.Remove(key);
+        }
+
+        public void RemoveData(string str_key)
+        {
+            int key = (int)CRC.Calculate(str_key);//key.GetHashCode();
+            m_data.Remove(key);
+            m_data_ext.Remove(key);
+        }
+        #endregion
     }
 
     public partial class BTContextKey
