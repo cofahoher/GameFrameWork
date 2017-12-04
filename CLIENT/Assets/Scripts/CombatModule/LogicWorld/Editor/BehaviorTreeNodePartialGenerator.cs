@@ -21,6 +21,8 @@ namespace Combat
         {
             #region 独立的
             //Actions
+            REGISTER_BTNODE<BTAction_RemoveContextValue>()
+                .REGISTER_VARIABLE_CRC<int>("context_key", "m_context_key");
             REGISTER_BTNODE<BTAction_SetContextValue>()
                 .REGISTER_VARIABLE_CRC<int>("context_key", "m_context_key")
                 .REGISTER_VARIABLE<string>("context_value", "m_context_value_expression");
