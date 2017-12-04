@@ -41,7 +41,11 @@ namespace Combat
 
     public class RandomGeneratorFP : IDestruct
     {
+#if FIXPOINT_32BITS_FRACTIONAL
+        public const ulong MASK = 0x7FFFFFFFFFFFFFFF;
+#else
         public const ulong MASK = 0x00007FFFFFFFFFFF;
+#endif
         MersenneTwister64 m_mt64;
 
         public RandomGeneratorFP(int seed = 0)
