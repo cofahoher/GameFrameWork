@@ -198,5 +198,12 @@ namespace Combat
             crc = crc ^ 0xFFFFFFFF;
             return crc;
         }
+
+        public static ulong CRC64(string data, ulong crc = 0)
+        {
+            for (int i = 0; i < data.Length; ++i)
+                crc = CRC64TABLE[(crc ^ data[i]) & 0xff] ^ (crc >> 8);
+            return crc;
+        }
     }
 }
